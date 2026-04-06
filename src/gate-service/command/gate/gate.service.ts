@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CommandType } from 'src/user-service/common/types/command';
+import { CommandType } from 'src/gate-service/common/types/command';
 
 @Injectable()
 export class GateService {

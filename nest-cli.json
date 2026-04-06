@@ -18,16 +18,22 @@
   },
   "monorepo": true,
   "projects": {
-    "api-gateway": {
+    "gate-service": {
       "type": "application",
-      "root": "apps/api-gateway",
-      "entryFile": "src/user-service/main",
+      "root": "apps/gate-service",
+      "entryFile": "src/gate-service/main",
       "sourceRoot": "src"
     },
     "grpc-service": {
       "type": "application",
       "root": "apps/grpc-service",
       "entryFile": "src/grpc-service/main",
+      "sourceRoot": "src"
+    },
+    "notify-service": {
+      "type": "application",
+      "root": "apps/notify-service",
+      "entryFile": "src/notify-service/main",
       "sourceRoot": "src"
     }
   }

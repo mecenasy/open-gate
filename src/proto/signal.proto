@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package signal;
+
+// Hosted by gate-service (port 50053) — receives incoming Signal messages from notify-service
+service IncomingSignalService {
+  rpc ReceiveMessage (IncomingSignalRequest) returns (SignalAck);
+}
+
+// Hosted by notify-service (port 50052) — receives outbound send requests from gate-service
+service OutgoingSignalService {
+  rpc SendMessage          (OutgoingSignalRequest)          returns (SignalAck);
+  rpc DownloadAttachment   (DownloadAttachmentRequest)      returns (DownloadAttachmentResponse);
+}
+
+// Full SignalMessage serialized as JSON — preserves the complete, unmodified structure
+message IncomingSignalRequest {
+  string payload = 1;
+}
+
+enum SignalMessageType {
+  TEXT  = 0;
+  AUDIO = 1;
+}
+
+// Outbound message from gate-service to be sent via Signal
+message OutgoingSignalRequest {
+  string source            = 1;
+  bytes  message           = 2;
+  SignalMessageType type   = 3;
+  optional string group_name = 4;
+  optional string group_id   = 5;
+}
+
+message DownloadAttachmentRequest {
+  string attachment_id = 1;
+}
+
+message DownloadAttachmentResponse {
+  bool   success = 1;
+  bytes  data    = 2;
+  string error   = 3;
+}
+
+message SignalAck {
+  bool   success = 1;
+  string message = 2;
+}

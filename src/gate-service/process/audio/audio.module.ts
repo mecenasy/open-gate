@@ -9,4 +9,4 @@ import { GroqService } from '../services/groq.service';
   imports: [HttpModule],
   providers: [TranscriptionProcessor, SpeechProcessor, GroqService, GoogleService],
 })
-export class AudioModule { }
+export class AudioModule {}

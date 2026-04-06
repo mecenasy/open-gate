@@ -9,7 +9,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async create(userData: Omit<UserData, 'id' | 'suspended'>): Promise<User> {
     const user = this.userRepository.create(userData);

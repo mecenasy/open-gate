@@ -5,7 +5,7 @@ import { toPascalCase } from './to-pascal-case';
 const commandHandlerTemplate = (
   handlerName: string,
   noQuery: boolean = false,
-) => `import { Handler } from 'src/user-service/common/handler/handler';
+) => `import { Handler } from 'src/gate-service/common/handler/handler';
 import { QueryHandler } from '@nestjs/cqrs';
 ${noQuery ? '' : `import { ${toPascalCase(handlerName)}Query } from '../impl/${handlerName}.query';`}
 
@@ -22,7 +22,7 @@ export class ${toPascalCase(handlerName)}Handler extends Handler<${noQuery ? '' 
 export const createQueryHandler = async (modulePath: string, queryName: string, noQuery: boolean = false) => {
   const filePath = path.join(
     __dirname,
-    '../src/user-service',
+    '../src/gate-service',
     modulePath,
     'queries/handlers',
     `${queryName}.handler.ts`,

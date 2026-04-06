@@ -1,46 +1,48 @@
-import { Handler } from 'src/user-service/common/handler/handler';
+import { Inject } from '@nestjs/common';
+import { type ClientGrpc } from '@nestjs/microservices';
+import { Handler } from 'src/gate-service/common/handler/handler';
 import { CommandHandler } from '@nestjs/cqrs';
-import { NotificationAudioCommand } from '../impl/notification-audio.command';
-import { Status } from 'src/user-service/status/status';
 import { firstValueFrom } from 'rxjs';
-import { HttpService } from '@nestjs/axios';
-import { isAxiosError } from 'axios';
+import { NotificationAudioCommand } from '../impl/notification-audio.command';
+import { Status } from 'src/gate-service/status/status';
+import { NotifyGrpcKey } from 'src/gate-service/common/signal-grpc.module';
+import { OUTGOING_SIGNAL_SERVICE_NAME, OutgoingSignalServiceClient, SignalMessageType } from 'src/proto/signal';
 
 @CommandHandler(NotificationAudioCommand)
 export class NotificationAudioHandler extends Handler<NotificationAudioCommand, Status> {
-  private url = `http://signal_bridge:8080/v2/send`;
+  private notifyClient!: OutgoingSignalServiceClient;
 
-  constructor(private readonly httpService: HttpService) {
-    super();
+  @Inject(NotifyGrpcKey)
+  public readonly notifyGrpcClient!: ClientGrpc;
+
+  onModuleInit() {
+    super.onModuleInit();
+    this.notifyClient = this.notifyGrpcClient.getService<OutgoingSignalServiceClient>(OUTGOING_SIGNAL_SERVICE_NAME);
   }
+
   async execute({ audioFile, phone }: NotificationAudioCommand): Promise<Status> {
-    // TODO: dorobić pobieranie telefonu bota  z bazy i cache
     if (audioFile.length === 0) {
-      this.logger.error('BŁĄD: Bufor audio jest pustY!');
+      this.logger.error('BŁĄD: Bufor audio jest pusty!');
     }
-    const body = {
-      number: '+48608447495',
-      recipients: [phone],
-      message: '',
-      base64_attachments: [`data:audio/aac;base64,${audioFile.toString('base64')}`],
-      is_voice_note: true,
-    };
 
     try {
-      await firstValueFrom(
-        this.httpService.post(this.url, body, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      const result = await firstValueFrom(
+        this.notifyClient.sendMessage({
+          source: phone,
+          message: audioFile,
+          type: SignalMessageType.AUDIO,
         }),
       );
 
-      this.logger.log(`✅ Voice message was sended to phone ${phone}`);
-      return { status: true, message: 'Message was sended' };
-    } catch (error) {
-      if (isAxiosError(error)) {
-        this.logger.error('❌ Error :', error.response?.data || error.message);
+      if (result.success) {
+        this.logger.log(`✅ Voice message was sended to phone ${phone}`);
+        return { status: true, message: 'Message was sended' };
       }
+
+      this.logger.error(`❌ notify-service error: ${result.message}`);
+      return { status: false, message: result.message };
+    } catch (error) {
+      this.logger.error('❌ Error:', error);
       return { status: false, message: 'Message was not sended' };
     }
   }

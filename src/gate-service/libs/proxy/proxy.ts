@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { TypeConfigService } from '../../configs/types.config.service';
-import { RedisConfig } from 'src/user-service/common/redis/config/redis.config';
+import { RedisConfig } from 'src/gate-service/common/redis/config/redis.config';
 
 export const initProxy = async (app: INestApplication) => {
   const config = app.get(TypeConfigService);

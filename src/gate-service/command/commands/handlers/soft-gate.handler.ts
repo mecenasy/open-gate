@@ -1,8 +1,8 @@
 import { CommandHandler } from '@nestjs/cqrs';
-import { SofHandler } from 'src/user-service/common/decorators/sof-handler.decorator';
-import { CommandType } from 'src/user-service/common/types/command';
+import { SofHandler } from 'src/gate-service/common/decorators/sof-handler.decorator';
+import { CommandType } from 'src/gate-service/common/types/command';
 import { SofCommand } from '../impl/sof-command';
-import { Status } from 'src/user-service/status/status';
+import { Status } from 'src/gate-service/status/status';
 import { SoftGateService } from '../../gate/soft-gate.service';
 import { SofCommandHandler } from './command.handler';
 

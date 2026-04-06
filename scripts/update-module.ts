@@ -4,7 +4,7 @@ import { toPascalCase } from './to-pascal-case';
 
 export const updateModule = async (modulePath: string, moduleName: string) => {
   const pascalModuleName = toPascalCase(moduleName);
-  const moduleFilePath = path.join(__dirname, '../src/user-service', modulePath, `${moduleName}.module.ts`);
+  const moduleFilePath = path.join(__dirname, '../src/gate-service', modulePath, `${moduleName}.module.ts`);
 
   try {
     // Check if module file exists
@@ -25,7 +25,7 @@ export const updateModule = async (modulePath: string, moduleName: string) => {
     const importStatements: string[] = [];
 
     // 1. Find resolver files
-    const moduleDir = path.join(__dirname, '../src/user-service', modulePath);
+    const moduleDir = path.join(__dirname, '../src/gate-service', modulePath);
 
     try {
       const files = await fs.readdir(moduleDir);

@@ -5,7 +5,7 @@ import { Config } from '../common/entity/config.entity';
 
 @Controller()
 export class ConfigController {
-  constructor(private readonly configService: ConfigService) { }
+  constructor(private readonly configService: ConfigService) {}
 
   @GrpcMethod('ConfigService', 'Add')
   async add(request: {

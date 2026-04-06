@@ -4,8 +4,8 @@ import { QueueMessageToAudioData } from '../../common/types/queue-message-data';
 import { Logger } from '@nestjs/common';
 import { CacheService } from '../../common/cache/cache.service';
 import { EventService } from '../../common/event/event.service';
-import { NotificationEvent } from 'src/user-service/notification/events/notification.event';
-import { QueueType } from 'src/user-service/queue/types';
+import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
+import { QueueType } from 'src/gate-service/queue/types';
 import { OnModuleInit } from '@nestjs/common';
 import { GoogleService } from '../services/google.service';
 

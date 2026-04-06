@@ -15,7 +15,7 @@ export class ${toPascalCase(name)}Type {
 `;
 
 export const createObjectType = async (modulePath: string, commandName: string) => {
-  const filePath = path.join(__dirname, '../src/user-service', modulePath, 'object-types', `${commandName}.type.ts`);
+  const filePath = path.join(__dirname, '../src/gate-service', modulePath, 'object-types', `${commandName}.type.ts`);
   await createFile(filePath, commandClass(commandName));
   console.log(`Creating command: ${commandName}`, filePath);
 };

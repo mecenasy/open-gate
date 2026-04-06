@@ -1,7 +1,7 @@
 import { AppConfig } from './app.configs';
 import * as Joi from 'joi';
 import { SessionConfig } from './session.config';
-import { RedisConfig } from 'src/user-service/common/redis/config/redis.config';
+import { RedisConfig } from 'src/gate-service/common/redis/config/redis.config';
 
 export interface ConfigTypes {
   app: AppConfig;

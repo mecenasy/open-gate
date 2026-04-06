@@ -9,24 +9,29 @@ services:
     restart: unless-stopped
 
     # Komenda wymuszająca start konkretnego pliku i obserwowanie zmian
-    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/user-service/main.ts
+    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/gate-service/main.ts
     volumes:
       - .:/app
       - /app/node_modules
     ports:
       - "3002:3002"
+      - "50053:50053"
     env_file:
       - .env
     environment:
       CHOKIDAR_USEPOLLING: true
       WATCHPACK_POLLING: true
       USER_SERVICE_URL: "${GRPC_SERVICE_URL}"
+      NOTIFY_SERVICE_GRPC_URL: "notify-service:50052"
+      SIGNAL_GRPC_PORT: 50053
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
       grpc-service:
+        condition: service_started
+      notify-service:
         condition: service_started
     networks:
       - backend-net
@@ -54,6 +59,34 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  notify-service:
+    container_name: notify-service
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/notify-service/main.ts
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3003:3003"
+      - "50052:50052"
+    env_file:
+      - .env
+    environment:
+      CHOKIDAR_USEPOLLING: true
+      WATCHPACK_POLLING: true
+      PORT: 3003
+      GRPC_PORT: 50052
+      GATE_SERVICE_GRPC_URL: "api:50053"
+      SIGNAL_API_URL: "http://signal_bridge:8080"
+    depends_on:
+      signal-api:
+        condition: service_started
+    networks:
+      - backend-net
 
   postgres:
     image: postgres:15-alpine

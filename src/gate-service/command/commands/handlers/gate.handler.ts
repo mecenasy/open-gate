@@ -1,11 +1,11 @@
 import { CommandHandler } from '@nestjs/cqrs';
 import { SofCommand } from '../impl/sof-command';
-import { SofHandler } from 'src/user-service/common/decorators/sof-handler.decorator';
-import { CommandAction, CommandType } from 'src/user-service/common/types/command';
-import { Status } from 'src/user-service/status/status';
+import { SofHandler } from 'src/gate-service/common/decorators/sof-handler.decorator';
+import { CommandAction, CommandType } from 'src/gate-service/common/types/command';
+import { Status } from 'src/gate-service/status/status';
 import { GateService } from '../../gate/gate.service';
 import { SofCommandHandler } from './command.handler';
-import { MessageType } from 'src/user-service/process/signal/types';
+import { MessageType } from 'src/gate-service/process/signal/types';
 
 @SofHandler(CommandType.Gate)
 @CommandHandler(SofCommand)

@@ -7,10 +7,10 @@ import { EventService } from '../../common/event/event.service';
 import { Readable } from 'stream';
 import ffmpeg from 'fluent-ffmpeg';
 import { QueueService } from '../../queue/queue.service';
-import { QueueType } from 'src/user-service/queue/types';
+import { QueueType } from 'src/gate-service/queue/types';
 import { OnModuleInit } from '@nestjs/common';
 import { GroqService } from '../services/groq.service';
-import { NotificationEvent } from 'src/user-service/notification/events/notification.event';
+import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
 
 interface SerializedBuffer {
   type: 'Buffer';

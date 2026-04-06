@@ -1,28 +1,28 @@
 import { Process, Processor } from '@nestjs/bull';
 import { type Job } from 'bull';
-import { Logger, OnModuleInit } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
+import { Inject, Logger, OnModuleInit } from '@nestjs/common';
+import { type ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { isAxiosError } from 'axios';
-import { EventService } from 'src/user-service/common/event/event.service';
-import { QueueService } from 'src/user-service/queue/queue.service';
-import { QueueMessageData } from 'src/user-service/common/types/queue-message-data';
-import { QueueType } from 'src/user-service/queue/types';
+import { QueueService } from 'src/gate-service/queue/queue.service';
+import { QueueMessageData } from 'src/gate-service/common/types/queue-message-data';
+import { QueueType } from 'src/gate-service/queue/types';
+import { NotifyGrpcKey } from 'src/gate-service/common/signal-grpc.module';
+import { OUTGOING_SIGNAL_SERVICE_NAME, OutgoingSignalServiceClient } from 'src/proto/signal';
 
 @Processor(QueueType.Attachment)
 export class AttachmentsProcessor implements OnModuleInit {
   logger: Logger;
-  private readonly SIGNAL_URL = 'http://signal_bridge:8080';
+  private notifyClient!: OutgoingSignalServiceClient;
 
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly eventService: EventService,
-    private readonly queueService: QueueService,
-  ) {
+  @Inject(NotifyGrpcKey)
+  public readonly notifyGrpcClient!: ClientGrpc;
+
+  constructor(private readonly queueService: QueueService) {
     this.logger = new Logger(this.constructor.name);
   }
 
   onModuleInit() {
+    this.notifyClient = this.notifyGrpcClient.getService<OutgoingSignalServiceClient>(OUTGOING_SIGNAL_SERVICE_NAME);
     this.logger.log('AttachmentsProcessor initialized');
   }
 
@@ -35,31 +35,27 @@ export class AttachmentsProcessor implements OnModuleInit {
     } = job.data;
     const attachmentId = dataMessage?.attachments?.[0]?.id;
 
-    try {
-      const { data } = await lastValueFrom(
-        this.httpService.get<Buffer>(`${this.SIGNAL_URL}/v1/attachments/${attachmentId}`, {
-          responseType: 'arraybuffer',
-          timeout: 5000,
-        }),
-      );
-
-      await this.queueService.audioToTextToQueue(
-        {
-          data: {
-            ...job.data.data,
-            attachment: data,
-          },
-          context,
-        },
-        5000,
-      );
-    } catch (error) {
-      // TODO: wysłać informację, by użytkownik wybrał metodę command
-      if (isAxiosError(error)) {
-        this.logger.warn('Przekroczono limit zapytań (Rate Limit).');
-      } else {
-        this.logger.error('Nieoczekiwany błąd:', error);
-      }
+    if (!attachmentId) {
+      this.logger.warn('Attachment job received without attachment ID');
+      return;
     }
+
+    const result = await lastValueFrom(this.notifyClient.downloadAttachment({ attachmentId }));
+
+    if (!result.success) {
+      this.logger.error(`❌ Failed to download attachment: ${result.error}`);
+      return;
+    }
+
+    await this.queueService.audioToTextToQueue(
+      {
+        data: {
+          ...job.data.data,
+          attachment: Buffer.from(result.data),
+        },
+        context,
+      },
+      5000,
+    );
   }
 }

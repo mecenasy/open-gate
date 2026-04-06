@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 export const generateIndex = async (modulePath: string, arrayName: string) => {
-  const dirPath = path.join(__dirname, '../src/user-service', modulePath, arrayName, 'handlers');
+  const dirPath = path.join(__dirname, '../src/gate-service', modulePath, arrayName, 'handlers');
   try {
     // 1. Pobierz wszystkie pliki w katalogu
     const files = await fs.readdir(dirPath);

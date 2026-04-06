@@ -1,10 +1,10 @@
-import { Handler } from 'src/user-service/common/handler/handler';
+import { Handler } from 'src/gate-service/common/handler/handler';
 import { CommandHandler } from '@nestjs/cqrs';
 import { UserMessageCommand } from '../impl/user-message.command';
 import { MessageToQueueCommand } from '../impl/message-to-queue.command';
-import { QueueService } from 'src/user-service/queue/queue.service';
+import { QueueService } from 'src/gate-service/queue/queue.service';
 import { MessageType } from '../../types';
-import { Status } from 'src/user-service/status/status';
+import { Status } from 'src/gate-service/status/status';
 
 @CommandHandler(MessageToQueueCommand)
 export class MessageToQueueHandler extends Handler<UserMessageCommand, Status> {

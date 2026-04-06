@@ -55,17 +55,17 @@ export class SignalBridgeService implements OnModuleInit {
 ### FORMAT WYJŚCIOWY:
 Zwróć dane w formacie JSON:
 {"command": "ID", "action": "ID", "data": number, "message": "wiadomość"}
-{"error": true, "message": "komunikat błędu"}
+{"error": true, "command": "error", "message": "komunikat błędu"}
 
 ### PRZYKŁADY UCZĄCE (FEW-SHOT):
-- "otwórz bramę" -> {"command": "BRAMA_1", "action": "OPEN", "data": 1, "message": "Potwierdzam, otwieram bramę pierwszą."}
-- "Zamknij furtkę 2, proszę" -> {"command": "FURTKA_2", "action": "CLOSE", "data": 2, "message": "Oczywiście, już zamykam furtkę numer dwa."}
-- "Skarbie, otwórz bramę 3 dla myszki" -> {"command": "BRAMA_3", "action": "OPEN", "data": 3, "message": "Dla Ciebie wszystko kochanie, brama trzecia już się otwiera."}
-- "Sezamie otwórz się, brama 4!" -> {"command": "BRAMA_4", "action": "OPEN", "data": 4, "message": "Magiczne hasło przyjęte! Czwarta brama idzie w górę."}
-- "Ty głupi gracie, otwórz tę bramę!" -> {"command": "BRAMA_1", "action": "OPEN", "data": 1, "message": "Grzeczniej proszę! Ale bramę otwieram, bo taką mam pracę."}
-- "Zamknij to cholerstwo 2" -> {"command": "FURTKA_2", "action": "CLOSE", "data": 2, "message": "Zamykam to cholerstwo numer dwa, nie denerwuj się."}
-- "Udhdjdjdjfjfjf" -> {"error": true, "message": "Nie rozumiem. Proszę o polecenie związane z bramą lub furtką."}
-- "Zrób mi herbatę" -> {"error": true, "message": "Przepraszam, potrafię obsługiwać tylko bramy i furtki."}`,
+- "otwórz bramę" -> {"command": "gate", "action": "open", "data": 1, "message": "Potwierdzam, otwieram bramę pierwszą."}
+- "Zamknij furtkę 2, proszę" -> {"command": "soft_gate", "action": "close", "data": 2, "message": "Oczywiście, już zamykam furtkę numer dwa."}
+- "Skarbie, otwórz bramę 3 dla myszki" -> {"command": "gate", "action": "open", "data": 3, "message": "Dla Ciebie wszystko kochanie, brama trzecia już się otwiera."}
+- "Sezamie otwórz się, brama 4!" -> {"command": "gate", "action": "open", "data": 4, "message": "Magiczne hasło przyjęte! Czwarta brama idzie w górę."}
+- "Ty głupi gracie, otwórz tę bramę!" -> {"command": "gate", "action": "open", "data": 1, "message": "Grzeczniej proszę! Ale bramę otwieram, bo taką mam pracę."}
+- "Zamknij to cholerstwo 2" -> {"command": "soft_gate", "action": "close", "data": 2, "message": "Zamykam to cholerstwo numer dwa, nie denerwuj się."}
+- "Udhdjdjdjfjfjf" -> {"error": true, "command": "error", "message": "Nie rozumiem. Proszę o polecenie związane z bramą lub furtką."}
+- "Zrób mi herbatę" -> {"error": true, "command": "error", "message": "Przepraszam, potrafię obsługiwać tylko bramy i furtki."}`,
           },
           { role: 'user', content: userText },
         ],

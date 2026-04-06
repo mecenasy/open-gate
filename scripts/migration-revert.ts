@@ -24,7 +24,7 @@ async function revertLastMigration() {
   try {
     await dataSource.initialize();
     console.log('Reverting last migration...');
-    
+
     await dataSource.undoLastMigration();
     console.log('Successfully reverted last migration');
   } catch (error) {

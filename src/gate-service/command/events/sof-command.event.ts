@@ -1,6 +1,6 @@
 import { AggregateRoot } from '@nestjs/cqrs';
-import { SofCommand } from 'src/user-service/common/types/command';
-import { UserContext } from 'src/user-service/context/user-context';
+import { SofCommand } from 'src/gate-service/common/types/command';
+import { UserContext } from 'src/gate-service/context/user-context';
 
 export class SofCommandEvent<T> extends AggregateRoot {
   constructor(

@@ -1,4 +1,4 @@
-import { SignalEnvelope } from 'src/user-service/process/signal/types';
+import { SignalEnvelope } from 'src/gate-service/process/signal/types';
 import { UserContext } from '../../context/user-context';
 
 export interface QueueMessageData {

@@ -11,6 +11,7 @@ import { CacheService } from './cache/cache.service';
 import { EventService } from './event/event.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { SignalGrpcModule } from './signal-grpc.module';
 
 @Global()
 @Module({
@@ -22,6 +23,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     GetawayModule,
     ConfigsModule,
     ProxyModule,
+    SignalGrpcModule,
     ThrottlerModule.forRoot([
       {
         name: 'short',
@@ -48,6 +50,6 @@ import { ThrottlerModule } from '@nestjs/throttler';
       useExisting: ConfigService,
     },
   ],
-  exports: [CacheService, EventService, TypeConfigService, CqrsModule],
+  exports: [CacheService, EventService, TypeConfigService, CqrsModule, SignalGrpcModule],
 })
 export class CommonModule {}

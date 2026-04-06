@@ -2,12 +2,12 @@ import { Handler } from '../../../../common/handler/handler';
 import { USER_PROXY_SERVICE_NAME, UserProxyServiceClient } from 'src/proto/user';
 import { lastValueFrom } from 'rxjs';
 import { UserMessageEvent } from '../../events/user-message.event';
-import type { UserContext } from 'src/user-service/context/user-context';
+import type { UserContext } from 'src/gate-service/context/user-context';
 import { CommandHandler } from '@nestjs/cqrs';
 import { MessageCommand } from '../impl/message.command';
 import { MessageType, SignalEnvelope } from '../../types';
-import { NotificationEvent } from 'src/user-service/notification/events/notification.event';
-import { Status } from 'src/user-service/status/status';
+import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
+import { Status } from 'src/gate-service/status/status';
 import { protoToJsUserType } from 'src/utils/user-type-converter';
 
 @CommandHandler(MessageCommand)

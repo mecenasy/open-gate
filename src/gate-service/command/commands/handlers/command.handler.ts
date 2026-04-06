@@ -1,11 +1,11 @@
-import { Handler } from 'src/user-service/common/handler/handler';
+import { Handler } from 'src/gate-service/common/handler/handler';
 import { SofCommand } from '../impl/sof-command';
-import { Status } from 'src/user-service/status/status';
-import { NotificationEvent } from 'src/user-service/notification/events/notification.event';
-import { QueueService } from 'src/user-service/queue/queue.service';
+import { Status } from 'src/gate-service/status/status';
+import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
+import { QueueService } from 'src/gate-service/queue/queue.service';
 import { Inject } from '@nestjs/common';
-import { UserContext } from 'src/user-service/context/user-context';
-import { MessageType } from 'src/user-service/process/signal/types';
+import { UserContext } from 'src/gate-service/context/user-context';
+import { MessageType } from 'src/gate-service/process/signal/types';
 
 export abstract class SofCommandHandler extends Handler<SofCommand<number>, Status> {
   @Inject()

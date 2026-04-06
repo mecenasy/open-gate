@@ -1,5 +1,5 @@
 import { AggregateRoot } from '@nestjs/cqrs';
-import { UserContext } from 'src/user-service/context/user-context';
+import { UserContext } from 'src/gate-service/context/user-context';
 import { SignalEnvelope } from '../types';
 
 export class IdentifyMessageEvent extends AggregateRoot {

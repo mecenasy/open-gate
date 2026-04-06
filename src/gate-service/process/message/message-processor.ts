@@ -4,12 +4,12 @@ import { QueueMessageData } from '../../common/types/queue-message-data';
 import { Logger } from '@nestjs/common';
 import { EventService } from '../../common/event/event.service';
 import { SofCommandEvent } from '../../command/events/sof-command.event';
-import { QueueType } from 'src/user-service/queue/types';
+import { QueueType } from 'src/gate-service/queue/types';
 import { OnModuleInit } from '@nestjs/common';
 import { MessageContextService } from '../services/message-context.service';
 import { GroqService } from '../services/groq.service';
 import { CommandParserService } from '../services/command-parser.service';
-import { NotificationEvent } from 'src/user-service/notification/events/notification.event';
+import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
 
 @Processor(QueueType.Message)
 export class MessageProcessor implements OnModuleInit {

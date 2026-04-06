@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MassageHandler } from './message.handler';
 import { MessageCommand } from '../impl/message.command';
-import { CacheService } from 'src/user-service/common/cache/cache.service';
-import { EventService } from 'src/user-service/common/event/event.service';
-import { GrpcProxyKey } from 'src/user-service/common/proxy/constance';
+import { CacheService } from 'src/gate-service/common/cache/cache.service';
+import { EventService } from 'src/gate-service/common/event/event.service';
+import { GrpcProxyKey } from 'src/gate-service/common/proxy/constance';
 import { UserMessageEvent } from '../../events/user-message.event';
-import { NotificationEvent } from 'src/user-service/notification/events/notification.event';
+import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
 import { MessageType } from '../../types';
-import { UserType } from 'src/user-service/user/types';
+import { UserType } from 'src/gate-service/user/types';
 import { of, throwError } from 'rxjs';
 
 describe('MassageHandler', () => {

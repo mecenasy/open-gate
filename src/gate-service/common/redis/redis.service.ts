@@ -20,10 +20,6 @@ export class RedisService {
 
   public async save<T>({ data, identifier, EX, prefix }: SaveRedisData<T>): Promise<void> {
     const key = this.getIdentifier(identifier, prefix);
-    await this.redis.hSet('dupa:asdasd', {
-      key: 'skhdkhsfkjdshfs',
-      sshdakdh: 'sdsdsdsd',
-    });
 
     await this.redis.set(key, JSON.stringify(data), { EX });
   }

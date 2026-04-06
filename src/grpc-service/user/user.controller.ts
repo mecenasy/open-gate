@@ -18,7 +18,7 @@ import { jsToProtoUserType } from 'src/utils/user-type-converter';
 
 @Controller()
 export class UserController implements UserProxyServiceController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @GrpcMethod(USER_PROXY_SERVICE_NAME, 'AddUser')
   async addUser(request: AddUserRequest): Promise<UserResponse> {

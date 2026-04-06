@@ -1,12 +1,12 @@
-import { Handler } from 'src/user-service/common/handler/handler';
+import { Handler } from 'src/gate-service/common/handler/handler';
 import { USER_PROXY_SERVICE_NAME, UserProxyServiceClient } from 'src/proto/user';
 import { CommandHandler } from '@nestjs/cqrs';
 import { UserMessageCommand } from '../impl/user-message.command';
 import { IdentifyMessageEvent } from '../../events/identifier-message.event';
 import { MessageType } from '../../types';
 import { Logger } from '@nestjs/common';
-import { Status } from 'src/user-service/status/status';
-import { NotificationEvent } from 'src/user-service/notification/events/notification.event';
+import { Status } from 'src/gate-service/status/status';
+import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
 
 @CommandHandler(UserMessageCommand)
 export class MassageIdentifierHandler extends Handler<UserMessageCommand, Status, UserProxyServiceClient> {

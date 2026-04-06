@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package user;
+
+service UserProxyService {
+  rpc AddUser (AddUserRequest) returns (UserResponse);
+  rpc GetUser (GetUserRequest) returns (UserResponse);
+  rpc GetUserByPhone (GetUserByPhoneRequest) returns (UserResponse);
+  rpc UpdateUser (UpdateUserRequest) returns (UserResponse);
+  rpc RemoveUser (RemoveUserRequest) returns (UserResponse);
+  rpc GetAllUsers (GetAllUsersRequest) returns (GetAllUsersResponse);
+}
+
+enum UserType {
+  ADMIN = 0;
+  SUPER_USER = 1;
+  MEMBER = 2;
+  USER = 3;
+}
+
+message AddUserRequest {
+  string email = 1;
+  string phone = 2;
+  string name = 3;
+  string surname = 4;
+  UserType type = 5;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserByPhoneRequest {
+  string phone = 1;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  optional string email = 2;
+  optional string phone = 3;
+  optional string name = 4;
+  optional string surname = 5;
+  optional UserType type = 6;
+}
+
+message RemoveUserRequest {
+  string id = 1;
+}
+
+message GetAllUsersRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message UserResponse {
+  bool status = 1;
+  string message = 2;
+  optional UserData data = 3;
+}
+
+message GetAllUsersResponse {
+  bool status = 1;
+  string message = 2;
+  repeated UserData data = 3;
+  int32 total = 4;
+}
+
+message UserData {
+  string id = 1;
+  string email = 2;
+  string phone = 3;
+  string name = 4;
+  string surname = 5;
+  bool suspended = 6;
+  UserType type = 7;
+}

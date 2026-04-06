@@ -1,0 +1,136 @@
+{
+  "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "moduleName",
+      "type": "promptString",
+      "description": "Nazwa modułu (np. LightOn)"
+    },
+    {
+      "id": "modulePath",
+      "type": "promptString",
+      "description": "Ścieżka modułu (np. auth/mfa)"
+    },
+    {
+      "id": "commandName",
+      "type": "promptString",
+      "description": "Flagi (np. co mo s)",
+    },
+    {
+      "id": "fileName",
+      "type": "promptString",
+      "description": "File name of migration",
+    }
+  ],
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "format",
+      "problemMatcher": [],
+      "label": "npm: format",
+      "detail": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"scripts/**/*.ts\"",
+    },
+    {
+      "label": "NestJS: Generate TS Command",
+      "type": "shell",
+      "command": "node -r ts-node/register -r tsconfig-paths/register ${workspaceFolder}/scripts/module-generator.ts",
+      "problemMatcher": [],
+      "options": {
+        "shell": {
+          "executable": "cmd.exe",
+          "args": [
+            "/d",
+            "/c"
+          ]
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "showReuseMessage": false
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Nestjs: generate",
+      "type": "shell",
+      "command": "npx @nestjs/cli g ${input:commandName} ${input:moduleName} ${input:modulePath} --no-spec",
+      "problemMatcher": [],
+      "detail": "nestjs cli"
+    },
+    {
+      "type": "shell",
+      "command": "docker exec -it api npm run typeorm migration:run -- -d typeorm.config.ts",
+      "problemMatcher": [],
+      "label": "migration:run",
+      "detail": "migration of databae"
+    },
+    {
+      "type": "shell",
+      "command": "docker compose exec grpc-service npm run migration:generate -- src/grpc-service/migrations/`${input:fileName}",
+      "problemMatcher": [],
+      "label": "migration:generate",
+      "detail": "generate new migration of databae"
+    },
+    {
+      "type": "shell",
+      "command": "docker compose up",
+      "problemMatcher": [],
+      "label": "docker:up",
+      "detail": "docker compose up"
+    },
+    {
+      "type": "shell",
+      "command": "docker compose down",
+      "problemMatcher": [],
+      "label": "docker:down",
+      "detail": "docker compose down"
+    },
+    {
+      "type": "shell",
+      "command": "docker compose restart",
+      "problemMatcher": [],
+      "label": "docker:restart",
+      "detail": "docker compose restart"
+    },
+    {
+      "type": "shell",
+      "command": "docker compose build",
+      "problemMatcher": [],
+      "label": "docker:build",
+      "detail": "docker compose build"
+    },
+    {
+      "type": "shell",
+      "command": "docker compose ps",
+      "problemMatcher": [],
+      "label": "docker:ps",
+      "detail": "docker compose ps"
+    },
+    {
+      "type": "shell",
+      "command": "docker compose stop",
+      "problemMatcher": [],
+      "label": "docker:stop",
+      "detail": "docker compose stop"
+    },
+    {
+      "label": "docker: logs",
+      "type": "shell",
+      "command": "docker logs -f api",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "group": "none"
+    }
+  ]
+}

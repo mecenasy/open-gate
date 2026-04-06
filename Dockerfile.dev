@@ -1,0 +1,23 @@
+FROM node:20-alpine
+
+# Instalujemy zależności systemowe potrzebne do kompilacji niektórych paczek npm
+RUN apk add --no-cache libc6-compat
+
+RUN apk add --no-cache ffmpeg
+
+WORKDIR /app
+
+# Kopiujemy pliki definicji zależności
+COPY package*.json ./
+
+# Instalujemy wszystkie zależności (w tym ts-node-dev do hot reloadingu)
+RUN npm install
+
+# Kopiujemy całą resztę kodu (src, proto, configi)
+COPY . .
+
+# Otwieramy porty (3002 dla Gateway, 50051 dla gRPC)
+EXPOSE 3002 50051
+
+# Domyślna komenda (zostanie nadpisana przez docker-compose)
+CMD ["npm", "run", "start:dev"]

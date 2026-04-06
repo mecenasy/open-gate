@@ -1,0 +1,125 @@
+syntax = "proto3";
+
+package command;
+
+service CommandService {
+  // Create a new command
+  rpc AddCommand (AddCommandRequest) returns (CommandResponse);
+  
+  // Update all fields except the command name
+  rpc UpdateCommand (UpdateCommandRequest) returns (CommandResponse);
+  
+  // Fetch a single command by ID or Name
+  rpc GetCommand (GetCommandRequest) returns (CommandResponse);
+  
+  // List all commands
+  rpc GetAllCommands (GetAllCommandsRequest) returns (GetAllCommandsResponse);
+  
+  // Filter commands based on a specific user role/permission
+  rpc GetAllByPermission (GetAllByPermissionRequest) returns (GetAllCommandsResponse);
+  
+  // Fetch a specific command only if the user has the required permission
+  rpc GetByPermission (GetByPermissionRequest) returns (CommandResponse);
+  
+  // Change only the active boolean field
+  rpc ToggleActiveStatus (ToggleActiveStatusRequest) returns (CommandResponse);
+}
+
+// Enum for predefined command actions
+enum CommandAction {
+  ACTION_UNSPECIFIED = 0;
+  OPEN = 1;
+  CLOSE = 2;
+  EXECUTE = 3;
+  CANCEL = 4;
+  RESTART = 5;
+  STOP = 6;
+  START = 7;
+}
+
+// Message representing a command
+message Command {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  bool active = 4;
+  repeated CommandAction actions = 5;
+  string parameters = 6; // JSON string for flexible parameter storage
+  string created_at = 7;
+  string updated_at = 8;
+}
+
+// Request/Response messages for AddCommand
+message AddCommandRequest {
+  string name = 1;
+  string description = 2;
+  repeated CommandAction actions = 3;
+  string parameters = 4; // JSON string
+  repeated string role_names = 5; // List of role names to grant permissions
+}
+
+// Request/Response messages for UpdateCommand
+message UpdateCommandRequest {
+  string id = 1;
+  optional string description = 2;
+  optional bool active = 3;
+  repeated CommandAction actions = 4;
+  optional string parameters = 5; // JSON string
+  repeated string role_names = 6; // Update permissions (replace existing)
+}
+
+// Request/Response messages for GetCommand
+message GetCommandRequest {
+  oneof identifier {
+    string id = 1;
+    string name = 2;
+  }
+}
+
+// Request/Response messages for GetAllCommands
+message GetAllCommandsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  optional bool active_only = 3;
+  optional CommandAction action_filter = 4;
+}
+
+// Request/Response messages for GetAllByPermission
+message GetAllByPermissionRequest {
+  string role_name = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  optional bool active_only = 4;
+}
+
+// Request/Response messages for GetByPermission
+message GetByPermissionRequest {
+  string role_name = 1;
+  oneof identifier {
+    string id = 2;
+    string name = 3;
+  }
+}
+
+// Request/Response messages for ToggleActiveStatus
+message ToggleActiveStatusRequest {
+  string id = 1;
+  bool active = 2;
+}
+
+// Standard response wrapper for single command operations
+message CommandResponse {
+  bool status = 1;
+  string message = 2;
+  optional Command data = 3;
+}
+
+// Response wrapper for multiple commands
+message GetAllCommandsResponse {
+  bool status = 1;
+  string message = 2;
+  repeated Command data = 3;
+  int32 total = 4;
+  int32 page = 5;
+  int32 limit = 6;
+}

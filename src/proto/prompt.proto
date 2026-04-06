@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package prompt;
+
+service PromptProxyService {
+  rpc AddPrompt (AddPromptRequest) returns (PromptResponse);
+  rpc GetPrompt (GetPromptRequest) returns (PromptResponse);
+  rpc UpdatePrompt (UpdatePromptRequest) returns (PromptResponse);
+  rpc RemovePrompt (RemovePromptRequest) returns (PromptResponse);
+  rpc GetAllPrompts (GetAllPromptsRequest) returns (GetAllPromptsResponse);
+}
+
+enum UserType {
+  ADMIN = 0;
+  SUPER_USER = 1;
+  MEMBER = 2;
+  USER = 3;
+}
+
+message AddPromptRequest {
+  UserType promptType = 1;
+  string prompt = 2;
+}
+
+message GetPromptRequest {
+  UserType promptType = 1;
+}
+
+message UpdatePromptRequest {
+  string id = 1;
+  optional UserType promptType = 2;
+  optional string prompt = 3;
+}
+
+message RemovePromptRequest {
+  string id = 1;
+}
+
+message GetAllPromptsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  optional UserType promptType = 3;
+}
+
+message PromptResponse {
+  bool status = 1;
+  string message = 2;
+  optional Prompt data = 3;
+}
+
+message GetAllPromptsResponse {
+  bool status = 1;
+  string message = 2;
+  repeated Prompt data = 3;
+  int32 total = 4;
+}
+
+message Prompt {
+  string id = 1;
+  UserType promptType = 2;
+  string prompt = 3;
+}

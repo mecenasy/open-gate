@@ -1,0 +1,20 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Query {
+  user(id: ID!): UserType!
+}
+
+type UserType {
+  city: String!
+  email: String!
+  id: ID!
+  name: String!
+  number: String!
+  phone: String!
+  state: String!
+  street: String!
+  surname: String!
+  zip: String!
+}

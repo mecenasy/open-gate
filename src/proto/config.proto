@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package config;
+
+service ConfigService {
+  // Add a new configuration entry
+  rpc Add (AddConfigRequest) returns (ConfigResponse);
+  
+  // Remove a configuration entry by key
+  rpc Remove (RemoveConfigRequest) returns (ConfigResponse);
+  
+  // Get a specific configuration by key
+  rpc GetByKey (GetByKeyRequest) returns (ConfigResponse);
+  
+  // Get all configuration entries
+  rpc GetAll (GetAllRequest) returns (GetAllResponse);
+}
+
+// Configuration entity
+message Config {
+  string id = 1;
+  string key = 2;
+  string value = 3;
+  string description = 4;
+  string created_at = 5;
+  string updated_at = 6;
+}
+
+// Request to add a new config
+message AddConfigRequest {
+  string key = 1;
+  string value = 2;
+  optional string description = 3;
+}
+
+// Request to remove a config by key
+message RemoveConfigRequest {
+  string key = 1;
+}
+
+// Request to get a config by key
+message GetByKeyRequest {
+  string key = 1;
+}
+
+// Request to get all configs
+message GetAllRequest {
+  // Empty request - no parameters needed
+}
+
+// Response containing a single config
+message ConfigResponse {
+  bool status = 1;
+  string message = 2;
+  optional Config data = 3;
+}
+
+// Response containing multiple configs
+message GetAllResponse {
+  bool status = 1;
+  string message = 2;
+  repeated Config data = 3;
+}

@@ -1,0 +1,134 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { Process, Processor } from '@nestjs/bull';
+import { type Job } from 'bull';
+import { QueueMessageData } from '../../common/types/queue-message-data';
+import { Logger } from '@nestjs/common';
+import { EventService } from '../../common/event/event.service';
+import { Readable } from 'stream';
+import ffmpeg from 'fluent-ffmpeg';
+import { QueueService } from '../../queue/queue.service';
+import { QueueType } from 'src/user-service/queue/types';
+import { OnModuleInit } from '@nestjs/common';
+import { GroqService } from '../services/groq.service';
+import { NotificationEvent } from 'src/user-service/notification/events/notification.event';
+
+interface SerializedBuffer {
+  type: 'Buffer';
+  data: number[];
+}
+
+@Processor(QueueType.Transcription)
+export class TranscriptionProcessor implements OnModuleInit {
+  logger: Logger;
+  constructor(
+    private readonly eventService: EventService,
+    private readonly queueService: QueueService,
+    private readonly groqService: GroqService,
+  ) {
+    this.logger = new Logger(this.constructor.name);
+  }
+
+  onModuleInit() {
+    this.logger.log('AudioProcessor initialized');
+  }
+
+  @Process(QueueType.Transcription)
+  async analizeAudio(job: Job<QueueMessageData>) {
+    this.logger.debug('Analyzing Audio message');
+    const {
+      data: { attachment },
+      data,
+      context,
+    } = job.data;
+
+    if (!attachment) {
+      this.eventService.emit(
+        new NotificationEvent(
+          context.phone,
+          // TODO: komunikat z bazy
+          'Przepraszam ale twoja notatka jes nie zrozumiała. Spokój wysłac jeszcze raz mówiąc wyraznie lub komendę.',
+        ),
+      );
+      this.logger.warn('No attachment found in job data');
+      return;
+    }
+
+    try {
+      const fileMp3 = await this.convertToMp3(attachment);
+
+      const message = await this.groqService.createTranscription(fileMp3);
+
+      data.dataMessage = { ...data.dataMessage, message };
+      await this.queueService.messageToQueue({
+        data,
+        context,
+      });
+    } catch (error) {
+      this.eventService.emit(
+        new NotificationEvent(
+          context.phone,
+          // TODO: komunikat z bazy
+          'Przepraszam, łapie zadyszkę, proszę wyslij komendę zamiast wiadomości. jezeli nie wiesz jaką, mogę ci wysłać samouczka jesli wyslesz mi słowo pomoc lub help',
+        ),
+      );
+      this.logger.error('Error processing audio:', error);
+    }
+  }
+  private validateAttachment(attachment: any): Buffer {
+    let buffer: Buffer;
+
+    if (Buffer.isBuffer(attachment)) {
+      buffer = attachment;
+    } else if (
+      attachment &&
+      typeof attachment === 'object' &&
+      'type' in attachment &&
+      attachment.type === 'Buffer' &&
+      'data' in attachment &&
+      Array.isArray(attachment.data)
+    ) {
+      const serializedBuffer = attachment as SerializedBuffer;
+      buffer = Buffer.from(serializedBuffer.data);
+    } else if (attachment && 'data' in attachment) {
+      // Try to extract buffer data from serialized object
+      const data: unknown = attachment.data;
+      if (Array.isArray(data)) {
+        buffer = Buffer.from(data as number[]);
+      } else {
+        throw new Error('Attachment data is not in a valid format');
+      }
+    } else {
+      throw new Error('Input is not a Buffer or cannot be converted to Buffer');
+    }
+
+    return buffer;
+  }
+
+  private async convertToMp3(attachment: any): Promise<Buffer> {
+    const buffer = this.validateAttachment(attachment);
+
+    return new Promise((resolve, reject) => {
+      const inputStream = new Readable({
+        read() {
+          this.push(buffer);
+          this.push(null);
+        },
+      });
+
+      const chunks: Buffer[] = [];
+
+      ffmpeg(inputStream)
+        .toFormat('mp3')
+        .on('error', (error) => {
+          this.logger.error('FFmpeg error:', error);
+          reject(error);
+        })
+        .on('end', () => {
+          resolve(Buffer.concat(chunks));
+        })
+        .pipe()
+        .on('data', (chunk) => chunks.push(chunk))
+        .on('error', reject);
+    });
+  }
+}

@@ -15,7 +15,7 @@ import { UserType } from '../user-type';
 @Entity('user_roles')
 export class UserRole {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({
     type: 'text',
@@ -23,7 +23,7 @@ export class UserRole {
   })
   @IsOptional()
   @IsString()
-  description: string;
+  description!: string;
 
   @Column({
     type: 'enum',
@@ -31,23 +31,23 @@ export class UserRole {
     nullable: false,
   })
   @IsEnum(UserType)
-  userType: UserType;
+  userType!: UserType;
 
   @OneToOne(() => User, (user) => user.userRole)
-  user: User;
+  user!: User;
 
   @ManyToMany(() => Command, (command) => command.userRoles)
-  commands: Command[];
+  commands!: Command[];
 
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamptz',
   })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamptz',
   })
-  updatedAt: Date;
+  updatedAt!: Date;
 }

@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package login;
+
+service LoginProxyService {
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc GetLoginStatus (LoginStatusRequest) returns (LoginStatusResponse);
+  rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse);
+  rpc ChangePassword (ChangePasswordRequest) returns (ChangePasswordResponse);
+  rpc GetUser2FaSecret (Verify2FARequest) returns (Verify2FAResponse);
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+  string fingerprintHash = 3;
+}
+
+message History {
+  string city = 1;
+  string country = 2;
+  string lastIp = 3;
+  string fingerprintHash = 4;
+  string userAgent = 5;
+  repeated string riskReasons = 6;
+  int32 lastScore = 7;
+  int32 failureCount = 8;
+  string updatedAt = 9;
+  string lastFailureAt = 10;
+}
+
+message LoginResponse {
+  bool success = 1;
+  string message = 2;
+  optional string phone = 3;
+  optional bool is2fa = 4;
+  optional string userId = 5;
+  optional bool isAdaptive = 6;
+  optional History history = 7;
+}
+
+message LoginStatusRequest {
+  string userId = 1;
+}
+
+message LoginStatusResponse {
+  oneof user {
+    string message = 1;
+    UserStatus userStatus = 2;
+  }
+}
+
+message UserStatus {
+  bool admin = 1;
+  string email = 2;
+  bool isAdaptive = 3;
+  bool is2fa = 4;
+}
+
+message ResetPasswordRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message ResetPasswordResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ChangePasswordRequest {
+  string userId = 1;
+  string oldPassword = 2;
+  string newPassword = 3;
+}
+
+message ChangePasswordResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message Verify2FARequest {
+  string login = 1;
+}
+
+message Verify2FAResponse {
+  string secret = 1;
+  string userId = 2;
+}

@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package passkey;
+
+service PasskeyProxyService {
+  rpc RemovePasskey (RemovePasskeyRequest) returns (PasskeyResponse);
+  rpc AddPasskey (AddPasskeyRequest) returns (PasskeyResponse);
+  rpc GetPasskey (GetPasskeyRequest) returns (GetPasskeyResponse);
+  rpc GetPasskeys (GetPasskeysRequest) returns (GetPasskeysResponse);
+  rpc SetCounter (SetCounterRequest) returns (PasskeyResponse);
+}
+
+message RemovePasskeyRequest {
+  string id = 2;
+}
+
+message PasskeyResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message AddPasskeyRequest {
+  string credentialID = 1;
+  bytes publicKey = 2;
+  string deviceName = 3;
+  string userId = 4;
+}
+
+message GetPasskeyRequest {
+  string credentialID = 1;
+}
+
+message GetPasskeysRequest {
+  string userId = 1;
+}
+
+message GetPasskeyResponse {
+  bool success = 1;
+  string message = 2;
+  optional string userId = 3;
+  optional string credentialID = 4;
+  optional bytes publicKey = 5;
+  optional int32 counter = 6;
+}
+
+message Passkey {
+  string id = 1;
+  string createAt = 2;
+  string deviceName = 3;
+  string credentialID = 5;
+}
+
+message GetPasskeysResponse {
+  repeated Passkey passkeys = 1;
+}
+
+message SetCounterRequest {
+  string credentialID = 1;
+  int32 counter = 2;
+}

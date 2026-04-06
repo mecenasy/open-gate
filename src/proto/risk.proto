@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package risk;
+
+service RiskProxyService {
+  rpc AddFailure(FailureRequest) returns (EventResponse);
+  rpc LogRiskEvent(LogRiskEventRequest) returns (EventResponse);
+  rpc UpdateRiskEvent(UpdateRiskEventRequest) returns (EventResponse);
+  rpc GetUnusualTime(GetUnusualTimeRequest) returns (GetUnusualTimeResponse);
+}
+
+message FailureRequest {
+  string id = 1;
+  string fingerprintHash = 2;
+}
+
+message LogRiskEventRequest {
+  string userId = 1;
+  string city = 2;
+  string country = 3;
+  string lastIp = 4;
+  string fingerprintHash = 5;
+  string userAgent = 6;
+}
+
+message EventResponse {
+  bool success = 1;
+  optional string message = 2;
+}
+
+message UpdateRiskEventRequest {
+  string userId = 1;
+  string city = 2;
+  string country = 3;
+  string lastIp = 4;
+  string fingerprintHash = 5;
+  string userAgent = 6;
+  repeated string riskReasons = 7;
+  int32 lastScore = 8;
+}
+
+message GetUnusualTimeRequest {
+  string userId = 1;
+  int32 currentHour = 3;
+}
+
+message GetUnusualTimeResponse {
+  int32 totalLogins = 1; 
+  int32 similarLogins = 2;
+}

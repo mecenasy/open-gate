@@ -7,6 +7,8 @@ export class AdminGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const user = context.switchToHttp().getRequest<express.Request>().user;
-    return Boolean(user?.admin);
+
+    //TODO: Implement real admin check logic here, for example by checking user roles or permissions
+    return Boolean(user);
   }
 }

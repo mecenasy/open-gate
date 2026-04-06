@@ -7,13 +7,18 @@ import {
   UpdateDateColumn,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { UserRole } from './user-role.entity';
+import { History } from '../history/entity/history.entity';
+import { UserSettings } from '../user-settings/entity/user-settings.entity';
+import { Password } from '../password/entity/password.entity';
+import { PassKey } from '../../auth/passkey/entity/passkey.entity';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({
     unique: true,
@@ -22,7 +27,7 @@ export class User {
     nullable: false,
   })
   @IsEmail()
-  email: string;
+  email!: string;
 
   @Column({
     type: 'varchar',
@@ -31,7 +36,7 @@ export class User {
     nullable: true,
   })
   @IsPhoneNumber()
-  phone: string;
+  phone!: string;
 
   @Column({
     type: 'varchar',
@@ -39,7 +44,7 @@ export class User {
     nullable: false,
   })
   @IsString()
-  name: string;
+  name!: string;
 
   @Column({
     type: 'varchar',
@@ -47,14 +52,14 @@ export class User {
     nullable: false,
   })
   @IsString()
-  surname: string;
+  surname!: string;
 
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP(6)',
   })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',
@@ -62,15 +67,39 @@ export class User {
     default: () => 'CURRENT_TIMESTAMP(6)',
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
-  updatedAt: Date;
+  updatedAt!: Date;
 
   @OneToOne(() => UserRole, (userRole) => userRole.user, { cascade: true })
   @JoinColumn()
-  userRole: UserRole;
+  userRole!: UserRole;
 
   @Column({
     type: 'boolean',
     default: false,
   })
-  suspended: boolean;
+  suspended!: boolean;
+
+  @OneToMany(() => History, (history) => history.user, {
+    cascade: true,
+    nullable: true,
+  })
+  authHistories!: History[];
+
+  @OneToOne(() => UserSettings, (settings) => settings.user, {
+    cascade: true,
+    nullable: false,
+  })
+  userSettings!: UserSettings;
+
+  @OneToOne(() => Password, (password) => password.user, {
+    cascade: true,
+    nullable: true,
+  })
+  password!: Password;
+
+  @OneToMany(() => PassKey, (passkey) => passkey.user, {
+    cascade: true,
+    nullable: true,
+  })
+  passkey!: PassKey[];
 }

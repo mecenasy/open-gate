@@ -4,7 +4,6 @@ import { HttpModule } from '@nestjs/axios';
 import { GetawayModule } from './getaway/getaway.module';
 import { ConfigsModule } from '../configs/configs.module';
 import { ProxyModule } from './proxy/proxy.module';
-import { GraphQlModule } from './graph-ql/graph-ql.module';
 import { TypeConfigService } from '../configs/types.config.service';
 import { ConfigService } from '@nestjs/config';
 import { CacheService } from './cache/cache.service';
@@ -17,7 +16,6 @@ import { SignalGrpcModule } from './signal-grpc.module';
 @Module({
   imports: [
     CqrsModule,
-    GraphQlModule,
     RedisModule,
     HttpModule,
     GetawayModule,

@@ -44,7 +44,6 @@ export class SignalBridgeService implements OnModuleInit {
         map((msg) => msg),
       )
       .subscribe((msg) => {
-        console.log('🚀 ~ SignalBridgeService ~ observer ~ msg:', msg);
         this.eventBus.publish(new SignalMessageEvent(msg));
       });
   }

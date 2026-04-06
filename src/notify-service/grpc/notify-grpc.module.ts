@@ -3,8 +3,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { HttpModule } from '@nestjs/axios';
 import { join } from 'path';
-import { getGrpcOptions } from 'src/db-service/common/proxy/get-proto-files';
 import { OutgoingSignalController } from './outgoing-signal.controller';
+import { NotificationController } from './notification.controller';
+import { SmsModule } from '../sms/sms.module';
+import { SmtpModule } from '../smtp/smtp.module';
+import { getGrpcOptions } from 'src/utils/get-proto-files';
 
 /** Token for the gRPC client targeting gate-service IncomingSignalService */
 export const GateGrpcKey = Symbol('GateGrpcKey');
@@ -12,6 +15,8 @@ export const GateGrpcKey = Symbol('GateGrpcKey');
 @Module({
   imports: [
     HttpModule,
+    SmsModule,
+    SmtpModule,
     ClientsModule.registerAsync([
       {
         name: GateGrpcKey,
@@ -27,7 +32,7 @@ export const GateGrpcKey = Symbol('GateGrpcKey');
       },
     ]),
   ],
-  controllers: [OutgoingSignalController],
+  controllers: [OutgoingSignalController, NotificationController],
   exports: [ClientsModule],
 })
 export class NotifyGrpcModule {}

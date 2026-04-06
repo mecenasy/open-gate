@@ -4,8 +4,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeConfigService } from '../configs/types.config.service';
 import { GrpcProxyKey } from './constance';
 import { join } from 'path';
-import { getGrpcOptions } from './get-proto-files';
 import { GrpcConfig } from './config/proxy.config';
+import { getGrpcOptions } from 'src/utils/get-proto-files';
 
 @Global()
 @Module({

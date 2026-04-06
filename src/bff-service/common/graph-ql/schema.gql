@@ -1,0 +1,146 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type StatusType {
+  status: AuthStatus!
+}
+
+enum AuthStatus {
+  new
+  tfa
+  adaptive
+  accept2fa
+  reject2fa
+  sms
+  email
+  login
+  logout
+  refresh
+  changePassword
+  forgotPassword
+  resetPassword
+}
+
+type AcceptType {
+  status: AuthStatus!
+  dataUrl: String!
+}
+
+type AcceptAdaptiveLoginType {
+  active: Boolean!
+}
+
+type UserType {
+  id: ID!
+  email: String!
+}
+
+type UserStatusType {
+  id: ID!
+  admin: Boolean!
+  email: String!
+  is2faEnabled: Boolean!
+  isAdaptiveLoginEnabled: Boolean!
+}
+
+type LoginStatusType {
+  status: AuthStatus!
+  user: UserStatusType
+  message: String
+  phoneId: String
+}
+
+type VerifyTokenType {
+  verify: Boolean!
+}
+
+type PassKeyType {
+  id: String!
+  createAt: String!
+  deviceName: String!
+  credentialID: String!
+}
+
+type RemovePasskeyType {
+  status: Boolean!
+}
+
+type QrChallengeType {
+  challenge: String!
+  dataUrl: String!
+}
+
+type Query {
+  loginStatus: LoginStatusType!
+  verifyToken(token: String!): VerifyTokenType!
+  getPasskeys: [PassKeyType!]!
+}
+
+type Mutation {
+  createUser(input: CreateUserType!): UserType!
+  accept2fa: AcceptType!
+  reject2fa: StatusType!
+  adaptiveLogin: AcceptAdaptiveLoginType!
+  verify2fa(code: String!): StatusType!
+  verifyMfa(input: VerifyCodeType!): StatusType!
+  verify2faCode(input: Verify2faCodeType!): StatusType!
+  loginUser(input: LoginType!): StatusType!
+  logoutUser: StatusType!
+  changePassword(input: ChangePasswordType!): StatusType!
+  resetPassword(input: ResetPasswordType!): StatusType!
+  forgotPassword(input: ForgotPasswordType!): StatusType!
+  removePasskey(id: String!): RemovePasskeyType!
+  optionPasskey: JSON!
+  registerOptionPasskey: JSON!
+  registerOptionPasskeyVerify(data: JSON!): StatusType!
+  optionPasskeyVerify(data: JSON!): StatusType!
+  qrChallenge(nonce: String!): QrChallengeType!
+  qrReject(challenge: String!): StatusType!
+  qrLogin(challenge: String!, nonce: String!): StatusType!
+  qrOption(challenge: String!, nonce: String!): JSON!
+  qrConfirm(challenge: String!, data: JSON!): StatusType!
+}
+
+input CreateUserType {
+  email: String!
+  phone: String!
+  password: String!
+  name: String!
+  surname: String!
+  type: String!
+}
+
+input VerifyCodeType {
+  email: String!
+  code: Float!
+}
+
+input Verify2faCodeType {
+  email: String!
+  code: String!
+}
+
+input LoginType {
+  email: String!
+  password: String!
+}
+
+input ChangePasswordType {
+  newPassword: String!
+  oldPassword: String!
+}
+
+input ResetPasswordType {
+  token: String!
+  password: String!
+}
+
+input ForgotPasswordType {
+  email: String!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON

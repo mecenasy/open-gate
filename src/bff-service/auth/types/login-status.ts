@@ -1,0 +1,15 @@
+export enum AuthStatus {
+  new = 'new',
+  tfa = '2fa',
+  adaptive = 'adaptive',
+  accept2fa = 'accept2fa',
+  reject2fa = 'reject2fa',
+  sms = 'sms',
+  email = 'email',
+  login = 'login',
+  logout = 'logout',
+  refresh = 'refresh',
+  changePassword = 'changePassword',
+  forgotPassword = 'forgotPassword',
+  resetPassword = 'resetPassword',
+}

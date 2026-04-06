@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
-import { getGrpcOptions } from 'src/db-service/common/proxy/get-proto-files';
+import { getGrpcOptions } from 'src/utils/get-proto-files';
 
 /** Token for the gRPC client targeting notify-service OutgoingSignalService */
 export const NotifyGrpcKey = Symbol('NotifyGrpcKey');

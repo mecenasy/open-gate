@@ -8,7 +8,7 @@ import { initProxy } from './libs/proxy/proxy';
 import { initSession } from './libs/session/init-session';
 import { initCorse } from './libs/corse/corse';
 import { join } from 'path';
-import { getGrpcOptions } from 'src/db-service/common/proxy/get-proto-files';
+import { getGrpcOptions } from 'src/utils/get-proto-files';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');

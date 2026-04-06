@@ -19,12 +19,25 @@ export enum UserType {
   UNRECOGNIZED = -1,
 }
 
+export interface CheckExistRequest {
+  email: string;
+}
+
+export interface CheckExistResponse {
+  exist: boolean;
+}
+
+export interface GetUserByEmailRequest {
+  email: string;
+}
+
 export interface AddUserRequest {
   email: string;
   phone: string;
   name: string;
   surname: string;
   type: UserType;
+  password?: string | undefined;
 }
 
 export interface GetUserRequest {
@@ -83,6 +96,8 @@ export interface UserProxyServiceClient {
 
   getUser(request: GetUserRequest, metadata?: Metadata): Observable<UserResponse>;
 
+  getUserByEmail(request: GetUserByEmailRequest, metadata?: Metadata): Observable<UserResponse>;
+
   getUserByPhone(request: GetUserByPhoneRequest, metadata?: Metadata): Observable<UserResponse>;
 
   updateUser(request: UpdateUserRequest, metadata?: Metadata): Observable<UserResponse>;
@@ -90,6 +105,8 @@ export interface UserProxyServiceClient {
   removeUser(request: RemoveUserRequest, metadata?: Metadata): Observable<UserResponse>;
 
   getAllUsers(request: GetAllUsersRequest, metadata?: Metadata): Observable<GetAllUsersResponse>;
+
+  checkExist(request: CheckExistRequest, metadata?: Metadata): Observable<CheckExistResponse>;
 }
 
 export interface UserProxyServiceController {
@@ -100,6 +117,11 @@ export interface UserProxyServiceController {
 
   getUser(
     request: GetUserRequest,
+    metadata?: Metadata,
+  ): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
+
+  getUserByEmail(
+    request: GetUserByEmailRequest,
     metadata?: Metadata,
   ): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 
@@ -122,11 +144,25 @@ export interface UserProxyServiceController {
     request: GetAllUsersRequest,
     metadata?: Metadata,
   ): Promise<GetAllUsersResponse> | Observable<GetAllUsersResponse> | GetAllUsersResponse;
+
+  checkExist(
+    request: CheckExistRequest,
+    metadata?: Metadata,
+  ): Promise<CheckExistResponse> | Observable<CheckExistResponse> | CheckExistResponse;
 }
 
 export function UserProxyServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['addUser', 'getUser', 'getUserByPhone', 'updateUser', 'removeUser', 'getAllUsers'];
+    const grpcMethods: string[] = [
+      'addUser',
+      'getUser',
+      'getUserByEmail',
+      'getUserByPhone',
+      'updateUser',
+      'removeUser',
+      'getAllUsers',
+      'checkExist',
+    ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod('UserProxyService', method)(constructor.prototype[method], method, descriptor);

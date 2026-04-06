@@ -2,10 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { TypeConfigService } from './common/configs/types.config.service';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { getGrpcOptions } from './common/proxy/get-proto-files';
 import { join } from 'path';
 import { GrpcConfig } from './common/proxy/config/proxy.config';
 import { Logger } from '@nestjs/common';
+import { getGrpcOptions } from 'src/utils/get-proto-files';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');

@@ -1,6 +1,55 @@
 version: "3.8"
 
 services:
+  bff-service:
+    container_name: bff-service
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/bff-service/main.ts
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      CHOKIDAR_USEPOLLING: true
+      WATCHPACK_POLLING: true
+      PORT: 3000
+      NOTIFY_SERVICE_GRPC_URL: "notify-service:50052"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      notify-service:
+        condition: service_started
+    networks:
+      - backend-net
+
+  # front-servise:
+  #   container_name: front-servise
+  #   build:
+  #     context: ./src/front-servise
+  #     dockerfile: Dockerfile.dev
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./src/front-servise:/app
+  #     - /app/node_modules
+  #     - /app/.next
+  #   ports:
+  #     - "3001:3001"
+  #   environment:
+  #     WATCHPACK_POLLING: true
+  #     NEXT_PUBLIC_BFF_URL: "http://bff-service:3000"
+  #   depends_on:
+  #     - bff-service
+  #   networks:
+  #     - backend-net
+
   gate-service:
     container_name: gate-service
     build:
@@ -80,8 +129,16 @@ services:
       WATCHPACK_POLLING: true
       PORT: 3003
       GRPC_PORT: 50052
-      GATE_SERVICE_GRPC_URL: "api:50053"
+      GATE_SERVICE_GRPC_URL: "gate-service:50053"
       SIGNAL_API_URL: "http://signal_bridge:8080"
+      TWILO_SID: "${TWILO_SID}"
+      TWILO_TOKEN: "${TWILO_TOKEN}"
+      TWILO_PHONE: "${TWILO_PHONE}"
+      SMTP_HOST: "${SMTP_HOST}"
+      SMTP_PORT: "${SMTP_PORT}"
+      SMTP_USER: "${SMTP_USER}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD}"
+      SMTP_FROM: "${SMTP_FROM}"
     depends_on:
       signal-api:
         condition: service_started

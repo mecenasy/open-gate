@@ -3,7 +3,7 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import { AppModule } from './app.module';
-import { getGrpcOptions } from 'src/grpc-service/common/proxy/get-proto-files';
+import { getGrpcOptions } from 'src/db-service/common/proxy/get-proto-files';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');

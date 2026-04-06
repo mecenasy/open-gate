@@ -13,7 +13,7 @@ function generateMigration(name?: string) {
     console.log(`Generating migration: ${migrationName}`);
 
     // Create migrations directory if it doesn't exist
-    const migrationsDir = join(__dirname, '../src/grpc-service/migrations');
+    const migrationsDir = join(__dirname, '../src/db-service/migrations');
     const migrationPath = join(migrationsDir, `${migrationName}.ts`);
 
     // Use TypeORM CLI to generate migration

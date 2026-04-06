@@ -14,8 +14,8 @@ const dataSource = new DataSource({
     .replace('${DATABASE_HOST}', process.env.DATABASE_HOST ?? '')
     .replace('${DATABASE_PORT}', process.env.DATABASE_PORT ?? '')
     .replace('${DATABASE_DB}', process.env.DATABASE_DB ?? ''),
-  entities: [join(__dirname, '../src/grpc-service/**/*.entity{.ts,.js}')],
-  migrations: [join(__dirname, '../src/grpc-service/migrations/*{.ts,.js}')],
+  entities: [join(__dirname, '../src/db-service/**/*.entity{.ts,.js}')],
+  migrations: [join(__dirname, '../src/db-service/migrations/*{.ts,.js}')],
   synchronize: false,
   logging: true,
 });

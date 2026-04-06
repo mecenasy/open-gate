@@ -1,8 +1,8 @@
 version: "3.8"
 
 services:
-  api:
-    container_name: api
+  gate-service:
+    container_name: gate-service
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -29,21 +29,21 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      grpc-service:
+      db-service:
         condition: service_started
       notify-service:
         condition: service_started
     networks:
       - backend-net
 
-  grpc-service:
-    container_name: grpc-service
+  db-service:
+    container_name: db-service
     build:
       context: .
       dockerfile: Dockerfile.dev
     ports:
       - "${GRPC_PORT}:50051"
-    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/grpc-service/main.ts
+    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/db-service/main.ts
     restart: unless-stopped
     # Startuje drugi punkt wejścia w tym samym projekcie
     volumes:

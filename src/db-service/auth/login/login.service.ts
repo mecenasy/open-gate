@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PasswordService } from 'src/grpc-service/user/password/password.service';
-import { UserType } from 'src/grpc-service/user/user-type';
-import { UserService } from 'src/grpc-service/user/user.service';
+import { PasswordService } from 'src/db-service/user/password/password.service';
+import { UserType } from 'src/db-service/user/user-type';
+import { UserService } from 'src/db-service/user/user.service';
 import { ChangePasswordResponse, LoginResponse, LoginStatusResponse, ResetPasswordResponse } from 'src/proto/login';
 
 @Injectable()

@@ -1,4 +1,4 @@
-import { CommandAction as EntityCommandAction } from '../grpc-service/command/enums/command-action.enum';
+import { CommandAction as EntityCommandAction } from '../db-service/command/enums/command-action.enum';
 import { CommandAction as ProtoCommandAction } from '../proto/command';
 
 export function protoToEntityCommandAction(protoAction: ProtoCommandAction): EntityCommandAction {

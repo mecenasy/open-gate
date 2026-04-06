@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { HttpModule } from '@nestjs/axios';
 import { join } from 'path';
-import { getGrpcOptions } from 'src/grpc-service/common/proxy/get-proto-files';
+import { getGrpcOptions } from 'src/db-service/common/proxy/get-proto-files';
 import { OutgoingSignalController } from './outgoing-signal.controller';
 
 /** Token for the gRPC client targeting gate-service IncomingSignalService */

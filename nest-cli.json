@@ -24,10 +24,10 @@
       "entryFile": "src/gate-service/main",
       "sourceRoot": "src"
     },
-    "grpc-service": {
+    "db-service": {
       "type": "application",
-      "root": "apps/grpc-service",
-      "entryFile": "src/grpc-service/main",
+      "root": "apps/db-service",
+      "entryFile": "src/db-service/main",
       "sourceRoot": "src"
     },
     "notify-service": {

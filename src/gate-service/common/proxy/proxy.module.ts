@@ -5,7 +5,7 @@ import { TypeConfigService } from '../../configs/types.config.service';
 import { GrpcProxyKey, ProxyKey } from './constance';
 import { RedisConfig } from 'src/gate-service/common/redis/config/redis.config';
 import { join } from 'path';
-import { getGrpcOptions } from 'src/grpc-service/common/proxy/get-proto-files';
+import { getGrpcOptions } from 'src/db-service/common/proxy/get-proto-files';
 
 @Global()
 @Module({

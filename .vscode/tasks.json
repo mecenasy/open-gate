@@ -70,7 +70,7 @@
     },
     {
       "type": "shell",
-      "command": "docker compose exec grpc-service npm run migration:generate -- src/grpc-service/migrations/${input:fileName}",
+      "command": "docker compose exec db-service npm run migration:generate -- src/db-service/migrations/${input:fileName}",
       "problemMatcher": [],
       "label": "migration:generate",
       "detail": "generate new migration of databae"

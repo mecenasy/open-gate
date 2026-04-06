@@ -14,7 +14,7 @@ export default new DataSource(
       },
       url: process.env.DATABASE_URL,
       entities: [__dirname + '/src/**/*.entity{.ts,.js}'],
-      migrations: [__dirname + '/src/grpc-service/migrations/*{.ts,.js}'],
+      migrations: [__dirname + '/src/db-service/migrations/*{.ts,.js}'],
     }
     : {
       type: 'postgres',
@@ -28,6 +28,6 @@ export default new DataSource(
         .replace('${DATABASE_DB}', process.env.DATABASE_DB ?? ''),
       synchronize: process.env.DATABASE_SYNC === '1',
       entities: [__dirname + '/src/**/*.entity{.ts,.js}'],
-      migrations: [__dirname + '/src/grpc-service/migrations/*{.ts,.js}'],
+      migrations: [__dirname + '/src/db-service/migrations/*{.ts,.js}'],
     },
 );

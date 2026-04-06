@@ -12,7 +12,7 @@ import {
 } from 'src/proto/passkey';
 import { Repository } from 'typeorm';
 import { PassKey } from './entity/passkey.entity';
-import { UserService } from 'src/grpc-service/user/user.service';
+import { UserService } from 'src/db-service/user/user.service';
 
 @Injectable()
 export class PasskeyService {

@@ -1,5 +1,5 @@
 import { UserType as ProtoUserType } from '../proto/user';
-import { UserType as JsUserType } from '../grpc-service/user/user-type';
+import { UserType as JsUserType } from '../db-service/user/user-type';
 
 /**
  * Convert JavaScript UserType to Proto UserType

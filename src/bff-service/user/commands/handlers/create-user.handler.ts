@@ -2,17 +2,18 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../impl/create-user.command';
 import { BadRequestException } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
-import { USER_PROXY_SERVICE_NAME, UserProxyServiceClient, UserResponse } from 'src/proto/user';
+import { USER_PROXY_SERVICE_NAME, UserProxyServiceClient } from 'src/proto/user';
 import { Handler } from 'src/bff-service/common/handler/handler';
 import { jsToProtoUserType } from 'src/utils/user-type-converter';
+import { UserType } from '../../dto/user.type.';
 
 @CommandHandler(CreateUserCommand)
-export class CreateUserHandler extends Handler<CreateUserCommand, UserResponse, UserProxyServiceClient> {
+export class CreateUserHandler extends Handler<CreateUserCommand, UserType, UserProxyServiceClient> {
   constructor() {
     super(USER_PROXY_SERVICE_NAME);
   }
 
-  async execute(command: CreateUserCommand) {
+  async execute(command: CreateUserCommand): Promise<UserType> {
     const { user: userToCreate } = command;
     this.logger.log(userToCreate);
     const { exist } = await lastValueFrom(this.gRpcService.checkExist(userToCreate));
@@ -31,6 +32,10 @@ export class CreateUserHandler extends Handler<CreateUserCommand, UserResponse, 
       }),
     );
 
+    if (!user || user.status === false) {
+      throw new BadRequestException("Sorry we con't create this account");
+    }
+
     await this.cache.saveInCache({
       identifier: user.data?.id ?? '',
       data: user,
@@ -38,6 +43,9 @@ export class CreateUserHandler extends Handler<CreateUserCommand, UserResponse, 
       prefix: 'user',
     });
 
-    return user;
+    return {
+      id: user.data?.id ?? '',
+      email: user.data?.email ?? '',
+    };
   }
 }

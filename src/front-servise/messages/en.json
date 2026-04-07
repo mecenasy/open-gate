@@ -1,0 +1,65 @@
+{
+  "nav": {
+    "login": "Login",
+    "register": "Register",
+    "brand": "Open Gate"
+  },
+  "home": {
+    "title": "Open Gate",
+    "subtitle": "Application frontend",
+    "designSystem": "Design System →"
+  },
+  "login": {
+    "title": "Login",
+    "email": "E-mail",
+    "emailPlaceholder": "john@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "cancel": "Cancel",
+    "unexpectedStatus": "Unexpected status: {status}",
+    "verifyTitle": "Verification",
+    "verifyCode": "Verification code",
+    "verifyCodePlaceholder": "000000",
+    "verifySubmit": "Confirm",
+    "verifySubmitting": "Verifying…",
+    "verifyWrong": "Invalid verification code",
+    "verifyBack": "Back"
+  },
+  "register": {
+    "title": "Register",
+    "name": "First name",
+    "namePlaceholder": "John",
+    "surname": "Last name",
+    "surnamePlaceholder": "Smith",
+    "email": "E-mail",
+    "emailPlaceholder": "john@example.com",
+    "phone": "Phone",
+    "phonePlaceholder": "+1 123 456 789",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "passwordHint": "Min. 8 chars, uppercase, lowercase, digit, special character",
+    "confirmPassword": "Confirm password",
+    "submit": "Create account",
+    "submitting": "Creating account…",
+    "cancel": "Cancel"
+  },
+  "schemas": {
+    "codeMin": "Minimum 6 digits",
+    "codeMax": "Maximum 8 digits",
+    "codeDigitsOnly": "Digits only"
+  },
+  "validation": {
+    "emailInvalid": "Invalid email address",
+    "passwordMin": "Minimum 8 characters",
+    "passwordUppercase": "Uppercase letter required",
+    "passwordLowercase": "Lowercase letter required",
+    "passwordDigit": "Digit required",
+    "passwordSpecial": "Special character required",
+    "passwordsMismatch": "Passwords do not match",
+    "fieldMin2": "Minimum 2 characters",
+    "phoneMin": "Minimum 9 digits",
+    "phoneInvalid": "Invalid phone number"
+  }
+}

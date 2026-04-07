@@ -10,7 +10,7 @@ service UserProxyService {
   rpc UpdateUser (UpdateUserRequest) returns (UserResponse);
   rpc RemoveUser (RemoveUserRequest) returns (UserResponse);
   rpc GetAllUsers (GetAllUsersRequest) returns (GetAllUsersResponse);
-    rpc CheckExist(CheckExistRequest) returns (CheckExistResponse);
+  rpc CheckExist(CheckExistRequest) returns (CheckExistResponse);
 }
 
 enum UserType {

@@ -14,11 +14,9 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
 
-  logger.log('Initializing proxy...');
   await initProxy(app);
   logger.log('Proxy initialized');
 
-  logger.log('Initializing session...');
   await initSession(app);
   logger.log('Session initialized');
 
@@ -28,16 +26,15 @@ async function bootstrap() {
     }),
   );
 
-  logger.log('Initializing CORS...');
   initCorse(app);
   logger.log('CORS initialized');
 
   const config = app.get(TypeConfigService);
   const url = config.getOrThrow<AppConfig>('app').appUrl;
 
-  await app.listen(process.env.PORT || 3000, '0.0.0.0');
+  await app.listen(process.env.BFF_PORT || 3001, '0.0.0.0');
 
-  logger.log(`Application is running on: ${url}:${process.env.PORT || 3000}`);
+  logger.log(`Application is running on: ${url}:${process.env.BFF_PORT || 3002}`);
 }
 
 bootstrap().catch((error) => {

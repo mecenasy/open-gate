@@ -24,7 +24,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   await app.startAllMicroservices();
-  await app.listen(process.env.PORT ?? 3003, '0.0.0.0');
+  await app.listen(process.env.NOTIFY_PORT ?? 3003, '0.0.0.0');
 
   logger.log(`notify-service HTTP running on port ${process.env.PORT ?? 3003}`);
   logger.log(`notify-service gRPC running on port ${process.env.GRPC_PORT ?? 50052}`);

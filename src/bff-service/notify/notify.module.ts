@@ -6,4 +6,5 @@ import { SocketModule } from './socket/socket.module';
 @Module({
   imports: [SmsModule, SmtpModule, SocketModule],
 })
+
 export class NotifyModule {}

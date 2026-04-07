@@ -16,7 +16,7 @@ export const redisConfig = registerAs(
     redisHost: process.env.REDIS_HOST ?? '',
     redisPort: process.env.REDIS_PORT ?? '',
     redisUri: process.env.REDIS_URL ?? '',
-    grpcUrl: process.env.GRPC_URL ?? '',
+    grpcUrl: process.env.GRPC_CLIENT_URL ?? process.env.GRPC_URL ?? '',
     notifyGrpcUrl: process.env.NOTIFY_SERVICE_GRPC_URL ?? 'notify-service:50052',
   }),
 );

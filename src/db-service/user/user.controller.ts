@@ -11,6 +11,9 @@ import type {
   RemoveUserRequest,
   GetAllUsersRequest,
   UserData,
+  CheckExistRequest,
+  CheckExistResponse,
+  GetUserByEmailRequest,
 } from 'src/proto/user';
 import { USER_PROXY_SERVICE_NAME } from 'src/proto/user';
 import { UserService } from './user.service';
@@ -209,5 +212,15 @@ export class UserController implements UserProxyServiceController {
         total: 0,
       };
     }
+  }
+
+  @GrpcMethod(USER_PROXY_SERVICE_NAME, 'CheckExist')
+  async checkExist({ email }: CheckExistRequest): Promise<CheckExistResponse> {
+    return { exist: !!(await this.userService.findUser(email)) };
+  }
+
+  @GrpcMethod(USER_PROXY_SERVICE_NAME, 'GetUserByEmail')
+  getUserByEmail(request: GetUserByEmailRequest): Promise<UserResponse> {
+    return this.userService.findUserByEmail(request.email);
   }
 }

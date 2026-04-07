@@ -2,19 +2,32 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entity/user.entity';
-import { UserData } from 'src/proto/user';
+import { AddUserRequest, UserData, UserResponse } from 'src/proto/user';
 import { HistoryService } from './history/history.service';
+import { jsToProtoUserType } from 'src/utils/user-type-converter';
+import { PasswordService } from './password/password.service';
+import { UserSettingsService } from './user-settings/user-settings.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly passwordService: PasswordService,
+    private readonly userSettingsService: UserSettingsService,
     private readonly historyService: HistoryService,
   ) {}
 
-  async create(userData: Omit<UserData, 'id' | 'suspended'>): Promise<User> {
-    const user = this.userRepository.create(userData);
+  async create({ email, phone, password, name, surname }: AddUserRequest): Promise<User> {
+    const user = this.userRepository.create({
+      email,
+      phone,
+      name,
+      surname,
+      password: this.passwordService.createPassword(password),
+      userSettings: this.userSettingsService.create(),
+    });
+
     return await this.userRepository.save(user);
   }
 
@@ -92,5 +105,33 @@ export class UserService {
       .leftJoinAndSelect('user.userSettings', 'settings')
       .where('user.email = :email', { email: login })
       .getOneOrFail();
+  }
+  public async findUser(email: string): Promise<User | null> {
+    return await this.userRepository.createQueryBuilder('user').where('user.email = :email', { email }).getOne();
+  }
+
+  public async findUserByEmail(email: string): Promise<UserResponse> {
+    const user = await this.userRepository.createQueryBuilder('user').where('user.email = :email', { email }).getOne();
+
+    if (user) {
+      return {
+        status: true,
+        message: 'User found',
+        data: {
+          id: user.id,
+          email: user.email,
+          phone: user.phone,
+          name: user.name,
+          surname: user.surname,
+          suspended: user.suspended,
+          type: jsToProtoUserType('user' as any),
+        },
+      };
+    }
+
+    return {
+      status: false,
+      message: 'User not found',
+    };
   }
 }

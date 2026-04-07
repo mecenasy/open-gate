@@ -1,0 +1,65 @@
+{
+  "nav": {
+    "login": "Logowanie",
+    "register": "Rejestracja",
+    "brand": "Open Gate"
+  },
+  "home": {
+    "title": "Open Gate",
+    "subtitle": "Frontend aplikacji",
+    "designSystem": "Design System →"
+  },
+  "login": {
+    "title": "Logowanie",
+    "email": "E-mail",
+    "emailPlaceholder": "jan@example.com",
+    "password": "Hasło",
+    "passwordPlaceholder": "••••••••",
+    "submit": "Zaloguj się",
+    "submitting": "Logowanie…",
+    "cancel": "Anuluj",
+    "unexpectedStatus": "Nieoczekiwany status: {status}",
+    "verifyTitle": "Weryfikacja",
+    "verifyCode": "Kod weryfikacyjny",
+    "verifyCodePlaceholder": "000000",
+    "verifySubmit": "Potwierdź",
+    "verifySubmitting": "Weryfikacja…",
+    "verifyWrong": "Nieprawidłowy kod weryfikacyjny",
+    "verifyBack": "Wróć"
+  },
+  "register": {
+    "title": "Rejestracja",
+    "name": "Imię",
+    "namePlaceholder": "Jan",
+    "surname": "Nazwisko",
+    "surnamePlaceholder": "Kowalski",
+    "email": "E-mail",
+    "emailPlaceholder": "jan@example.pl",
+    "phone": "Telefon",
+    "phonePlaceholder": "+48 123 456 789",
+    "password": "Hasło",
+    "passwordPlaceholder": "••••••••",
+    "passwordHint": "Min. 8 znaków, wielka i mała litera, cyfra, znak specjalny",
+    "confirmPassword": "Powtórz hasło",
+    "submit": "Zarejestruj się",
+    "submitting": "Rejestracja…",
+    "cancel": "Anuluj"
+  },
+  "schemas": {
+    "codeMin": "Minimum 6 cyfr",
+    "codeMax": "Maksymalnie 8 cyfr",
+    "codeDigitsOnly": "Tylko cyfry"
+  },
+  "validation": {
+    "emailInvalid": "Nieprawidłowy adres e-mail",
+    "passwordMin": "Minimum 8 znaków",
+    "passwordUppercase": "Wymagana wielka litera",
+    "passwordLowercase": "Wymagana mała litera",
+    "passwordDigit": "Wymagana cyfra",
+    "passwordSpecial": "Wymagany znak specjalny",
+    "passwordsMismatch": "Hasła nie są identyczne",
+    "fieldMin2": "Minimum 2 znaki",
+    "phoneMin": "Minimum 9 cyfr",
+    "phoneInvalid": "Nieprawidłowy numer telefonu"
+  }
+}

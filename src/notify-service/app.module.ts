@@ -6,15 +6,10 @@ import { AppService } from './app.service';
 import { SignalModule } from './signal/signal.module';
 import { SmsModule } from './sms/sms.module';
 import { SmtpModule } from './smtp/smtp.module';
+import { NotifyGrpcModule } from './grpc/notify-grpc.module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    CqrsModule,
-    SignalModule,
-    SmsModule,
-    SmtpModule,
-  ],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), CqrsModule, SignalModule, SmsModule, SmtpModule, NotifyGrpcModule],
   controllers: [AppController],
   providers: [AppService],
 })

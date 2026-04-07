@@ -10,14 +10,18 @@ import { NotifyModule } from './notify/notify.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [UserModule, CommonModule, AuthModule, NotifyModule, CsrfModule],
+  imports: [UserModule, CommonModule, AuthModule, NotifyModule,
+    //  CsrfModule
+  ],
   controllers: [AppController],
   providers: [
+
     AppService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CsrfInterceptor,
-    },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: CsrfInterceptor,
+    // },
+
   ],
 })
 export class AppModule {}

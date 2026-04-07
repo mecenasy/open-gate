@@ -12,7 +12,7 @@ export class PasswordService {
     private readonly repository: Repository<Password>,
   ) {}
 
-  public createPassword(password: string) {
+  public createPassword(password: string = 'Pass123#'): IPassword {
     const { salt, hash } = this.generatePassword(password);
     return this.repository.create({ salt, hash });
   }

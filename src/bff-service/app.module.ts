@@ -8,6 +8,9 @@ import { CsrfModule } from './csrf/csrf.module';
 import { CsrfInterceptor } from './csrf/csrf.interceptor';
 import { NotifyModule } from './notify/notify.module';
 import { AuthModule } from './auth/auth.module';
+import { PromptsModule } from './prompts/prompts.module';
+import { CommandModule } from './command/command.module';
+import { ConfigModule } from './config/config.module';
 
 @Module({
   imports: [
@@ -15,6 +18,9 @@ import { AuthModule } from './auth/auth.module';
     CommonModule,
     AuthModule,
     NotifyModule,
+    PromptsModule,
+    CommandModule,
+    ConfigModule,
     //  CsrfModule
   ],
   controllers: [AppController],

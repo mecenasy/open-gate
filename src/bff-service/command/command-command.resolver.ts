@@ -1,0 +1,31 @@
+import { Resolver, Mutation, Args } from '@nestjs/graphql';
+import { CommandBus } from '@nestjs/cqrs';
+import { AddCommandType } from './dto/add-command.type';
+import { UpdateCommandType } from './dto/update-command.type';
+import { ToggleActiveStatusType } from './dto/toggle-active-status.type';
+import { CommandResponseType } from './dto/response.type';
+import { AddCommandCommand } from './commands/impl/add-command.command';
+import { UpdateCommandCommand } from './commands/impl/update-command.command';
+import { ToggleActiveStatusCommand } from './commands/impl/toggle-active-status.command';
+
+@Resolver()
+export class CommandCommandResolver {
+  constructor(private readonly commandBus: CommandBus) {}
+
+  @Mutation(() => CommandResponseType)
+  async addCommand(@Args('input') input: AddCommandType): Promise<CommandResponseType> {
+    return this.commandBus.execute<AddCommandCommand, CommandResponseType>(new AddCommandCommand(input));
+  }
+
+  @Mutation(() => CommandResponseType)
+  async updateCommand(@Args('input') input: UpdateCommandType): Promise<CommandResponseType> {
+    return this.commandBus.execute<UpdateCommandCommand, CommandResponseType>(new UpdateCommandCommand(input));
+  }
+
+  @Mutation(() => CommandResponseType)
+  async toggleActiveStatus(@Args('input') input: ToggleActiveStatusType): Promise<CommandResponseType> {
+    return this.commandBus.execute<ToggleActiveStatusCommand, CommandResponseType>(
+      new ToggleActiveStatusCommand(input),
+    );
+  }
+}

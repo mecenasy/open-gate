@@ -106,12 +106,57 @@ type QrChallengeType {
   dataUrl: String!
 }
 
+type PromptType {
+  id: ID!
+  key: String!
+  description: String!
+  commandName: String!
+  userType: PromptUserType!
+  prompt: String!
+}
+
+enum PromptUserType {
+  OWNER
+  ADMIN
+  SUPER_USER
+  MEMBER
+  USER
+  UNRECOGNIZED
+}
+
+type PromptSimplyType {
+  id: ID!
+  key: String!
+  description: String!
+  commandName: String!
+  userType: PromptUserType!
+}
+
+type PromptResponseType {
+  status: Boolean!
+  message: String!
+  data: PromptType
+}
+
+type PromptsListType {
+  status: Boolean!
+  message: String!
+  data: [PromptSimplyType!]!
+  total: Int!
+}
+
+type PromptSuccessType {
+  success: Boolean!
+}
+
 type Query {
   users(input: GetAllUsersType): UsersListType!
   user(input: GetUserType!): UserSummaryType!
   loginStatus: LoginStatusType!
   verifyToken(token: String!): VerifyTokenType!
   getPasskeys: [PassKeyType!]!
+  prompt(input: GetPromptType!): PromptResponseType!
+  prompts(input: GetAllPromptsType): PromptsListType!
 }
 
 input GetAllUsersType {
@@ -121,6 +166,16 @@ input GetAllUsersType {
 
 input GetUserType {
   id: String!
+}
+
+input GetPromptType {
+  userType: PromptUserType!
+}
+
+input GetAllPromptsType {
+  page: Int! = 1
+  limit: Int! = 10
+  userType: PromptUserType
 }
 
 type Mutation {
@@ -150,6 +205,9 @@ type Mutation {
   qrLogin(challenge: String!, nonce: String!): StatusType!
   qrOption(challenge: String!, nonce: String!): JSON!
   qrConfirm(challenge: String!, data: JSON!): StatusType!
+  addPrompt(input: AddPromptType!): PromptResponseType!
+  updatePrompt(input: UpdatePromptType!): PromptResponseType!
+  removePrompt(input: RemovePromptType!): PromptSuccessType!
 }
 
 input CreateUserType {
@@ -212,3 +270,24 @@ input ForgotPasswordType {
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
+
+input AddPromptType {
+  userType: PromptUserType!
+  prompt: String!
+  key: String!
+  description: String!
+  commandName: String!
+}
+
+input UpdatePromptType {
+  id: ID!
+  key: String
+  description: String
+  commandName: String
+  userType: PromptUserType
+  prompt: String
+}
+
+input RemovePromptType {
+  id: ID!
+}

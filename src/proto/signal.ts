@@ -5,11 +5,11 @@
 // source: src/proto/signal.proto
 
 /* eslint-disable */
-import type { Metadata } from "@grpc/grpc-js";
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { Observable } from "rxjs";
+import type { Metadata } from '@grpc/grpc-js';
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
 
-export const protobufPackage = "signal";
+export const protobufPackage = 'signal';
 
 export enum SignalMessageType {
   TEXT = 0,
@@ -46,7 +46,7 @@ export interface SignalAck {
   message: string;
 }
 
-export const SIGNAL_PACKAGE_NAME = "signal";
+export const SIGNAL_PACKAGE_NAME = 'signal';
 
 /** Hosted by gate-service (port 50053) — receives incoming Signal messages from notify-service */
 
@@ -65,20 +65,20 @@ export interface IncomingSignalServiceController {
 
 export function IncomingSignalServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["receiveMessage"];
+    const grpcMethods: string[] = ['receiveMessage'];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("IncomingSignalService", method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod('IncomingSignalService', method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("IncomingSignalService", method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod('IncomingSignalService', method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const INCOMING_SIGNAL_SERVICE_NAME = "IncomingSignalService";
+export const INCOMING_SIGNAL_SERVICE_NAME = 'IncomingSignalService';
 
 /** Hosted by notify-service (port 50052) — receives outbound send requests from gate-service */
 
@@ -104,17 +104,17 @@ export interface OutgoingSignalServiceController {
 
 export function OutgoingSignalServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["sendMessage", "downloadAttachment"];
+    const grpcMethods: string[] = ['sendMessage', 'downloadAttachment'];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("OutgoingSignalService", method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod('OutgoingSignalService', method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("OutgoingSignalService", method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod('OutgoingSignalService', method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const OUTGOING_SIGNAL_SERVICE_NAME = "OutgoingSignalService";
+export const OUTGOING_SIGNAL_SERVICE_NAME = 'OutgoingSignalService';

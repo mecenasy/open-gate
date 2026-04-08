@@ -5,11 +5,11 @@
 // source: src/proto/risk.proto
 
 /* eslint-disable */
-import type { Metadata } from "@grpc/grpc-js";
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { Observable } from "rxjs";
+import type { Metadata } from '@grpc/grpc-js';
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
 
-export const protobufPackage = "risk";
+export const protobufPackage = 'risk';
 
 export interface FailureRequest {
   id: string;
@@ -51,7 +51,7 @@ export interface GetUnusualTimeResponse {
   similarLogins: number;
 }
 
-export const RISK_PACKAGE_NAME = "risk";
+export const RISK_PACKAGE_NAME = 'risk';
 
 export interface RiskProxyServiceClient {
   addFailure(request: FailureRequest, metadata?: Metadata): Observable<EventResponse>;
@@ -87,17 +87,17 @@ export interface RiskProxyServiceController {
 
 export function RiskProxyServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["addFailure", "logRiskEvent", "updateRiskEvent", "getUnusualTime"];
+    const grpcMethods: string[] = ['addFailure', 'logRiskEvent', 'updateRiskEvent', 'getUnusualTime'];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("RiskProxyService", method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod('RiskProxyService', method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("RiskProxyService", method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod('RiskProxyService', method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const RISK_PROXY_SERVICE_NAME = "RiskProxyService";
+export const RISK_PROXY_SERVICE_NAME = 'RiskProxyService';

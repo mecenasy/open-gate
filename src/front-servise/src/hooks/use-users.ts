@@ -91,7 +91,6 @@ export const useUsers = () => {
 
   const [doUpdateUser, { loading: updatingUser }] = useMutation(UPDATE_USER_MUTATION, {
     refetchQueries: [{ query: GET_USERS_QUERY }],
-
   });
 
   const [doUpdateStatus] = useMutation(UPDATE_USER_STATUS_MUTATION, {
@@ -105,7 +104,6 @@ export const useUsers = () => {
   const users = data?.users.users;
 
   const isLoading = loading || updatingUser;
-
 
   const [doRemoveUser] = useMutation(REMOVE_USER_MUTATION, {
     refetchQueries: [{ query: GET_USERS_QUERY }],

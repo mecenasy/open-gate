@@ -7,11 +7,14 @@ export const verification = async (
   challenge: string,
   passkey: GetPasskeyResponse,
 ) => {
+  const url = new URL(clientUrl);
+  const expectedRPID = url.hostname;
+
   return await verifyAuthenticationResponse({
     response,
     expectedChallenge: challenge,
     expectedOrigin: clientUrl,
-    expectedRPID: clientUrl?.replace('https://', '').replace('http://', '').replace(':4002', ''),
+    expectedRPID,
     credential: {
       id: passkey.credentialID ?? '',
       publicKey: new Uint8Array(passkey.publicKey ?? []),

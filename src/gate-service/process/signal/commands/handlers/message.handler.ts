@@ -5,10 +5,11 @@ import { UserMessageEvent } from '../../events/user-message.event';
 import type { UserContext } from 'src/gate-service/context/user-context';
 import { CommandHandler } from '@nestjs/cqrs';
 import { MessageCommand } from '../impl/message.command';
-import { MessageType, SignalEnvelope } from '../../types';
+import { MessageType, SignalEnvelope, UserStatus } from '../../types';
 import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
 import { Status } from 'src/gate-service/status/status';
 import { protoToJsUserType } from 'src/utils/user-type-converter';
+import { protoToUserStatus } from 'src/utils/concert-status';
 
 @CommandHandler(MessageCommand)
 export class MassageHandler extends Handler<MessageCommand, Status, UserProxyServiceClient> {
@@ -50,13 +51,21 @@ export class MassageHandler extends Handler<MessageCommand, Status, UserProxySer
           await this.cache.saveInCache<UserContext>({
             identifier: source,
             prefix: 'signal-user',
-            data: { ...user.data, type: protoToJsUserType(user.data.type) },
+            data: {
+              ...user.data,
+              type: protoToJsUserType(user.data.type),
+              status: protoToUserStatus(user.data.status),
+            },
           });
         } catch (error) {
           this.logger.error('Error saving user to cache:', error);
         }
 
-        this.sendEvent(message, { ...user.data, type: protoToJsUserType(user.data.type) });
+        this.sendEvent(message, {
+          ...user.data,
+          type: protoToJsUserType(user.data.type),
+          status: protoToUserStatus(user.data.status),
+        });
       }
     } catch (error) {
       this.event.emit(

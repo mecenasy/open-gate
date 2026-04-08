@@ -7,6 +7,8 @@ import {
   UpdateDateColumn,
   ManyToMany,
   OneToOne,
+  ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { Command } from '../../command/entity/command.entity';
 import { User } from './user.entity';
@@ -33,7 +35,7 @@ export class UserRole {
   @IsEnum(UserType)
   userType!: UserType;
 
-  @OneToOne(() => User, (user) => user.userRole)
+  @OneToMany(() => User, (user) => user.userRole)
   user!: User;
 
   @ManyToMany(() => Command, (command) => command.userRoles)

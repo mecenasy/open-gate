@@ -21,9 +21,9 @@
     "typeorm": "typeorm-ts-node-commonjs",
     "db:drop": "typeorm schema:drop -- -d typeorm.config.ts",
     "migration:create": "npm run typeorm migration:create",
-    "migration:generate": "npm run build && npm run typeorm migration:generate -- -d typeorm.config.ts",
+    "migration:generate": "npm run typeorm migration:generate -- -d typeorm.config.ts",
     "migration:revert": "npm run build && npm run typeorm migration:revert -- -d typeorm.config.ts",
-    "migration:run": "npm run build && npm run typeorm migration:run -- -d typeorm.config.ts",
+    "migration:run": "npm run typeorm migration:run -- -d typeorm.config.ts",
     "migration:run:prod": "typeorm migration:run -d ./dist/typeorm.config.js",
     "deploy": "npm install && npm run build && npm run migration:run:prod",
     "proto": "npx protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto.cmd --ts_proto_out=./ --ts_proto_opt=nestJs=true,addGrpcMetadata=true,addReflection=false ./src/proto/*.proto"

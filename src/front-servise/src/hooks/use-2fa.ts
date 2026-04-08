@@ -1,4 +1,3 @@
-
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -10,7 +9,7 @@ import { graphql } from '@/app/gql';
 type VerificationFormValues = z.infer<ReturnType<typeof verificationSchema>>;
 
 const VERIFY_MFA_MUTATION = graphql(`
-  mutation Verify2fa($code:  String!) {
+  mutation Verify2fa($code: String!) {
     verify2fa(code: $code) {
       status
     }
@@ -22,11 +21,14 @@ export const use2fa = (login: string, onSuccess: () => void) => {
   const tSchemas = useTranslations('schemas');
 
   const [verify2fa, { loading }] = useMutation(VERIFY_MFA_MUTATION, {
-    refetchQueries: ['Status']
+    refetchQueries: ['Status'],
   });
 
-
-  const { register, handleSubmit, formState: { errors } } = useForm<VerificationFormValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<VerificationFormValues>({
     resolver: zodResolver(verificationSchema(tSchemas)),
   });
 
@@ -45,4 +47,4 @@ export const use2fa = (login: string, onSuccess: () => void) => {
     onSubmit: handleSubmit(onSubmit),
     isPending: loading,
   };
-}
+};

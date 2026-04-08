@@ -8,12 +8,14 @@ import {
   OneToOne,
   JoinColumn,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { UserRole } from './user-role.entity';
 import { History } from '../history/entity/history.entity';
 import { UserSettings } from '../user-settings/entity/user-settings.entity';
 import { Password } from '../password/entity/password.entity';
 import { PassKey } from '../../auth/passkey/entity/passkey.entity';
+import { UserStatus } from '../status';
 
 @Entity('users')
 export class User {
@@ -54,6 +56,20 @@ export class User {
   @IsString()
   surname!: string;
 
+  @Column({
+    type: 'enum',
+    enum: UserStatus,
+    default: UserStatus.Pending,
+  })
+  status!: UserStatus;
+
+  @Column({
+    type: 'uuid',
+    nullable: true,
+  })
+  @IsString()
+  ownerId!: string;
+
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamptz',
@@ -69,15 +85,9 @@ export class User {
   })
   updatedAt!: Date;
 
-  @OneToOne(() => UserRole, (userRole) => userRole.user, { cascade: true })
+  @ManyToOne(() => UserRole, (userRole) => userRole.user, { cascade: true })
   @JoinColumn()
   userRole!: UserRole;
-
-  @Column({
-    type: 'boolean',
-    default: false,
-  })
-  suspended!: boolean;
 
   @OneToMany(() => History, (history) => history.user, {
     cascade: true,
@@ -95,7 +105,7 @@ export class User {
     cascade: true,
     nullable: true,
   })
-  password!: Password;
+  password?: Password;
 
   @OneToMany(() => PassKey, (passkey) => passkey.user, {
     cascade: true,

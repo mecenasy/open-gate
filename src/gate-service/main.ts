@@ -2,8 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
-import { TypeConfigService } from './configs/types.config.service';
-import { AppConfig } from './configs/app.configs';
 import { initProxy } from './libs/proxy/proxy';
 import { initSession } from './libs/session/init-session';
 import { initCorse } from './libs/corse/corse';
@@ -36,11 +34,7 @@ async function bootstrap() {
 
   initCorse(app);
 
-  const config = app.get(TypeConfigService);
-  const url = config.getOrThrow<AppConfig>('app').appUrl;
-
   await app.listen(process.env.GATE_PORT || 3002, '0.0.0.0');
-  console.log("🚀 ~ bootstrap ~ process.env.GATE_PORT:", process.env.GATE_PORT)
   logger.log(`gate-service gRPC (signal) running on port ${process.env.SIGNAL_GRPC_PORT ?? 50053}`);
 }
 bootstrap().catch((err) => {

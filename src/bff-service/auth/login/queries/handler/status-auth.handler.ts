@@ -45,6 +45,7 @@ export class LoginStatusHandler extends Handler<StatusAuthQuery, StatusType, Log
     data = {
       id: userId,
       admin: userStatus.admin,
+      owner: userStatus.owner,
       email: userStatus.email,
       is2faEnabled: userStatus.is2fa,
       isAdaptiveLoginEnabled: userStatus.isAdaptive,

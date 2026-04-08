@@ -52,9 +52,10 @@ message LoginStatusResponse {
 
 message UserStatus {
   bool admin = 1;
-  string email = 2;
-  bool isAdaptive = 3;
-  bool is2fa = 4;
+  bool owner = 2;
+  string email = 3;
+  bool isAdaptive = 4;
+  bool is2fa = 5;
 }
 
 message ResetPasswordRequest {

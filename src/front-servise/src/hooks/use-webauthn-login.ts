@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useMutation } from '@apollo/client/react';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { useTranslations } from 'next-intl';
@@ -20,15 +20,17 @@ export const PASSKEY_VERIFY_MUTATION = graphql(`
 `);
 
 export const useWebAuthnLogin = () => {
-  const t = useTranslations('auth')
+  const t = useTranslations('auth');
   const router = useRouter();
   const [passkeyOption] = useMutation(PASSKEY_OPTION_MUTATION);
-  const [passkeyVerifyOption] = useMutation(PASSKEY_VERIFY_MUTATION);
+  const [passkeyVerifyOption] = useMutation(PASSKEY_VERIFY_MUTATION, {
+    refetchQueries: ['Status'],
+  });
 
   const handleToggleChange = async () => {
     try {
-      const { data } = await passkeyOption()
-      const options = data?.optionPasskey
+      const { data } = await passkeyOption();
+      const options = data?.optionPasskey;
 
       const regResponse = await startAuthentication({ optionsJSON: options });
 
@@ -43,4 +45,4 @@ export const useWebAuthnLogin = () => {
   return {
     handleToggleChange,
   };
-}
+};

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { usePathname, useRouter } from '../components/navigation/navigation';
 import { useMutation, useQuery } from '@apollo/client/react';
@@ -35,8 +35,10 @@ export const useAuth = () => {
   const { data, loading, error, refetch } = useQuery(STATUS_QUERY, {
     fetchPolicy: 'cache-and-network',
     nextFetchPolicy: 'cache-first',
-    skip: path.includes('qr-verify') || /\/login\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/.test(path),
-  })
+    skip:
+      path.includes('qr-verify') ||
+      /\/login\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/.test(path),
+  });
 
   const status = data?.loginStatus.status;
   const user = data?.loginStatus.user;
@@ -47,9 +49,9 @@ export const useAuth = () => {
   });
 
   const logout = async () => {
-    await logoutUser()
+    await logoutUser();
     router.replace('/');
-  }
+  };
 
   return {
     isLoading: loading && !data,

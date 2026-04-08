@@ -32,11 +32,14 @@ export class VerifyRegistrationOptionHandler extends Handler<
       return { status: AuthStatus.logout };
     }
 
+    const url = new URL(this.clientUrl);
+    const expectedRPID = url.hostname;
+
     const verification = await verifyRegistrationResponse({
       response: option,
       expectedChallenge: challenge,
       expectedOrigin: this.clientUrl,
-      expectedRPID: this.clientUrl?.replace('https://', '').replace('http://', '').replace(':4002', ''),
+      expectedRPID,
     });
 
     if (verification.verified) {

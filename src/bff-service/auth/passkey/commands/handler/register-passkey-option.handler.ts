@@ -25,9 +25,12 @@ export class RegisterPasskeyOptionHandler extends Handler<
       prefix: 'user-state',
     });
 
+    const url = new URL(this.clientUrl);
+    const expectedRPID = url.hostname;
+
     const options = await generateRegistrationOptions({
       rpName: 'Autenticator',
-      rpID: this.clientUrl?.replace('https://', '').replace('http://', '').replace(':4002', ''),
+      rpID: expectedRPID,
       userID: Buffer.from(userId),
       userName: user?.email ?? '',
       attestationType: 'none',

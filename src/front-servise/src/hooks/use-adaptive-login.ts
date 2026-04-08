@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client/react';
 import { graphql } from '@/app/gql';
@@ -6,10 +5,10 @@ import { graphql } from '@/app/gql';
 const ADAPTIVE_LOGIN_MUTATION = graphql(`
   mutation AcceptAdaptiveLogin {
     adaptiveLogin {
-      active 
+      active
     }
-  } 
-`)
+  }
+`);
 
 export const useAdaptiveLogin = (init: boolean) => {
   const [isEnabled, setIsEnabled] = useState(init);
@@ -24,9 +23,7 @@ export const useAdaptiveLogin = (init: boolean) => {
     try {
       const { data } = await acceptAdaptiveLogin();
       setIsEnabled(data?.adaptiveLogin.active ?? false);
-    } catch (error) {
-
-    }
+    } catch (error) {}
   };
 
   return {
@@ -34,4 +31,4 @@ export const useAdaptiveLogin = (init: boolean) => {
     handleToggleChange,
     isPending: loading,
   };
-}
+};

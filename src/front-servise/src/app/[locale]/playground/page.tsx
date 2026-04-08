@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Input, Toggle, Textarea, Table, Modal } from '@/components/ui';
-import type { TableColumn } from '@/components/ui';
+import { Button, Input, Toggle, Textarea, Table, Modal, Select } from '@/components/ui';
+import type { TableColumn, SelectOption } from '@/components/ui';
+import { UserStatus, UserRole } from '@/app/gql/graphql';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -81,11 +82,28 @@ type FormData = {
 
 // ── page ──────────────────────────────────────────────────────────────────────
 
+const STATUS_OPTIONS: SelectOption<UserStatus>[] = [
+  { value: UserStatus.Pending, label: 'Pending' },
+  { value: UserStatus.Active, label: 'Active' },
+  { value: UserStatus.Suspended, label: 'Suspended' },
+  { value: UserStatus.Banned, label: 'Banned' },
+];
+
+const ROLE_OPTIONS: SelectOption<UserRole>[] = [
+  { value: UserRole.Owner, label: 'Owner' },
+  { value: UserRole.Admin, label: 'Admin' },
+  { value: UserRole.SuperUser, label: 'SuperUser' },
+  { value: UserRole.Member, label: 'Member' },
+  { value: UserRole.User, label: 'User' },
+];
+
 export default function PlaygroundPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [toggle1, setToggle1] = useState(false);
   const [toggle2, setToggle2] = useState(true);
   const [submitted, setSubmitted] = useState<FormData | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<UserStatus>(UserStatus.Active);
+  const [selectedRole, setSelectedRole] = useState<UserRole>(UserRole.User);
 
   const {
     register,
@@ -274,6 +292,44 @@ export default function PlaygroundPage() {
               </div>
             </form>
           </Card>
+        </Section>
+
+        {/* ── SELECT ── */}
+        <Section title="Select / Dropdown">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <p className="text-xs text-slate-500 font-medium">Status użytkownika</p>
+              <Select<UserStatus>
+                label="Status"
+                value={selectedStatus}
+                onChange={setSelectedStatus}
+                options={STATUS_OPTIONS}
+              />
+              <p className="text-xs text-muted">Wybrano: {selectedStatus}</p>
+            </Card>
+
+            <Card>
+              <p className="text-xs text-slate-500 font-medium">Rola użytkownika</p>
+              <Select<UserRole>
+                label="Rola"
+                value={selectedRole}
+                onChange={setSelectedRole}
+                options={ROLE_OPTIONS}
+              />
+              <p className="text-xs text-muted">Wybrano: {selectedRole}</p>
+            </Card>
+
+            <Card>
+              <p className="text-xs text-slate-500 font-medium">Zablokowany</p>
+              <Select<UserStatus>
+                label="Status (disabled)"
+                value={UserStatus.Active}
+                onChange={() => {}}
+                options={STATUS_OPTIONS}
+                disabled
+              />
+            </Card>
+          </div>
         </Section>
 
         {/* ── MODAL trigger ── */}

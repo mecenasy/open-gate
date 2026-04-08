@@ -13,8 +13,15 @@ export class LoginService {
 
   async login(email: string, password: string): Promise<LoginResponse> {
     const user = await this.userService.findUserWithPassword(email);
-    if (!user) {
+    console.log('🚀 ~ LoginService ~ login ~ user:', user);
+    if (!user || !user.password) {
       return { success: false, message: 'Unknown user' };
+    }
+
+    const role = user.userRole?.userType;
+    console.log('🚀 ~ LoginService ~ login ~ role:', role);
+    if (role !== UserType.Owner && role !== UserType.SuperUser) {
+      return { success: false, message: 'Access denied' };
     }
 
     const isPasswordValid = this.passwordService.validatePassword(password, user.password);
@@ -44,7 +51,8 @@ export class LoginService {
     }
     return {
       userStatus: {
-        admin: user.userRole.userType === UserType.SuperUser,
+        admin: user.userRole.userType === UserType.SuperUser || user.userRole.userType === UserType.Owner,
+        owner: user.userRole.userType === UserType.Owner,
         email: user.email,
         isAdaptive: user.userSettings.isAdaptiveAuthEnabled,
         is2fa: user.userSettings.isTwoFactorEnabled,
@@ -69,7 +77,7 @@ export class LoginService {
   async changePassword(userId: string, oldPassword: string, newPassword: string): Promise<ChangePasswordResponse> {
     const user = await this.userService.findUserWithPasswordById(userId);
 
-    if (!user) {
+    if (!user || !user.password) {
       return { success: false, message: 'Unknown user' };
     }
 

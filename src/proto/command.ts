@@ -5,11 +5,11 @@
 // source: src/proto/command.proto
 
 /* eslint-disable */
-import type { Metadata } from '@grpc/grpc-js';
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import type { Metadata } from "@grpc/grpc-js";
+import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { Observable } from "rxjs";
 
-export const protobufPackage = 'command';
+export const protobufPackage = "command";
 
 /** Enum for predefined command actions */
 export enum CommandAction {
@@ -55,7 +55,9 @@ export interface UpdateCommandRequest {
   active?: boolean | undefined;
   actions: CommandAction[];
   /** JSON string */
-  parameters?: string | undefined;
+  parameters?:
+    | string
+    | undefined;
   /** Update permissions (replace existing) */
   roleNames: string[];
 }
@@ -112,7 +114,7 @@ export interface GetAllCommandsResponse {
   limit: number;
 }
 
-export const COMMAND_PACKAGE_NAME = 'command';
+export const COMMAND_PACKAGE_NAME = "command";
 
 export interface CommandServiceClient {
   /** Create a new command */
@@ -198,24 +200,24 @@ export interface CommandServiceController {
 export function CommandServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      'addCommand',
-      'updateCommand',
-      'getCommand',
-      'getAllCommands',
-      'getAllByPermission',
-      'getByPermission',
-      'toggleActiveStatus',
+      "addCommand",
+      "updateCommand",
+      "getCommand",
+      "getAllCommands",
+      "getAllByPermission",
+      "getByPermission",
+      "toggleActiveStatus",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('CommandService', method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod("CommandService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('CommandService', method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod("CommandService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const COMMAND_SERVICE_NAME = 'CommandService';
+export const COMMAND_SERVICE_NAME = "CommandService";

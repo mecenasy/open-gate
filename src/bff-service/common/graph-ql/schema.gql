@@ -36,9 +36,44 @@ type UserType {
   email: String!
 }
 
+type UserSummaryType {
+  id: ID!
+  name: String!
+  surname: String!
+  email: String!
+  phone: String!
+  status: UserStatus!
+  type: UserRole!
+}
+
+enum UserStatus {
+  Pending
+  Active
+  Suspended
+  Banned
+}
+
+enum UserRole {
+  Owner
+  Admin
+  SuperUser
+  Member
+  User
+}
+
+type UsersListType {
+  users: [UserSummaryType!]!
+  total: Int!
+}
+
+type SuccessResponseType {
+  success: Boolean!
+}
+
 type UserStatusType {
   id: ID!
   admin: Boolean!
+  owner: Boolean!
   email: String!
   is2faEnabled: Boolean!
   isAdaptiveLoginEnabled: Boolean!
@@ -72,13 +107,28 @@ type QrChallengeType {
 }
 
 type Query {
+  users(input: GetAllUsersType): UsersListType!
+  user(input: GetUserType!): UserSummaryType!
   loginStatus: LoginStatusType!
   verifyToken(token: String!): VerifyTokenType!
   getPasskeys: [PassKeyType!]!
 }
 
+input GetAllUsersType {
+  page: Int = 1
+  limit: Int = 10
+}
+
+input GetUserType {
+  id: String!
+}
+
 type Mutation {
   createUser(input: CreateUserType!): UserType!
+  updateUser(input: UpdateUserType!): UserSummaryType!
+  updateUserStatus(input: UpdateUserStatusType!): UserSummaryType!
+  updateUserRole(input: UpdateUserRoleType!): UserSummaryType!
+  removeUser(input: GetUserType!): SuccessResponseType!
   accept2fa: AcceptType!
   reject2fa: StatusType!
   adaptiveLogin: AcceptAdaptiveLoginType!
@@ -109,6 +159,24 @@ input CreateUserType {
   name: String!
   surname: String!
   type: String!
+}
+
+input UpdateUserType {
+  id: ID!
+  email: String
+  phone: String
+  name: String
+  surname: String
+}
+
+input UpdateUserStatusType {
+  id: ID!
+  status: UserStatus!
+}
+
+input UpdateUserRoleType {
+  id: ID!
+  type: UserRole!
 }
 
 input VerifyCodeType {

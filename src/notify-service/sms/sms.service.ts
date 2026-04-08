@@ -13,7 +13,6 @@ export class SmsService {
     this.client = new Twilio(config?.sid, config?.token);
   }
 
-
   async sendCode(phoneNumber: string, code: number): Promise<void> {
     const phone = this.configService.get<SmsConfig>('sms')?.phone;
     try {

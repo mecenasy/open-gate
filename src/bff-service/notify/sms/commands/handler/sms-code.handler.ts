@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
-import { ClientGrpc } from '@nestjs/microservices';
+import type { ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { GrpcNotifyProxyKey } from 'src/bff-service/common/proxy/constance';
 import { NotificationServiceClient, NOTIFICATION_SERVICE_NAME } from 'src/proto/notification';

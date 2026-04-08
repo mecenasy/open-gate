@@ -10,6 +10,9 @@ export class UserStatusType {
   admin!: boolean;
 
   @Field()
+  owner?: boolean;
+
+  @Field()
   email!: string;
 
   @Field()

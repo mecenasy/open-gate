@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from "zod";
+import * as z from 'zod';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '../components/navigation/navigation';
 import { useMutation } from '@apollo/client/react';
@@ -29,11 +29,10 @@ function useLoginSchema() {
   });
 }
 
-
 export const useLogin = (
   setVerifyType: (type: AuthStatus) => void,
   setErrorMessage: (message: string) => void,
-  setLogin: (login: string) => void
+  setLogin: (login: string) => void,
 ) => {
   const router = useRouter();
   const [loginUser, { loading }] = useMutation(LOGIN_MUTATION);
@@ -50,7 +49,7 @@ export const useLogin = (
   });
 
   const onSubmit = async (data: z.infer<typeof schemas>) => {
-    console.log("🚀 ~ onSubmit ~ data:", data)
+    console.log('🚀 ~ onSubmit ~ data:', data);
     setLogin(data.email);
 
     try {
@@ -59,20 +58,18 @@ export const useLogin = (
 
       if (status === AuthStatus.Login) {
         reset();
-        router.replace("/");
+        router.replace('/');
         return;
       } else if (status === AuthStatus.Logout) {
         alert(t('loginWrong'));
-        return
+        return;
       }
 
-      setVerifyType(status as AuthStatus)
+      setVerifyType(status as AuthStatus);
     } catch (error: any) {
       setErrorMessage(error.message);
     }
   };
-
-
 
   return {
     errors,
@@ -80,4 +77,4 @@ export const useLogin = (
     onSubmit: handleSubmit(onSubmit),
     loading,
   };
-}
+};

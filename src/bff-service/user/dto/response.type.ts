@@ -1,8 +1,9 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ID, ObjectType, Int } from '@nestjs/graphql';
+import { UserRole, UserStatus } from './enums';
 
 @ObjectType()
 export class UserSummaryType {
-  @Field()
+  @Field(() => ID)
   id!: string;
 
   @Field()
@@ -16,12 +17,21 @@ export class UserSummaryType {
 
   @Field()
   phone!: string;
+
+  @Field(() => UserStatus)
+  status!: UserStatus;
+
+  @Field(() => UserRole)
+  type!: UserRole;
 }
 
 @ObjectType()
 export class UsersListType {
   @Field(() => [UserSummaryType])
   users!: UserSummaryType[];
+
+  @Field(() => Int)
+  total!: number;
 }
 
 @ObjectType()

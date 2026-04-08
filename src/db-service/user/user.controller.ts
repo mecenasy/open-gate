@@ -8,6 +8,8 @@ import type {
   GetUserRequest,
   GetUserByPhoneRequest,
   UpdateUserRequest,
+  UpdateUserStatusRequest,
+  UpdateUserRoleRequest,
   RemoveUserRequest,
   GetAllUsersRequest,
   UserData,
@@ -18,6 +20,7 @@ import type {
 import { USER_PROXY_SERVICE_NAME } from 'src/proto/user';
 import { UserService } from './user.service';
 import { jsToProtoUserType } from 'src/utils/user-type-converter';
+import { userStatusToProto } from 'src/utils/concert-status';
 
 @Controller()
 export class UserController implements UserProxyServiceController {
@@ -43,8 +46,8 @@ export class UserController implements UserProxyServiceController {
           phone: user.phone,
           name: user.name,
           surname: user.surname,
-          suspended: user.suspended,
-          type: jsToProtoUserType('user' as any),
+          status: userStatusToProto(user.status),
+          type: jsToProtoUserType(user.userRole.userType),
         },
       };
     } catch (error) {
@@ -76,8 +79,8 @@ export class UserController implements UserProxyServiceController {
           phone: user.phone,
           name: user.name,
           surname: user.surname,
-          suspended: user.suspended,
-          type: jsToProtoUserType('user' as any),
+          status: userStatusToProto(user.status),
+          type: jsToProtoUserType(user.userRole.userType),
         },
       };
     } catch (error) {
@@ -109,8 +112,8 @@ export class UserController implements UserProxyServiceController {
           phone: user.phone,
           name: user.name,
           surname: user.surname,
-          suspended: user.suspended,
-          type: jsToProtoUserType('user' as any),
+          status: userStatusToProto(user.status),
+          type: jsToProtoUserType(user.userRole.userType),
         },
       };
     } catch (error) {
@@ -149,14 +152,80 @@ export class UserController implements UserProxyServiceController {
           phone: user.phone,
           name: user.name,
           surname: user.surname,
-          suspended: user.suspended,
-          type: jsToProtoUserType('user' as any),
+          status: userStatusToProto(user.status),
+          type: jsToProtoUserType(user.userRole.userType),
         },
       };
     } catch (error) {
       return {
         status: false,
         message: `Failed to update user: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+  }
+
+  @GrpcMethod(USER_PROXY_SERVICE_NAME, 'UpdateUserStatus')
+  async updateUserStatus(request: UpdateUserStatusRequest): Promise<UserResponse> {
+    try {
+      const user = await this.userService.updateStatus(request.id, request.status);
+
+      if (!user) {
+        return {
+          status: false,
+          message: 'User not found',
+        };
+      }
+
+      return {
+        status: true,
+        message: 'User status updated successfully',
+        data: {
+          id: user.id,
+          email: user.email,
+          phone: user.phone,
+          name: user.name,
+          surname: user.surname,
+          status: userStatusToProto(user.status),
+          type: jsToProtoUserType(user.userRole.userType),
+        },
+      };
+    } catch (error) {
+      return {
+        status: false,
+        message: `Failed to update user status: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+  }
+
+  @GrpcMethod(USER_PROXY_SERVICE_NAME, 'UpdateUserRole')
+  async updateUserRole(request: UpdateUserRoleRequest): Promise<UserResponse> {
+    try {
+      const user = await this.userService.updateRole(request.id, request.type);
+
+      if (!user) {
+        return {
+          status: false,
+          message: 'User not found',
+        };
+      }
+
+      return {
+        status: true,
+        message: 'User role updated successfully',
+        data: {
+          id: user.id,
+          email: user.email,
+          phone: user.phone,
+          name: user.name,
+          surname: user.surname,
+          status: userStatusToProto(user.status),
+          type: jsToProtoUserType(user.userRole.userType),
+        },
+      };
+    } catch (error) {
+      return {
+        status: false,
+        message: `Failed to update user role: ${error instanceof Error ? error.message : 'Unknown error'}`,
       };
     }
   }
@@ -199,8 +268,8 @@ export class UserController implements UserProxyServiceController {
           phone: user.phone,
           name: user.name,
           surname: user.surname,
-          suspended: user.suspended,
-          type: jsToProtoUserType('user' as any),
+          status: userStatusToProto(user.status),
+          type: jsToProtoUserType(user.userRole.userType),
         })),
         total,
       };

@@ -5,11 +5,11 @@
 // source: src/proto/config.proto
 
 /* eslint-disable */
-import type { Metadata } from '@grpc/grpc-js';
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import type { Metadata } from "@grpc/grpc-js";
+import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { Observable } from "rxjs";
 
-export const protobufPackage = 'config';
+export const protobufPackage = "config";
 
 /** Configuration entity */
 export interface Config {
@@ -39,7 +39,8 @@ export interface GetByKeyRequest {
 }
 
 /** Request to get all configs */
-export interface GetAllRequest {}
+export interface GetAllRequest {
+}
 
 /** Response containing a single config */
 export interface ConfigResponse {
@@ -55,7 +56,7 @@ export interface GetAllResponse {
   data: Config[];
 }
 
-export const CONFIG_PACKAGE_NAME = 'config';
+export const CONFIG_PACKAGE_NAME = "config";
 
 export interface ConfigServiceClient {
   /** Add a new configuration entry */
@@ -107,17 +108,17 @@ export interface ConfigServiceController {
 
 export function ConfigServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['add', 'remove', 'getByKey', 'getAll'];
+    const grpcMethods: string[] = ["add", "remove", "getByKey", "getAll"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('ConfigService', method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod("ConfigService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('ConfigService', method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod("ConfigService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const CONFIG_SERVICE_NAME = 'ConfigService';
+export const CONFIG_SERVICE_NAME = "ConfigService";

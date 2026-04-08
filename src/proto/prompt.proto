@@ -11,25 +11,31 @@ service PromptProxyService {
 }
 
 enum UserType {
-  ADMIN = 0;
-  SUPER_USER = 1;
-  MEMBER = 2;
-  USER = 3;
+  OWNER = 0;
+  ADMIN = 1;
+  SUPER_USER = 2;
+  MEMBER = 3;
+  USER = 4;
 }
-
 message AddPromptRequest {
-  UserType promptType = 1;
+  UserType userType = 1;
   string prompt = 2;
+  string key = 3;
+  string description = 4;
+  string commandName = 5;
 }
 
 message GetPromptRequest {
-  UserType promptType = 1;
+  UserType userType = 1;
 }
 
 message UpdatePromptRequest {
   string id = 1;
-  optional UserType promptType = 2;
-  optional string prompt = 3;
+  optional string key = 2;
+  optional string description = 3;
+  optional string commandName = 4;
+  optional UserType userType = 5;
+  optional string prompt = 6;
 }
 
 message RemovePromptRequest {
@@ -39,7 +45,7 @@ message RemovePromptRequest {
 message GetAllPromptsRequest {
   int32 page = 1;
   int32 limit = 2;
-  optional UserType promptType = 3;
+  optional UserType userType = 3;
 }
 
 message PromptResponse {
@@ -51,12 +57,23 @@ message PromptResponse {
 message GetAllPromptsResponse {
   bool status = 1;
   string message = 2;
-  repeated Prompt data = 3;
+  repeated PromptSimply data = 3;
   int32 total = 4;
+}
+
+message PromptSimply {
+  string id = 1;
+  string key = 2;
+  string description = 3;
+  string commandName = 4;
+  UserType userType = 5;
 }
 
 message Prompt {
   string id = 1;
-  UserType promptType = 2;
-  string prompt = 3;
+  string key = 2;
+  string description = 3;
+  string commandName = 4;
+  UserType userType = 5;
+  string prompt = 6;
 }

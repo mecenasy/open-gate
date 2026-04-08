@@ -63,14 +63,14 @@
     },
     {
       "type": "shell",
-      "command": "docker exec -it api npm run typeorm migration:run -- -d typeorm.config.ts",
+      "command": "docker compose exec db-service npm run migration:run",
       "problemMatcher": [],
       "label": "migration:run",
       "detail": "migration of databae"
     },
     {
       "type": "shell",
-      "command": "docker compose exec db-service npm run migration:generate -- src/db-service/migrations/${input:fileName}",
+      "command": "docker compose exec db-service npm run migration:generate -- src/db-service/migrations/${input:fileName} ",
       "problemMatcher": [],
       "label": "migration:generate",
       "detail": "generate new migration of databae"

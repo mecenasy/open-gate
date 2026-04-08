@@ -8,7 +8,7 @@ import { graphql } from '@/app/gql';
 import { useRouter } from '@/components/navigation/navigation';
 
 const CHALLENGE_MUTATION = graphql(`
-  mutation QrChallenge ($nonce: String!) {
+  mutation QrChallenge($nonce: String!) {
     qrChallenge(nonce: $nonce) {
       challenge
       dataUrl
@@ -17,7 +17,7 @@ const CHALLENGE_MUTATION = graphql(`
 `);
 
 const LOGIN_MUTATION = graphql(`
-  mutation QrLogin ($challenge: String!, $nonce: String!) {
+  mutation QrLogin($challenge: String!, $nonce: String!) {
     qrLogin(challenge: $challenge, nonce: $nonce) {
       status
     }

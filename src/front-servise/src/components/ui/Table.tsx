@@ -15,32 +15,39 @@ interface TableProps<T extends Record<string, unknown>> {
   data: T[];
   keyExtractor?: (row: T, index: number) => string | number;
   emptyMessage?: string;
+  onRowClick?: (row: T) => void;
 }
 
 function TableRow<T extends Record<string, unknown>>({
   row,
   columns,
+  onRowClick,
 }: {
   row: T;
   columns: TableColumn<T>[];
+  onRowClick?: (row: T) => void;
 }) {
   const [spring, api] = useSpring(() => ({
-    backgroundColor: 'rgba(15,23,42,0)',
+    backgroundColor: 'rgba(0,0,0,0)',
     config: { tension: 300, friction: 30 },
   }));
 
   return (
     <animated.tr
       style={spring}
-      onMouseEnter={() => api.start({ backgroundColor: 'rgba(30,41,59,0.45)' })}
-      onMouseLeave={() => api.start({ backgroundColor: 'rgba(15,23,42,0)' })}
-      className="border-b border-slate-800/60 transition-colors"
+      onMouseEnter={() => api.start({ backgroundColor: 'var(--color-hover)' })}
+      onMouseLeave={() => api.start({ backgroundColor: 'rgba(0,0,0,0)' })}
+      onClick={onRowClick ? () => onRowClick(row) : undefined}
+      className={[
+        'border-b border-border transition-colors',
+        onRowClick ? 'cursor-pointer' : '',
+      ].join(' ')}
     >
       {columns.map((col) => (
         <td
           key={String(col.key)}
           className={[
-            'px-4 py-3 text-sm text-slate-300',
+            'px-4 py-3 text-sm text-text',
             col.align === 'center'
               ? 'text-center'
               : col.align === 'right'
@@ -62,18 +69,19 @@ export function Table<T extends Record<string, unknown>>({
   data,
   keyExtractor,
   emptyMessage = 'Brak danych',
+  onRowClick,
 }: TableProps<T>) {
   return (
-    <div className="rounded-xl border border-slate-800/80 overflow-hidden bg-slate-900/40">
+    <div className="rounded-xl border border-border overflow-hidden bg-surface">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-slate-800">
+            <tr className="border-b border-border bg-surface-raised">
               {columns.map((col) => (
                 <th
                   key={String(col.key)}
                   className={[
-                    'px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-900/60',
+                    'px-4 py-3 text-xs font-semibold text-muted uppercase tracking-wider',
                     col.align === 'center'
                       ? 'text-center'
                       : col.align === 'right'
@@ -91,7 +99,7 @@ export function Table<T extends Record<string, unknown>>({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-4 py-8 text-center text-sm text-slate-600"
+                  className="px-4 py-8 text-center text-sm text-muted"
                 >
                   {emptyMessage}
                 </td>
@@ -102,6 +110,7 @@ export function Table<T extends Record<string, unknown>>({
                   key={keyExtractor ? keyExtractor(row, i) : i}
                   row={row}
                   columns={columns}
+                  onRowClick={onRowClick}
                 />
               ))
             )}

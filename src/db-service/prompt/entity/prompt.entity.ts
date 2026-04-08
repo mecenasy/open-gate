@@ -1,33 +1,55 @@
-import { IsString } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
 import { UserType } from '../../user/user-type';
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('prompts')
 export class Prompt {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
+  @Column({
+    type: 'varchar',
+    unique: true,
+    // TODO: make it not null after we migrate existing data
+    nullable: true,
+  })
+  @IsString()
+  key!: string;
+
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  @IsString()
+  description!: string;
+
+  @Column({
+    type: 'varchar',
+    // TODO: make it not null after we migrate existing data
+    nullable: true,
+  })
+  commandName!: string;
   @Column({
     type: 'enum',
     enum: UserType,
-    unique: true,
     default: UserType.User,
   })
-  promptType: UserType;
+  @IsEnum(UserType)
+  userType!: UserType;
 
   @Column({
     type: 'varchar',
     nullable: false,
   })
   @IsString()
-  prompt: string;
+  prompt!: string;
 
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP(6)',
   })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',
@@ -35,5 +57,5 @@ export class Prompt {
     default: () => 'CURRENT_TIMESTAMP(6)',
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
-  updatedAt: Date;
+  updatedAt!: Date;
 }

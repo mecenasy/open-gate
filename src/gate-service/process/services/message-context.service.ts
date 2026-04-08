@@ -10,7 +10,7 @@ import type { ChatCompletionMessageParam } from 'groq-sdk/resources/chat/complet
 @Injectable()
 export class MessageContextService implements OnModuleInit {
   private readonly logger = new Logger(MessageContextService.name);
-  private gRpcService: PromptProxyServiceClient;
+  private gRpcService!: PromptProxyServiceClient;
 
   constructor(
     private readonly cache: CacheService,

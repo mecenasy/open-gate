@@ -22,7 +22,10 @@ export class PromptGrpcController implements PromptProxyServiceController {
   async addPrompt(request: AddPromptRequest): Promise<PromptResponse> {
     try {
       const prompt = await this.promptService.create({
-        promptType: request.promptType,
+        commandName: request.commandName,
+        description: request.description,
+        key: request.key,
+        userType: request.userType,
         prompt: request.prompt,
       });
 
@@ -31,7 +34,10 @@ export class PromptGrpcController implements PromptProxyServiceController {
         message: 'Prompt created successfully',
         data: {
           id: prompt.id,
-          promptType: jsToProtoUserType(prompt.promptType),
+          key: prompt.key,
+          commandName: prompt.commandName,
+          description: prompt.description,
+          userType: jsToProtoUserType(prompt.userType),
           prompt: prompt.prompt,
         },
       };
@@ -46,7 +52,7 @@ export class PromptGrpcController implements PromptProxyServiceController {
   @GrpcMethod(PROMPT_PROXY_SERVICE_NAME, 'GetPrompt')
   async getPrompt(request: GetPromptRequest): Promise<PromptResponse> {
     try {
-      const prompt = await this.promptService.findByPromptType(request.promptType);
+      const prompt = await this.promptService.findByUserType(request.userType);
 
       if (!prompt) {
         return {
@@ -60,7 +66,10 @@ export class PromptGrpcController implements PromptProxyServiceController {
         message: 'Prompt found',
         data: {
           id: prompt.id,
-          promptType: jsToProtoUserType(prompt.promptType),
+          commandName: prompt.commandName,
+          description: prompt.description,
+          key: prompt.key,
+          userType: jsToProtoUserType(prompt.userType),
           prompt: prompt.prompt,
         },
       };
@@ -76,8 +85,11 @@ export class PromptGrpcController implements PromptProxyServiceController {
   async updatePrompt(request: UpdatePromptRequest): Promise<PromptResponse> {
     try {
       const updateData: Partial<AddPromptRequest> = {};
-      if (request.promptType !== undefined) updateData.promptType = request.promptType;
+      if (request.userType !== undefined) updateData.userType = request.userType;
       if (request.prompt) updateData.prompt = request.prompt;
+      if (request.key) updateData.key = request.key;
+      if (request.description) updateData.description = request.description;
+      if (request.commandName) updateData.commandName = request.commandName;
 
       const prompt = await this.promptService.update(request.id, updateData);
 
@@ -93,7 +105,10 @@ export class PromptGrpcController implements PromptProxyServiceController {
         message: 'Prompt updated successfully',
         data: {
           id: prompt.id,
-          promptType: jsToProtoUserType(prompt.promptType),
+          key: prompt.key,
+          description: prompt.description,
+          commandName: prompt.commandName,
+          userType: jsToProtoUserType(prompt.userType),
           prompt: prompt.prompt,
         },
       };
@@ -132,14 +147,17 @@ export class PromptGrpcController implements PromptProxyServiceController {
   @GrpcMethod(PROMPT_PROXY_SERVICE_NAME, 'GetAllPrompts')
   async getAllPrompts(request: GetAllPromptsRequest): Promise<GetAllPromptsResponse> {
     try {
-      const { prompts, total } = await this.promptService.findAll(request.page, request.limit, request.promptType);
+      const { prompts, total } = await this.promptService.findAll(request.page, request.limit, request.userType);
 
       return {
         status: true,
         message: 'Prompts retrieved successfully',
         data: prompts.map((prompt) => ({
           id: prompt.id,
-          promptType: jsToProtoUserType(prompt.promptType),
+          key: prompt.key,
+          description: prompt.description,
+          commandName: prompt.commandName,
+          userType: jsToProtoUserType(prompt.userType),
           prompt: prompt.prompt,
         })),
         total,

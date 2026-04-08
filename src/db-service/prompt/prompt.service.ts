@@ -15,7 +15,7 @@ export class PromptService {
   async create(promptData: AddPromptRequest): Promise<Prompt> {
     const prompt = this.promptRepository.create({
       ...promptData,
-      promptType: protoToJsUserType(promptData.promptType),
+      userType: protoToJsUserType(promptData.userType),
     });
     return await this.promptRepository.save(prompt);
   }
@@ -24,16 +24,16 @@ export class PromptService {
     return await this.promptRepository.findOne({ where: { id } });
   }
 
-  async findByPromptType(promptType: UserType): Promise<Prompt | null> {
-    return await this.promptRepository.findOne({ where: { promptType: protoToJsUserType(promptType) } });
+  async findByUserType(userType: UserType): Promise<Prompt | null> {
+    return await this.promptRepository.findOne({ where: { userType: protoToJsUserType(userType) } });
   }
 
   async findAll(
     page: number = 1,
     limit: number = 10,
-    promptType?: UserType,
+    userType?: UserType,
   ): Promise<{ prompts: Prompt[]; total: number }> {
-    const whereCondition = promptType ? { promptType: protoToJsUserType(promptType) } : {};
+    const whereCondition = userType ? { userType: protoToJsUserType(userType) } : {};
 
     const [prompts, total] = await this.promptRepository.findAndCount({
       where: whereCondition,
@@ -46,7 +46,7 @@ export class PromptService {
   async update(id: string, updateData: Partial<AddPromptRequest>): Promise<Prompt | null> {
     await this.promptRepository.update(id, {
       ...updateData,
-      promptType: updateData.promptType ? protoToJsUserType(updateData.promptType) : undefined,
+      userType: updateData.userType ? protoToJsUserType(updateData.userType) : undefined,
     });
     return await this.findById(id);
   }

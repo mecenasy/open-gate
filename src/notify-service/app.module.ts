@@ -9,7 +9,14 @@ import { SmtpModule } from './smtp/smtp.module';
 import { NotifyGrpcModule } from './grpc/notify-grpc.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), CqrsModule, SignalModule, SmsModule, SmtpModule, NotifyGrpcModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    CqrsModule,
+    SignalModule,
+    SmsModule,
+    SmtpModule,
+    NotifyGrpcModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

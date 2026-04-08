@@ -34,7 +34,7 @@ export const useWebAuthnSettings = (setShow: (show: boolean) => void) => {
 
   useEffect(() => {
     setShow(!isLocal);
-  }, [isLocal, setShow])
+  }, [isLocal, setShow]);
 
   const [removePasskey] = useMutation(REMOVE_PASSKEY_MUTATION, {
     refetchQueries: ['GetPasskeys'],
@@ -46,13 +46,11 @@ export const useWebAuthnSettings = (setShow: (show: boolean) => void) => {
       const isCurrentDeviceActive = localStorage.getItem(`webauthn_${credentialId}`);
 
       if (isCurrentDeviceActive) {
-        setShow(true)
+        setShow(true);
         localStorage.removeItem(`webauthn_${credentialId}`);
       }
-    } catch (error) {
-
-    }
-  }
+    } catch (error) {}
+  };
 
   return { keys, isLoading: loading, isCurrentDeviceActive: isLocal, onRemoveKey };
-}
+};

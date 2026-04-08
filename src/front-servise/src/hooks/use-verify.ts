@@ -1,4 +1,4 @@
-import * as z from "zod";
+import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { verificationSchema } from '../components/schemas/schemas';
@@ -20,9 +20,9 @@ const getUrl = (type?: AuthStatus) => {
     default:
       return '';
   }
-}
+};
 const VERIFY_MFA_MUTATION = graphql(`
-  mutation VerifyMfa($input:  VerifyCodeType!) {
+  mutation VerifyMfa($input: VerifyCodeType!) {
     verifyMfa(input: $input) {
       status
     }
@@ -36,9 +36,12 @@ const VERIFY_2FA_MUTATION = graphql(`
   }
 `);
 
-
-
-export const useVerify = (login: string, verifyType?: AuthStatus, callBack?: (status: AuthStatus) => void, token?: string) => {
+export const useVerify = (
+  login: string,
+  verifyType?: AuthStatus,
+  callBack?: (status: AuthStatus) => void,
+  token?: string,
+) => {
   const router = useRouter();
   const t = useTranslations('login');
   const tSchemas = useTranslations('schemas');
@@ -70,12 +73,12 @@ export const useVerify = (login: string, verifyType?: AuthStatus, callBack?: (st
 
   const onSubmit = async ({ code }: VerificationFormValues) => {
     try {
-      const result = await verify(login, code, token)
-      callBack?.(result?.status as AuthStatus)
-      router.replace("/");
+      const result = await verify(login, code, token);
+      callBack?.(result?.status as AuthStatus);
+      router.replace('/');
     } catch (error) {
-      console.error("Verification failed:", error);
-      alert(t("verifyWrong"));
+      console.error('Verification failed:', error);
+      alert(t('verifyWrong'));
     }
   };
 
@@ -85,5 +88,4 @@ export const useVerify = (login: string, verifyType?: AuthStatus, callBack?: (st
     errors,
     isPending: verifyMfaMeta.loading || verify2faMeta.loading,
   };
-
-}
+};

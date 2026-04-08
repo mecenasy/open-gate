@@ -5,11 +5,11 @@
 // source: src/proto/passkey.proto
 
 /* eslint-disable */
-import type { Metadata } from '@grpc/grpc-js';
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import type { Metadata } from "@grpc/grpc-js";
+import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { Observable } from "rxjs";
 
-export const protobufPackage = 'passkey';
+export const protobufPackage = "passkey";
 
 export interface RemovePasskeyRequest {
   id: string;
@@ -60,7 +60,7 @@ export interface SetCounterRequest {
   counter: number;
 }
 
-export const PASSKEY_PACKAGE_NAME = 'passkey';
+export const PASSKEY_PACKAGE_NAME = "passkey";
 
 export interface PasskeyProxyServiceClient {
   removePasskey(request: RemovePasskeyRequest, metadata?: Metadata): Observable<PasskeyResponse>;
@@ -103,17 +103,17 @@ export interface PasskeyProxyServiceController {
 
 export function PasskeyProxyServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['removePasskey', 'addPasskey', 'getPasskey', 'getPasskeys', 'setCounter'];
+    const grpcMethods: string[] = ["removePasskey", "addPasskey", "getPasskey", "getPasskeys", "setCounter"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('PasskeyProxyService', method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod("PasskeyProxyService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('PasskeyProxyService', method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod("PasskeyProxyService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const PASSKEY_PROXY_SERVICE_NAME = 'PasskeyProxyService';
+export const PASSKEY_PROXY_SERVICE_NAME = "PasskeyProxyService";

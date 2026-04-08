@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Request } from 'express';
 import { SessionData } from 'express-session';
-import { Context } from 'src/common/types/context';
+import { Context } from '../types/context';
 
 interface GraphQLOperation {
   query?: string;

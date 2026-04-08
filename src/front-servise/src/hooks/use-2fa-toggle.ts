@@ -6,12 +6,14 @@ import { useMutation } from '@apollo/client/react';
 import { AuthStatus } from '@/app/gql/graphql';
 import { graphql } from '@/app/gql';
 
-type TfaStatus = {
-  status: AuthStatus.accept2fa
-  dataUrl: string
-} | {
-  status: Exclude<AuthStatus, AuthStatus.accept2fa>
-}
+type TfaStatus =
+  | {
+      status: AuthStatus.accept2fa;
+      dataUrl: string;
+    }
+  | {
+      status: Exclude<AuthStatus, AuthStatus.accept2fa>;
+    };
 
 const ACCEPT_TFA_MUTATION = graphql(`
   mutation AcceptTfa {
@@ -60,7 +62,9 @@ export const use2faToggle = (init: boolean, setQrCode: (code: string) => void) =
   const cancelSetup = async () => {
     try {
       await reject2fa();
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     setIsEnabled(false);
     setQrCode('');
   };
@@ -71,4 +75,4 @@ export const use2faToggle = (init: boolean, setQrCode: (code: string) => void) =
     cancelSetup,
     isPending: metaAccept.loading || metaReject.loading,
   };
-}
+};

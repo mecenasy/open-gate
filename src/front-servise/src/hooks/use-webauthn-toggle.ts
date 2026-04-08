@@ -35,10 +35,9 @@ export const useWebAuthnToggle = (setShow: (show: boolean) => void) => {
   const handleToggleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
     if (checked) {
-
       try {
-        const { data } = await registerOption()
-        const options = data?.registerOptionPasskey
+        const { data } = await registerOption();
+        const options = data?.registerOptionPasskey;
 
         const regResponse = await startRegistration({ optionsJSON: options });
         localStorage.setItem(`webauthn_${regResponse.id}`, 'true');
@@ -46,13 +45,12 @@ export const useWebAuthnToggle = (setShow: (show: boolean) => void) => {
         setShow(!regResponse);
         setCredentialId(regResponse.id ?? '');
         await verifyOption({ variables: { input: regResponse } });
-
       } catch (error) {
         console.error('Błąd biometrii:', error);
         setCredentialId('');
       }
     } else {
-      localStorage.removeItem(`webauthn_${credentialId}`)
+      localStorage.removeItem(`webauthn_${credentialId}`);
       removePasskey({ variables: { id: credentialId } });
       setCredentialId('');
     }
@@ -62,5 +60,5 @@ export const useWebAuthnToggle = (setShow: (show: boolean) => void) => {
     isEnabled: Boolean(credentialId),
     handleToggleChange,
     isPending: metaOption.loading || metaVerify.loading || metaRemove.loading,
-  }
-}
+  };
+};

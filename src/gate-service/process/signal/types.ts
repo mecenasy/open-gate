@@ -119,3 +119,18 @@ export enum MessageType {
   Command = 'command',
   Unknown = 'unknown',
 }
+
+export enum UserType {
+  Owner = 'owner',
+  Admin = 'admin',
+  SuperUser = 'super_user',
+  Member = 'member',
+  User = 'user',
+}
+
+export enum UserStatus {
+  Pending = 'pending',
+  Active = 'active',
+  Suspended = 'suspended',
+  Banned = 'banned',
+}

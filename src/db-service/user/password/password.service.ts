@@ -12,12 +12,12 @@ export class PasswordService {
     private readonly repository: Repository<Password>,
   ) {}
 
-  public createPassword(password: string = 'Pass123#'): IPassword {
+  public createPassword(password: string = 'Pass123#') {
     const { salt, hash } = this.generatePassword(password);
     return this.repository.create({ salt, hash });
   }
 
-  public validatePassword(password: string, { salt, hash }: IPassword): boolean {
+  public validatePassword(password: string, { salt, hash }: Password): boolean {
     const hashVerify = bcrypt.hashSync(password, salt);
 
     return hashVerify === hash;

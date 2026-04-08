@@ -1,6 +1,6 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { useRouter } from '../components/navigation/navigation';
 import { useTranslations } from 'next-intl';
 import { useMutation } from '@apollo/client/react';
@@ -44,9 +44,9 @@ function useRegisterSchema() {
 }
 
 export const useRegister = (setError: (message: string) => void) => {
-  const [createUser, { loading }] = useMutation(REGISTER_MUTATION)
+  const [createUser, { loading }] = useMutation(REGISTER_MUTATION);
   const t = useTranslations('register');
-  const schemas = useRegisterSchema()
+  const schemas = useRegisterSchema();
   const router = useRouter();
 
   const {
@@ -61,12 +61,11 @@ export const useRegister = (setError: (message: string) => void) => {
   const onSubmit = async (data: z.infer<typeof schemas>) => {
     try {
       const { confirmPassword: _, ...rest } = data;
-      console.log("🚀 ~ onSubmit ~ rest:", rest)
+      console.log('🚀 ~ onSubmit ~ rest:', rest);
       await createUser({ variables: { input: { ...rest, type: 'user' } } });
 
       reset();
-      router.replace("/");
-
+      router.replace('/');
     } catch (error) {
       setError(t('registerWrong'));
     }
@@ -77,5 +76,5 @@ export const useRegister = (setError: (message: string) => void) => {
     errors,
     onSubmit: handleSubmit(onSubmit),
     loading,
-  }
-}
+  };
+};

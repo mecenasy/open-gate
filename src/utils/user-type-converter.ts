@@ -7,13 +7,15 @@ import { UserType as JsUserType } from '../db-service/user/user-type';
 export function jsToProtoUserType(jsUserType: JsUserType): ProtoUserType {
   switch (jsUserType) {
     case JsUserType.Admin:
-      return 0; // ProtoUserType.ADMIN
+      return ProtoUserType.ADMIN;
     case JsUserType.SuperUser:
-      return 1; // ProtoUserType.SUPER_USER
+      return ProtoUserType.SUPER_USER;
     case JsUserType.Member:
-      return 2; // ProtoUserType.MEMBER
+      return ProtoUserType.MEMBER;
     case JsUserType.User:
-      return 3; // ProtoUserType.USER
+      return ProtoUserType.USER;
+    case JsUserType.Owner:
+      return ProtoUserType.OWNER;
     default:
       throw new Error(`Unknown UserType: ${String(jsUserType)}`);
   }
@@ -32,6 +34,8 @@ export function protoToJsUserType(protoUserType: ProtoUserType): JsUserType {
       return JsUserType.Member;
     case ProtoUserType.USER: // ProtoUserType.USER
       return JsUserType.User;
+    case ProtoUserType.OWNER:
+      return JsUserType.Owner;
     case ProtoUserType.UNRECOGNIZED: // ProtoUserType.UNRECOGNIZED
     default:
       throw new Error(`Unknown Proto UserType: ${protoUserType}`);

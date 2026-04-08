@@ -5,32 +5,39 @@
 // source: src/proto/prompt.proto
 
 /* eslint-disable */
-import type { Metadata } from '@grpc/grpc-js';
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import type { Metadata } from "@grpc/grpc-js";
+import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { Observable } from "rxjs";
 
-export const protobufPackage = 'prompt';
+export const protobufPackage = "prompt";
 
 export enum UserType {
-  ADMIN = 0,
-  SUPER_USER = 1,
-  MEMBER = 2,
-  USER = 3,
+  OWNER = 0,
+  ADMIN = 1,
+  SUPER_USER = 2,
+  MEMBER = 3,
+  USER = 4,
   UNRECOGNIZED = -1,
 }
 
 export interface AddPromptRequest {
-  promptType: UserType;
+  userType: UserType;
   prompt: string;
+  key: string;
+  description: string;
+  commandName: string;
 }
 
 export interface GetPromptRequest {
-  promptType: UserType;
+  userType: UserType;
 }
 
 export interface UpdatePromptRequest {
   id: string;
-  promptType?: UserType | undefined;
+  key?: string | undefined;
+  description?: string | undefined;
+  commandName?: string | undefined;
+  userType?: UserType | undefined;
   prompt?: string | undefined;
 }
 
@@ -41,7 +48,7 @@ export interface RemovePromptRequest {
 export interface GetAllPromptsRequest {
   page: number;
   limit: number;
-  promptType?: UserType | undefined;
+  userType?: UserType | undefined;
 }
 
 export interface PromptResponse {
@@ -53,17 +60,28 @@ export interface PromptResponse {
 export interface GetAllPromptsResponse {
   status: boolean;
   message: string;
-  data: Prompt[];
+  data: PromptSimply[];
   total: number;
+}
+
+export interface PromptSimply {
+  id: string;
+  key: string;
+  description: string;
+  commandName: string;
+  userType: UserType;
 }
 
 export interface Prompt {
   id: string;
-  promptType: UserType;
+  key: string;
+  description: string;
+  commandName: string;
+  userType: UserType;
   prompt: string;
 }
 
-export const PROMPT_PACKAGE_NAME = 'prompt';
+export const PROMPT_PACKAGE_NAME = "prompt";
 
 export interface PromptProxyServiceClient {
   addPrompt(request: AddPromptRequest, metadata?: Metadata): Observable<PromptResponse>;
@@ -106,17 +124,17 @@ export interface PromptProxyServiceController {
 
 export function PromptProxyServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['addPrompt', 'getPrompt', 'updatePrompt', 'removePrompt', 'getAllPrompts'];
+    const grpcMethods: string[] = ["addPrompt", "getPrompt", "updatePrompt", "removePrompt", "getAllPrompts"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('PromptProxyService', method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod("PromptProxyService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('PromptProxyService', method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod("PromptProxyService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const PROMPT_PROXY_SERVICE_NAME = 'PromptProxyService';
+export const PROMPT_PROXY_SERVICE_NAME = "PromptProxyService";

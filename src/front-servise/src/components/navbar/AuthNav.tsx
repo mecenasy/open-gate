@@ -3,6 +3,7 @@
 import { usePathname } from '@/components/navigation/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { NavIconLink, NavIconButton } from './NavIconButton';
+import { Link } from '@/components/navigation/navigation';
 import loginIcon from '@/assets/login.svg';
 import registrationIcon from '@/assets/registration.svg';
 import logoutIcon from '@/assets/logout.svg';
@@ -19,6 +20,12 @@ export function AuthNav() {
   if (isAuthenticated) {
     return (
       <>
+        <Link
+          href="/users"
+          className="text-text text-sm font-medium hover:opacity-80 transition-opacity"
+        >
+          Użytkownicy
+        </Link>
         <NavIconLink href="/settings" icon={settingsIcon} alt="Settings" active={pathname === '/settings'} />
         <NavIconButton onClick={logout} icon={logoutIcon} alt="Logout" />
       </>

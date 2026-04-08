@@ -1,5 +1,5 @@
 // import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 // import axios from '../../src/api/api';
 import { useTranslations } from 'next-intl';
 import { useMutation } from '@apollo/client/react';
@@ -34,6 +34,10 @@ export const use2faToggle = (init: boolean, setQrCode: (code: string) => void) =
   const [isEnabled, setIsEnabled] = useState(init);
   const t = useTranslations('auth');
 
+  useEffect(() => {
+    setIsEnabled(init);
+  }, [init]);
+
   const [accept2fa, metaReject] = useMutation(ACCEPT_TFA_MUTATION);
   const [reject2fa, metaAccept] = useMutation(REJECT_TFA_MUTATION);
 
@@ -53,9 +57,18 @@ export const use2faToggle = (init: boolean, setQrCode: (code: string) => void) =
     }
   };
 
+  const cancelSetup = async () => {
+    try {
+      await reject2fa();
+    } catch { /* ignore */ }
+    setIsEnabled(false);
+    setQrCode('');
+  };
+
   return {
     isEnabled,
     handleToggleChange,
+    cancelSetup,
     isPending: metaAccept.loading || metaReject.loading,
   };
 }

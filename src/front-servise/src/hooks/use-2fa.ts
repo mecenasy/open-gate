@@ -4,8 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { verificationSchema } from '../components/schemas/schemas';
 import { useTranslations } from 'next-intl';
-import { graphql } from '../gql';
 import { useMutation } from '@apollo/client/react';
+import { graphql } from '@/app/gql';
 
 type VerificationFormValues = z.infer<ReturnType<typeof verificationSchema>>;
 
@@ -33,7 +33,6 @@ export const use2fa = (login: string, onSuccess: () => void) => {
   const onSubmit = async (data: VerificationFormValues) => {
     try {
       await verify2fa({ variables: { code: data.code } });
-      alert(t('tfaSuccess'));
       onSuccess();
     } catch {
       alert(t('wrongCode'));

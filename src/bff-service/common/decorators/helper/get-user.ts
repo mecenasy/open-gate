@@ -1,6 +1,6 @@
 import { ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { Context } from 'src/common/types/context';
+import { Context } from '../../types/context';
 
 export const getUser = (context: ExecutionContext): string | undefined => {
   const ctx = GqlExecutionContext.create(context);

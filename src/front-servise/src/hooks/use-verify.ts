@@ -42,8 +42,8 @@ export const useVerify = (login: string, verifyType?: AuthStatus, callBack?: (st
   const router = useRouter();
   const t = useTranslations('login');
   const tSchemas = useTranslations('schemas');
-  const [verifyMfa, verifyMfaMeta] = useMutation(VERIFY_MFA_MUTATION);
-  const [verify2fa, verify2faMeta] = useMutation(VERIFY_2FA_MUTATION);
+  const [verifyMfa, verifyMfaMeta] = useMutation(VERIFY_MFA_MUTATION, { refetchQueries: ['Status'] });
+  const [verify2fa, verify2faMeta] = useMutation(VERIFY_2FA_MUTATION, { refetchQueries: ['Status'] });
   const {
     register,
     handleSubmit,

@@ -9,13 +9,23 @@ interface ModalProps {
   title?: string;
   children: ReactNode;
   footer?: ReactNode;
+  /** When false, the parent is responsible for rendering the backdrop and locking body scroll. */
+  showBackdrop?: boolean;
 }
 
-export function Modal({ isOpen, onClose, title, children, footer }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  footer,
+  showBackdrop = true,
+}: ModalProps) {
   useEffect(() => {
+    if (!showBackdrop) return;
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
+  }, [isOpen, showBackdrop]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -39,15 +49,16 @@ export function Modal({ isOpen, onClose, title, children, footer }: ModalProps) 
 
   return (
     <>
-      {backdropTransition((style, show) =>
-        show ? (
-          <animated.div
-            style={{ ...style, backgroundColor: 'rgba(0,0,0,0.45)' }}
-            className="fixed inset-0 z-40"
-            onClick={onClose}
-          />
-        ) : null,
-      )}
+      {showBackdrop &&
+        backdropTransition((style, show) =>
+          show ? (
+            <animated.div
+              style={{ ...style, backgroundColor: 'rgba(0,0,0,0.45)' }}
+              className="fixed inset-0 z-40"
+              onClick={onClose}
+            />
+          ) : null,
+        )}
 
       {modalTransition((style, show) =>
         show ? (

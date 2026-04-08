@@ -33,7 +33,7 @@ export const useAuth = () => {
   const router = useRouter();
   const path = usePathname();
   const { data, loading, error, refetch } = useQuery(STATUS_QUERY, {
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'cache-and-network',
     nextFetchPolicy: 'cache-first',
     skip: path.includes('qr-verify') || /\/login\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/.test(path),
   })
@@ -52,7 +52,7 @@ export const useAuth = () => {
   }
 
   return {
-    isLoading: loading,
+    isLoading: loading && !data,
     isError: error,
     isAuthenticated: status === AuthStatus.Login,
     user: user,

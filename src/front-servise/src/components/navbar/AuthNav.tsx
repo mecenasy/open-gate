@@ -10,7 +10,11 @@ import settingsIcon from '@/assets/settings.svg';
 
 export function AuthNav() {
   const pathname = usePathname();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
+
+  if (isLoading) {
+    return <div className="w-18 h-9" />;
+  }
 
   if (isAuthenticated) {
     return (

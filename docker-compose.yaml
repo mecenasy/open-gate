@@ -1,7 +1,10 @@
 version: "3.8"
 
 services:
+  # Serwis konfiguracyjny cały systme główny, odpowiedzialny za logikę biznesową, komunikację z bazą danych i innymi serwisami poprzez gRPC oraz udostępnianie API dla frontendu
   bff-service:
+    profiles:
+      - front
     container_name: bff-service
     build:
       context: .
@@ -29,6 +32,7 @@ services:
         condition: service_healthy
       notify-service:
         condition: service_started
+        required: false
     networks:
       - backend-net
 
@@ -46,14 +50,17 @@ services:
   #     - "3001:3001"
   #   environment:
   #     WATCHPACK_POLLING: true
-  #     NEXT_PUBLIC_BFF_URL: "http://bff-service:3000"
+  #     NEXT_PUBLIC_BFF_URL: "http://bff-service:3001"
   #   depends_on:
   #     - bff-service
   #   networks:
   #     - backend-net
 
+  # Serwis główny, odpowiedzialny za logikę biznesową, komunikację z bazą danych i innymi serwisami poprzez gRPC oraz udostępnianie API dla frontendu
   gate-service:
     container_name: gate-service
+    profiles:
+      - gate
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -88,7 +95,11 @@ services:
     networks:
       - backend-net
 
+    # Database service - serwis odpowiedzialny za komunikację z bazą danych i udostępnianie danych innym serwisom poprzez gRPC
   db-service:
+    profiles:
+      - gate
+      - front
     container_name: db-service
     build:
       context: .
@@ -113,7 +124,11 @@ services:
       postgres:
         condition: service_healthy
 
+  # Serwis powiadamiajacy
   notify-service:
+    profiles:
+      - gate
+      - notify
     container_name: notify-service
     build:
       context: .
@@ -149,7 +164,12 @@ services:
     networks:
       - backend-net
 
+      # Database
+
   postgres:
+    profiles:
+      - gate
+      - front
     image: postgres:15-alpine
     container_name: postgres_db
     restart: unless-stopped
@@ -173,6 +193,9 @@ services:
 
   # Cache i kolejki Redis
   redis:
+    profiles:
+      - gate
+      - front
     image: redis:7-alpine
     container_name: redis_cache
     restart: unless-stopped
@@ -189,6 +212,8 @@ services:
 
   # Most do komunikacji Signal
   signal-api:
+    profiles:
+      - gate
     image: bbernhard/signal-cli-rest-api
     container_name: signal_bridge
     restart: unless-stopped

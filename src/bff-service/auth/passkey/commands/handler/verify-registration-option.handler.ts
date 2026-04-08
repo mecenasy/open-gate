@@ -36,7 +36,7 @@ export class VerifyRegistrationOptionHandler extends Handler<
       response: option,
       expectedChallenge: challenge,
       expectedOrigin: this.clientUrl,
-      expectedRPID: this.clientUrl?.replace('https://', ''),
+      expectedRPID: this.clientUrl?.replace('https://', '').replace('http://', '').replace(':4002', ''),
     });
 
     if (verification.verified) {

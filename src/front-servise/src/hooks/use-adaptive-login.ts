@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client/react';
 import { graphql } from '@/app/gql';
 
@@ -15,6 +15,10 @@ export const useAdaptiveLogin = (init: boolean) => {
   const [isEnabled, setIsEnabled] = useState(init);
 
   const [acceptAdaptiveLogin, { loading }] = useMutation(ADAPTIVE_LOGIN_MUTATION);
+
+  useEffect(() => {
+    setIsEnabled(init);
+  }, [init]);
 
   const handleToggleChange = async () => {
     try {

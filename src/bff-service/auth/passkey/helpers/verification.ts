@@ -11,7 +11,7 @@ export const verification = async (
     response,
     expectedChallenge: challenge,
     expectedOrigin: clientUrl,
-    expectedRPID: clientUrl.replace('https://', ''),
+    expectedRPID: clientUrl?.replace('https://', '').replace('http://', '').replace(':4002', ''),
     credential: {
       id: passkey.credentialID ?? '',
       publicKey: new Uint8Array(passkey.publicKey ?? []),

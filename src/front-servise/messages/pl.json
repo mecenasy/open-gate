@@ -25,7 +25,20 @@
     "verifySubmit": "Potwierdź",
     "verifySubmitting": "Weryfikacja…",
     "verifyWrong": "Nieprawidłowy kod weryfikacyjny",
-    "verifyBack": "Wróć"
+    "verifyBack": "Wróć",
+    "or": "lub",
+    "passkeyLogin": "Zaloguj się kluczem",
+    "qrLogin": "Zaloguj się kodem QR",
+    "qrBack": "Wróć do logowania",
+    "qrTitle": "Logowanie kodem QR"
+  },
+  "qrCode": {
+    "title": "Logowanie kodem QR",
+    "description": "Zeskanuj kod QR aplikacją Open Gate na innym urządzeniu, aby zalogować się tutaj.",
+    "waiting": "Oczekiwanie na potwierdzenie na Twoim urządzeniu…",
+    "canceled": "Logowanie zostało anulowane na drugim urządzeniu.",
+    "error": "Coś poszło nie tak. Spróbuj ponownie.",
+    "alert": "Otrzymano nieoczekiwane żądanie QR."
   },
   "register": {
     "title": "Rejestracja",
@@ -44,6 +57,35 @@
     "submit": "Zarejestruj się",
     "submitting": "Rejestracja…",
     "cancel": "Anuluj"
+  },
+  "auth": {
+    "tfaWrong": "Błąd podczas zmiany ustawień 2FA"
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "adaptiveTitle": "Adaptacyjne logowanie",
+    "adaptiveDesc": "System analizuje wzorce logowania i blokuje podejrzane próby dostępu.",
+    "tfaTitle": "Weryfikacja dwuetapowa (aplikacja)",
+    "tfaDesc": "Używaj aplikacji autoryzującej (np. Google Authenticator) do generowania kodów jednorazowych.",
+    "passkeyTitle": "Klucz dostępu",
+    "passkeyDesc": "Loguj się za pomocą biometrii lub klucza sprzętowego (odcisk palca, Face ID, YubiKey).",
+    "qrModalTitle": "Skonfiguruj aplikację autoryzującą",
+    "qrInstruction": "Zeskanuj kod QR w swojej aplikacji autoryzującej, następnie wpisz wygenerowany kod.",
+    "verifyCode": "Kod weryfikacyjny",
+    "verifyCodePlaceholder": "000000",
+    "confirm": "Potwierdź i włącz",
+    "confirming": "Weryfikacja…",
+    "tfaSuccess": "Weryfikacja dwuetapowa została włączona",
+    "wrongCode": "Nieprawidłowy kod. Spróbuj ponownie.",
+    "keysSectionTitle": "Twoje klucze",
+    "keysEmpty": "Nie dodano jeszcze żadnych kluczy.",
+    "currentDevice": "To urządzenie",
+    "keyAddedAt": "Dodano {date}",
+    "removeKey": "Usuń klucz",
+    "removeKeyTitle": "Usuń klucz",
+    "removeKeyConfirm": "Czy na pewno chcesz usunąć klucz „{name}\"? Nie będzie już można użyć go do logowania.",
+    "cancel": "Anuluj",
+    "remove": "Usuń"
   },
   "schemas": {
     "codeMin": "Minimum 6 cyfr",

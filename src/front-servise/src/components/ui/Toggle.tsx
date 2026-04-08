@@ -47,7 +47,7 @@ export function Toggle({ checked = false, onChange, label, disabled }: TogglePro
         />
       </animated.div>
 
-      {label && <span className="text-sm text-slate-300">{label}</span>}
+      {label && <span className="text-sm text-text">{label}</span>}
     </div>
   );
 }

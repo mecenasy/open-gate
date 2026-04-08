@@ -25,7 +25,7 @@ export const REMOVE_PASSKEY_MUTATION = graphql(`
   }
 `);
 
-export const useWebauthnToggle = (setShow: (show: boolean) => void) => {
+export const useWebAuthnToggle = (setShow: (show: boolean) => void) => {
   const [credentialId, setCredentialId] = useState('');
 
   const [registerOption, metaOption] = useMutation(REGISTER_OPTIONS_PASSKEY_MUTATION);

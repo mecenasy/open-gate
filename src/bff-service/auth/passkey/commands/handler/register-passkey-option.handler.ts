@@ -27,7 +27,7 @@ export class RegisterPasskeyOptionHandler extends Handler<
 
     const options = await generateRegistrationOptions({
       rpName: 'Autenticator',
-      rpID: this.clientUrl?.replace('https://', ''),
+      rpID: this.clientUrl?.replace('https://', '').replace('http://', '').replace(':4002', ''),
       userID: Buffer.from(userId),
       userName: user?.email ?? '',
       attestationType: 'none',

@@ -25,7 +25,20 @@
     "verifySubmit": "Confirm",
     "verifySubmitting": "Verifying…",
     "verifyWrong": "Invalid verification code",
-    "verifyBack": "Back"
+    "verifyBack": "Back",
+    "or": "or",
+    "passkeyLogin": "Sign in with passkey",
+    "qrLogin": "Sign in with QR code",
+    "qrBack": "Back to login",
+    "qrTitle": "Sign in with QR code"
+  },
+  "qrCode": {
+    "title": "Sign in with QR code",
+    "description": "Scan the QR code with the Open Gate app on another device to sign in here.",
+    "waiting": "Waiting for confirmation on your device…",
+    "canceled": "Sign-in canceled on the other device.",
+    "error": "Something went wrong. Please try again.",
+    "alert": "Received an unexpected QR challenge."
   },
   "register": {
     "title": "Register",
@@ -44,6 +57,35 @@
     "submit": "Create account",
     "submitting": "Creating account…",
     "cancel": "Cancel"
+  },
+  "auth": {
+    "tfaWrong": "Failed to change 2FA settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "adaptiveTitle": "Adaptive login",
+    "adaptiveDesc": "The system analyses login patterns and blocks suspicious access attempts.",
+    "tfaTitle": "Two-factor authentication (app)",
+    "tfaDesc": "Use an authenticator app (e.g. Google Authenticator) to generate one-time codes.",
+    "passkeyTitle": "Passkey",
+    "passkeyDesc": "Sign in using biometrics or a hardware key (fingerprint, Face ID, YubiKey).",
+    "qrModalTitle": "Set up authenticator app",
+    "qrInstruction": "Scan the QR code in your authenticator app, then enter the generated code.",
+    "verifyCode": "Verification code",
+    "verifyCodePlaceholder": "000000",
+    "confirm": "Confirm & enable",
+    "confirming": "Verifying…",
+    "tfaSuccess": "Two-factor authentication has been enabled",
+    "wrongCode": "Invalid code. Please try again.",
+    "keysSectionTitle": "Your passkeys",
+    "keysEmpty": "You haven't registered any passkeys yet.",
+    "currentDevice": "This device",
+    "keyAddedAt": "Added {date}",
+    "removeKey": "Remove passkey",
+    "removeKeyTitle": "Remove passkey",
+    "removeKeyConfirm": "Are you sure you want to remove the passkey \"{name}\"? You won't be able to use it to sign in anymore.",
+    "cancel": "Cancel",
+    "remove": "Remove"
   },
   "schemas": {
     "codeMin": "Minimum 6 digits",

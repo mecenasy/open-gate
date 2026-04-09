@@ -4,8 +4,8 @@ import { INestApplication, Logger } from '@nestjs/common';
 import { RedisStore } from 'connect-redis';
 import session from 'express-session';
 import { createClient } from 'redis';
-import { SessionConfig } from '../../configs/session.config';
-import { TypeConfigService } from '../../configs/types.config.service';
+import { SessionConfig } from '../../common/configs/session.config';
+import { TypeConfigService } from '../../common/configs/types.config.service';
 
 export const initSession = async (app: INestApplication) => {
   const config = app.get(TypeConfigService);

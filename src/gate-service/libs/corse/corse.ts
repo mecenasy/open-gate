@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
-import { SessionConfig } from '../../configs/session.config';
-import { TypeConfigService } from '../../configs/types.config.service';
+import { SessionConfig } from '../../common/configs/session.config';
+import { TypeConfigService } from '../../common/configs/types.config.service';
 
 export const initCorse = (app: INestApplication) => {
   const config = app.get(TypeConfigService);

@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"scripts/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch --preserveWatchOutput",
     "start:debug": "nest start --debug --watch",
@@ -144,7 +144,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
@@ -152,10 +152,19 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
-    "coverageDirectory": "../coverage",
+    "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
+      "^@app/db-grpc(|/.*)$": "<rootDir>/libs/db-grpc/src/$1",
+      "^@app/gate-grpc(|/.*)$": "<rootDir>/libs/gate-grpc/src/$1",
+      "^@app/notify-grpc(|/.*)$": "<rootDir>/libs/notify-grpc/src/$1",
+      "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
+      "^@app/shared-redis(|/.*)$": "<rootDir>/libs/shared-redis/src/$1",
       "^src/(.*)$": "<rootDir>/$1"
-    }
+    },
+    "roots": [
+      "<rootDir>/src/",
+      "<rootDir>/libs/"
+    ]
   }
 }

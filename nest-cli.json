@@ -10,7 +10,8 @@
         "include": "**/*.proto",
         "watchAssets": true
       }
-    ]
+    ],
+    "webpack": true
   },
   "watchOptions": {
     "usePolling": true,
@@ -18,11 +19,14 @@
   },
   "monorepo": true,
   "projects": {
-    "gate-service": {
-      "type": "application",
-      "root": "apps/gate-service",
-      "entryFile": "src/gate-service/main",
-      "sourceRoot": "src"
+    "db-grpc": {
+      "type": "library",
+      "root": "libs/db-grpc",
+      "entryFile": "index",
+      "sourceRoot": "libs/db-grpc/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/db-grpc/tsconfig.lib.json"
+      }
     },
     "db-service": {
       "type": "application",
@@ -30,11 +34,53 @@
       "entryFile": "src/db-service/main",
       "sourceRoot": "src"
     },
+    "gate-grpc": {
+      "type": "library",
+      "root": "libs/gate-grpc",
+      "entryFile": "index",
+      "sourceRoot": "libs/gate-grpc/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/gate-grpc/tsconfig.lib.json"
+      }
+    },
+    "gate-service": {
+      "type": "application",
+      "root": "apps/gate-service",
+      "entryFile": "src/gate-service/main",
+      "sourceRoot": "src"
+    },
+    "notify-grpc": {
+      "type": "library",
+      "root": "libs/notify-grpc",
+      "entryFile": "index",
+      "sourceRoot": "libs/notify-grpc/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/notify-grpc/tsconfig.lib.json"
+      }
+    },
     "notify-service": {
       "type": "application",
       "root": "apps/notify-service",
       "entryFile": "src/notify-service/main",
       "sourceRoot": "src"
+    },
+    "redis": {
+      "type": "library",
+      "root": "libs/redis",
+      "entryFile": "index",
+      "sourceRoot": "libs/redis/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/redis/tsconfig.lib.json"
+      }
+    },
+    "shared-redis": {
+      "type": "library",
+      "root": "libs/shared-redis",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared-redis/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shared-redis/tsconfig.lib.json"
+      }
     }
   }
 }

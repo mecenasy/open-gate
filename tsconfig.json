@@ -30,6 +30,36 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
+      "@app/db-grpc": [
+        "src/libs/db-grpc/src"
+      ],
+      "@app/db-grpc/*": [
+        "src/libs/db-grpc/src/*"
+      ],
+      "@app/gate-grpc": [
+        "src/libs/gate-grpc/src"
+      ],
+      "@app/gate-grpc/*": [
+        "src/libs/gate-grpc/src/*"
+      ],
+      "@app/notify-grpc": [
+        "src/libs/notify-grpc/src"
+      ],
+      "@app/notify-grpc/*": [
+        "src/libs/notify-grpc/src/*"
+      ],
+      "@app/redis": [
+        "src/libs/redis/src"
+      ],
+      "@app/redis/*": [
+        "src/libs/redis/src/*"
+      ],
+      "@app/shared-redis": [
+        "src/libs/shared-redis/src"
+      ],
+      "@app/shared-redis/*": [
+        "src/libs/shared-redis/src/*"
+      ],
       "src/*": [
         "src/*"
       ]

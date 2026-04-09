@@ -2,9 +2,9 @@ import { Global, Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule } from '@nestjs/config';
 import { QueueService } from './queue.service';
-import { TypeConfigService } from '../common/configs/types.config.service';
-import { RedisConfig } from '../common/redis/config/redis.config';
 import { QueueType } from './types';
+import { TypeConfigService } from '../config/types.config.service';
+import { RedisConfig } from '../config/redis.config';
 @Global()
 @Module({
   imports: [

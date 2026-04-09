@@ -1,9 +1,9 @@
 import { INestApplication } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { TypeConfigService } from '../../common/configs/types.config.service';
-import { RedisConfig } from 'src/gate-service/common/redis/config/redis.config';
+import { TypeConfigService } from './config/types.config.service';
+import { RedisConfig } from './config/redis.config';
 
-export const initProxy = async (app: INestApplication) => {
+export const initRedis = (app: INestApplication) => {
   const config = app.get(TypeConfigService);
   const redisUri = app.get(TypeConfigService)?.getOrThrow<RedisConfig>('redis')?.redisUri;
   const tls = redisUri.startsWith('rediss') ? { rejectUnauthorized: false } : undefined;
@@ -16,8 +16,12 @@ export const initProxy = async (app: INestApplication) => {
       tls,
     },
   });
+};
 
-  await app.startAllMicroservices().catch((err) => {
-    console.error('BŁĄD POŁĄCZENIA Z REDISEM:', err);
-  });
+export const startMicroservices = async (app: INestApplication) => {
+  try {
+    await app.startAllMicroservices();
+  } catch (error) {
+    console.error('BŁĄD POŁĄCZENIA Z REDISEM:', error);
+  }
 };

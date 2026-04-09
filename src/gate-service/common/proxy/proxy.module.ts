@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { TypeConfigService } from '../../configs/types.config.service';
+import { TypeConfigService } from '../configs/types.config.service';
 import { GrpcProxyKey, ProxyKey } from './constance';
 import { RedisConfig } from 'src/gate-service/common/redis/config/redis.config';
 import { join } from 'path';

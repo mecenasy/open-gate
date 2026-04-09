@@ -46,9 +46,10 @@ message AddUserRequest {
   string phone = 2;
   string name = 3;
   string surname = 4;
-  optional string ownerId = 5;
-  optional UserType type = 6;
-  optional string password = 7;
+  optional Status status = 5;
+  optional string phoneOwner = 6;
+  optional UserType type = 7;
+  optional string password = 8;
 }
 
 message GetUserRequest {

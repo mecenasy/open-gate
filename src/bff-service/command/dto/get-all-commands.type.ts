@@ -1,6 +1,6 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
-import { IsBoolean, IsEnum, IsInt, IsOptional, Min } from 'class-validator';
-import { CommandAction } from './enums';
+import { IsBoolean, IsInt, IsOptional, Min } from 'class-validator';
+import { GraphQLJSON } from 'graphql-type-json';
 
 @InputType()
 export class GetAllCommandsType {
@@ -19,8 +19,7 @@ export class GetAllCommandsType {
   @IsOptional()
   activeOnly?: boolean;
 
-  @Field(() => CommandAction, { nullable: true })
-  @IsEnum(CommandAction)
+  @Field(() => GraphQLJSON, { nullable: true })
   @IsOptional()
-  actionFilter?: CommandAction;
+  actionFilter?: Record<string, boolean>;
 }

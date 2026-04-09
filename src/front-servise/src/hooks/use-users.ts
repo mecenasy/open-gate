@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { graphql } from '@/app/gql';
-import { UserRole, UserStatus } from '@/app/gql/graphql';
+import { CreateSimpleUserType, UpdateUserType, UserRole, UserStatus } from '@/app/gql/graphql';
 
 export type UserSummary = {
   id: string;
@@ -82,8 +82,18 @@ const REMOVE_USER_MUTATION = graphql(`
   }
 `);
 
+const CREATE_USER_MUTATION = graphql(`
+  mutation CreateSimpleUser($input: CreateSimpleUserType!) {
+    createSimpleUser(input: $input) {
+      id
+      email
+    }
+  }
+`);
+
 export const useUsers = () => {
   const [selectedUser, setSelectedUser] = useState<UserSummary | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const { loading, data } = useQuery(GET_USERS_QUERY, {
     fetchPolicy: 'cache-and-network',
@@ -109,12 +119,16 @@ export const useUsers = () => {
     refetchQueries: [{ query: GET_USERS_QUERY }],
   });
 
+  const [doCreateUser, { loading: creatingUser }] = useMutation(CREATE_USER_MUTATION, {
+    refetchQueries: [{ query: GET_USERS_QUERY }],
+  });
+
   const openModal = (user: UserSummary) => setSelectedUser(user);
   const closeModal = () => setSelectedUser(null);
 
-  const onUpdateUser = async (input: { name?: string; surname?: string; email?: string; phone?: string }) => {
+  const onUpdateUser = async (input: Omit<UpdateUserType, 'id'>) => {
     if (!selectedUser) return;
-    await doUpdateUser({ variables: { input: { id: selectedUser.id, ...input } } });
+    await doUpdateUser({ variables: { input: { ...input, id: selectedUser.id } } });
   };
 
   const onUpdateStatus = (id: string, status: UserStatus) => {
@@ -129,6 +143,13 @@ export const useUsers = () => {
     doRemoveUser({ variables: { input: { id } } });
   };
 
+  const openAddModal = () => setIsAddModalOpen(true);
+  const closeAddModal = () => setIsAddModalOpen(false);
+
+  const onCreateUser = async (input: CreateSimpleUserType) => {
+    await doCreateUser({ variables: { input } });
+  };
+
   return {
     users,
     isLoading: isLoading,
@@ -140,5 +161,10 @@ export const useUsers = () => {
     onUpdateRole,
     onRemoveUser,
     isUpdatingUser: updatingUser,
+    isAddModalOpen,
+    openAddModal,
+    closeAddModal,
+    onCreateUser,
+    isCreatingUser: creatingUser,
   };
 };

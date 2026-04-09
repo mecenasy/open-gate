@@ -23,7 +23,17 @@ type Documents = {
   '\n  mutation AcceptAdaptiveLogin {\n    adaptiveLogin {\n      active\n    }\n  }\n': typeof types.AcceptAdaptiveLoginDocument;
   '\n  query Status {\n    loginStatus {\n      status\n      phoneId\n      user {\n        id\n        email\n        is2faEnabled\n        isAdaptiveLoginEnabled\n        admin\n      }\n    }\n  }\n': typeof types.StatusDocument;
   '\n  mutation Logout {\n    logoutUser {\n      status\n    }\n  }\n': typeof types.LogoutDocument;
+  '\n  query GetCommands($input: GetAllCommandsType) {\n    commands(input: $input) {\n      status\n      message\n      data {\n        id\n        name\n        description\n        active\n        actions\n        parameters\n        roleNames\n      }\n      total\n    }\n  }\n': typeof types.GetCommandsDocument;
+  '\n  mutation AddCommand($input: AddCommandType!) {\n    addCommand(input: $input) {\n      status\n      message\n      data {\n        id\n        name\n        description\n        active\n        actions\n        parameters\n        roleNames\n      }\n    }\n  }\n': typeof types.AddCommandDocument;
+  '\n  mutation UpdateCommand($input: UpdateCommandType!) {\n    updateCommand(input: $input) {\n      status\n      message\n      data {\n        id\n      }\n    }\n  }\n': typeof types.UpdateCommandDocument;
+  '\n  mutation ToggleActiveStatus($input: ToggleActiveStatusType!) {\n    toggleActiveStatus(input: $input) {\n      status\n      message\n      data {\n        id\n        active\n      }\n    }\n  }\n': typeof types.ToggleActiveStatusDocument;
+  '\n  mutation RemoveCommand($input: RemoveCommandType!) {\n    removeCommand(input: $input) {\n      status\n      message\n    }\n  }\n': typeof types.RemoveCommandDocument;
   '\n  mutation Login($input: LoginType!) {\n    loginUser(input: $input) {\n      status\n    }\n  }\n': typeof types.LoginDocument;
+  '\n  query GetPrompts($input: GetAllPromptsType) {\n    prompts(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n      }\n      total\n    }\n  }\n': typeof types.GetPromptsDocument;
+  '\n  query GetPromptById($input: GetPromptByIdType!) {\n    promptById(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n': typeof types.GetPromptByIdDocument;
+  '\n  mutation AddPrompt($input: AddPromptType!) {\n    addPrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n': typeof types.AddPromptDocument;
+  '\n  mutation UpdatePrompt($input: UpdatePromptType!) {\n    updatePrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n': typeof types.UpdatePromptDocument;
+  '\n  mutation RemovePrompt($input: RemovePromptType!) {\n    removePrompt(input: $input) {\n      success\n    }\n  }\n': typeof types.RemovePromptDocument;
   '\n  mutation QrChallenge($nonce: String!) {\n    qrChallenge(nonce: $nonce) {\n      challenge\n      dataUrl\n    }\n  }\n': typeof types.QrChallengeDocument;
   '\n  mutation QrLogin($challenge: String!, $nonce: String!) {\n    qrLogin(challenge: $challenge, nonce: $nonce) {\n      status\n    }\n  }\n': typeof types.QrLoginDocument;
   '\n  mutation Register($input: CreateUserType!) {\n    createUser(input: $input) {\n      id\n      email\n    }\n  }\n': typeof types.RegisterDocument;
@@ -32,6 +42,7 @@ type Documents = {
   '\n  mutation UpdateUserStatus($input: UpdateUserStatusType!) {\n    updateUserStatus(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n': typeof types.UpdateUserStatusDocument;
   '\n  mutation UpdateUserRole($input: UpdateUserRoleType!) {\n    updateUserRole(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n': typeof types.UpdateUserRoleDocument;
   '\n  mutation RemoveUser($input: GetUserType!) {\n    removeUser(input: $input) {\n      success\n    }\n  }\n': typeof types.RemoveUserDocument;
+  '\n  mutation CreateSimpleUser($input: CreateSimpleUserType!) {\n    createSimpleUser(input: $input) {\n      id\n      email\n    }\n  }\n': typeof types.CreateSimpleUserDocument;
   '\n  mutation VerifyMfa($input: VerifyCodeType!) {\n    verifyMfa(input: $input) {\n      status\n    }\n  }\n': typeof types.VerifyMfaDocument;
   '\n  mutation Verify2faCode($input: Verify2faCodeType!) {\n    verify2faCode(input: $input) {\n      status\n    }\n  }\n': typeof types.Verify2faCodeDocument;
   '\n  mutation GetPasskeyOptions {\n    optionPasskey\n  }\n': typeof types.GetPasskeyOptionsDocument;
@@ -57,8 +68,28 @@ const documents: Documents = {
   '\n  query Status {\n    loginStatus {\n      status\n      phoneId\n      user {\n        id\n        email\n        is2faEnabled\n        isAdaptiveLoginEnabled\n        admin\n      }\n    }\n  }\n':
     types.StatusDocument,
   '\n  mutation Logout {\n    logoutUser {\n      status\n    }\n  }\n': types.LogoutDocument,
+  '\n  query GetCommands($input: GetAllCommandsType) {\n    commands(input: $input) {\n      status\n      message\n      data {\n        id\n        name\n        description\n        active\n        actions\n        parameters\n        roleNames\n      }\n      total\n    }\n  }\n':
+    types.GetCommandsDocument,
+  '\n  mutation AddCommand($input: AddCommandType!) {\n    addCommand(input: $input) {\n      status\n      message\n      data {\n        id\n        name\n        description\n        active\n        actions\n        parameters\n        roleNames\n      }\n    }\n  }\n':
+    types.AddCommandDocument,
+  '\n  mutation UpdateCommand($input: UpdateCommandType!) {\n    updateCommand(input: $input) {\n      status\n      message\n      data {\n        id\n      }\n    }\n  }\n':
+    types.UpdateCommandDocument,
+  '\n  mutation ToggleActiveStatus($input: ToggleActiveStatusType!) {\n    toggleActiveStatus(input: $input) {\n      status\n      message\n      data {\n        id\n        active\n      }\n    }\n  }\n':
+    types.ToggleActiveStatusDocument,
+  '\n  mutation RemoveCommand($input: RemoveCommandType!) {\n    removeCommand(input: $input) {\n      status\n      message\n    }\n  }\n':
+    types.RemoveCommandDocument,
   '\n  mutation Login($input: LoginType!) {\n    loginUser(input: $input) {\n      status\n    }\n  }\n':
     types.LoginDocument,
+  '\n  query GetPrompts($input: GetAllPromptsType) {\n    prompts(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n      }\n      total\n    }\n  }\n':
+    types.GetPromptsDocument,
+  '\n  query GetPromptById($input: GetPromptByIdType!) {\n    promptById(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n':
+    types.GetPromptByIdDocument,
+  '\n  mutation AddPrompt($input: AddPromptType!) {\n    addPrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n':
+    types.AddPromptDocument,
+  '\n  mutation UpdatePrompt($input: UpdatePromptType!) {\n    updatePrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n':
+    types.UpdatePromptDocument,
+  '\n  mutation RemovePrompt($input: RemovePromptType!) {\n    removePrompt(input: $input) {\n      success\n    }\n  }\n':
+    types.RemovePromptDocument,
   '\n  mutation QrChallenge($nonce: String!) {\n    qrChallenge(nonce: $nonce) {\n      challenge\n      dataUrl\n    }\n  }\n':
     types.QrChallengeDocument,
   '\n  mutation QrLogin($challenge: String!, $nonce: String!) {\n    qrLogin(challenge: $challenge, nonce: $nonce) {\n      status\n    }\n  }\n':
@@ -75,6 +106,8 @@ const documents: Documents = {
     types.UpdateUserRoleDocument,
   '\n  mutation RemoveUser($input: GetUserType!) {\n    removeUser(input: $input) {\n      success\n    }\n  }\n':
     types.RemoveUserDocument,
+  '\n  mutation CreateSimpleUser($input: CreateSimpleUserType!) {\n    createSimpleUser(input: $input) {\n      id\n      email\n    }\n  }\n':
+    types.CreateSimpleUserDocument,
   '\n  mutation VerifyMfa($input: VerifyCodeType!) {\n    verifyMfa(input: $input) {\n      status\n    }\n  }\n':
     types.VerifyMfaDocument,
   '\n  mutation Verify2faCode($input: Verify2faCodeType!) {\n    verify2faCode(input: $input) {\n      status\n    }\n  }\n':
@@ -163,8 +196,68 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
+  source: '\n  query GetCommands($input: GetAllCommandsType) {\n    commands(input: $input) {\n      status\n      message\n      data {\n        id\n        name\n        description\n        active\n        actions\n        parameters\n        roleNames\n      }\n      total\n    }\n  }\n',
+): (typeof documents)['\n  query GetCommands($input: GetAllCommandsType) {\n    commands(input: $input) {\n      status\n      message\n      data {\n        id\n        name\n        description\n        active\n        actions\n        parameters\n        roleNames\n      }\n      total\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  mutation AddCommand($input: AddCommandType!) {\n    addCommand(input: $input) {\n      status\n      message\n      data {\n        id\n        name\n        description\n        active\n        actions\n        parameters\n        roleNames\n      }\n    }\n  }\n',
+): (typeof documents)['\n  mutation AddCommand($input: AddCommandType!) {\n    addCommand(input: $input) {\n      status\n      message\n      data {\n        id\n        name\n        description\n        active\n        actions\n        parameters\n        roleNames\n      }\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  mutation UpdateCommand($input: UpdateCommandType!) {\n    updateCommand(input: $input) {\n      status\n      message\n      data {\n        id\n      }\n    }\n  }\n',
+): (typeof documents)['\n  mutation UpdateCommand($input: UpdateCommandType!) {\n    updateCommand(input: $input) {\n      status\n      message\n      data {\n        id\n      }\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  mutation ToggleActiveStatus($input: ToggleActiveStatusType!) {\n    toggleActiveStatus(input: $input) {\n      status\n      message\n      data {\n        id\n        active\n      }\n    }\n  }\n',
+): (typeof documents)['\n  mutation ToggleActiveStatus($input: ToggleActiveStatusType!) {\n    toggleActiveStatus(input: $input) {\n      status\n      message\n      data {\n        id\n        active\n      }\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  mutation RemoveCommand($input: RemoveCommandType!) {\n    removeCommand(input: $input) {\n      status\n      message\n    }\n  }\n',
+): (typeof documents)['\n  mutation RemoveCommand($input: RemoveCommandType!) {\n    removeCommand(input: $input) {\n      status\n      message\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
   source: '\n  mutation Login($input: LoginType!) {\n    loginUser(input: $input) {\n      status\n    }\n  }\n',
 ): (typeof documents)['\n  mutation Login($input: LoginType!) {\n    loginUser(input: $input) {\n      status\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  query GetPrompts($input: GetAllPromptsType) {\n    prompts(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n      }\n      total\n    }\n  }\n',
+): (typeof documents)['\n  query GetPrompts($input: GetAllPromptsType) {\n    prompts(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n      }\n      total\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  query GetPromptById($input: GetPromptByIdType!) {\n    promptById(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n',
+): (typeof documents)['\n  query GetPromptById($input: GetPromptByIdType!) {\n    promptById(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  mutation AddPrompt($input: AddPromptType!) {\n    addPrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n',
+): (typeof documents)['\n  mutation AddPrompt($input: AddPromptType!) {\n    addPrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  mutation UpdatePrompt($input: UpdatePromptType!) {\n    updatePrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n',
+): (typeof documents)['\n  mutation UpdatePrompt($input: UpdatePromptType!) {\n    updatePrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  mutation RemovePrompt($input: RemovePromptType!) {\n    removePrompt(input: $input) {\n      success\n    }\n  }\n',
+): (typeof documents)['\n  mutation RemovePrompt($input: RemovePromptType!) {\n    removePrompt(input: $input) {\n      success\n    }\n  }\n'];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -213,6 +306,12 @@ export function graphql(
 export function graphql(
   source: '\n  mutation RemoveUser($input: GetUserType!) {\n    removeUser(input: $input) {\n      success\n    }\n  }\n',
 ): (typeof documents)['\n  mutation RemoveUser($input: GetUserType!) {\n    removeUser(input: $input) {\n      success\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  mutation CreateSimpleUser($input: CreateSimpleUserType!) {\n    createSimpleUser(input: $input) {\n      id\n      email\n    }\n  }\n',
+): (typeof documents)['\n  mutation CreateSimpleUser($input: CreateSimpleUserType!) {\n    createSimpleUser(input: $input) {\n      id\n      email\n    }\n  }\n'];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

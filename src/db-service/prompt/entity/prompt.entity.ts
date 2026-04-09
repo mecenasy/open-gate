@@ -1,8 +1,9 @@
 import { IsEnum, IsString } from 'class-validator';
 import { UserType } from '../../user/user-type';
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
 
 @Entity('prompts')
+@Unique(['userType', 'key', 'commandName'])
 export class Prompt {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -10,25 +11,17 @@ export class Prompt {
   @Column({
     type: 'varchar',
     unique: true,
-    // TODO: make it not null after we migrate existing data
-    nullable: true,
+    nullable: false,
   })
   @IsString()
   key!: string;
 
   @Column({
-    type: 'text',
-    nullable: true,
-  })
-  @IsString()
-  description!: string;
-
-  @Column({
     type: 'varchar',
-    // TODO: make it not null after we migrate existing data
-    nullable: true,
+    nullable: false,
   })
   commandName!: string;
+
   @Column({
     type: 'enum',
     enum: UserType,
@@ -36,6 +29,13 @@ export class Prompt {
   })
   @IsEnum(UserType)
   userType!: UserType;
+
+  @Column({
+    type: 'text',
+    nullable: false,
+  })
+  @IsString()
+  description!: string;
 
   @Column({
     type: 'varchar',

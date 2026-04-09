@@ -7,14 +7,16 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   error?: string;
   hint?: string;
+  /** Stretch textarea to fill remaining flex space in parent */
+  grow?: boolean;
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ label, error, hint, id, ...props }, ref) => {
+  ({ label, error, hint, id, grow, ...props }, ref) => {
     const [focused, setFocused] = useState(false);
 
     const labelSpring = useSpring({
-      color: error ? '#f87171' : focused ? '#60a5fa' : '#94a3b8',
+      color: error ? '#f87171' : focused ? '#60a5fa' : 'var(--color-muted)',
       config: { tension: 300, friction: 25 },
     });
 
@@ -28,7 +30,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     });
 
     return (
-      <div className="flex flex-col gap-1.5 w-full">
+      <div className={`flex flex-col gap-1.5 w-full${grow ? ' flex-1 min-h-0' : ''}`}>
         {label && (
           <animated.label
             htmlFor={id}
@@ -39,22 +41,25 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           </animated.label>
         )}
 
-        <animated.div style={borderSpring} className="rounded-lg">
+        <animated.div
+          style={borderSpring}
+          className={`rounded-lg${grow ? ' flex-1 flex flex-col min-h-0' : ''}`}
+        >
           <textarea
             ref={ref}
             id={id}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             className={[
-              'w-full bg-slate-900/60 border rounded-lg px-4 py-2.5',
-              'text-sm text-slate-200 placeholder-slate-600',
-              'outline-none transition-colors resize-y min-h-[96px]',
-              'scrollbar-thin',
+              'w-full bg-surface-raised border rounded-lg px-4 py-2.5',
+              'text-sm text-text placeholder-muted',
+              'outline-none transition-colors scrollbar-thin',
+              grow ? 'resize-none flex-1 h-full min-h-0' : 'resize-y min-h-[96px]',
               error
                 ? 'border-red-500/50'
                 : focused
                   ? 'border-blue-500/50'
-                  : 'border-slate-700/60',
+                  : 'border-border',
             ].join(' ')}
             {...props}
           />

@@ -11,13 +11,16 @@ import type {
   GetAllByPermissionRequest,
   GetByPermissionRequest,
   ToggleActiveStatusRequest,
+  RemoveCommandRequest,
 } from 'src/proto/command';
 import { COMMAND_SERVICE_NAME } from 'src/proto/command';
 import { CommandService } from './command.service';
 
 @Controller()
 export class CommandGrpcController implements CommandServiceController {
-  constructor(private readonly commandService: CommandService) {}
+  constructor(private readonly commandService: CommandService) {
+    console.log('CommandGrpcController initialized');
+  }
 
   @GrpcMethod(COMMAND_SERVICE_NAME, 'AddCommand')
   async addCommand(request: AddCommandRequest): Promise<CommandResponse> {
@@ -33,6 +36,22 @@ export class CommandGrpcController implements CommandServiceController {
       return {
         status: false,
         message: `Failed to create command: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+  }
+
+  @GrpcMethod(COMMAND_SERVICE_NAME, 'RemoveCommand')
+  async removeCommand(request: RemoveCommandRequest): Promise<CommandResponse> {
+    try {
+      await this.commandService.remove(request.id);
+      return {
+        status: true,
+        message: 'Command removed successfully',
+      };
+    } catch (error) {
+      return {
+        status: false,
+        message: `Failed to remove command: ${error instanceof Error ? error.message : 'Unknown error'}`,
       };
     }
   }

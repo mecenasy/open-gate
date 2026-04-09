@@ -11,17 +11,13 @@ import { Observable } from 'rxjs';
 
 export const protobufPackage = 'command';
 
-/** Enum for predefined command actions */
-export enum CommandAction {
-  ACTION_UNSPECIFIED = 0,
-  OPEN = 1,
-  CLOSE = 2,
-  EXECUTE = 3,
-  CANCEL = 4,
-  RESTART = 5,
-  STOP = 6,
-  START = 7,
-  UNRECOGNIZED = -1,
+export interface RemoveCommandRequest {
+  id: string;
+}
+
+export interface RemoveCommandResponse {
+  status: boolean;
+  message: string;
 }
 
 /** Message representing a command */
@@ -30,22 +26,41 @@ export interface Command {
   name: string;
   description: string;
   active: boolean;
-  actions: CommandAction[];
-  /** JSON string for flexible parameter storage */
-  parameters: string;
+  actions: { [key: string]: boolean };
+  parameters: { [key: string]: boolean };
   createdAt: string;
   updatedAt: string;
+  roleNames: string[];
+}
+
+export interface Command_ActionsEntry {
+  key: string;
+  value: boolean;
+}
+
+export interface Command_ParametersEntry {
+  key: string;
+  value: boolean;
 }
 
 /** Request/Response messages for AddCommand */
 export interface AddCommandRequest {
   name: string;
   description: string;
-  actions: CommandAction[];
-  /** JSON string */
-  parameters: string;
+  actions: { [key: string]: boolean };
+  parameters: { [key: string]: boolean };
   /** List of role names to grant permissions */
   roleNames: string[];
+}
+
+export interface AddCommandRequest_ActionsEntry {
+  key: string;
+  value: boolean;
+}
+
+export interface AddCommandRequest_ParametersEntry {
+  key: string;
+  value: boolean;
 }
 
 /** Request/Response messages for UpdateCommand */
@@ -53,11 +68,21 @@ export interface UpdateCommandRequest {
   id: string;
   description?: string | undefined;
   active?: boolean | undefined;
-  actions: CommandAction[];
+  actions: { [key: string]: boolean };
   /** JSON string */
-  parameters?: string | undefined;
+  parameters: { [key: string]: boolean };
   /** Update permissions (replace existing) */
   roleNames: string[];
+}
+
+export interface UpdateCommandRequest_ActionsEntry {
+  key: string;
+  value: boolean;
+}
+
+export interface UpdateCommandRequest_ParametersEntry {
+  key: string;
+  value: boolean;
 }
 
 /** Request/Response messages for GetCommand */
@@ -71,7 +96,12 @@ export interface GetAllCommandsRequest {
   page: number;
   limit: number;
   activeOnly?: boolean | undefined;
-  actionFilter?: CommandAction | undefined;
+  actionFilter: { [key: string]: boolean };
+}
+
+export interface GetAllCommandsRequest_ActionFilterEntry {
+  key: string;
+  value: boolean;
 }
 
 /** Request/Response messages for GetAllByPermission */
@@ -119,6 +149,10 @@ export interface CommandServiceClient {
 
   addCommand(request: AddCommandRequest, metadata?: Metadata): Observable<CommandResponse>;
 
+  /** remove a new command */
+
+  removeCommand(request: RemoveCommandRequest, metadata?: Metadata): Observable<RemoveCommandResponse>;
+
   /** Update all fields except the command name */
 
   updateCommand(request: UpdateCommandRequest, metadata?: Metadata): Observable<CommandResponse>;
@@ -151,6 +185,13 @@ export interface CommandServiceController {
     request: AddCommandRequest,
     metadata?: Metadata,
   ): Promise<CommandResponse> | Observable<CommandResponse> | CommandResponse;
+
+  /** remove a new command */
+
+  removeCommand(
+    request: RemoveCommandRequest,
+    metadata?: Metadata,
+  ): Promise<RemoveCommandResponse> | Observable<RemoveCommandResponse> | RemoveCommandResponse;
 
   /** Update all fields except the command name */
 
@@ -199,6 +240,7 @@ export function CommandServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
       'addCommand',
+      'removeCommand',
       'updateCommand',
       'getCommand',
       'getAllCommands',

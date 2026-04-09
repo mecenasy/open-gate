@@ -5,10 +5,11 @@ import type {
   PromptResponse,
   GetAllPromptsResponse,
   AddPromptRequest,
-  GetPromptRequest,
+  GetPromptByIdRequest,
   UpdatePromptRequest,
   RemovePromptRequest,
   GetAllPromptsRequest,
+  GetPromptByKeyRequest,
 } from 'src/proto/prompt';
 import { PROMPT_PROXY_SERVICE_NAME } from 'src/proto/prompt';
 import { PromptService } from './prompt.service';
@@ -49,10 +50,42 @@ export class PromptGrpcController implements PromptProxyServiceController {
     }
   }
 
-  @GrpcMethod(PROMPT_PROXY_SERVICE_NAME, 'GetPrompt')
-  async getPrompt(request: GetPromptRequest): Promise<PromptResponse> {
+  @GrpcMethod(PROMPT_PROXY_SERVICE_NAME, 'GetPromptById')
+  async getPromptById(request: GetPromptByIdRequest): Promise<PromptResponse> {
     try {
-      const prompt = await this.promptService.findByUserType(request.userType);
+      const prompt = await this.promptService.findById(request.id);
+
+      if (!prompt) {
+        return {
+          status: false,
+          message: 'Prompt not found',
+        };
+      }
+
+      return {
+        status: true,
+        message: 'Prompt found',
+        data: {
+          id: prompt.id,
+          commandName: prompt.commandName,
+          description: prompt.description,
+          key: prompt.key,
+          userType: jsToProtoUserType(prompt.userType),
+          prompt: prompt.prompt,
+        },
+      };
+    } catch (error) {
+      return {
+        status: false,
+        message: `Failed to get prompt: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+  }
+
+  @GrpcMethod(PROMPT_PROXY_SERVICE_NAME, 'GetPromptByKey')
+  async getPromptByKey(request: GetPromptByKeyRequest): Promise<PromptResponse> {
+    try {
+      const prompt = await this.promptService.findByKey(request.key);
 
       if (!prompt) {
         return {

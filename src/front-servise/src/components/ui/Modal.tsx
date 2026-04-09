@@ -11,6 +11,8 @@ interface ModalProps {
   footer?: ReactNode;
   /** When false, the parent is responsible for rendering the backdrop and locking body scroll. */
   showBackdrop?: boolean;
+  /** Extra classes applied to the modal panel (e.g. max-w-3xl to override default width). */
+  className?: string;
 }
 
 export function Modal({
@@ -20,6 +22,7 @@ export function Modal({
   children,
   footer,
   showBackdrop = true,
+  className,
 }: ModalProps) {
   useEffect(() => {
     if (!showBackdrop) return;
@@ -67,20 +70,20 @@ export function Modal({
             className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
           >
             <div
-              className="pointer-events-auto w-full max-w-lg bg-surface border border-border rounded-2xl overflow-hidden"
+              className={`${className ?? ''} pointer-events-auto w-full max-w-lg bg-surface border border-border rounded-2xl overflow-hidden flex flex-col`}
               style={{ boxShadow: '0 20px 60px -10px rgba(0,0,0,0.4)' }}
               onClick={(e) => e.stopPropagation()}
             >
               {title && (
-                <div className="px-6 py-4 border-b border-border">
+                <div className="px-6 py-4 border-b border-border shrink-0">
                   <h2 className="text-base font-semibold text-text">{title}</h2>
                 </div>
               )}
 
-              <div className="px-6 py-5">{children}</div>
+              <div className="px-6 py-5 flex-1 min-h-0 flex flex-col">{children}</div>
 
               {footer && (
-                <div className="px-6 pb-6 pt-2 border-t border-border flex gap-3 justify-end">
+                <div className="px-6 pb-6 pt-2 border-t border-border flex gap-3 justify-end shrink-0">
                   {footer}
                 </div>
               )}

@@ -40,6 +40,7 @@ export class AddCommandHandler extends Handler<AddCommandCommand, CommandRespons
         active: response.data.active,
         actions: response.data.actions,
         parameters: response.data.parameters,
+        roleNames: response.data.roleNames ?? [],
         createdAt: response.data.createdAt,
         updatedAt: response.data.updatedAt,
       };

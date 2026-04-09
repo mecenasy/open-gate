@@ -29,6 +29,28 @@ export type AcceptType = {
   status: AuthStatus | '%future added value';
 };
 
+export type AddCommandType = {
+  actions: Scalars['JSON']['input'];
+  description: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  parameters: Scalars['JSON']['input'];
+  roleNames: Array<Scalars['String']['input']>;
+};
+
+export type AddConfigType = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  key: Scalars['String']['input'];
+  value: Scalars['String']['input'];
+};
+
+export type AddPromptType = {
+  commandName: Scalars['String']['input'];
+  description: Scalars['String']['input'];
+  key: Scalars['String']['input'];
+  prompt: Scalars['String']['input'];
+  userType: PromptUserType | '%future added value';
+};
+
 export enum AuthStatus {
   Accept2fa = 'accept2fa',
   Adaptive = 'adaptive',
@@ -50,11 +72,80 @@ export type ChangePasswordType = {
   oldPassword: Scalars['String']['input'];
 };
 
+export type CommandResponseType = {
+  __typename?: 'CommandResponseType';
+  data?: Maybe<CommandType>;
+  message: Scalars['String']['output'];
+  status: Scalars['Boolean']['output'];
+};
+
+export type CommandType = {
+  __typename?: 'CommandType';
+  actions: Scalars['JSON']['output'];
+  active: Scalars['Boolean']['output'];
+  createdAt: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  parameters: Scalars['JSON']['output'];
+  roleNames: Array<Scalars['String']['output']>;
+  updatedAt: Scalars['String']['output'];
+};
+
+export type CommandsListType = {
+  __typename?: 'CommandsListType';
+  data: Array<CommandType>;
+  limit: Scalars['Int']['output'];
+  message: Scalars['String']['output'];
+  page: Scalars['Int']['output'];
+  status: Scalars['Boolean']['output'];
+  total: Scalars['Int']['output'];
+};
+
+export type ConfigResponseType = {
+  __typename?: 'ConfigResponseType';
+  data?: Maybe<ConfigType>;
+  message: Scalars['String']['output'];
+  status: Scalars['Boolean']['output'];
+};
+
+export type ConfigSuccessType = {
+  __typename?: 'ConfigSuccessType';
+  success: Scalars['Boolean']['output'];
+};
+
+export type ConfigType = {
+  __typename?: 'ConfigType';
+  createdAt: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  key: Scalars['String']['output'];
+  updatedAt: Scalars['String']['output'];
+  value: Scalars['String']['output'];
+};
+
+export type ConfigsListType = {
+  __typename?: 'ConfigsListType';
+  data: Array<ConfigType>;
+  message: Scalars['String']['output'];
+  status: Scalars['Boolean']['output'];
+};
+
+export type CreateSimpleUserType = {
+  email: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  phone: Scalars['String']['input'];
+  phoneOwner?: InputMaybe<Scalars['String']['input']>;
+  status: UserStatus | '%future added value';
+  surname: Scalars['String']['input'];
+  type: UserRole | '%future added value';
+};
+
 export type CreateUserType = {
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
-  password: Scalars['String']['input'];
+  password?: InputMaybe<Scalars['String']['input']>;
   phone: Scalars['String']['input'];
+  phoneOwner?: InputMaybe<Scalars['String']['input']>;
   surname: Scalars['String']['input'];
   type: Scalars['String']['input'];
 };
@@ -63,9 +154,52 @@ export type ForgotPasswordType = {
   email: Scalars['String']['input'];
 };
 
+export type GetAllByPermissionType = {
+  activeOnly?: InputMaybe<Scalars['Boolean']['input']>;
+  limit?: Scalars['Int']['input'];
+  page?: Scalars['Int']['input'];
+  roleName: Scalars['String']['input'];
+};
+
+export type GetAllCommandsType = {
+  actionFilter?: InputMaybe<Scalars['JSON']['input']>;
+  activeOnly?: InputMaybe<Scalars['Boolean']['input']>;
+  limit?: Scalars['Int']['input'];
+  page?: Scalars['Int']['input'];
+};
+
+export type GetAllPromptsType = {
+  limit?: Scalars['Int']['input'];
+  page?: Scalars['Int']['input'];
+  userType?: InputMaybe<PromptUserType | '%future added value'>;
+};
+
 export type GetAllUsersType = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type GetByKeyType = {
+  key: Scalars['String']['input'];
+};
+
+export type GetByPermissionType = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  roleName: Scalars['String']['input'];
+};
+
+export type GetCommandType = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type GetPromptByIdType = {
+  id: Scalars['String']['input'];
+};
+
+export type GetPromptByKeyType = {
+  key: Scalars['String']['input'];
 };
 
 export type GetUserType = {
@@ -89,7 +223,11 @@ export type Mutation = {
   __typename?: 'Mutation';
   accept2fa: AcceptType;
   adaptiveLogin: AcceptAdaptiveLoginType;
+  addCommand: CommandResponseType;
+  addConfig: ConfigResponseType;
+  addPrompt: PromptResponseType;
   changePassword: StatusType;
+  createSimpleUser: UserType;
   createUser: UserType;
   forgotPassword: StatusType;
   loginUser: StatusType;
@@ -104,9 +242,15 @@ export type Mutation = {
   registerOptionPasskey: Scalars['JSON']['output'];
   registerOptionPasskeyVerify: StatusType;
   reject2fa: StatusType;
+  removeCommand: CommandResponseType;
+  removeConfig: ConfigSuccessType;
   removePasskey: RemovePasskeyType;
+  removePrompt: PromptSuccessType;
   removeUser: SuccessResponseType;
   resetPassword: StatusType;
+  toggleActiveStatus: CommandResponseType;
+  updateCommand: CommandResponseType;
+  updatePrompt: PromptResponseType;
   updateUser: UserSummaryType;
   updateUserRole: UserSummaryType;
   updateUserStatus: UserSummaryType;
@@ -115,8 +259,24 @@ export type Mutation = {
   verifyMfa: StatusType;
 };
 
+export type MutationAddCommandArgs = {
+  input: AddCommandType;
+};
+
+export type MutationAddConfigArgs = {
+  input: AddConfigType;
+};
+
+export type MutationAddPromptArgs = {
+  input: AddPromptType;
+};
+
 export type MutationChangePasswordArgs = {
   input: ChangePasswordType;
+};
+
+export type MutationCreateSimpleUserArgs = {
+  input: CreateSimpleUserType;
 };
 
 export type MutationCreateUserArgs = {
@@ -162,8 +322,20 @@ export type MutationRegisterOptionPasskeyVerifyArgs = {
   data: Scalars['JSON']['input'];
 };
 
+export type MutationRemoveCommandArgs = {
+  input: RemoveCommandType;
+};
+
+export type MutationRemoveConfigArgs = {
+  input: RemoveConfigType;
+};
+
 export type MutationRemovePasskeyArgs = {
   id: Scalars['String']['input'];
+};
+
+export type MutationRemovePromptArgs = {
+  input: RemovePromptType;
 };
 
 export type MutationRemoveUserArgs = {
@@ -172,6 +344,18 @@ export type MutationRemoveUserArgs = {
 
 export type MutationResetPasswordArgs = {
   input: ResetPasswordType;
+};
+
+export type MutationToggleActiveStatusArgs = {
+  input: ToggleActiveStatusType;
+};
+
+export type MutationUpdateCommandArgs = {
+  input: UpdateCommandType;
+};
+
+export type MutationUpdatePromptArgs = {
+  input: UpdatePromptType;
 };
 
 export type MutationUpdateUserArgs = {
@@ -206,6 +390,54 @@ export type PassKeyType = {
   id: Scalars['String']['output'];
 };
 
+export type PromptResponseType = {
+  __typename?: 'PromptResponseType';
+  data?: Maybe<PromptType>;
+  message: Scalars['String']['output'];
+  status: Scalars['Boolean']['output'];
+};
+
+export type PromptSimplyType = {
+  __typename?: 'PromptSimplyType';
+  commandName: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  key: Scalars['String']['output'];
+  userType: PromptUserType | '%future added value';
+};
+
+export type PromptSuccessType = {
+  __typename?: 'PromptSuccessType';
+  success: Scalars['Boolean']['output'];
+};
+
+export type PromptType = {
+  __typename?: 'PromptType';
+  commandName: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  key: Scalars['String']['output'];
+  prompt: Scalars['String']['output'];
+  userType: PromptUserType | '%future added value';
+};
+
+export enum PromptUserType {
+  Admin = 'ADMIN',
+  Member = 'MEMBER',
+  Owner = 'OWNER',
+  SuperUser = 'SUPER_USER',
+  Unrecognized = 'UNRECOGNIZED',
+  User = 'USER',
+}
+
+export type PromptsListType = {
+  __typename?: 'PromptsListType';
+  data: Array<PromptSimplyType>;
+  message: Scalars['String']['output'];
+  status: Scalars['Boolean']['output'];
+  total: Scalars['Int']['output'];
+};
+
 export type QrChallengeType = {
   __typename?: 'QrChallengeType';
   challenge: Scalars['String']['output'];
@@ -214,11 +446,52 @@ export type QrChallengeType = {
 
 export type Query = {
   __typename?: 'Query';
+  command: CommandResponseType;
+  commandByPermission: CommandResponseType;
+  commands: CommandsListType;
+  commandsByPermission: CommandsListType;
+  config: ConfigResponseType;
+  configs: ConfigsListType;
   getPasskeys: Array<PassKeyType>;
   loginStatus: LoginStatusType;
+  promptById: PromptResponseType;
+  promptByKey: PromptResponseType;
+  prompts: PromptsListType;
   user: UserSummaryType;
   users: UsersListType;
   verifyToken: VerifyTokenType;
+};
+
+export type QueryCommandArgs = {
+  input: GetCommandType;
+};
+
+export type QueryCommandByPermissionArgs = {
+  input: GetByPermissionType;
+};
+
+export type QueryCommandsArgs = {
+  input?: InputMaybe<GetAllCommandsType>;
+};
+
+export type QueryCommandsByPermissionArgs = {
+  input: GetAllByPermissionType;
+};
+
+export type QueryConfigArgs = {
+  input: GetByKeyType;
+};
+
+export type QueryPromptByIdArgs = {
+  input: GetPromptByIdType;
+};
+
+export type QueryPromptByKeyArgs = {
+  input: GetPromptByKeyType;
+};
+
+export type QueryPromptsArgs = {
+  input?: InputMaybe<GetAllPromptsType>;
 };
 
 export type QueryUserArgs = {
@@ -233,9 +506,21 @@ export type QueryVerifyTokenArgs = {
   token: Scalars['String']['input'];
 };
 
+export type RemoveCommandType = {
+  id: Scalars['ID']['input'];
+};
+
+export type RemoveConfigType = {
+  key: Scalars['String']['input'];
+};
+
 export type RemovePasskeyType = {
   __typename?: 'RemovePasskeyType';
   status: Scalars['Boolean']['output'];
+};
+
+export type RemovePromptType = {
+  id: Scalars['ID']['input'];
 };
 
 export type ResetPasswordType = {
@@ -251,6 +536,29 @@ export type StatusType = {
 export type SuccessResponseType = {
   __typename?: 'SuccessResponseType';
   success: Scalars['Boolean']['output'];
+};
+
+export type ToggleActiveStatusType = {
+  active: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+export type UpdateCommandType = {
+  actions: Scalars['JSON']['input'];
+  active?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  parameters: Scalars['JSON']['input'];
+  roleNames?: Array<Scalars['String']['input']>;
+};
+
+export type UpdatePromptType = {
+  commandName?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  key?: InputMaybe<Scalars['String']['input']>;
+  prompt?: InputMaybe<Scalars['String']['input']>;
+  userType?: InputMaybe<PromptUserType | '%future added value'>;
 };
 
 export type UpdateUserRoleType = {
@@ -293,6 +601,7 @@ export type UserStatusType = {
   id: Scalars['ID']['output'];
   is2faEnabled: Scalars['Boolean']['output'];
   isAdaptiveLoginEnabled: Scalars['Boolean']['output'];
+  owner: Scalars['Boolean']['output'];
 };
 
 export type UserSummaryType = {
@@ -409,11 +718,192 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
 
 export type LogoutMutation = { __typename?: 'Mutation'; logoutUser: { __typename?: 'StatusType'; status: AuthStatus } };
 
+export type GetCommandsQueryVariables = Exact<{
+  input?: InputMaybe<GetAllCommandsType>;
+}>;
+
+export type GetCommandsQuery = {
+  __typename?: 'Query';
+  commands: {
+    __typename?: 'CommandsListType';
+    status: boolean;
+    message: string;
+    total: number;
+    data: Array<{
+      __typename?: 'CommandType';
+      id: string;
+      name: string;
+      description: string;
+      active: boolean;
+      actions: any;
+      parameters: any;
+      roleNames: Array<string>;
+    }>;
+  };
+};
+
+export type AddCommandMutationVariables = Exact<{
+  input: AddCommandType;
+}>;
+
+export type AddCommandMutation = {
+  __typename?: 'Mutation';
+  addCommand: {
+    __typename?: 'CommandResponseType';
+    status: boolean;
+    message: string;
+    data?: {
+      __typename?: 'CommandType';
+      id: string;
+      name: string;
+      description: string;
+      active: boolean;
+      actions: any;
+      parameters: any;
+      roleNames: Array<string>;
+    } | null;
+  };
+};
+
+export type UpdateCommandMutationVariables = Exact<{
+  input: UpdateCommandType;
+}>;
+
+export type UpdateCommandMutation = {
+  __typename?: 'Mutation';
+  updateCommand: {
+    __typename?: 'CommandResponseType';
+    status: boolean;
+    message: string;
+    data?: { __typename?: 'CommandType'; id: string } | null;
+  };
+};
+
+export type ToggleActiveStatusMutationVariables = Exact<{
+  input: ToggleActiveStatusType;
+}>;
+
+export type ToggleActiveStatusMutation = {
+  __typename?: 'Mutation';
+  toggleActiveStatus: {
+    __typename?: 'CommandResponseType';
+    status: boolean;
+    message: string;
+    data?: { __typename?: 'CommandType'; id: string; active: boolean } | null;
+  };
+};
+
+export type RemoveCommandMutationVariables = Exact<{
+  input: RemoveCommandType;
+}>;
+
+export type RemoveCommandMutation = {
+  __typename?: 'Mutation';
+  removeCommand: { __typename?: 'CommandResponseType'; status: boolean; message: string };
+};
+
 export type LoginMutationVariables = Exact<{
   input: LoginType;
 }>;
 
 export type LoginMutation = { __typename?: 'Mutation'; loginUser: { __typename?: 'StatusType'; status: AuthStatus } };
+
+export type GetPromptsQueryVariables = Exact<{
+  input?: InputMaybe<GetAllPromptsType>;
+}>;
+
+export type GetPromptsQuery = {
+  __typename?: 'Query';
+  prompts: {
+    __typename?: 'PromptsListType';
+    status: boolean;
+    message: string;
+    total: number;
+    data: Array<{
+      __typename?: 'PromptSimplyType';
+      id: string;
+      key: string;
+      description: string;
+      commandName: string;
+      userType: PromptUserType;
+    }>;
+  };
+};
+
+export type GetPromptByIdQueryVariables = Exact<{
+  input: GetPromptByIdType;
+}>;
+
+export type GetPromptByIdQuery = {
+  __typename?: 'Query';
+  promptById: {
+    __typename?: 'PromptResponseType';
+    status: boolean;
+    message: string;
+    data?: {
+      __typename?: 'PromptType';
+      id: string;
+      key: string;
+      description: string;
+      commandName: string;
+      userType: PromptUserType;
+      prompt: string;
+    } | null;
+  };
+};
+
+export type AddPromptMutationVariables = Exact<{
+  input: AddPromptType;
+}>;
+
+export type AddPromptMutation = {
+  __typename?: 'Mutation';
+  addPrompt: {
+    __typename?: 'PromptResponseType';
+    status: boolean;
+    message: string;
+    data?: {
+      __typename?: 'PromptType';
+      id: string;
+      key: string;
+      description: string;
+      commandName: string;
+      userType: PromptUserType;
+      prompt: string;
+    } | null;
+  };
+};
+
+export type UpdatePromptMutationVariables = Exact<{
+  input: UpdatePromptType;
+}>;
+
+export type UpdatePromptMutation = {
+  __typename?: 'Mutation';
+  updatePrompt: {
+    __typename?: 'PromptResponseType';
+    status: boolean;
+    message: string;
+    data?: {
+      __typename?: 'PromptType';
+      id: string;
+      key: string;
+      description: string;
+      commandName: string;
+      userType: PromptUserType;
+      prompt: string;
+    } | null;
+  };
+};
+
+export type RemovePromptMutationVariables = Exact<{
+  input: RemovePromptType;
+}>;
+
+export type RemovePromptMutation = {
+  __typename?: 'Mutation';
+  removePrompt: { __typename?: 'PromptSuccessType'; success: boolean };
+};
 
 export type QrChallengeMutationVariables = Exact<{
   nonce: Scalars['String']['input'];
@@ -523,6 +1013,15 @@ export type RemoveUserMutationVariables = Exact<{
 export type RemoveUserMutation = {
   __typename?: 'Mutation';
   removeUser: { __typename?: 'SuccessResponseType'; success: boolean };
+};
+
+export type CreateSimpleUserMutationVariables = Exact<{
+  input: CreateSimpleUserType;
+}>;
+
+export type CreateSimpleUserMutation = {
+  __typename?: 'Mutation';
+  createSimpleUser: { __typename?: 'UserType'; id: string; email: string };
 };
 
 export type VerifyMfaMutationVariables = Exact<{
@@ -890,6 +1389,267 @@ export const LogoutDocument = {
     },
   ],
 } as unknown as DocumentNode<LogoutMutation, LogoutMutationVariables>;
+export const GetCommandsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetCommands' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'GetAllCommandsType' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'commands' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'actions' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'parameters' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'roleNames' } },
+                    ],
+                  },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'total' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetCommandsQuery, GetCommandsQueryVariables>;
+export const AddCommandDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'AddCommand' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'AddCommandType' } } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'addCommand' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'actions' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'parameters' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'roleNames' } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AddCommandMutation, AddCommandMutationVariables>;
+export const UpdateCommandDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateCommand' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'UpdateCommandType' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateCommand' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [{ kind: 'Field', name: { kind: 'Name', value: 'id' } }],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UpdateCommandMutation, UpdateCommandMutationVariables>;
+export const ToggleActiveStatusDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'ToggleActiveStatus' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ToggleActiveStatusType' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'toggleActiveStatus' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ToggleActiveStatusMutation, ToggleActiveStatusMutationVariables>;
+export const RemoveCommandDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'RemoveCommand' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'RemoveCommandType' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'removeCommand' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<RemoveCommandMutation, RemoveCommandMutationVariables>;
 export const LoginDocument = {
   kind: 'Document',
   definitions: [
@@ -927,6 +1687,266 @@ export const LoginDocument = {
     },
   ],
 } as unknown as DocumentNode<LoginMutation, LoginMutationVariables>;
+export const GetPromptsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetPrompts' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'GetAllPromptsType' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'prompts' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'key' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'commandName' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'userType' } },
+                    ],
+                  },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'total' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetPromptsQuery, GetPromptsQueryVariables>;
+export const GetPromptByIdDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetPromptById' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'GetPromptByIdType' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'promptById' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'key' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'commandName' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'userType' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'prompt' } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetPromptByIdQuery, GetPromptByIdQueryVariables>;
+export const AddPromptDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'AddPrompt' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'AddPromptType' } } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'addPrompt' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'key' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'commandName' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'userType' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'prompt' } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AddPromptMutation, AddPromptMutationVariables>;
+export const UpdatePromptDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdatePrompt' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'UpdatePromptType' } } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updatePrompt' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'key' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'commandName' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'userType' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'prompt' } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UpdatePromptMutation, UpdatePromptMutationVariables>;
+export const RemovePromptDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'RemovePrompt' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'RemovePromptType' } } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'removePrompt' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [{ kind: 'Field', name: { kind: 'Name', value: 'success' } }],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<RemovePromptMutation, RemovePromptMutationVariables>;
 export const QrChallengeDocument = {
   kind: 'Document',
   definitions: [
@@ -1287,6 +2307,49 @@ export const RemoveUserDocument = {
     },
   ],
 } as unknown as DocumentNode<RemoveUserMutation, RemoveUserMutationVariables>;
+export const CreateSimpleUserDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateSimpleUser' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'CreateSimpleUserType' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createSimpleUser' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<CreateSimpleUserMutation, CreateSimpleUserMutationVariables>;
 export const VerifyMfaDocument = {
   kind: 'Document',
   definitions: [

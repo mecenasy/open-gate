@@ -13,6 +13,8 @@ import { UpdateUserStatusCommand } from './commands/impl/update-user-status.comm
 import { UpdateUserRoleCommand } from './commands/impl/update-user-role.command';
 import { RemoveUserCommand } from './commands/impl/remove-user.command';
 import { Public } from '../common/decorators/public.decorator';
+import { CreateSimpleUserType } from './dto/create-simple-user.type.';
+import { CreateSimpleUserCommand } from './commands/impl/create-simple-user.command';
 
 @Resolver()
 export class UserCommandResolver {
@@ -22,6 +24,11 @@ export class UserCommandResolver {
   @Mutation(() => UserType)
   async createUser(@Args('input') input: CreateUserType) {
     return this.commandBus.execute<CreateUserCommand, UserType>(new CreateUserCommand(input));
+  }
+
+  @Mutation(() => UserType)
+  async createSimpleUser(@Args('input') input: CreateSimpleUserType) {
+    return this.commandBus.execute<CreateSimpleUserCommand, UserType>(new CreateSimpleUserCommand(input));
   }
 
   @Mutation(() => UserSummaryType)

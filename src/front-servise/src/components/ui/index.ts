@@ -14,3 +14,6 @@ export { Modal } from './Modal';
 
 export { Select } from './Select';
 export type { SelectOption } from './Select';
+
+export { TagInput } from './TagInput';
+export { MultiSelect } from './MultiSelect';

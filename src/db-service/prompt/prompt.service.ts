@@ -24,6 +24,10 @@ export class PromptService {
     return await this.promptRepository.findOne({ where: { id } });
   }
 
+  async findByKey(key: string): Promise<Prompt | null> {
+    return await this.promptRepository.findOne({ where: { key } });
+  }
+
   async findByUserType(userType: UserType): Promise<Prompt | null> {
     return await this.promptRepository.findOne({ where: { userType: protoToJsUserType(userType) } });
   }

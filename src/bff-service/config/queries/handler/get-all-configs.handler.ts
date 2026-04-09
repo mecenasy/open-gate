@@ -20,7 +20,7 @@ export class GetAllConfigsHandler extends Handler<GetAllConfigsQuery, ConfigsLis
     }
 
     return {
-      status: response.status,
+      status: true,
       message: response.message,
       data: response.data.map((c) => ({
         id: c.id,

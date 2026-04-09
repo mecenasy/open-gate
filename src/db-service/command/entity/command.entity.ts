@@ -8,7 +8,6 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { CommandAction } from '../enums/command-action.enum';
 import { UserRole } from '../../user/entity/user-role.entity';
 
 @Entity('commands')
@@ -42,11 +41,12 @@ export class Command {
   active: boolean;
 
   @Column({
-    type: 'simple-array',
+    type: 'jsonb',
+    default: {},
     nullable: false,
   })
-  @IsArray()
-  actions: CommandAction[];
+  @IsJSON()
+  actions: Record<string, boolean>;
 
   @Column({
     type: 'jsonb',
@@ -54,7 +54,7 @@ export class Command {
     nullable: false,
   })
   @IsJSON()
-  parameters: Record<string, any>;
+  parameters: Record<string, boolean>;
 
   @ManyToMany(() => UserRole, (role) => role.commands, { cascade: true })
   @JoinTable({

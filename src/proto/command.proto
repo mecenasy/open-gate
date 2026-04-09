@@ -5,6 +5,8 @@ package command;
 service CommandService {
   // Create a new command
   rpc AddCommand (AddCommandRequest) returns (CommandResponse);
+  // remove a new command
+  rpc RemoveCommand (RemoveCommandRequest) returns (RemoveCommandResponse);
   
   // Update all fields except the command name
   rpc UpdateCommand (UpdateCommandRequest) returns (CommandResponse);
@@ -25,16 +27,14 @@ service CommandService {
   rpc ToggleActiveStatus (ToggleActiveStatusRequest) returns (CommandResponse);
 }
 
-// Enum for predefined command actions
-enum CommandAction {
-  ACTION_UNSPECIFIED = 0;
-  OPEN = 1;
-  CLOSE = 2;
-  EXECUTE = 3;
-  CANCEL = 4;
-  RESTART = 5;
-  STOP = 6;
-  START = 7;
+
+message RemoveCommandRequest {
+  string id = 1;
+} 
+
+message RemoveCommandResponse {
+  bool status = 1;
+  string message = 2;
 }
 
 // Message representing a command
@@ -43,18 +43,19 @@ message Command {
   string name = 2;
   string description = 3;
   bool active = 4;
-  repeated CommandAction actions = 5;
-  string parameters = 6; // JSON string for flexible parameter storage
+  map<string, bool> actions = 5;
+  map<string, bool> parameters = 6;
   string created_at = 7;
   string updated_at = 8;
+  repeated string role_names = 9;
 }
 
 // Request/Response messages for AddCommand
 message AddCommandRequest {
   string name = 1;
   string description = 2;
-  repeated CommandAction actions = 3;
-  string parameters = 4; // JSON string
+  map<string, bool> actions = 3;
+  map<string, bool> parameters = 4;
   repeated string role_names = 5; // List of role names to grant permissions
 }
 
@@ -63,8 +64,8 @@ message UpdateCommandRequest {
   string id = 1;
   optional string description = 2;
   optional bool active = 3;
-  repeated CommandAction actions = 4;
-  optional string parameters = 5; // JSON string
+  map<string, bool> actions = 4;
+  map<string, bool> parameters = 5; // JSON string
   repeated string role_names = 6; // Update permissions (replace existing)
 }
 
@@ -81,7 +82,7 @@ message GetAllCommandsRequest {
   int32 page = 1;
   int32 limit = 2;
   optional bool active_only = 3;
-  optional CommandAction action_filter = 4;
+  map<string, bool> action_filter = 4;
 }
 
 // Request/Response messages for GetAllByPermission

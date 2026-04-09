@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsEmail, IsString, IsNotEmpty, MinLength, Matches } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty, MinLength, Matches, IsOptional } from 'class-validator';
 
 @InputType()
 export class CreateUserType {
@@ -12,9 +12,9 @@ export class CreateUserType {
   @IsNotEmpty()
   phone!: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MinLength(8)
   @Matches(/[A-Z]/, {
     message: 'Password must contain at least 1 uppercase letter',
@@ -25,7 +25,7 @@ export class CreateUserType {
   @Matches(/[^A-Za-z0-9]/, {
     message: 'Password must contain at least 1 special character',
   })
-  password!: string;
+  password?: string;
 
   @Field()
   @IsString()
@@ -41,4 +41,9 @@ export class CreateUserType {
   @IsString()
   @IsNotEmpty()
   type!: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  phoneOwner?: string;
 }

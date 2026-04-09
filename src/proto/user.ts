@@ -45,7 +45,8 @@ export interface AddUserRequest {
   phone: string;
   name: string;
   surname: string;
-  ownerId?: string | undefined;
+  status?: Status | undefined;
+  phoneOwner?: string | undefined;
   type?: UserType | undefined;
   password?: string | undefined;
 }

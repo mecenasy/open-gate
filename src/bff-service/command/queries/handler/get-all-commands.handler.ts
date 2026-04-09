@@ -12,7 +12,7 @@ export class GetAllCommandsHandler extends Handler<GetAllCommandsQuery, Commands
     super(COMMAND_SERVICE_NAME);
   }
 
-  async execute({ page, limit, activeOnly, actionFilter }: GetAllCommandsQuery): Promise<CommandsListType> {
+  async execute({ page, limit, activeOnly, actionFilter = {} }: GetAllCommandsQuery): Promise<CommandsListType> {
     const response = await lastValueFrom(this.gRpcService.getAllCommands({ page, limit, activeOnly, actionFilter }));
 
     if (!response || response.status === false) {
@@ -29,6 +29,7 @@ export class GetAllCommandsHandler extends Handler<GetAllCommandsQuery, Commands
         active: c.active,
         actions: c.actions,
         parameters: c.parameters,
+        roleNames: c.roleNames ?? [],
         createdAt: c.createdAt,
         updatedAt: c.updatedAt,
       })),

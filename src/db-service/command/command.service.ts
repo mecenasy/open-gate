@@ -1,15 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, ArrayContains, FindOperator } from 'typeorm';
+import { Repository, In, FindOperator } from 'typeorm';
 import { Command } from './entity/command.entity';
 import { UserRole } from '../user/entity/user-role.entity';
-import {
-  Command as CommandProto,
-  AddCommandRequest,
-  UpdateCommandRequest,
-  CommandAction as ProtoCommandAction,
-} from 'src/proto/command';
-import { protoToEntityCommandAction, entityToProtoCommandAction } from 'src/utils/command-action-converter';
+import { Command as CommandProto, AddCommandRequest, UpdateCommandRequest } from 'src/proto/command';
 import { protoToJsUserType } from 'src/utils/user-type-converter';
 
 @Injectable()
@@ -26,9 +20,9 @@ export class CommandService {
       name: commandData.name,
       description: commandData.description,
       active: true,
-      actions: commandData.actions.map(protoToEntityCommandAction),
+      actions: commandData.actions,
       //TODO: Validate parameters
-      parameters: JSON.parse(commandData.parameters),
+      parameters: commandData.parameters,
       userRoles: [], // Will be set after creation
     });
 
@@ -37,7 +31,7 @@ export class CommandService {
     // Set user roles if provided
     if (commandData.roleNames && commandData.roleNames.length > 0) {
       const roles = await this.userRoleRepository.find({
-        where: { userType: In(commandData.roleNames.map(Number)) },
+        where: { userType: In(commandData.roleNames) },
       });
       savedCommand.userRoles = roles;
       await this.commandRepository.save(savedCommand);
@@ -74,15 +68,16 @@ export class CommandService {
     page: number = 1,
     limit: number = 10,
     activeOnly: boolean = false,
-    actionFilter?: ProtoCommandAction,
+    actionFilter?: Record<string, boolean>,
   ): Promise<{ commands: Command[]; total: number }> {
     const whereConditions: { active?: boolean; actions?: FindOperator<any> } = {};
     if (activeOnly) {
       whereConditions.active = true;
     }
-    if (actionFilter) {
-      whereConditions.actions = ArrayContains([protoToEntityCommandAction(actionFilter)]);
-    }
+    //TODO: Implement action filter using ArrayContains or a custom query builder if needed
+    // if (actionFilter) {
+    //   whereConditions.actions = ArrayContains([protoToEntityCommandAction(actionFilter)]);
+    // }
 
     const [commands, total] = await this.commandRepository.findAndCount({
       where: whereConditions,
@@ -150,17 +145,16 @@ export class CommandService {
       command.active = updateData.active;
     }
     if (updateData.actions) {
-      command.actions = updateData.actions.map(protoToEntityCommandAction);
+      command.actions = updateData.actions;
     }
     if (updateData.parameters !== undefined) {
-      //TODO: Validate parameters
-      command.parameters = JSON.parse(updateData.parameters);
+      command.parameters = updateData.parameters;
     }
 
     // Update user roles if provided
     if (updateData.roleNames) {
       const roles = await this.userRoleRepository.find({
-        where: { userType: In(updateData.roleNames.map(Number)) },
+        where: { userType: In(updateData.roleNames) },
       });
       command.userRoles = roles;
     }
@@ -190,10 +184,16 @@ export class CommandService {
       name: command.name,
       description: command.description || '',
       active: command.active,
-      actions: command.actions.map(entityToProtoCommandAction),
-      parameters: JSON.stringify(command.parameters),
+      actions: (typeof command.actions === 'string' ? JSON.parse(command.actions) : command.actions) as Record<
+        string,
+        boolean
+      >,
+      parameters: (Array.isArray(command.parameters)
+        ? command.parameters.reduce((acc, key) => ({ ...acc, [key]: true }), {})
+        : command.parameters) as Record<string, boolean>,
       createdAt: command.createdAt.toISOString(),
       updatedAt: command.updatedAt.toISOString(),
+      roleNames: command.userRoles?.map((r) => r.userType) ?? [],
     };
   }
 }

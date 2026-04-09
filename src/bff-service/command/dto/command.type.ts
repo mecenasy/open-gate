@@ -1,5 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { CommandAction } from './enums';
+import GraphQLJSON from 'graphql-type-json';
 
 @ObjectType()
 export class CommandType {
@@ -15,11 +15,14 @@ export class CommandType {
   @Field()
   active!: boolean;
 
-  @Field(() => [CommandAction])
-  actions!: CommandAction[];
+  @Field(() => GraphQLJSON)
+  actions!: Record<string, boolean>;
 
-  @Field()
-  parameters!: string;
+  @Field(() => GraphQLJSON)
+  parameters!: Record<string, boolean>;
+
+  @Field(() => [String])
+  roleNames!: string[];
 
   @Field()
   createdAt!: string;

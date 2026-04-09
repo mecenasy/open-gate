@@ -1,18 +1,25 @@
 import { Resolver, Query, Args } from '@nestjs/graphql';
 import { QueryBus } from '@nestjs/cqrs';
-import { GetPromptType } from './dto/get-prompt.type';
+import { GetPromptByKeyType } from './dto/get-prompt.-by-key.type';
 import { GetAllPromptsType } from './dto/get-all-prompts.type';
 import { PromptResponseType, PromptsListType } from './dto/response.type';
-import { GetPromptQuery } from './queries/impl/get-prompt.query';
+import { GetPromptByIdQuery } from './queries/impl/get-prompt.query';
+import { GetPromptByKeyQuery } from './queries/impl/get-prompt-by-key.query';
 import { GetAllPromptsQuery } from './queries/impl/get-all-prompts.query';
+import { GetPromptByIdType } from './dto/get-prompt.-by-id.type';
 
 @Resolver('Prompt')
 export class PromptsQueryResolver {
   constructor(private readonly queryBus: QueryBus) {}
 
   @Query(() => PromptResponseType)
-  async prompt(@Args('input') input: GetPromptType): Promise<PromptResponseType> {
-    return this.queryBus.execute<GetPromptQuery, PromptResponseType>(new GetPromptQuery(input.userType));
+  async promptById(@Args('input') input: GetPromptByIdType): Promise<PromptResponseType> {
+    return this.queryBus.execute<GetPromptByIdQuery, PromptResponseType>(new GetPromptByIdQuery(input.id));
+  }
+
+  @Query(() => PromptResponseType)
+  async promptByKey(@Args('input') input: GetPromptByKeyType): Promise<PromptResponseType> {
+    return this.queryBus.execute<GetPromptByKeyQuery, PromptResponseType>(new GetPromptByKeyQuery(input.key));
   }
 
   @Query(() => PromptsListType)

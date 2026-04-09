@@ -4,7 +4,8 @@ package prompt;
 
 service PromptProxyService {
   rpc AddPrompt (AddPromptRequest) returns (PromptResponse);
-  rpc GetPrompt (GetPromptRequest) returns (PromptResponse);
+  rpc GetPromptById (GetPromptByIdRequest) returns (PromptResponse);
+  rpc GetPromptByKey (GetPromptByKeyRequest) returns (PromptResponse);
   rpc UpdatePrompt (UpdatePromptRequest) returns (PromptResponse);
   rpc RemovePrompt (RemovePromptRequest) returns (PromptResponse);
   rpc GetAllPrompts (GetAllPromptsRequest) returns (GetAllPromptsResponse);
@@ -17,6 +18,7 @@ enum UserType {
   MEMBER = 3;
   USER = 4;
 }
+
 message AddPromptRequest {
   UserType userType = 1;
   string prompt = 2;
@@ -25,8 +27,12 @@ message AddPromptRequest {
   string commandName = 5;
 }
 
-message GetPromptRequest {
-  UserType userType = 1;
+message GetPromptByIdRequest {
+  string id = 1;
+}
+
+message GetPromptByKeyRequest {
+  string key = 1;
 }
 
 message UpdatePromptRequest {

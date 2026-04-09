@@ -3,17 +3,17 @@ import { lastValueFrom } from 'rxjs';
 import { NotFoundException } from '@nestjs/common';
 import { PROMPT_PROXY_SERVICE_NAME, PromptProxyServiceClient } from 'src/proto/prompt';
 import { Handler } from 'src/bff-service/common/handler/handler';
-import { GetPromptQuery } from '../impl/get-prompt.query';
 import { PromptResponseType } from '../../dto/response.type';
+import { GetPromptByKeyQuery } from '../impl/get-prompt-by-key.query';
 
-@QueryHandler(GetPromptQuery)
-export class GetPromptHandler extends Handler<GetPromptQuery, PromptResponseType, PromptProxyServiceClient> {
+@QueryHandler(GetPromptByKeyQuery)
+export class GetPromptByKeyHandler extends Handler<GetPromptByKeyQuery, PromptResponseType, PromptProxyServiceClient> {
   constructor() {
     super(PROMPT_PROXY_SERVICE_NAME);
   }
 
-  async execute({ userType }: GetPromptQuery): Promise<PromptResponseType> {
-    const response = await lastValueFrom(this.gRpcService.getPrompt({ userType }));
+  async execute({ key }: GetPromptByKeyQuery): Promise<PromptResponseType> {
+    const response = await lastValueFrom(this.gRpcService.getPromptByKey({ key }));
 
     if (!response || response.status === false || !response.data) {
       throw new NotFoundException(response?.message ?? 'Prompt not found');

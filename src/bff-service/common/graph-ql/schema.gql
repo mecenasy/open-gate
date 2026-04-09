@@ -149,14 +149,77 @@ type PromptSuccessType {
   success: Boolean!
 }
 
+type CommandType {
+  id: ID!
+  name: String!
+  description: String!
+  active: Boolean!
+  actions: JSON!
+  parameters: JSON!
+  roleNames: [String!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type CommandResponseType {
+  status: Boolean!
+  message: String!
+  data: CommandType
+}
+
+type CommandsListType {
+  status: Boolean!
+  message: String!
+  data: [CommandType!]!
+  total: Int!
+  page: Int!
+  limit: Int!
+}
+
+type ConfigType {
+  key: String!
+  value: String!
+  description: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type ConfigResponseType {
+  status: Boolean!
+  message: String!
+  data: ConfigType
+}
+
+type ConfigsListType {
+  status: Boolean!
+  message: String!
+  data: [ConfigType!]!
+}
+
+type ConfigSuccessType {
+  success: Boolean!
+}
+
 type Query {
   users(input: GetAllUsersType): UsersListType!
   user(input: GetUserType!): UserSummaryType!
   loginStatus: LoginStatusType!
   verifyToken(token: String!): VerifyTokenType!
   getPasskeys: [PassKeyType!]!
-  prompt(input: GetPromptType!): PromptResponseType!
+  promptById(input: GetPromptByIdType!): PromptResponseType!
+  promptByKey(input: GetPromptByKeyType!): PromptResponseType!
   prompts(input: GetAllPromptsType): PromptsListType!
+  command(input: GetCommandType!): CommandResponseType!
+  commands(input: GetAllCommandsType): CommandsListType!
+  commandsByPermission(input: GetAllByPermissionType!): CommandsListType!
+  commandByPermission(input: GetByPermissionType!): CommandResponseType!
+  config(input: GetByKeyType!): ConfigResponseType!
+  configs: ConfigsListType!
 }
 
 input GetAllUsersType {
@@ -168,8 +231,12 @@ input GetUserType {
   id: String!
 }
 
-input GetPromptType {
-  userType: PromptUserType!
+input GetPromptByIdType {
+  id: String!
+}
+
+input GetPromptByKeyType {
+  key: String!
 }
 
 input GetAllPromptsType {
@@ -178,8 +245,38 @@ input GetAllPromptsType {
   userType: PromptUserType
 }
 
+input GetCommandType {
+  id: ID
+  name: String
+}
+
+input GetAllCommandsType {
+  page: Int! = 1
+  limit: Int! = 10
+  activeOnly: Boolean
+  actionFilter: JSON
+}
+
+input GetAllByPermissionType {
+  roleName: String!
+  page: Int! = 1
+  limit: Int! = 10
+  activeOnly: Boolean
+}
+
+input GetByPermissionType {
+  roleName: String!
+  id: ID
+  name: String
+}
+
+input GetByKeyType {
+  key: String!
+}
+
 type Mutation {
   createUser(input: CreateUserType!): UserType!
+  createSimpleUser(input: CreateSimpleUserType!): UserType!
   updateUser(input: UpdateUserType!): UserSummaryType!
   updateUserStatus(input: UpdateUserStatusType!): UserSummaryType!
   updateUserRole(input: UpdateUserRoleType!): UserSummaryType!
@@ -208,15 +305,32 @@ type Mutation {
   addPrompt(input: AddPromptType!): PromptResponseType!
   updatePrompt(input: UpdatePromptType!): PromptResponseType!
   removePrompt(input: RemovePromptType!): PromptSuccessType!
+  addCommand(input: AddCommandType!): CommandResponseType!
+  updateCommand(input: UpdateCommandType!): CommandResponseType!
+  toggleActiveStatus(input: ToggleActiveStatusType!): CommandResponseType!
+  removeCommand(input: RemoveCommandType!): CommandResponseType!
+  addConfig(input: AddConfigType!): ConfigResponseType!
+  removeConfig(input: RemoveConfigType!): ConfigSuccessType!
 }
 
 input CreateUserType {
   email: String!
   phone: String!
-  password: String!
+  password: String
   name: String!
   surname: String!
   type: String!
+  phoneOwner: String
+}
+
+input CreateSimpleUserType {
+  email: String!
+  phone: String!
+  name: String!
+  surname: String!
+  type: UserRole!
+  status: UserStatus!
+  phoneOwner: String
 }
 
 input UpdateUserType {
@@ -266,11 +380,6 @@ input ForgotPasswordType {
   email: String!
 }
 
-"""
-The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON
-
 input AddPromptType {
   userType: PromptUserType!
   prompt: String!
@@ -290,4 +399,41 @@ input UpdatePromptType {
 
 input RemovePromptType {
   id: ID!
+}
+
+input AddCommandType {
+  name: String!
+  description: String!
+  actions: JSON!
+  parameters: JSON!
+  roleNames: [String!]!
+}
+
+input UpdateCommandType {
+  id: ID!
+  name: String
+  description: String
+  active: Boolean
+  actions: JSON!
+  parameters: JSON!
+  roleNames: [String!]! = []
+}
+
+input ToggleActiveStatusType {
+  id: ID!
+  active: Boolean!
+}
+
+input RemoveCommandType {
+  id: ID!
+}
+
+input AddConfigType {
+  key: String!
+  value: String!
+  description: String
+}
+
+input RemoveConfigType {
+  key: String!
 }

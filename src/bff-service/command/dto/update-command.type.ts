@@ -1,6 +1,6 @@
 import { Field, ID, InputType } from '@nestjs/graphql';
-import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { CommandAction } from './enums';
+import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import GraphQLJSON from 'graphql-type-json';
 
 @InputType()
 export class UpdateCommandType {
@@ -12,6 +12,11 @@ export class UpdateCommandType {
   @Field({ nullable: true })
   @IsString()
   @IsOptional()
+  name?: string;
+
+  @Field({ nullable: true })
+  @IsString()
+  @IsOptional()
   description?: string;
 
   @Field({ nullable: true })
@@ -19,15 +24,11 @@ export class UpdateCommandType {
   @IsOptional()
   active?: boolean;
 
-  @Field(() => [CommandAction], { defaultValue: [] })
-  @IsArray()
-  @IsEnum(CommandAction, { each: true })
-  actions!: CommandAction[];
+  @Field(() => GraphQLJSON)
+  actions!: Record<string, boolean>;
 
-  @Field({ nullable: true })
-  @IsString()
-  @IsOptional()
-  parameters?: string;
+  @Field(() => GraphQLJSON)
+  parameters!: Record<string, boolean>;
 
   @Field(() => [String], { defaultValue: [] })
   @IsArray()

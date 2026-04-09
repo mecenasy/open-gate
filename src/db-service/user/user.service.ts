@@ -24,7 +24,7 @@ export class UserService {
     private readonly historyService: HistoryService,
   ) {}
 
-  async create({ email, phone, password, name, surname, type, ownerId }: AddUserRequest): Promise<User> {
+  async create({ email, phone, password, name, surname, type, phoneOwner }: AddUserRequest): Promise<User> {
     const userType = await this.userRoleRepository.findOneOrFail({
       where: {
         userType: type ? protoToJsUserType(type) : UserType.User,
@@ -41,7 +41,11 @@ export class UserService {
       userSettings: this.userSettingsService.create(),
     });
 
-    if (ownerId) {
+    if (phoneOwner) {
+      const owner = await this.userRepository.findOneOrFail({
+        where: { phone: phoneOwner },
+      });
+      const ownerId = owner.id;
       user.ownerId = ownerId;
     }
     if (password) {
@@ -117,8 +121,12 @@ export class UserService {
   async remove(id: string): Promise<boolean> {
     const result = await this.userRepository.delete({
       id,
+    });
+
+    await this.userRepository.delete({
       ownerId: id,
     });
+
     return (result?.affected ?? 0) > 0;
   }
   public async save(user: User): Promise<User> {

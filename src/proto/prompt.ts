@@ -28,8 +28,12 @@ export interface AddPromptRequest {
   commandName: string;
 }
 
-export interface GetPromptRequest {
-  userType: UserType;
+export interface GetPromptByIdRequest {
+  id: string;
+}
+
+export interface GetPromptByKeyRequest {
+  key: string;
 }
 
 export interface UpdatePromptRequest {
@@ -86,7 +90,9 @@ export const PROMPT_PACKAGE_NAME = 'prompt';
 export interface PromptProxyServiceClient {
   addPrompt(request: AddPromptRequest, metadata?: Metadata): Observable<PromptResponse>;
 
-  getPrompt(request: GetPromptRequest, metadata?: Metadata): Observable<PromptResponse>;
+  getPromptById(request: GetPromptByIdRequest, metadata?: Metadata): Observable<PromptResponse>;
+
+  getPromptByKey(request: GetPromptByKeyRequest, metadata?: Metadata): Observable<PromptResponse>;
 
   updatePrompt(request: UpdatePromptRequest, metadata?: Metadata): Observable<PromptResponse>;
 
@@ -101,8 +107,13 @@ export interface PromptProxyServiceController {
     metadata?: Metadata,
   ): Promise<PromptResponse> | Observable<PromptResponse> | PromptResponse;
 
-  getPrompt(
-    request: GetPromptRequest,
+  getPromptById(
+    request: GetPromptByIdRequest,
+    metadata?: Metadata,
+  ): Promise<PromptResponse> | Observable<PromptResponse> | PromptResponse;
+
+  getPromptByKey(
+    request: GetPromptByKeyRequest,
     metadata?: Metadata,
   ): Promise<PromptResponse> | Observable<PromptResponse> | PromptResponse;
 
@@ -124,7 +135,14 @@ export interface PromptProxyServiceController {
 
 export function PromptProxyServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['addPrompt', 'getPrompt', 'updatePrompt', 'removePrompt', 'getAllPrompts'];
+    const grpcMethods: string[] = [
+      'addPrompt',
+      'getPromptById',
+      'getPromptByKey',
+      'updatePrompt',
+      'removePrompt',
+      'getAllPrompts',
+    ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod('PromptProxyService', method)(constructor.prototype[method], method, descriptor);

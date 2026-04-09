@@ -109,6 +109,16 @@ type EditUserForm = {
   type: UserRole;
 };
 
+type AddUserForm = {
+  name: string;
+  surname: string;
+  email: string;
+  phone: string;
+  phoneOwner?: string;
+  status: UserStatus;
+  type: UserRole;
+};
+
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function UsersPage() {
@@ -123,6 +133,11 @@ export default function UsersPage() {
     onUpdateRole,
     onRemoveUser,
     isUpdatingUser,
+    isAddModalOpen,
+    openAddModal,
+    closeAddModal,
+    onCreateUser,
+    isCreatingUser,
   } = useUsers();
 
   const {
@@ -133,6 +148,23 @@ export default function UsersPage() {
     setValue,
     formState: { errors },
   } = useForm<EditUserForm>();
+
+  const {
+    register: registerAdd,
+    handleSubmit: handleSubmitAdd,
+    reset: resetAdd,
+    watch: watchAdd,
+    setValue: setValueAdd,
+    formState: { errors: errorsAdd },
+  } = useForm<AddUserForm>({
+    defaultValues: {
+      status: UserStatus.Active,
+      type: UserRole.User,
+    },
+  });
+
+  const watchedAddStatus = watchAdd('status');
+  const watchedAddType = watchAdd('type');
 
   const watchedStatus = watch('status');
   const watchedType = watch('type');
@@ -150,10 +182,16 @@ export default function UsersPage() {
     }
   }, [selectedUser, reset]);
 
+  const onSubmitAdd = async (data: AddUserForm) => {
+    await onCreateUser(data);
+    resetAdd();
+    closeAddModal();
+  };
+
   const onSubmit = async (data: EditUserForm) => {
     if (!selectedUser) return;
     const mutations: Promise<unknown>[] = [
-      onUpdateUser({ name: data.name, surname: data.surname, email: data.email, phone: data.phone }),
+      onUpdateUser(data),
     ];
     if (data.status !== selectedUser.status) {
       mutations.push(onUpdateStatus(selectedUser.id, data.status) as Promise<unknown>);
@@ -206,7 +244,7 @@ export default function UsersPage() {
       {/* header */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-xl font-bold text-text">Użytkownicy</h1>
-        <Button variant="green" disabled>
+        <Button variant="green" onClick={openAddModal}>
           + Dodaj użytkownika
         </Button>
       </div>
@@ -225,6 +263,77 @@ export default function UsersPage() {
           onRowClick={openModal}
         />
       )}
+
+      {/* add modal */}
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={closeAddModal}
+        title="Dodaj użytkownika"
+        footer={
+          <>
+            <Button variant="blue" size="sm" onClick={closeAddModal}>
+              Anuluj
+            </Button>
+            <Button
+              variant="green"
+              size="sm"
+              form="add-user-form"
+              type="submit"
+              disabled={isCreatingUser}
+            >
+              {isCreatingUser ? 'Dodawanie…' : 'Dodaj'}
+            </Button>
+          </>
+        }
+      >
+        <form
+          id="add-user-form"
+          onSubmit={handleSubmitAdd(onSubmitAdd)}
+          className="flex flex-col gap-4"
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Imię"
+              error={errorsAdd.name?.message}
+              {...registerAdd('name', { required: 'Wymagane' })}
+            />
+            <Input
+              label="Nazwisko"
+              error={errorsAdd.surname?.message}
+              {...registerAdd('surname', { required: 'Wymagane' })}
+            />
+          </div>
+          <Input
+            label="Email"
+            type="email"
+            error={errorsAdd.email?.message}
+            {...registerAdd('email', { required: 'Wymagane' })}
+          />
+          <Input
+            label="Telefon"
+            error={errorsAdd.phone?.message}
+            {...registerAdd('phone')}
+          />
+          <Input
+            label="Telefon do osoby decyzyjnej"
+            {...registerAdd('phoneOwner')}
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <Select<UserStatus>
+              label="Status"
+              value={watchedAddStatus}
+              options={STATUS_OPTIONS}
+              onChange={(v) => setValueAdd('status', v)}
+            />
+            <Select<UserRole>
+              label="Rola"
+              value={watchedAddType}
+              options={ROLE_OPTIONS}
+              onChange={(v) => setValueAdd('type', v)}
+            />
+          </div>
+        </form>
+      </Modal>
 
       {/* edit modal */}
       <Modal

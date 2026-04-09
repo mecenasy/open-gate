@@ -10,7 +10,7 @@ import { NotifyModule } from './notify/notify.module';
 import { AuthModule } from './auth/auth.module';
 import { PromptsModule } from './prompts/prompts.module';
 import { CommandModule } from './command/command.module';
-import { ConfigModule } from './config/config.module';
+import { CoreConfigModule } from './core-config/core-config.module';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { ConfigModule } from './config/config.module';
     NotifyModule,
     PromptsModule,
     CommandModule,
-    ConfigModule,
+    CoreConfigModule,
     //  CsrfModule
   ],
   controllers: [AppController],

@@ -5,11 +5,11 @@
 // source: src/proto/user.proto
 
 /* eslint-disable */
-import type { Metadata } from '@grpc/grpc-js';
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import type { Metadata } from "@grpc/grpc-js";
+import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { Observable } from "rxjs";
 
-export const protobufPackage = 'user';
+export const protobufPackage = "user";
 
 export enum Status {
   PENDING = 0,
@@ -111,7 +111,7 @@ export interface UserData {
   type: UserType;
 }
 
-export const USER_PACKAGE_NAME = 'user';
+export const USER_PACKAGE_NAME = "user";
 
 export interface UserProxyServiceClient {
   addUser(request: AddUserRequest, metadata?: Metadata): Observable<UserResponse>;
@@ -190,27 +190,27 @@ export interface UserProxyServiceController {
 export function UserProxyServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      'addUser',
-      'getUser',
-      'getUserByEmail',
-      'getUserByPhone',
-      'updateUser',
-      'updateUserStatus',
-      'updateUserRole',
-      'removeUser',
-      'getAllUsers',
-      'checkExist',
+      "addUser",
+      "getUser",
+      "getUserByEmail",
+      "getUserByPhone",
+      "updateUser",
+      "updateUserStatus",
+      "updateUserRole",
+      "removeUser",
+      "getAllUsers",
+      "checkExist",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('UserProxyService', method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod("UserProxyService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('UserProxyService', method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod("UserProxyService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const USER_PROXY_SERVICE_NAME = 'UserProxyService';
+export const USER_PROXY_SERVICE_NAME = "UserProxyService";

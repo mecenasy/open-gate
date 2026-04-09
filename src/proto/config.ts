@@ -5,11 +5,12 @@
 // source: src/proto/config.proto
 
 /* eslint-disable */
-import type { Metadata } from '@grpc/grpc-js';
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import type { Metadata } from "@grpc/grpc-js";
+import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { Observable } from "rxjs";
+import { Empty } from "../../google/protobuf/empty";
 
-export const protobufPackage = 'config';
+export const protobufPackage = "config";
 
 /** Configuration entity */
 export interface Config {
@@ -22,30 +23,13 @@ export interface Config {
 }
 
 /** Request to add a new config */
-export interface AddConfigRequest {
+export interface UpdateConfigRequest {
   key: string;
   value: string;
-  description?: string | undefined;
 }
 
-/** Request to remove a config by key */
-export interface RemoveConfigRequest {
+export interface GetConfigsRequest {
   key: string;
-}
-
-/** Request to get a config by key */
-export interface GetByKeyRequest {
-  key: string;
-}
-
-/** Request to get all configs */
-export interface GetAllRequest {}
-
-/** Response containing a single config */
-export interface ConfigResponse {
-  status: boolean;
-  message: string;
-  data?: Config | undefined;
 }
 
 /** Response containing multiple configs */
@@ -55,69 +39,59 @@ export interface GetAllResponse {
   data: Config[];
 }
 
-export const CONFIG_PACKAGE_NAME = 'config';
+export interface ConfigResponse {
+  status: boolean;
+  message: string;
+  data: Config | undefined;
+}
+
+export const CONFIG_PACKAGE_NAME = "config";
 
 export interface ConfigServiceClient {
-  /** Add a new configuration entry */
+  getCoreAll(request: Empty, metadata?: Metadata): Observable<GetAllResponse>;
 
-  add(request: AddConfigRequest, metadata?: Metadata): Observable<ConfigResponse>;
+  getFeatures(request: Empty, metadata?: Metadata): Observable<GetAllResponse>;
 
-  /** Remove a configuration entry by key */
+  getFeatureConfig(request: GetConfigsRequest, metadata?: Metadata): Observable<GetAllResponse>;
 
-  remove(request: RemoveConfigRequest, metadata?: Metadata): Observable<ConfigResponse>;
-
-  /** Get a specific configuration by key */
-
-  getByKey(request: GetByKeyRequest, metadata?: Metadata): Observable<ConfigResponse>;
-
-  /** Get all configuration entries */
-
-  getAll(request: GetAllRequest, metadata?: Metadata): Observable<GetAllResponse>;
+  updateConfig(request: UpdateConfigRequest, metadata?: Metadata): Observable<ConfigResponse>;
 }
 
 export interface ConfigServiceController {
-  /** Add a new configuration entry */
-
-  add(
-    request: AddConfigRequest,
-    metadata?: Metadata,
-  ): Promise<ConfigResponse> | Observable<ConfigResponse> | ConfigResponse;
-
-  /** Remove a configuration entry by key */
-
-  remove(
-    request: RemoveConfigRequest,
-    metadata?: Metadata,
-  ): Promise<ConfigResponse> | Observable<ConfigResponse> | ConfigResponse;
-
-  /** Get a specific configuration by key */
-
-  getByKey(
-    request: GetByKeyRequest,
-    metadata?: Metadata,
-  ): Promise<ConfigResponse> | Observable<ConfigResponse> | ConfigResponse;
-
-  /** Get all configuration entries */
-
-  getAll(
-    request: GetAllRequest,
+  getCoreAll(
+    request: Empty,
     metadata?: Metadata,
   ): Promise<GetAllResponse> | Observable<GetAllResponse> | GetAllResponse;
+
+  getFeatures(
+    request: Empty,
+    metadata?: Metadata,
+  ): Promise<GetAllResponse> | Observable<GetAllResponse> | GetAllResponse;
+
+  getFeatureConfig(
+    request: GetConfigsRequest,
+    metadata?: Metadata,
+  ): Promise<GetAllResponse> | Observable<GetAllResponse> | GetAllResponse;
+
+  updateConfig(
+    request: UpdateConfigRequest,
+    metadata?: Metadata,
+  ): Promise<ConfigResponse> | Observable<ConfigResponse> | ConfigResponse;
 }
 
 export function ConfigServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['add', 'remove', 'getByKey', 'getAll'];
+    const grpcMethods: string[] = ["getCoreAll", "getFeatures", "getFeatureConfig", "updateConfig"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('ConfigService', method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod("ConfigService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('ConfigService', method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod("ConfigService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const CONFIG_SERVICE_NAME = 'ConfigService';
+export const CONFIG_SERVICE_NAME = "ConfigService";

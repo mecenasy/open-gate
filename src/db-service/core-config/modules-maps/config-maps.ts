@@ -1,6 +1,6 @@
-export const signalConfigMap = ['botNumber'];
+export const signalConfigMap = ['bot-number'];
 
-export const smtpConfigMap = ['smt-port', 'smt-host', 'smt-password', 'smt-user', 'smt-from'];
+export const smtpConfigMap = ['smtp-port', 'smtp-host', 'smtp-password', 'smtp-user', 'smtp-from'];
 
 export const groqConfigMap = ['api-key', 'api-url'];
 

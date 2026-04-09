@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import Providers from '@/app/providers';
 import { Navbar } from '@/components/Navbar';
+import { AuthGuard } from '@/components/AuthGuard';
 import '@/app/globals.css';
 
 export const metadata: Metadata = {
@@ -30,8 +31,10 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <Providers>
-        <Navbar />
-        {children}
+        <AuthGuard>
+          <Navbar />
+          {children}
+        </AuthGuard>
       </Providers>
     </NextIntlClientProvider>
   );

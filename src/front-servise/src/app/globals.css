@@ -34,6 +34,7 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  scrollbar-gutter: stable;
 }
 
 * {
@@ -51,12 +52,14 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 12px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-surface);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 3px;
+  background-color: var(--color-border);
+  border-radius: 6px;
+  border-left: 6px solid transparent;
+  background-clip: padding-box;
 }

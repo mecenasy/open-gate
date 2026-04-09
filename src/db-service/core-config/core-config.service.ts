@@ -14,15 +14,27 @@ export class CoreConfigService {
   ) {}
 
   async getAllCoreConfigs(): Promise<Config[]> {
-    return this.configRepository.find({ where: { configType: ConfigType.Core } });
+    return this.configRepository.find({
+      order: { key: 'ASC' },
+      where: { configType: ConfigType.Core },
+    });
   }
 
   fetchAllFeatures(): Promise<Config[]> {
-    return this.configRepository.find({ where: { key: In(configMaps['feature']) } });
+    return this.configRepository.find({
+      order: { key: 'ASC' },
+      where: {
+        key: In(configMaps['feature']),
+        value: 'true',
+      },
+    });
   }
 
   async getConfigsByFeatureKey(key: string): Promise<Config[]> {
-    return this.configRepository.find({ where: { key: In(configMaps[key]) } });
+    return this.configRepository.find({
+      order: { key: 'ASC' },
+      where: { key: In(configMaps[key]) },
+    });
   }
 
   async updateConfig(key: string, value: string): Promise<Config> {
@@ -30,7 +42,7 @@ export class CoreConfigService {
     if (!config) {
       config = this.configRepository.create({ key, value });
     } else {
-      config.value = value;
+      config.value = value.toString();
     }
     return this.configRepository.save(config);
   }

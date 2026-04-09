@@ -154,7 +154,7 @@ type CommandType {
   name: String!
   description: String!
   active: Boolean!
-  actions: JSON!
+  actions: JSON
   parameters: JSON!
   roleNames: [String!]!
   createdAt: String!
@@ -182,6 +182,7 @@ type CommandsListType {
 }
 
 type ConfigType {
+  id: ID!
   key: String!
   value: String!
   description: String!
@@ -201,10 +202,6 @@ type ConfigsListType {
   data: [ConfigType!]!
 }
 
-type ConfigSuccessType {
-  success: Boolean!
-}
-
 type Query {
   users(input: GetAllUsersType): UsersListType!
   user(input: GetUserType!): UserSummaryType!
@@ -218,8 +215,9 @@ type Query {
   commands(input: GetAllCommandsType): CommandsListType!
   commandsByPermission(input: GetAllByPermissionType!): CommandsListType!
   commandByPermission(input: GetByPermissionType!): CommandResponseType!
-  config(input: GetByKeyType!): ConfigResponseType!
-  configs: ConfigsListType!
+  coreConfigs: ConfigsListType!
+  featureConfigs: ConfigsListType!
+  featureConfig(input: GetFeatureConfigType!): ConfigsListType!
 }
 
 input GetAllUsersType {
@@ -270,7 +268,7 @@ input GetByPermissionType {
   name: String
 }
 
-input GetByKeyType {
+input GetFeatureConfigType {
   key: String!
 }
 
@@ -309,8 +307,7 @@ type Mutation {
   updateCommand(input: UpdateCommandType!): CommandResponseType!
   toggleActiveStatus(input: ToggleActiveStatusType!): CommandResponseType!
   removeCommand(input: RemoveCommandType!): CommandResponseType!
-  addConfig(input: AddConfigType!): ConfigResponseType!
-  removeConfig(input: RemoveConfigType!): ConfigSuccessType!
+  updateConfig(input: UpdateConfigType!): ConfigResponseType!
 }
 
 input CreateUserType {
@@ -428,12 +425,7 @@ input RemoveCommandType {
   id: ID!
 }
 
-input AddConfigType {
+input UpdateConfigType {
   key: String!
   value: String!
-  description: String
-}
-
-input RemoveConfigType {
-  key: String!
 }

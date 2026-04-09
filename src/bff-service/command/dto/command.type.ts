@@ -15,13 +15,13 @@ export class CommandType {
   @Field()
   active!: boolean;
 
-  @Field(() => GraphQLJSON)
+  @Field(() => GraphQLJSON, { nullable: true })
   actions!: Record<string, boolean>;
 
   @Field(() => GraphQLJSON)
   parameters!: Record<string, boolean>;
 
-  @Field(() => [String])
+  @Field(() => [String, { nullable: true }])
   roleNames!: string[];
 
   @Field()

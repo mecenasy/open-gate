@@ -102,6 +102,7 @@ export const useCommands = () => {
     fetchPolicy: 'cache-and-network',
     variables: { input: { limit: 100, page: 1 } },
   });
+  console.log("🚀 ~ useCommands ~ data:", data)
 
   const [doAddCommand, { loading: creatingCommand }] = useMutation(ADD_COMMAND_MUTATION, {
     refetchQueries: ['GetCommands'],

@@ -18,7 +18,7 @@ export function Navbar() {
           </Link>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-4">
           <AuthNav />
         </div>
       </div>

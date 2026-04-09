@@ -5,7 +5,9 @@
     "brand": "Open Gate",
     "users": "Users",
     "prompts": "Prompts",
-    "commands": "Commands"
+    "commands": "Commands",
+    "coreConfig": "Core Config",
+    "featureConfig": "Features"
   },
   "home": {
     "title": "Open Gate",
@@ -154,6 +156,18 @@
     "roleSuperUser": "SuperUser",
     "roleMember": "Member",
     "roleUser": "User"
+  },
+  "coreConfig": {
+    "title": "Core Configuration",
+    "empty": "No configuration items found."
+  },
+  "featureConfig": {
+    "title": "Feature Configuration",
+    "empty": "No features found.",
+    "modalTitle": "Configure: {key}",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel"
   },
   "validation": {
     "emailInvalid": "Invalid email address",

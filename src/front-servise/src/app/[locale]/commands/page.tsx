@@ -56,7 +56,7 @@ function RoleBadge({ role }: { role: string }) {
 }
 
 function KeyBadges({ record }: { record: Record<string, boolean> }) {
-  const keys = Object.keys(record);
+  const keys = Object.keys(record || {});
   if (keys.length === 0) return <span className="text-muted text-xs">—</span>;
   return (
     <div className="flex flex-wrap gap-1">
@@ -131,8 +131,8 @@ export default function CommandsPage() {
   useEffect(() => {
     if (selectedCommand) {
       reset({ name: selectedCommand.name, description: selectedCommand.description });
-      setEditActions(Object.keys(selectedCommand.actions));
-      setEditParams(Object.keys(selectedCommand.parameters));
+      setEditActions(Object.keys(selectedCommand.actions || {}));
+      setEditParams(Object.keys(selectedCommand.parameters || {}));
       setEditRoles(selectedCommand.roleNames);
       setEditActive(selectedCommand.active);
     }

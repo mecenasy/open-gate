@@ -13,6 +13,7 @@ const STATUS_QUERY = graphql(`
       user {
         id
         email
+        owner
         is2faEnabled
         isAdaptiveLoginEnabled
         admin
@@ -57,6 +58,7 @@ export const useAuth = () => {
     isLoading: loading && !data,
     isError: error,
     isAuthenticated: status === AuthStatus.Login,
+    isOwner: user?.owner === true,
     user: user,
     phoneId,
     logout,

@@ -12,6 +12,8 @@ import { UserType } from './user-type';
 import { UserStatus } from './status';
 import { protoToUserStatus, userStatusToProto } from 'src/utils/concert-status';
 
+
+
 @Injectable()
 export class UserService {
   constructor(
@@ -206,6 +208,18 @@ export class UserService {
     return {
       status: false,
       message: 'User not found',
+    };
+  }
+
+  entityToProto(user: User): UserData {
+    return {
+      id: user.id,
+      email: user.email,
+      phone: user.phone,
+      name: user.name,
+      surname: user.surname,
+      status: userStatusToProto(user.status),
+      type: jsToProtoUserType(user.userRole.userType),
     };
   }
 }

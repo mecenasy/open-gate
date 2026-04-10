@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { LoginService } from './login.service';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { LOGIN_PROXY_SERVICE_NAME, LoginProxyServiceController } from 'src/proto/login';
 import type {
   LoginStatusRequest,
@@ -14,32 +14,41 @@ import type {
   Verify2FAResponse,
 } from 'src/proto/login';
 import { GrpcMethod } from '@nestjs/microservices';
+import { LoginQuery } from './queries/impl/login.query';
+import { GetLoginStatusQuery } from './queries/impl/get-login-status.query';
+import { GetUser2FaSecretQuery } from './queries/impl/get-user-2fa-secret.query';
+import { ResetPasswordCommand } from './commands/impl/reset-password.command';
+import { ChangePasswordCommand } from './commands/impl/change-password.command';
 
 @Controller()
 export class LoginController implements LoginProxyServiceController {
-  constructor(private readonly loginService: LoginService) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @GrpcMethod(LOGIN_PROXY_SERVICE_NAME, 'Login')
-  async login(request: LoginRequest): Promise<LoginResponse> {
-    return await this.loginService.login(request.email, request.password);
+  login(request: LoginRequest): Promise<LoginResponse> {
+    return this.queryBus.execute(new LoginQuery(request.email, request.password));
   }
 
   @GrpcMethod(LOGIN_PROXY_SERVICE_NAME, 'GetLoginStatus')
-  async getLoginStatus(request: LoginStatusRequest): Promise<LoginStatusResponse> {
-    return await this.loginService.getLoginStatus(request.userId);
+  getLoginStatus(request: LoginStatusRequest): Promise<LoginStatusResponse> {
+    return this.queryBus.execute(new GetLoginStatusQuery(request.userId));
   }
 
   @GrpcMethod(LOGIN_PROXY_SERVICE_NAME, 'ResetPassword')
-  async resetPassword(request: ResetPasswordRequest): Promise<ResetPasswordResponse> {
-    return await this.loginService.resetPassword(request.email, request.password);
+  resetPassword(request: ResetPasswordRequest): Promise<ResetPasswordResponse> {
+    return this.commandBus.execute(new ResetPasswordCommand(request.email, request.password));
   }
 
   @GrpcMethod(LOGIN_PROXY_SERVICE_NAME, 'ChangePassword')
-  async changePassword(request: ChangePasswordRequest): Promise<ChangePasswordResponse> {
-    return await this.loginService.changePassword(request.userId, request.oldPassword, request.newPassword);
+  changePassword(request: ChangePasswordRequest): Promise<ChangePasswordResponse> {
+    return this.commandBus.execute(new ChangePasswordCommand(request.userId, request.oldPassword, request.newPassword));
   }
+
   @GrpcMethod(LOGIN_PROXY_SERVICE_NAME, 'GetUser2FaSecret')
-  async getUser2FaSecret(request: Verify2FARequest): Promise<Verify2FAResponse> {
-    return await this.loginService.getUser2FaSecret(request.login);
+  getUser2FaSecret(request: Verify2FARequest): Promise<Verify2FAResponse> {
+    return this.queryBus.execute(new GetUser2FaSecretQuery(request.login));
   }
 }

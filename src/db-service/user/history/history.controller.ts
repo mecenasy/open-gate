@@ -1,20 +1,21 @@
 import { Controller } from '@nestjs/common';
 import { HistoryService } from './history.service';
 import { GrpcMethod } from '@nestjs/microservices';
-import type {
-  EventResponse,
-  FailureRequest,
-  GetUnusualTimeRequest,
-  GetUnusualTimeResponse,
-  LogRiskEventRequest,
-  UpdateRiskEventRequest,
+import {
+  RISK_PACKAGE_NAME,
+  type EventResponse,
+  type FailureRequest,
+  type GetUnusualTimeRequest,
+  type GetUnusualTimeResponse,
+  type LogRiskEventRequest,
+  type UpdateRiskEventRequest,
 } from 'src/proto/risk';
 
 @Controller()
 export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
 
-  @GrpcMethod('RiskProxyService', 'AddFailure')
+  @GrpcMethod(RISK_PACKAGE_NAME, 'AddFailure')
   async addFailure(request: FailureRequest): Promise<EventResponse> {
     try {
       await this.historyService.addFailure(request.id, request.fingerprintHash);
@@ -24,7 +25,7 @@ export class HistoryController {
     }
   }
 
-  @GrpcMethod('RiskProxyService', 'LogRiskEvent')
+  @GrpcMethod(RISK_PACKAGE_NAME, 'LogRiskEvent')
   async logRiskEvent(request: LogRiskEventRequest): Promise<EventResponse> {
     try {
       await this.historyService.logRiskEvent(request);
@@ -34,7 +35,7 @@ export class HistoryController {
     }
   }
 
-  @GrpcMethod('RiskProxyService', 'UpdateRiskEvent')
+  @GrpcMethod(RISK_PACKAGE_NAME, 'UpdateRiskEvent')
   async updateRiskEvent(request: UpdateRiskEventRequest): Promise<EventResponse> {
     try {
       await this.historyService.updateRiskEvent(request);
@@ -44,7 +45,7 @@ export class HistoryController {
     }
   }
 
-  @GrpcMethod('RiskProxyService', 'GetUnusualTime')
+  @GrpcMethod(RISK_PACKAGE_NAME, 'GetUnusualTime')
   async getUnusualTime(request: GetUnusualTimeRequest): Promise<GetUnusualTimeResponse> {
     return await this.historyService.getUnusualTime(request.userId, request.currentHour);
   }

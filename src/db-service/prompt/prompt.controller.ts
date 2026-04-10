@@ -1,5 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import type {
   PromptProxyServiceController,
   PromptResponse,
@@ -10,38 +11,29 @@ import type {
   RemovePromptRequest,
   GetAllPromptsRequest,
   GetPromptByKeyRequest,
+  Prompt as PromptProto,
+  PromptSimply,
 } from 'src/proto/prompt';
 import { PROMPT_PROXY_SERVICE_NAME } from 'src/proto/prompt';
-import { PromptService } from './prompt.service';
-import { jsToProtoUserType } from 'src/utils/user-type-converter';
+import { AddPromptCommand } from './commands/impl/add-prompt.command';
+import { UpdatePromptCommand } from './commands/impl/update-prompt.command';
+import { RemovePromptCommand } from './commands/impl/remove-prompt.command';
+import { GetPromptByIdQuery } from './queries/impl/get-prompt-by-id.query';
+import { GetPromptByKeyQuery } from './queries/impl/get-prompt-by-key.query';
+import { GetAllPromptsQuery } from './queries/impl/get-all-prompts.query';
 
 @Controller()
 export class PromptGrpcController implements PromptProxyServiceController {
-  constructor(private readonly promptService: PromptService) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @GrpcMethod(PROMPT_PROXY_SERVICE_NAME, 'AddPrompt')
   async addPrompt(request: AddPromptRequest): Promise<PromptResponse> {
     try {
-      const prompt = await this.promptService.create({
-        commandName: request.commandName,
-        description: request.description,
-        key: request.key,
-        userType: request.userType,
-        prompt: request.prompt,
-      });
-
-      return {
-        status: true,
-        message: 'Prompt created successfully',
-        data: {
-          id: prompt.id,
-          key: prompt.key,
-          commandName: prompt.commandName,
-          description: prompt.description,
-          userType: jsToProtoUserType(prompt.userType),
-          prompt: prompt.prompt,
-        },
-      };
+      const data = await this.commandBus.execute<AddPromptCommand, PromptProto>(new AddPromptCommand(request));
+      return { status: true, message: 'Prompt created successfully', data };
     } catch (error) {
       return {
         status: false,
@@ -53,27 +45,13 @@ export class PromptGrpcController implements PromptProxyServiceController {
   @GrpcMethod(PROMPT_PROXY_SERVICE_NAME, 'GetPromptById')
   async getPromptById(request: GetPromptByIdRequest): Promise<PromptResponse> {
     try {
-      const prompt = await this.promptService.findById(request.id);
-
-      if (!prompt) {
-        return {
-          status: false,
-          message: 'Prompt not found',
-        };
+      const data = await this.queryBus.execute<GetPromptByIdQuery, PromptProto | null>(
+        new GetPromptByIdQuery(request.id),
+      );
+      if (!data) {
+        return { status: false, message: 'Prompt not found' };
       }
-
-      return {
-        status: true,
-        message: 'Prompt found',
-        data: {
-          id: prompt.id,
-          commandName: prompt.commandName,
-          description: prompt.description,
-          key: prompt.key,
-          userType: jsToProtoUserType(prompt.userType),
-          prompt: prompt.prompt,
-        },
-      };
+      return { status: true, message: 'Prompt found', data };
     } catch (error) {
       return {
         status: false,
@@ -85,27 +63,13 @@ export class PromptGrpcController implements PromptProxyServiceController {
   @GrpcMethod(PROMPT_PROXY_SERVICE_NAME, 'GetPromptByKey')
   async getPromptByKey(request: GetPromptByKeyRequest): Promise<PromptResponse> {
     try {
-      const prompt = await this.promptService.findByKey(request.key);
-
-      if (!prompt) {
-        return {
-          status: false,
-          message: 'Prompt not found',
-        };
+      const data = await this.queryBus.execute<GetPromptByKeyQuery, PromptProto | null>(
+        new GetPromptByKeyQuery(request.key),
+      );
+      if (!data) {
+        return { status: false, message: 'Prompt not found' };
       }
-
-      return {
-        status: true,
-        message: 'Prompt found',
-        data: {
-          id: prompt.id,
-          commandName: prompt.commandName,
-          description: prompt.description,
-          key: prompt.key,
-          userType: jsToProtoUserType(prompt.userType),
-          prompt: prompt.prompt,
-        },
-      };
+      return { status: true, message: 'Prompt found', data };
     } catch (error) {
       return {
         status: false,
@@ -124,27 +88,13 @@ export class PromptGrpcController implements PromptProxyServiceController {
       if (request.description) updateData.description = request.description;
       if (request.commandName) updateData.commandName = request.commandName;
 
-      const prompt = await this.promptService.update(request.id, updateData);
-
-      if (!prompt) {
-        return {
-          status: false,
-          message: 'Prompt not found',
-        };
+      const data = await this.commandBus.execute<UpdatePromptCommand, PromptProto | null>(
+        new UpdatePromptCommand(request.id, updateData),
+      );
+      if (!data) {
+        return { status: false, message: 'Prompt not found' };
       }
-
-      return {
-        status: true,
-        message: 'Prompt updated successfully',
-        data: {
-          id: prompt.id,
-          key: prompt.key,
-          description: prompt.description,
-          commandName: prompt.commandName,
-          userType: jsToProtoUserType(prompt.userType),
-          prompt: prompt.prompt,
-        },
-      };
+      return { status: true, message: 'Prompt updated successfully', data };
     } catch (error) {
       return {
         status: false,
@@ -156,19 +106,11 @@ export class PromptGrpcController implements PromptProxyServiceController {
   @GrpcMethod(PROMPT_PROXY_SERVICE_NAME, 'RemovePrompt')
   async removePrompt(request: RemovePromptRequest): Promise<PromptResponse> {
     try {
-      const success = await this.promptService.remove(request.id);
-
+      const success = await this.commandBus.execute<RemovePromptCommand, boolean>(new RemovePromptCommand(request.id));
       if (!success) {
-        return {
-          status: false,
-          message: 'Prompt not found',
-        };
+        return { status: false, message: 'Prompt not found' };
       }
-
-      return {
-        status: true,
-        message: 'Prompt removed successfully',
-      };
+      return { status: true, message: 'Prompt removed successfully' };
     } catch (error) {
       return {
         status: false,
@@ -180,21 +122,10 @@ export class PromptGrpcController implements PromptProxyServiceController {
   @GrpcMethod(PROMPT_PROXY_SERVICE_NAME, 'GetAllPrompts')
   async getAllPrompts(request: GetAllPromptsRequest): Promise<GetAllPromptsResponse> {
     try {
-      const { prompts, total } = await this.promptService.findAll(request.page, request.limit, request.userType);
-
-      return {
-        status: true,
-        message: 'Prompts retrieved successfully',
-        data: prompts.map((prompt) => ({
-          id: prompt.id,
-          key: prompt.key,
-          description: prompt.description,
-          commandName: prompt.commandName,
-          userType: jsToProtoUserType(prompt.userType),
-          prompt: prompt.prompt,
-        })),
-        total,
-      };
+      const result = await this.queryBus.execute<GetAllPromptsQuery, { data: PromptSimply[]; total: number }>(
+        new GetAllPromptsQuery(request.page, request.limit, request.userType),
+      );
+      return { status: true, message: 'Prompts retrieved successfully', ...result };
     } catch (error) {
       return {
         status: false,

@@ -51,6 +51,7 @@ export class MassageHandler extends Handler<MessageCommand, Status, UserProxySer
           await this.cache.saveInCache<UserContext>({
             identifier: source,
             prefix: 'signal-user',
+            EX: 3600,
             data: {
               ...user.data,
               type: protoToJsUserType(user.data.type),

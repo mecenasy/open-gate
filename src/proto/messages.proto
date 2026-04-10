@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package messages;
+
+service MessagesService {
+  rpc AddMessage (AddMessageRequest) returns (MessageResponse);
+  rpc GetMessage (GetMessageRequest) returns (MessageResponse);
+  rpc GetAllMessages (GetAllMessagesRequest) returns (GetAllMessagesResponse);
+  rpc UpdateMessage (UpdateMessageRequest) returns (MessageResponse);
+  rpc RemoveMessage (RemoveMessageRequest) returns (MessageResponse);
+}
+
+message Message {
+  string key = 1;
+  string value = 2;
+}
+
+message AddMessageRequest {
+  string key = 1;
+  string value = 2;
+}
+
+message GetMessageRequest {
+  string key = 1;
+}
+
+message UpdateMessageRequest {
+  string key = 1;
+  string value = 2;
+}
+
+message RemoveMessageRequest {
+  string key = 1;
+}
+
+message GetAllMessagesRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message MessageResponse {
+  bool status = 1;
+  string message = 2;
+  optional Message data = 3;
+}
+
+message GetAllMessagesResponse {
+  bool status = 1;
+  string message = 2;
+  repeated Message data = 3;
+  int32 total = 4;
+}

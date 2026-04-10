@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Prompt } from './entity/prompt.entity';
-import { AddPromptRequest, UserType } from 'src/proto/prompt';
-import { protoToJsUserType } from 'src/utils/user-type-converter';
+import { AddPromptRequest, Prompt as PromptProto, PromptSimply, UserType } from 'src/proto/prompt';
+import { jsToProtoUserType, protoToJsUserType } from 'src/utils/user-type-converter';
 
 @Injectable()
 export class PromptService {
@@ -58,5 +58,26 @@ export class PromptService {
   async remove(id: string): Promise<boolean> {
     const result = await this.promptRepository.delete(id);
     return (result.affected || 0) > 0;
+  }
+
+  entityToProto(prompt: Prompt): PromptProto {
+    return {
+      id: prompt.id,
+      key: prompt.key,
+      description: prompt.description,
+      commandName: prompt.commandName,
+      userType: jsToProtoUserType(prompt.userType),
+      prompt: prompt.prompt,
+    };
+  }
+
+  entityToSimplyProto(prompt: Prompt): PromptSimply {
+    return {
+      id: prompt.id,
+      key: prompt.key,
+      description: prompt.description,
+      commandName: prompt.commandName,
+      userType: jsToProtoUserType(prompt.userType),
+    };
   }
 }

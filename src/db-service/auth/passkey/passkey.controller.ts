@@ -1,4 +1,5 @@
 import { Controller } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import type {
   AddPasskeyRequest,
   GetPasskeyRequest,
@@ -10,33 +11,42 @@ import type {
   SetCounterRequest,
 } from 'src/proto/passkey';
 import { PASSKEY_PROXY_SERVICE_NAME, PasskeyProxyServiceController } from 'src/proto/passkey';
-import { PasskeyService } from './passkey.service';
 import { GrpcMethod } from '@nestjs/microservices';
+import { AddPasskeyCommand } from './commands/impl/add-passkey.command';
+import { RemovePasskeyCommand } from './commands/impl/remove-passkey.command';
+import { SetCounterCommand } from './commands/impl/set-counter.command';
+import { GetPasskeyQuery } from './queries/impl/get-passkey.query';
+import { GetPasskeysQuery } from './queries/impl/get-passkeys.query';
 
 @Controller('passkey')
 export class PasskeyController implements PasskeyProxyServiceController {
-  constructor(private readonly passkeyService: PasskeyService) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @GrpcMethod(PASSKEY_PROXY_SERVICE_NAME, 'RemovePasskey')
-  async removePasskey(request: RemovePasskeyRequest): Promise<PasskeyResponse> {
-    return await this.passkeyService.removePasskey(request);
+  removePasskey(request: RemovePasskeyRequest): Promise<PasskeyResponse> {
+    return this.commandBus.execute(new RemovePasskeyCommand(request));
   }
 
   @GrpcMethod(PASSKEY_PROXY_SERVICE_NAME, 'AddPasskey')
-  async addPasskey(request: AddPasskeyRequest): Promise<PasskeyResponse> {
-    return await this.passkeyService.addPasskey(request);
+  addPasskey(request: AddPasskeyRequest): Promise<PasskeyResponse> {
+    return this.commandBus.execute(new AddPasskeyCommand(request));
   }
 
   @GrpcMethod(PASSKEY_PROXY_SERVICE_NAME, 'GetPasskey')
-  async getPasskey(request: GetPasskeyRequest): Promise<GetPasskeyResponse> {
-    return await this.passkeyService.getPasskey(request);
+  getPasskey(request: GetPasskeyRequest): Promise<GetPasskeyResponse> {
+    return this.queryBus.execute(new GetPasskeyQuery(request));
   }
+
   @GrpcMethod(PASSKEY_PROXY_SERVICE_NAME, 'GetPasskeys')
-  async getPasskeys(request: GetPasskeysRequest): Promise<GetPasskeysResponse> {
-    return await this.passkeyService.getPasskeys(request);
+  getPasskeys(request: GetPasskeysRequest): Promise<GetPasskeysResponse> {
+    return this.queryBus.execute(new GetPasskeysQuery(request));
   }
+
   @GrpcMethod(PASSKEY_PROXY_SERVICE_NAME, 'SetCounter')
-  async setCounter(request: SetCounterRequest): Promise<PasskeyResponse> {
-    return await this.passkeyService.setCounter(request);
+  setCounter(request: SetCounterRequest): Promise<PasskeyResponse> {
+    return this.commandBus.execute(new SetCounterCommand(request));
   }
 }

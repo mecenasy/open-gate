@@ -1,9 +1,13 @@
 import { AppModule } from './app.module';
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger, Logger } from '@nestjs/common';
 import { initDbGrpc } from '@app/db-grpc';
 
 async function bootstrap() {
-  await initDbGrpc(AppModule, { logger: ['log', 'error', 'warn', 'debug', 'verbose'] });
+  await initDbGrpc(AppModule, {
+    logger: new ConsoleLogger({
+      timestamp: false,
+    }),
+  });
 }
 
 bootstrap().catch((err) => {

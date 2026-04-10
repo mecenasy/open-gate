@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ConsoleLogger, Logger, ValidationPipe } from '@nestjs/common';
 import { initSession } from './libs/session/init-session';
 import { initCorse } from './libs/corse/corse';
 import { TypeConfigService } from './common/configs/types.config.service';
@@ -11,7 +11,9 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   const app = await NestFactory.create(AppModule, {
-    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+    logger: new ConsoleLogger({
+      timestamp: false,
+    }),
   });
 
   initRedis(app);

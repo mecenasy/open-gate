@@ -1,5 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import type {
   CommandServiceController,
   CommandResponse,
@@ -12,24 +13,30 @@ import type {
   GetByPermissionRequest,
   ToggleActiveStatusRequest,
   RemoveCommandRequest,
+  Command as CommandProto,
 } from 'src/proto/command';
 import { COMMAND_SERVICE_NAME } from 'src/proto/command';
-import { CommandService } from './command.service';
+import { AddCommandCommand } from './commands/impl/add-command.command';
+import { UpdateCommandCommand } from './commands/impl/update-command.command';
+import { RemoveCommandCommand } from './commands/impl/remove-command.command';
+import { ToggleActiveStatusCommand } from './commands/impl/toggle-active-status.command';
+import { GetCommandQuery } from './queries/impl/get-command.query';
+import { GetAllCommandsQuery } from './queries/impl/get-all-commands.query';
+import { GetAllByPermissionQuery } from './queries/impl/get-all-by-permission.query';
+import { GetByPermissionQuery } from './queries/impl/get-by-permission.query';
 
 @Controller()
 export class CommandGrpcController implements CommandServiceController {
-  constructor(private readonly commandService: CommandService) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @GrpcMethod(COMMAND_SERVICE_NAME, 'AddCommand')
   async addCommand(request: AddCommandRequest): Promise<CommandResponse> {
     try {
-      const command = await this.commandService.create(request);
-
-      return {
-        status: true,
-        message: 'Command created successfully',
-        data: this.commandService.entityToProto(command),
-      };
+      const data = await this.commandBus.execute<AddCommandCommand, CommandProto>(new AddCommandCommand(request));
+      return { status: true, message: 'Command created successfully', data };
     } catch (error) {
       return {
         status: false,
@@ -41,11 +48,8 @@ export class CommandGrpcController implements CommandServiceController {
   @GrpcMethod(COMMAND_SERVICE_NAME, 'RemoveCommand')
   async removeCommand(request: RemoveCommandRequest): Promise<CommandResponse> {
     try {
-      await this.commandService.remove(request.id);
-      return {
-        status: true,
-        message: 'Command removed successfully',
-      };
+      await this.commandBus.execute(new RemoveCommandCommand(request.id));
+      return { status: true, message: 'Command removed successfully' };
     } catch (error) {
       return {
         status: false,
@@ -57,20 +61,13 @@ export class CommandGrpcController implements CommandServiceController {
   @GrpcMethod(COMMAND_SERVICE_NAME, 'UpdateCommand')
   async updateCommand(request: UpdateCommandRequest): Promise<CommandResponse> {
     try {
-      const command = await this.commandService.update(request.id, request);
-
-      if (!command) {
-        return {
-          status: false,
-          message: 'Command not found',
-        };
+      const data = await this.commandBus.execute<UpdateCommandCommand, CommandProto | null>(
+        new UpdateCommandCommand(request.id, request),
+      );
+      if (!data) {
+        return { status: false, message: 'Command not found' };
       }
-
-      return {
-        status: true,
-        message: 'Command updated successfully',
-        data: this.commandService.entityToProto(command),
-      };
+      return { status: true, message: 'Command updated successfully', data };
     } catch (error) {
       return {
         status: false,
@@ -82,23 +79,13 @@ export class CommandGrpcController implements CommandServiceController {
   @GrpcMethod(COMMAND_SERVICE_NAME, 'GetCommand')
   async getCommand(request: GetCommandRequest): Promise<CommandResponse> {
     try {
-      const command = await this.commandService.findByIdentifier({
-        id: request.id,
-        name: request.name,
-      });
-
-      if (!command) {
-        return {
-          status: false,
-          message: 'Command not found',
-        };
+      const data = await this.queryBus.execute<GetCommandQuery, CommandProto | null>(
+        new GetCommandQuery(request.id, request.name),
+      );
+      if (!data) {
+        return { status: false, message: 'Command not found' };
       }
-
-      return {
-        status: true,
-        message: 'Command found',
-        data: this.commandService.entityToProto(command),
-      };
+      return { status: true, message: 'Command found', data };
     } catch (error) {
       return {
         status: false,
@@ -110,18 +97,13 @@ export class CommandGrpcController implements CommandServiceController {
   @GrpcMethod(COMMAND_SERVICE_NAME, 'GetAllCommands')
   async getAllCommands(request: GetAllCommandsRequest): Promise<GetAllCommandsResponse> {
     try {
-      const { commands, total } = await this.commandService.findAll(
-        request.page,
-        request.limit,
-        request.activeOnly,
-        request.actionFilter,
+      const result = await this.queryBus.execute<GetAllCommandsQuery, { data: CommandProto[]; total: number }>(
+        new GetAllCommandsQuery(request.page, request.limit, request.activeOnly, request.actionFilter),
       );
-
       return {
         status: true,
         message: 'Commands retrieved successfully',
-        data: commands.map((cmd) => this.commandService.entityToProto(cmd)),
-        total,
+        ...result,
         page: request.page,
         limit: request.limit,
       };
@@ -140,18 +122,13 @@ export class CommandGrpcController implements CommandServiceController {
   @GrpcMethod(COMMAND_SERVICE_NAME, 'GetAllByPermission')
   async getAllByPermission(request: GetAllByPermissionRequest): Promise<GetAllCommandsResponse> {
     try {
-      const { commands, total } = await this.commandService.findAllByPermission(
-        request.roleName,
-        request.page,
-        request.limit,
-        request.activeOnly,
+      const result = await this.queryBus.execute<GetAllByPermissionQuery, { data: CommandProto[]; total: number }>(
+        new GetAllByPermissionQuery(request.roleName, request.page, request.limit, request.activeOnly),
       );
-
       return {
         status: true,
         message: 'Commands retrieved successfully',
-        data: commands.map((cmd) => this.commandService.entityToProto(cmd)),
-        total,
+        ...result,
         page: request.page,
         limit: request.limit,
       };
@@ -170,23 +147,13 @@ export class CommandGrpcController implements CommandServiceController {
   @GrpcMethod(COMMAND_SERVICE_NAME, 'GetByPermission')
   async getByPermission(request: GetByPermissionRequest): Promise<CommandResponse> {
     try {
-      const command = await this.commandService.findByPermission(request.roleName, {
-        id: request.id,
-        name: request.name,
-      });
-
-      if (!command) {
-        return {
-          status: false,
-          message: 'Command not found or access denied',
-        };
+      const data = await this.queryBus.execute<GetByPermissionQuery, CommandProto | null>(
+        new GetByPermissionQuery(request.roleName, request.id, request.name),
+      );
+      if (!data) {
+        return { status: false, message: 'Command not found or access denied' };
       }
-
-      return {
-        status: true,
-        message: 'Command found',
-        data: this.commandService.entityToProto(command),
-      };
+      return { status: true, message: 'Command found', data };
     } catch (error) {
       return {
         status: false,
@@ -198,20 +165,13 @@ export class CommandGrpcController implements CommandServiceController {
   @GrpcMethod(COMMAND_SERVICE_NAME, 'ToggleActiveStatus')
   async toggleActiveStatus(request: ToggleActiveStatusRequest): Promise<CommandResponse> {
     try {
-      const command = await this.commandService.toggleActiveStatus(request.id, request.active);
-
-      if (!command) {
-        return {
-          status: false,
-          message: 'Command not found',
-        };
+      const data = await this.commandBus.execute<ToggleActiveStatusCommand, CommandProto | null>(
+        new ToggleActiveStatusCommand(request.id, request.active),
+      );
+      if (!data) {
+        return { status: false, message: 'Command not found' };
       }
-
-      return {
-        status: true,
-        message: 'Command status updated successfully',
-        data: this.commandService.entityToProto(command),
-      };
+      return { status: true, message: 'Command status updated successfully', data };
     } catch (error) {
       return {
         status: false,

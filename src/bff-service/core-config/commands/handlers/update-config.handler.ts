@@ -29,13 +29,13 @@ export class UpdateConfigHandler extends Handler<UpdateConfigCommand, ConfigResp
       message: response.message,
       data: response.data
         ? {
-          id: response.data.id,
-          key: response.data.key,
-          value: response.data.value,
-          description: response.data.description,
-          createdAt: response.data.createdAt,
-          updatedAt: response.data.updatedAt,
-        }
+            id: response.data.id,
+            key: response.data.key,
+            value: response.data.value,
+            description: response.data.description,
+            createdAt: response.data.createdAt,
+            updatedAt: response.data.updatedAt,
+          }
         : undefined,
     };
   }

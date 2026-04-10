@@ -55,7 +55,7 @@ export const useCoreConfigs = () => {
     }
   };
 
-  console.log("🚀 ~ useCoreConfigs ~ loading:", loading)
+  console.log('🚀 ~ useCoreConfigs ~ loading:', loading);
   return {
     configs: data?.coreConfigs?.data ?? [],
     isLoading: loading,

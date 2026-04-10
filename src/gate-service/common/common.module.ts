@@ -12,7 +12,16 @@ import { NotifyGrpcModule } from '@app/notify-grpc';
 import { GateGrpcModule } from '@app/gate-grpc';
 @Global()
 @Module({
-  imports: [CqrsModule, RedisModule, DbGrpcModule, NotifyGrpcModule, GateGrpcModule, HttpModule, GetawayModule, ConfigsModule],
+  imports: [
+    CqrsModule,
+    RedisModule,
+    DbGrpcModule,
+    NotifyGrpcModule,
+    GateGrpcModule,
+    HttpModule,
+    GetawayModule,
+    ConfigsModule,
+  ],
   providers: [
     EventService,
     {

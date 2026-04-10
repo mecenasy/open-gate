@@ -5,11 +5,11 @@
 // source: src/proto/prompt.proto
 
 /* eslint-disable */
-import type { Metadata } from "@grpc/grpc-js";
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { Observable } from "rxjs";
+import type { Metadata } from '@grpc/grpc-js';
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
 
-export const protobufPackage = "prompt";
+export const protobufPackage = 'prompt';
 
 export enum UserType {
   OWNER = 0,
@@ -85,7 +85,7 @@ export interface Prompt {
   prompt: string;
 }
 
-export const PROMPT_PACKAGE_NAME = "prompt";
+export const PROMPT_PACKAGE_NAME = 'prompt';
 
 export interface PromptProxyServiceClient {
   addPrompt(request: AddPromptRequest, metadata?: Metadata): Observable<PromptResponse>;
@@ -136,23 +136,23 @@ export interface PromptProxyServiceController {
 export function PromptProxyServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      "addPrompt",
-      "getPromptById",
-      "getPromptByKey",
-      "updatePrompt",
-      "removePrompt",
-      "getAllPrompts",
+      'addPrompt',
+      'getPromptById',
+      'getPromptByKey',
+      'updatePrompt',
+      'removePrompt',
+      'getAllPrompts',
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("PromptProxyService", method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod('PromptProxyService', method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("PromptProxyService", method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod('PromptProxyService', method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const PROMPT_PROXY_SERVICE_NAME = "PromptProxyService";
+export const PROMPT_PROXY_SERVICE_NAME = 'PromptProxyService';

@@ -32,13 +32,13 @@ export class AddPromptHandler extends Handler<AddPromptCommand, PromptResponseTy
       message: response.message,
       data: response.data
         ? {
-          id: response.data.id,
-          key: response.data.key,
-          description: response.data.description,
-          commandName: response.data.commandName,
-          userType: response.data.userType,
-          prompt: response.data.prompt,
-        }
+            id: response.data.id,
+            key: response.data.key,
+            description: response.data.description,
+            commandName: response.data.commandName,
+            userType: response.data.userType,
+            prompt: response.data.prompt,
+          }
         : undefined,
     };
   }

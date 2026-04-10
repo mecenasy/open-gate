@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { type RedisClientType } from 'redis';
+import { RedisJSON, type RedisClientType } from 'redis';
 import { RedisData, SaveRedisData, VerifyRedisData } from '../model/redis-data';
 import { RedisClientKey } from './redis-keys';
 
@@ -7,7 +7,7 @@ import { RedisClientKey } from './redis-keys';
 export class RedisService {
   constructor(@Inject(RedisClientKey) private readonly redis: RedisClientType) {}
 
-  public async verify<T>({ data, ...rest }: VerifyRedisData<T>): Promise<boolean> {
+  public async verify<T extends RedisJSON>({ data, ...rest }: VerifyRedisData<T>): Promise<boolean> {
     const savedCode = await this.get(rest);
 
     if (savedCode == data) {
@@ -18,49 +18,47 @@ export class RedisService {
     return false;
   }
 
-  public async save<T>({ data, identifier, EX = 300, prefix }: SaveRedisData<T>): Promise<void> {
+  public async save<T extends RedisJSON>({ data, identifier, EX = 300, prefix }: SaveRedisData<T>): Promise<void> {
     const key = this.getIdentifier(identifier, prefix);
 
-    await this.redis.set(key, JSON.stringify(data), { EX });
+    await this.redis.multi().json.set(key, '$', data).expire(key, EX).exec();
   }
 
-  public async get<T>({ identifier, prefix }: RedisData): Promise<T | null> {
+  public async get<T extends RedisJSON>({ identifier, prefix, path = '' }: RedisData): Promise<T | null> {
     const key = this.getIdentifier(identifier, prefix);
-    const data: string | null = await this.redis.get(key);
+    const result = await this.redis.json.get(key, {
+      path: `$.${path}`,
+    });
 
-    return data ? (JSON.parse(data) as T) : null;
+    return (Array.isArray(result) ? result[0] : result) as T;
   }
 
-  public async update<T>({ identifier, prefix, data, EX }: SaveRedisData<T>): Promise<T | null> {
+  public async update<T extends RedisJSON>({
+    identifier,
+    prefix,
+    path = '',
+    data,
+    EX = 300,
+  }: SaveRedisData<T>): Promise<T | null> {
     const key = this.getIdentifier(identifier, prefix);
-    const result: string | null = await this.redis.get(key);
 
-    let newData: T;
-
-    if (result) {
-      const parsedData = JSON.parse(result) as unknown;
-      if (typeof data === 'object' && data !== null && typeof parsedData === 'object' && parsedData !== null) {
-        newData = { ...parsedData, ...data } as T;
-      } else {
-        newData = data;
-      }
-    } else {
-      newData = data;
-    }
-    await this.redis.set(key, JSON.stringify(newData), { EX });
+    await this.redis.multi().json.merge(key, `$.${path}`, data).expire(key, EX).exec();
 
     return null;
   }
 
-  public async checkExist({ identifier, prefix }: RedisData): Promise<boolean> {
+  public async checkExist({ identifier, prefix, path }: RedisData): Promise<boolean> {
     const key = this.getIdentifier(identifier, prefix);
 
-    return Boolean(await this.redis.get(key));
+    const result = await this.redis.json.get(key, { path: `$.${path}` });
+    const checkData = (Array.isArray(result) ? result[0] : result) as RedisJSON;
+
+    return Boolean(checkData);
   }
 
   public async remove({ identifier, prefix }: RedisData): Promise<void> {
     const key = this.getIdentifier(identifier, prefix);
-    await this.redis.del(key);
+    await this.redis.json.del(key);
   }
 
   private getIdentifier(identifier: string, prefix?: string) {

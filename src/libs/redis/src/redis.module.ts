@@ -7,7 +7,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { RedisKey } from './redis-keys';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeConfigService } from './config/types.config.service';
-import { RedisConfig } from './config/redis.config';
+import { Config } from './config/redis.config';
 import { CacheService } from './cache/cache.service';
 import { QueueModule } from './queue/queue.module';
 
@@ -22,15 +22,15 @@ import { QueueModule } from './queue/queue.module';
         imports: [ConfigModule],
         inject: [ConfigService],
         useFactory: (configService: TypeConfigService) => {
-          const redisUri = configService.getOrThrow<RedisConfig>('redis')?.redisUri;
+          const redisUri = configService.getOrThrow<Config>('redis')?.redisUri;
           const tls = redisUri.startsWith('rediss') ? { rejectUnauthorized: false } : undefined;
 
           return {
             transport: Transport.REDIS,
             options: {
-              host: configService.get<RedisConfig>('redis')?.redisHost,
-              port: +(configService.get<RedisConfig>('redis')?.redisPort ?? 0),
-              password: configService.get<RedisConfig>('redis')?.redisPassword,
+              host: configService.get<Config>('redis')?.redisHost,
+              port: +(configService.get<Config>('redis')?.redisPort ?? 0),
+              password: configService.get<Config>('redis')?.redisPassword,
               tls,
             },
           };
@@ -38,8 +38,16 @@ import { QueueModule } from './queue/queue.module';
       },
     ]),
   ],
-  providers: [redisProvider, RedisService, CacheService],
-  exports: [RedisService, CacheService],
+  providers: [
+    redisProvider,
+    RedisService,
+    CacheService,
+    {
+      provide: TypeConfigService,
+      useExisting: ConfigService,
+    },
+  ],
+  exports: [ClientsModule, TypeConfigService, RedisService, CacheService],
   controllers: [RedisController],
 })
 export class RedisModule {}

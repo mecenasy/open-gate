@@ -18,9 +18,7 @@ import { CommandService } from './command.service';
 
 @Controller()
 export class CommandGrpcController implements CommandServiceController {
-  constructor(private readonly commandService: CommandService) {
-    console.log('CommandGrpcController initialized');
-  }
+  constructor(private readonly commandService: CommandService) {}
 
   @GrpcMethod(COMMAND_SERVICE_NAME, 'AddCommand')
   async addCommand(request: AddCommandRequest): Promise<CommandResponse> {

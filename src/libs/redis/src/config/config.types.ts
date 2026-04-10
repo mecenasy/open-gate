@@ -1,11 +1,11 @@
 import * as Joi from 'joi';
-import { RedisConfig } from './redis.config';
+import { Config } from './redis.config';
 
 export interface ConfigTypes {
-  redis: RedisConfig;
+  redis: Config;
 }
 
-export const configSchema = Joi.object({
+export const schema: Joi.ObjectSchema = Joi.object({
   REDIS_URL: Joi.string().required(),
   REDIS_PASSWORD: Joi.string().required(),
   REDIS_HOST: Joi.string().required(),

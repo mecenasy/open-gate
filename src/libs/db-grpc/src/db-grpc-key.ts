@@ -1,1 +1,1 @@
-export const DbGrpcKey = Symbol('DbGrpcKey');
+export const DbGrpcKey = 'DbGrpcKey';

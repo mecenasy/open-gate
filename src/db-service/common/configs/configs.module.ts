@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { configSchema } from './config.types';
+import { schema } from './config.types';
 import { TypeConfigService } from './types.config.service';
-import { grpcConfig } from '../proxy/config/proxy.config';
 import { postgresConfig } from '../postgres/config/postgres.config';
+import { config as grpcConfig, schema as grpcConfigSchema } from '@app/db-grpc';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [grpcConfig, postgresConfig],
-      validationSchema: configSchema,
+      load: [postgresConfig, grpcConfig],
+      validationSchema: schema.concat(grpcConfigSchema),
       validationOptions: {
         abortEarly: true,
       },

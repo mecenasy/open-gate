@@ -1,20 +1,13 @@
 import { AppConfig } from './app.configs';
 import * as Joi from 'joi';
 import { SessionConfig } from './session.config';
-import { RedisConfig } from '../redis/config/redis.config';
 
 export interface ConfigTypes {
   app: AppConfig;
   session: SessionConfig;
-  redis: RedisConfig;
 }
 
 export const configSchema = Joi.object({
-  REDIS_URL: Joi.string().required(),
-  REDIS_PASSWORD: Joi.string().required(),
-  REDIS_HOST: Joi.string().required(),
-  REDIS_PORT: Joi.string().required(),
-  GRPC_URL: Joi.string().required(),
   NOTIFY_SERVICE_GRPC_URL: Joi.string().required(),
   MODE: Joi.string().required(),
   SESSION_SECRET: Joi.string().required(),

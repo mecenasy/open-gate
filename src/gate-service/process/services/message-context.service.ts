@@ -1,10 +1,10 @@
 import { Injectable, Logger, Inject, OnModuleInit } from '@nestjs/common';
-import { CacheService } from '../../common/cache/cache.service';
+import { CacheService } from '@app/redis';
 import { lastValueFrom } from 'rxjs';
 import type { ClientGrpc } from '@nestjs/microservices';
 import { PROMPT_PROXY_SERVICE_NAME, PromptProxyServiceClient } from '../../../proto/prompt';
-import { jsToProtoUserType, isValidJsUserType } from '../../../utils/user-type-converter';
-import { GrpcProxyKey } from '../../common/proxy/constance';
+import { isValidJsUserType } from '../../../utils/user-type-converter';
+import { DbGrpcKey } from '@app/db-grpc';
 import type { ChatCompletionMessageParam } from 'groq-sdk/resources/chat/completions';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class MessageContextService implements OnModuleInit {
 
   constructor(
     private readonly cache: CacheService,
-    @Inject(GrpcProxyKey)
+    @Inject(DbGrpcKey)
     public readonly grpcClient: ClientGrpc,
   ) {}
 
@@ -64,7 +64,7 @@ export class MessageContextService implements OnModuleInit {
         throw new Error(`Invalid user type: ${type}`);
       }
 
-      const promptResponse = await lastValueFrom(this.gRpcService.getPrompt({ promptType: jsToProtoUserType(type) }));
+      const promptResponse = await lastValueFrom(this.gRpcService.getPromptByKey({ key: 'gate' }));
       prompt = promptResponse.data?.prompt ?? '';
 
       await this.cache.saveInCache<string>({

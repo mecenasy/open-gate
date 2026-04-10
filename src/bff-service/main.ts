@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
-import { initProxy } from './libs/proxy/proxy';
 import { initSession } from './libs/session/init-session';
 import { initCorse } from './libs/corse/corse';
 import { TypeConfigService } from './common/configs/types.config.service';
 import { AppConfig } from './common/configs/app.configs';
+import { initRedis, startMicroservices } from '@app/redis';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -14,7 +14,8 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
 
-  await initProxy(app);
+  initRedis(app);
+  await startMicroservices(app);
   logger.log('Proxy initialized');
 
   await initSession(app);

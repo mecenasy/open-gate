@@ -2,7 +2,7 @@ import { Handler } from 'src/gate-service/common/handler/handler';
 import { CommandHandler } from '@nestjs/cqrs';
 import { UserMessageCommand } from '../impl/user-message.command';
 import { MessageToQueueCommand } from '../impl/message-to-queue.command';
-import { QueueService } from 'src/gate-service/queue/queue.service';
+import { QueueService } from '@app/redis';
 import { MessageType } from '../../types';
 import { Status } from 'src/gate-service/status/status';
 

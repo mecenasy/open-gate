@@ -31,6 +31,7 @@ export class ToggleActiveStatusHandler extends Handler<
         description: response.data.description,
         active: response.data.active,
         actions: response.data.actions,
+        roleNames: response.data.roleNames ?? [],
         parameters: response.data.parameters,
         createdAt: response.data.createdAt,
         updatedAt: response.data.updatedAt,

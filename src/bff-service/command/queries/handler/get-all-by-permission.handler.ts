@@ -39,6 +39,7 @@ export class GetAllByPermissionHandler extends Handler<
         description: c.description,
         active: c.active,
         actions: c.actions,
+        roleNames: c.roleNames ?? [],
         parameters: c.parameters,
         createdAt: c.createdAt,
         updatedAt: c.updatedAt,

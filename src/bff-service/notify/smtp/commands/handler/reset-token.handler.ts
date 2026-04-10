@@ -1,9 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
-import type { ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { GrpcNotifyProxyKey } from 'src/bff-service/common/proxy/constance';
+import { NotifyGrpcKey, type ClientGrpc } from '@app/notify-grpc';
 import { NotificationServiceClient, NOTIFICATION_SERVICE_NAME } from 'src/proto/notification';
 import { ResetTokenCommand } from '../impl/reset-token.command';
 import { TypeConfigService } from 'src/bff-service/common/configs/types.config.service';
@@ -15,7 +14,7 @@ export class ResetTokenHandler implements ICommandHandler<ResetTokenCommand> {
   private notificationService: NotificationServiceClient;
 
   constructor(
-    @Inject(GrpcNotifyProxyKey) private readonly client: ClientGrpc,
+    @Inject(NotifyGrpcKey) private readonly client: ClientGrpc,
     private readonly configService: TypeConfigService,
   ) {
     this.notificationService = this.client.getService<NotificationServiceClient>(NOTIFICATION_SERVICE_NAME);

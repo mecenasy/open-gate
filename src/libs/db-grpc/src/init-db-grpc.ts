@@ -1,15 +1,18 @@
 import { NestFactory } from '@nestjs/core';
-import { TypeConfigService } from './config/types.config.service';
-import { GrpcConfig } from 'src/db-service/common/proxy/config/proxy.config';
+import { ConfigService } from '@nestjs/config';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { getGrpcOptions } from 'src/utils/get-proto-files';
 import { join } from 'path';
+import { Logger } from '@nestjs/common';
+import { Config } from './config/config';
 
 export const initDbGrpc: typeof NestFactory.createMicroservice = async (module, option) => {
-  const appContext = await NestFactory.createApplicationContext(module, option);
-  const config = appContext.get(TypeConfigService);
+  const logger = new Logger('Bootstrap');
 
-  const grpcUrl = config.getOrThrow<GrpcConfig>('grpc').grpcUrl;
+  const appContext = await NestFactory.createApplicationContext(module, option);
+  const config = appContext.get(ConfigService);
+
+  const grpcUrl = config.getOrThrow<Config>('grpc').grpcUrl;
 
   await appContext.close();
 
@@ -20,6 +23,11 @@ export const initDbGrpc: typeof NestFactory.createMicroservice = async (module, 
       url: grpcUrl || '0.0.0.0:50051',
     },
   });
+
+  const url = config.getOrThrow<Config>('grpc').grpcUrl;
+  await app.listen();
+
+  logger.log(`Application is running on: ${url}`);
 
   return app;
 };

@@ -4,10 +4,9 @@ import * as dns from 'dns';
 import { promisify } from 'util';
 import { UAParser } from 'ua-parser-js';
 import { RISK_PROXY_SERVICE_NAME, RiskProxyServiceClient } from 'src/proto/risk';
-import type { ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { History } from 'src/proto/login';
-import { GrpcDbProxyKey } from 'src/bff-service/common/proxy/constance';
+import { DbGrpcKey, type ClientGrpc } from '@app/db-grpc';
 import { Security } from 'src/bff-service/common/interceptors/security-context.interceptor';
 import { RiskReason } from 'src/types/risk-reason';
 import { Location } from 'src/bff-service/common/geo/geo.service';
@@ -27,7 +26,7 @@ export class RiskService implements OnModuleInit {
   ];
 
   constructor(
-    @Inject(GrpcDbProxyKey)
+    @Inject(DbGrpcKey)
     private readonly grpcClient: ClientGrpc,
   ) {
     this.reverseDns = promisify(dns.resolve4);

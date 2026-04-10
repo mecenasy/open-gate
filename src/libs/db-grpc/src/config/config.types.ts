@@ -5,6 +5,6 @@ export interface ConfigTypes {
   grpc: Config;
 }
 
-export const configSchema = Joi.object({
+export const schema: Joi.ObjectSchema = Joi.object({
   DB_GRPC_URL: Joi.string().required(),
 });

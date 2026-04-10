@@ -5,7 +5,7 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { firstValueFrom } from 'rxjs';
 import { NotificationAudioCommand } from '../impl/notification-audio.command';
 import { Status } from 'src/gate-service/status/status';
-import { NotifyGrpcKey } from 'src/gate-service/common/signal-grpc.module';
+import { NotifyGrpcKey } from '@app/notify-grpc';
 import { OUTGOING_SIGNAL_SERVICE_NAME, OutgoingSignalServiceClient, SignalMessageType } from 'src/proto/signal';
 
 @CommandHandler(NotificationAudioCommand)

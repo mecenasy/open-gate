@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { QueueService } from './queue.service';
 import { QueueType } from './types';
 import { TypeConfigService } from '../config/types.config.service';
-import { RedisConfig } from '../config/redis.config';
+import { Config } from '../config/redis.config';
 @Global()
 @Module({
   imports: [
@@ -12,9 +12,9 @@ import { RedisConfig } from '../config/redis.config';
       imports: [ConfigModule],
       useFactory: (configService: TypeConfigService) => ({
         redis: {
-          host: configService.get<RedisConfig>('redis')?.redisHost ?? '',
-          port: Number(configService.get<RedisConfig>('redis')?.redisPort ?? 6379),
-          password: configService.get<RedisConfig>('redis')?.redisPassword ?? '',
+          host: configService.get<Config>('redis')?.redisHost ?? '',
+          port: Number(configService.get<Config>('redis')?.redisPort ?? 6379),
+          password: configService.get<Config>('redis')?.redisPassword ?? '',
         },
       }),
       inject: [TypeConfigService],

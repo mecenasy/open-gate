@@ -3,10 +3,9 @@ import { type Job } from 'bull';
 import { Inject, Logger, OnModuleInit } from '@nestjs/common';
 import { type ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { QueueService } from 'src/gate-service/queue/queue.service';
+import { QueueService, QueueType } from '@app/redis';
 import { QueueMessageData } from 'src/gate-service/common/types/queue-message-data';
-import { QueueType } from 'src/gate-service/queue/types';
-import { NotifyGrpcKey } from 'src/gate-service/common/signal-grpc.module';
+import { NotifyGrpcKey } from '@app/notify-grpc';
 import { OUTGOING_SIGNAL_SERVICE_NAME, OutgoingSignalServiceClient } from 'src/proto/signal';
 
 @Processor(QueueType.Attachment)

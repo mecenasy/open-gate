@@ -5,7 +5,6 @@ import { Global, Module } from '@nestjs/common';
 import { getGrpcOptions } from 'src/utils/get-proto-files';
 import { GateGrpcKey } from './gate-grpc-key';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ConfigsModule } from './config/configs.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeConfigService } from './config/types.config.service';
 import { Config } from './config/config';
@@ -13,7 +12,6 @@ import { join } from 'path';
 @Global()
 @Module({
   imports: [
-    ConfigsModule,
     ClientsModule.registerAsync([
       {
         name: GateGrpcKey,
@@ -32,6 +30,12 @@ import { join } from 'path';
       },
     ]),
   ],
-  exports: [ClientsModule],
+  providers: [
+    {
+      provide: TypeConfigService,
+      useExisting: ConfigService,
+    },
+  ],
+  exports: [ClientsModule, TypeConfigService],
 })
 export class GateGrpcModule {}

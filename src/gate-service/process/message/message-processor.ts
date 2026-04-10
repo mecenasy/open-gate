@@ -4,7 +4,7 @@ import { QueueMessageData } from '../../common/types/queue-message-data';
 import { Logger } from '@nestjs/common';
 import { EventService } from '../../common/event/event.service';
 import { SofCommandEvent } from '../../command/events/sof-command.event';
-import { QueueType } from 'src/gate-service/queue/types';
+import { QueueType } from '@app/redis';
 import { OnModuleInit } from '@nestjs/common';
 import { MessageContextService } from '../services/message-context.service';
 import { GroqService } from '../services/groq.service';

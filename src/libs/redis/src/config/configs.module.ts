@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { configSchema } from './config.types';
+import { schema } from './config.types';
 import { TypeConfigService } from './types.config.service';
-import { redisConfig } from './redis.config';
+import { config } from './redis.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [redisConfig],
-      validationSchema: configSchema,
+      load: [config],
+      validationSchema: schema,
       validationOptions: {
         abortEarly: true,
       },

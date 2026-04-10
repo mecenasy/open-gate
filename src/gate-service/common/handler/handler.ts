@@ -1,18 +1,17 @@
 import { Inject, Logger, OnModuleInit } from '@nestjs/common';
 import { ICommand } from '@nestjs/cqrs';
 import { type ClientGrpc } from '@nestjs/microservices';
-import { GrpcProxyKey } from '../proxy/constance';
-import { CacheService } from '../cache/cache.service';
+import { DbGrpcKey } from '@app/db-grpc';
+import { CacheService } from '@app/redis';
 import { EventService } from '../event/event.service';
 import { IBaseHandler } from './base-handler';
 
 export abstract class Handler<T extends ICommand, R, S extends object = any>
-  implements IBaseHandler<T, R>, OnModuleInit
-{
+  implements IBaseHandler<T, R>, OnModuleInit {
   public gRpcService: S;
   logger: Logger;
 
-  @Inject(GrpcProxyKey)
+  @Inject(DbGrpcKey)
   public readonly grpcClient: ClientGrpc;
 
   @Inject(CacheService)

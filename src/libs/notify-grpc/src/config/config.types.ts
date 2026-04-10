@@ -2,7 +2,7 @@ import * as Joi from 'joi';
 import { Config } from './config';
 
 export interface ConfigTypes {
-  grpc: Config;
+  'notify-grpc': Config;
 }
 
 export const schema: Joi.ObjectSchema = Joi.object({

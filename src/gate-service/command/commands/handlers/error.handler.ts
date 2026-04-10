@@ -12,7 +12,6 @@ export class ErrorHandler extends SofCommandHandler {
     super();
   }
   async execute({ command, context }: SofCommand<any>): Promise<Status> {
-    console.log('🚀 ~ ErrorHandler ~ execute ~ command:', command);
     await this.processing(command.message, context);
     return { status: false, message: 'Error occurred' };
   }

@@ -60,7 +60,6 @@ const run = async () => {
 
       const queries = res.queries.trim().split(' ').filter(Boolean);
 
-      console.log('🚀 ~ run ~ queries:', queries);
 
       const noQuery = flags.includes('-no-query');
       await Promise.all([

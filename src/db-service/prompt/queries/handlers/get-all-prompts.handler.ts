@@ -4,7 +4,10 @@ import { PromptService } from '../../prompt.service';
 import { PromptSimply } from 'src/proto/prompt';
 
 @QueryHandler(GetAllPromptsQuery)
-export class GetAllPromptsHandler implements IQueryHandler<GetAllPromptsQuery, { data: PromptSimply[]; total: number }> {
+export class GetAllPromptsHandler implements IQueryHandler<
+  GetAllPromptsQuery,
+  { data: PromptSimply[]; total: number }
+> {
   constructor(private readonly promptService: PromptService) {}
 
   async execute(query: GetAllPromptsQuery): Promise<{ data: PromptSimply[]; total: number }> {

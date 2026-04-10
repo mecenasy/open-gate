@@ -120,7 +120,7 @@
     {
       "label": "docker: logs",
       "type": "shell",
-      "command": "docker logs -f api",
+      "command": "docker logs -f bff-gate",
       "problemMatcher": [],
       "presentation": {
         "echo": true,

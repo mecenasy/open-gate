@@ -9,6 +9,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeConfigService } from './config/types.config.service';
 import { Config } from './config/config';
 import { join } from 'path';
+
 @Global()
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { join } from 'path';
           transport: Transport.GRPC,
           options: {
             ...getGrpcOptions(join(__dirname, '../../../proto')),
-            url: configService.get<Config>('grpc')?.grpcUrl,
+            url: configService.get<Config>('notify-grpc')?.grpcUrl,
             onLoadPackageDefinition: (pkg, server) => {
               new (require('@grpc/reflection').ReflectionService)(pkg).addToServer(server);
             },

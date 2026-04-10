@@ -19,7 +19,7 @@ async function bootstrap() {
     transport: Transport.GRPC,
     options: {
       ...getGrpcOptions(join(__dirname, '../proto')),
-      url: `0.0.0.0:${process.env.GRPC_PORT ?? 50052}`,
+      url: `0.0.0.0:${process.env.NOTIFY_GRPC_URL?.split(':')[1] ?? '50052'}`,
     },
   });
 

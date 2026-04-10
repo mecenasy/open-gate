@@ -1,1 +1,1 @@
-export const NotifyGrpcKey = Symbol('NotifyGrpcKey');
+export const NotifyGrpcKey = 'NotifyGrpcKey';

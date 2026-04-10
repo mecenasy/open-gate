@@ -4,7 +4,7 @@ import type { ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { SignalMessageEvent } from './signal-message.event';
 import { INCOMING_SIGNAL_SERVICE_NAME, IncomingSignalServiceClient } from 'src/proto/signal';
-import { GateGrpcKey } from 'src/notify-service/grpc/notify-grpc.module';
+import { GateGrpcKey } from '@app/gate-grpc';
 
 @EventsHandler(SignalMessageEvent)
 export class SignalMessageHandler implements IEventHandler<SignalMessageEvent>, OnModuleInit {

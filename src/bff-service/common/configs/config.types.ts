@@ -8,7 +8,6 @@ export interface ConfigTypes {
 }
 
 export const configSchema = Joi.object({
-  NOTIFY_SERVICE_GRPC_URL: Joi.string().required(),
   MODE: Joi.string().required(),
   SESSION_SECRET: Joi.string().required(),
   SESSION_NAME: Joi.string().required(),

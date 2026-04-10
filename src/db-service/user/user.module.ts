@@ -14,7 +14,13 @@ import { userQueryHandlers } from './queries/handlers';
 
 @Global()
 @Module({
-  imports: [TypeOrmModule.forFeature([User, UserRole, Command]), CqrsModule, PasswordModule, UserSettingsModule, HistoryModule],
+  imports: [
+    TypeOrmModule.forFeature([User, UserRole, Command]),
+    CqrsModule,
+    PasswordModule,
+    UserSettingsModule,
+    HistoryModule,
+  ],
   controllers: [UserController],
   providers: [UserService, ...userCommandHandlers, ...userQueryHandlers],
   exports: [UserService],

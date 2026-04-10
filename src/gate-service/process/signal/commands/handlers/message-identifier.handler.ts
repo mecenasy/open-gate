@@ -1,5 +1,4 @@
 import { Handler } from '@app/handler';
-import { USER_PROXY_SERVICE_NAME, UserProxyServiceClient } from 'src/proto/user';
 import { CommandHandler } from '@nestjs/cqrs';
 import { UserMessageCommand } from '../impl/user-message.command';
 import { IdentifyMessageEvent } from '../../events/identifier-message.event';
@@ -7,15 +6,24 @@ import { MessageType } from '../../types';
 import { Logger } from '@nestjs/common';
 import { Status } from 'src/gate-service/status/status';
 import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
+import { lastValueFrom } from 'rxjs';
+import { MESSAGES_SERVICE_NAME, MessagesServiceClient } from 'src/proto/messages';
 
 @CommandHandler(UserMessageCommand)
-export class MassageIdentifierHandler extends Handler<UserMessageCommand, Status, UserProxyServiceClient> {
+export class MassageIdentifierHandler extends Handler<UserMessageCommand, Status> {
   logger: Logger;
+  messageGrpc: MessagesServiceClient;
+
+  messageKey: string = 'wrong-message';
   constructor() {
-    super(USER_PROXY_SERVICE_NAME);
+    super();
     this.logger = new Logger(MassageIdentifierHandler.name);
   }
 
+  onModuleInit() {
+    super.onModuleInit();
+    this.messageGrpc = this.grpcClient.getService<MessagesServiceClient>(MESSAGES_SERVICE_NAME);
+  }
   async execute({ message, context }: UserMessageCommand): Promise<Status> {
     const { dataMessage } = message;
 
@@ -25,8 +33,8 @@ export class MassageIdentifierHandler extends Handler<UserMessageCommand, Status
     const attachment = dataMessage?.attachments?.[0];
     const hasAttachments = !!attachment;
     if (!(hasText || hasAttachments)) {
-      //TODO: Pobra z bazy cache tekst wiadomości
-      this.event.emit(new NotificationEvent(message.source, 'Przepraszam, ale nie wiem co masz na myśli'));
+      const errorMessage = await this.getMessage();
+      this.event.emit(new NotificationEvent(message.source, errorMessage));
       return {
         status: false,
         message: 'No text or attachment',
@@ -55,5 +63,30 @@ export class MassageIdentifierHandler extends Handler<UserMessageCommand, Status
       status: true,
       message: 'User send attachment',
     };
+  }
+
+  private async getMessage() {
+    const message = await this.cache.getFromCache<string>({
+      identifier: 'message',
+      path: this.messageKey,
+    });
+
+    if (message) {
+      return message;
+    }
+
+    const response = await lastValueFrom(this.messageGrpc.getMessage({ key: this.messageKey }));
+
+    if (!response?.status || !response?.data) {
+      return '';
+    }
+
+    await this.cache.saveInCache<string>({
+      identifier: 'message',
+      path: this.messageKey,
+      data: response.data.value,
+    });
+
+    return response.data.value;
   }
 }

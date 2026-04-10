@@ -12,7 +12,7 @@ export const initDbGrpc: typeof NestFactory.createMicroservice = async (module, 
   const appContext = await NestFactory.createApplicationContext(module, option);
   const config = appContext.get(ConfigService);
 
-  const grpcUrl = config.getOrThrow<Config>('grpc').grpcUrl;
+  const grpcUrl = config.getOrThrow<Config>('db-grpc').grpcUrl;
 
   await appContext.close();
 
@@ -24,7 +24,7 @@ export const initDbGrpc: typeof NestFactory.createMicroservice = async (module, 
     },
   });
 
-  const url = config.getOrThrow<Config>('grpc').grpcUrl;
+  const url = grpcUrl;
   await app.listen();
 
   logger.log(`Application is running on: ${url}`);

@@ -49,7 +49,6 @@ export const useLogin = (
   });
 
   const onSubmit = async (data: z.infer<typeof schemas>) => {
-    console.log('🚀 ~ onSubmit ~ data:', data);
     setLogin(data.email);
 
     try {

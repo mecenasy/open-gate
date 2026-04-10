@@ -12,8 +12,6 @@ import { UserType } from './user-type';
 import { UserStatus } from './status';
 import { protoToUserStatus, userStatusToProto } from 'src/utils/concert-status';
 
-
-
 @Injectable()
 export class UserService {
   constructor(
@@ -65,7 +63,7 @@ export class UserService {
   }
 
   async findByPhone(phone: string): Promise<User | null> {
-    return await this.userRepository.findOne({
+    return await this.userRepository.findOneOrFail({
       relations: ['userRole'],
       where: { phone },
     });

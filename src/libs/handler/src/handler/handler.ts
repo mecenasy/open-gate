@@ -7,8 +7,7 @@ import { EventService } from '@app/event';
 import { IBaseHandler } from './base-handler';
 
 export abstract class Handler<T extends ICommand, R, S extends object = any>
-  implements IBaseHandler<T, R>, OnModuleInit
-{
+  implements IBaseHandler<T, R>, OnModuleInit {
   public gRpcService!: S;
   logger: Logger;
 
@@ -21,7 +20,7 @@ export abstract class Handler<T extends ICommand, R, S extends object = any>
   @Inject(EventService)
   public readonly event!: EventService;
 
-  constructor(private readonly serviceName?: string) {
+  constructor(public readonly serviceName?: string) {
     this.logger = new Logger(this.constructor.name);
   }
 

@@ -61,7 +61,6 @@ export const useRegister = (setError: (message: string) => void) => {
   const onSubmit = async (data: z.infer<typeof schemas>) => {
     try {
       const { confirmPassword: _, ...rest } = data;
-      console.log('🚀 ~ onSubmit ~ rest:', rest);
       await createUser({ variables: { input: { ...rest, type: 'user' } } });
 
       reset();

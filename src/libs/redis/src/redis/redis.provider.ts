@@ -30,7 +30,17 @@ export const redisProvider = {
 
     const client = createClient({
       url: redisUri,
-      socket: isTls ? socketOptions : undefined,
+      socket: {
+        ...(isTls ? socketOptions : {}),
+        connectTimeout: 5000,
+        reconnectStrategy: (retries) => {
+          if (retries > 3) {
+            logger.error(`❌ [RedisProvider] Too many retries (${retries}), giving up`);
+            return new Error('Redis connection failed after 3 retries');
+          }
+          return Math.min(retries * 500, 2000);
+        },
+      },
     });
 
     client.on('error', (err) => {

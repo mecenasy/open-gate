@@ -71,7 +71,6 @@ Zwróć dane w formacie JSON:
         ],
         response_format: { type: 'json_object' },
       });
-      console.log('🚀 ~ SignalBridgeService ~ getSmartResponse ~ chatCompletion:', chatCompletion);
 
       return chatCompletion.choices[0].message.content ?? '';
     } catch (error) {
@@ -194,7 +193,6 @@ Zwróć dane w formacie JSON:
   }
 
   async sendVoiceNote(audioBuffer: Buffer, recipientNumber: string) {
-    console.log('🚀 ~ SignalBridgeService ~ sendVoiceNote ~ audioBuffer:', audioBuffer);
     const url = `${this.SIGNAL_URL}/v2/send`;
 
     console.log('Rozmiar bufora audio:', audioBuffer.length);

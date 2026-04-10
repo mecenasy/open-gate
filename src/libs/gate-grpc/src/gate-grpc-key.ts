@@ -1,1 +1,1 @@
-export const GateGrpcKey = Symbol('GateGrpcKey');
+export const GateGrpcKey = 'GateGrpcKey';

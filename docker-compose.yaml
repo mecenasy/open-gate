@@ -3,8 +3,8 @@ version: "3.8"
 services:
   # Serwis konfiguracyjny cały systme główny, odpowiedzialny za logikę biznesową, komunikację z bazą danych i innymi serwisami poprzez gRPC oraz udostępnianie API dla frontendu
   bff-service:
-    profiles:
-      - front
+    # profiles:
+    #   - front
     container_name: bff-service
     build:
       context: .
@@ -21,8 +21,8 @@ services:
     environment:
       CHOKIDAR_USEPOLLING: true
       WATCHPACK_POLLING: true
-      BFF_PORT: 3001
-      NOTIFY_SERVICE_GRPC_URL: "notify-service:50052"
+      BFF_PORT: "${BFF_PORT}"
+      NOTIFY_GRPC_URL: "${NOTIFY_GRPC_URL}"
       TS_NODE_PROJECT: /app/tsconfig.json
       NODE_OPTIONS: "--max-old-space-size=2048"
     depends_on:
@@ -30,9 +30,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      notify-service:
-        condition: service_started
-        required: false
+      # notify-service:
+      #   condition: service_started
+      #   required: false
     networks:
       - backend-net
 
@@ -59,8 +59,8 @@ services:
   # Serwis główny, odpowiedzialny za logikę biznesową, komunikację z bazą danych i innymi serwisami poprzez gRPC oraz udostępnianie API dla frontendu
   gate-service:
     container_name: gate-service
-    profiles:
-      - gate
+    # profiles:
+    #   - gate
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -78,10 +78,9 @@ services:
     environment:
       CHOKIDAR_USEPOLLING: true
       WATCHPACK_POLLING: true
-      USER_SERVICE_URL: "${GRPC_SERVICE_URL}"
-      NOTIFY_SERVICE_GRPC_URL: "notify-service:50052"
-      GRPC_PORT: 3002
-      SIGNAL_GRPC_PORT: 50053
+      DB_GRPC_URL: "${DB_GRPC_URL}"
+      NOTIFY_GRPC_URL: "${NOTIFY_GRPC_URL}"
+      GRPC_PORT: "${GRPC_PORT}"
       TS_NODE_PROJECT: /app/tsconfig.json
     depends_on:
       postgres:
@@ -97,9 +96,9 @@ services:
 
     # Database service - serwis odpowiedzialny za komunikację z bazą danych i udostępnianie danych innym serwisom poprzez gRPC
   db-service:
-    profiles:
-      - gate
-      - front
+    # profiles:
+    #   - gate
+    #   - front
     container_name: db-service
     build:
       context: .
@@ -115,7 +114,7 @@ services:
     environment:
       CHOKIDAR_USEPOLLING: true
       WATCHPACK_POLLING: true
-      GRPC_URL: "${GRPC_URL}"
+      DB_GRPC_URL: "${DB_GRPC_URL}"
       PROTO_PATH: /app/src/proto/user.proto
       TS_NODE_PROJECT: /app/tsconfig.json
     networks:
@@ -126,9 +125,9 @@ services:
 
   # Serwis powiadamiajacy
   notify-service:
-    profiles:
-      - gate
-      - notify
+    # profiles:
+    #   - gate
+    #   - notify
     container_name: notify-service
     build:
       context: .
@@ -139,16 +138,15 @@ services:
       - .:/app
       - /app/node_modules
     ports:
-      - "50052:50052"
+      - "${NOTIFY_PORT}:50052"
     env_file:
       - .env
     environment:
       CHOKIDAR_USEPOLLING: true
       WATCHPACK_POLLING: true
-      NOTIFY_PORT: 3003
-      GRPC_PORT: 50052
+      NOTIFY_PORT: "${NOTIFY_PORT}"
       TS_NODE_PROJECT: /app/tsconfig.json
-      GATE_SERVICE_GRPC_URL: "gate-service:50053"
+      GATE_GRPC_URL: "${GATE_GRPC_URL}"
       SIGNAL_API_URL: "http://signal_bridge:8080"
       TWILO_SID: "${TWILO_SID}"
       TWILO_TOKEN: "${TWILO_TOKEN}"
@@ -160,16 +158,16 @@ services:
       SMTP_FROM: "${SMTP_FROM}"
     depends_on:
       signal-api:
-        condition: service_started
+        condition: service_healthy
     networks:
       - backend-net
 
       # Database
 
   postgres:
-    profiles:
-      - gate
-      - front
+    # profiles:
+    #   - gate
+    #   - front
     image: postgres:15-alpine
     container_name: postgres_db
     restart: unless-stopped
@@ -193,17 +191,18 @@ services:
 
   # Cache i kolejki Redis
   redis:
-    profiles:
-      - gate
-      - front
-    environment:
-      - REDIS_ARGS=--requirepass "${REDIS_PASSWORD}"
+    # profiles:
+    #   - gate
+    #   - front
     image: redis/redis-stack-server:latest
     container_name: redis_cache
     restart: unless-stopped
-    command: redis-server --requirepass "${REDIS_PASSWORD}"
+    # Use environment variables for the password instead of overriding the command
+    environment:
+      - REDIS_ARGS=--requirepass ${REDIS_PASSWORD}
     ports:
       - "${REDIS_PORT}:6379"
+      - "8001:8001" # Optional: Redis Insight GUI to verify JSON data
     networks:
       - backend-net
     healthcheck:
@@ -214,8 +213,6 @@ services:
 
   # Most do komunikacji Signal
   signal-api:
-    profiles:
-      - gate
     image: bbernhard/signal-cli-rest-api
     container_name: signal_bridge
     restart: unless-stopped
@@ -227,6 +224,13 @@ services:
       - "8081:8080"
     networks:
       - backend-net
+    # Add a manual healthcheck if the image doesn't define one correctly
+    healthcheck:
+      test: ["CMD", "curl", "-a", "http://localhost:8080/v1/about"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
 volumes:
   postgres_data:

@@ -5,7 +5,7 @@ export interface Config {
 }
 
 export const config = registerAs(
-  'grpc',
+  'gate-grpc',
   (): Config => ({
     grpcUrl: process.env.GATE_GRPC_URL ?? '',
   }),

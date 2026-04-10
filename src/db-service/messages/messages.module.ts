@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
-import { Messages } from './entity/messages.entit';
+import { Messages } from './entity/messages.entity';
 import { MessagesService } from './messages.service';
 import { MessagesController } from './messages.controller';
 import { messageCommandHandlers } from './commands/handlers';

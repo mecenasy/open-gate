@@ -8,7 +8,7 @@ import { Config } from './config/config';
 export const initNotifyGrpc = (app: INestApplication) => {
   const config = app.get(TypeConfigService);
 
-  const grpcUrl = config.getOrThrow<Config>('grpc').grpcUrl;
+  const grpcUrl = config.getOrThrow<Config>('notify-grpc').grpcUrl;
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
     options: {

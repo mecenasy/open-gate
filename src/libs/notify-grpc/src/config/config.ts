@@ -5,7 +5,7 @@ export interface Config {
 }
 
 export const config = registerAs(
-  'grpc',
+  'notify-grpc',
   (): Config => ({
     grpcUrl: process.env.NOTIFY_GRPC_URL ?? '',
   }),

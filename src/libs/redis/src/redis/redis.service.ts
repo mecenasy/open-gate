@@ -27,7 +27,7 @@ export class RedisService {
   public async get<T extends RedisJSON>({ identifier, prefix, path = '' }: RedisData): Promise<T | null> {
     const key = this.getIdentifier(identifier, prefix);
     const result = await this.redis.json.get(key, {
-      path: `$.${path}`,
+      path: path ? `$.${path}` : '$',
     });
 
     return (Array.isArray(result) ? result[0] : result) as T;
@@ -42,7 +42,11 @@ export class RedisService {
   }: SaveRedisData<T>): Promise<T | null> {
     const key = this.getIdentifier(identifier, prefix);
 
-    await this.redis.multi().json.merge(key, `$.${path}`, data).expire(key, EX).exec();
+    await this.redis
+      .multi()
+      .json.merge(key, path ? `$.${path}` : '$', data)
+      .expire(key, EX)
+      .exec();
 
     return null;
   }
@@ -50,7 +54,7 @@ export class RedisService {
   public async checkExist({ identifier, prefix, path }: RedisData): Promise<boolean> {
     const key = this.getIdentifier(identifier, prefix);
 
-    const result = await this.redis.json.get(key, { path: `$.${path}` });
+    const result = await this.redis.json.get(key, { path: path ? `$.${path}` : '$' });
     const checkData = (Array.isArray(result) ? result[0] : result) as RedisJSON;
 
     return Boolean(checkData);

@@ -5,7 +5,7 @@ export interface Config {
 }
 
 export const config = registerAs(
-  'grpc',
+  'db-grpc',
   (): Config => ({
     grpcUrl: process.env.DB_GRPC_URL ?? '',
   }),

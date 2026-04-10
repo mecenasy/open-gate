@@ -6,16 +6,16 @@ import { AppService } from './app.service';
 import { SignalModule } from './signal/signal.module';
 import { SmsModule } from './sms/sms.module';
 import { SmtpModule } from './smtp/smtp.module';
-import { NotifyGrpcModule } from './grpc/notify-grpc.module';
+import { GateGrpcModule, config as gateGrpcConfig } from '@app/gate-grpc';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, load: [gateGrpcConfig] }),
     CqrsModule,
     SignalModule,
     SmsModule,
     SmtpModule,
-    NotifyGrpcModule,
+    GateGrpcModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -21,7 +21,7 @@ import { join } from 'path';
           transport: Transport.GRPC,
           options: {
             ...getGrpcOptions(join(__dirname, '../../../proto')),
-            url: configService.get<Config>('grpc')?.grpcUrl,
+            url: configService.get<Config>('db-grpc')?.grpcUrl,
             onLoadPackageDefinition: (pkg, server) => {
               new (require('@grpc/reflection').ReflectionService)(pkg).addToServer(server);
             },

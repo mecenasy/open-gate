@@ -19,8 +19,9 @@ async function bootstrap() {
     }),
   );
 
+  await app.startAllMicroservices();
   await app.listen(process.env.GATE_PORT || 3002, '0.0.0.0');
-  logger.log(`gate-service gRPC (signal) running on port ${process.env.SIGNAL_GRPC_PORT ?? 50053}`);
+  logger.log(`gate-service gRPC (signal) running on port  50053`);
 }
 bootstrap().catch((err) => {
   const logger = new Logger('Bootstrap');

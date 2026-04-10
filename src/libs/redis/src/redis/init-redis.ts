@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { TypeConfigService } from './config/types.config.service';
-import { Config } from './config/redis.config';
+import { TypeConfigService } from '../config/types.config.service';
+import { Config } from '../config/redis.config';
 
 export const initRedis = (app: INestApplication) => {
   const config = app.get(TypeConfigService);

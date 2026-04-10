@@ -2,7 +2,7 @@ import { firstValueFrom, lastValueFrom, timeout } from 'rxjs';
 import { RedisData, SaveRedisData, VerifyRedisData } from '../model/redis-data';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { RedisKey } from '../redis-keys';
+import { RedisKey } from '../redis/redis-keys';
 import { RedisEvent } from '../model/redis-event';
 
 @Injectable()

@@ -1,8 +1,8 @@
 import { Controller } from '@nestjs/common';
 import { EventPattern, MessagePattern } from '@nestjs/microservices';
 import { RedisService } from './redis.service';
-import { RedisEvent } from './model/redis-event';
-import { type RedisData, type SaveRedisData, type VerifyRedisData } from './model/redis-data';
+import { RedisEvent } from '../model/redis-event';
+import { type RedisData, type SaveRedisData, type VerifyRedisData } from '../model/redis-data';
 
 @Controller('redis')
 export class RedisController {

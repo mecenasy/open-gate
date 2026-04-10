@@ -2,7 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { GetawayModule } from './getaway/getaway.module';
 import { GraphQlModule } from './graph-ql/graph-ql.module';
-import { EventService } from './event/event.service';
+import { EventService } from '@app/event';
 import { ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';

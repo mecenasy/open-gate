@@ -1,7 +1,7 @@
 import { CommandHandler } from '@nestjs/cqrs';
 import { RegisterPasskeyOptionCommand } from '../impl/register-passkey-option.command';
 import { generateRegistrationOptions, PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/server';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { TypeConfigService } from 'src/bff-service/common/configs/types.config.service';
 import { AppConfig } from 'src/bff-service/common/configs/app.configs';
 import { LoginStatusType } from 'src/bff-service/auth/login/dto/login-status.tape';

@@ -1,4 +1,4 @@
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { VerifyCodeCommand } from '../impl/verify-code.command';
 import { CommandHandler } from '@nestjs/cqrs';
 import { StatusType } from 'src/bff-service/auth/login/dto/status.type';

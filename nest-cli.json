@@ -34,6 +34,15 @@
       "entryFile": "src/db-service/main",
       "sourceRoot": "src"
     },
+    "event": {
+      "type": "library",
+      "root": "libs/event",
+      "entryFile": "index",
+      "sourceRoot": "libs/event/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/event/tsconfig.lib.json"
+      }
+    },
     "gate-grpc": {
       "type": "library",
       "root": "libs/gate-grpc",
@@ -48,6 +57,24 @@
       "root": "apps/gate-service",
       "entryFile": "src/gate-service/main",
       "sourceRoot": "src"
+    },
+    "handler": {
+      "type": "library",
+      "root": "libs/handler",
+      "entryFile": "index",
+      "sourceRoot": "libs/handler/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/handler/tsconfig.lib.json"
+      }
+    },
+    "hendler": {
+      "type": "library",
+      "root": "libs/hendler",
+      "entryFile": "index",
+      "sourceRoot": "libs/hendler/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/hendler/tsconfig.lib.json"
+      }
     },
     "notify-grpc": {
       "type": "library",

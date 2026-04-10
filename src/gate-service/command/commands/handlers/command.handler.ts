@@ -1,4 +1,4 @@
-import { Handler } from 'src/gate-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { SofCommand } from '../impl/sof-command';
 import { Status } from 'src/gate-service/status/status';
 import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';

@@ -2,7 +2,7 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { BadRequestException } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { COMMAND_SERVICE_NAME, CommandServiceClient } from 'src/proto/command';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { CommandResponseType } from '../../dto/response.type';
 import { RemoveCommandCommand } from '../impl/remove-command.command';
 

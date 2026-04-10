@@ -3,7 +3,7 @@ import { type Job } from 'bull';
 import { QueueMessageToAudioData } from '../../common/types/queue-message-data';
 import { Logger } from '@nestjs/common';
 import { CacheService, QueueType } from '@app/redis';
-import { EventService } from '../../common/event/event.service';
+import { EventService } from '@app/event';
 import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
 import { OnModuleInit } from '@nestjs/common';
 import { GoogleService } from '../services/google.service';

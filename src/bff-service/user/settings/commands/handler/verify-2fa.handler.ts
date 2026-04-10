@@ -4,7 +4,7 @@ import { BadRequestException, InternalServerErrorException } from '@nestjs/commo
 import { Verify2faCommand } from '../impl/verify-2fa.command';
 import { SETTINGS_PROXY_SERVICE_NAME, SettingsProxyServiceClient } from 'src/proto/user-settings';
 import { authenticator } from '@otplib/preset-default';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { StatusType } from 'src/bff-service/auth/login/dto/status.type';
 import { LoginStatusType } from 'src/bff-service/auth/login/dto/login-status.tape';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';

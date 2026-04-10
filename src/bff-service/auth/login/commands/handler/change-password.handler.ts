@@ -4,7 +4,7 @@ import { BadRequestException } from '@nestjs/common';
 import { ChangePasswordCommand } from '../impl/change-password.command';
 import { LOGIN_PROXY_SERVICE_NAME, LoginProxyServiceClient } from 'src/proto/login';
 import { lastValueFrom } from 'rxjs';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';
 
 @CommandHandler(ChangePasswordCommand)

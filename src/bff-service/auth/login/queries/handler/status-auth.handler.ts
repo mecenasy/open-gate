@@ -4,7 +4,7 @@ import { LOGIN_PROXY_SERVICE_NAME, LoginProxyServiceClient } from 'src/proto/log
 import { StatusAuthQuery } from '../impl/status-auth.query';
 import { StatusType } from '../../dto/status.type';
 import { LoginStatusType } from '../../dto/login-status.tape';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';
 import { TypeConfigService } from 'src/bff-service/common/configs/types.config.service';
 

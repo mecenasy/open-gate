@@ -12,9 +12,12 @@
   },
   "moduleNameMapper": {
     "^@app/db-grpc(|/.*)$": "<rootDir>/../libs/db-grpc/src/$1",
+    "^@app/event(|/.*)$": "<rootDir>/../libs/event/src/$1",
     "^@app/gate-grpc(|/.*)$": "<rootDir>/../libs/gate-grpc/src/$1",
+    "^@app/handler(|/.*)$": "<rootDir>/../libs/handler/src/$1",
     "^@app/notify-grpc(|/.*)$": "<rootDir>/../libs/notify-grpc/src/$1",
     "^@app/redis(|/.*)$": "<rootDir>/../libs/redis/src/$1",
-    "^@app/shared-redis(|/.*)$": "<rootDir>/../libs/shared-redis/src/$1"
+    "^@app/shared-redis(|/.*)$": "<rootDir>/../libs/shared-redis/src/$1",
+    "^src/hendler(|/.*)$": "<rootDir>/../libs/hendler/src/$1"
   }
 }

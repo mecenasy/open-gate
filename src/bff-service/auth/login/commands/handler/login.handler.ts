@@ -3,7 +3,7 @@ import { lastValueFrom } from 'rxjs';
 import { LoginCommand } from '../impl/login.command';
 import { LOGIN_PROXY_SERVICE_NAME, LoginProxyServiceClient } from 'src/proto/login';
 import { StatusType } from '../../dto/status.type';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { OtpService } from 'src/bff-service/auth/otp/otp.service';
 import { RiskService } from 'src/bff-service/auth/risk/risk.service';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';

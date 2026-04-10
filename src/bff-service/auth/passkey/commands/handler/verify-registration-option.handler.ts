@@ -4,7 +4,7 @@ import { VerifyRegistrationOptionCommand } from '../impl/verify-registration-opt
 import { lastValueFrom } from 'rxjs';
 import { GetPasskeysResponse, PASSKEY_PROXY_SERVICE_NAME, PasskeyProxyServiceClient } from 'src/proto/passkey';
 import { UAParser } from 'ua-parser-js';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { StatusType } from 'src/bff-service/auth/login/dto/status.type';
 import { TypeConfigService } from 'src/bff-service/common/configs/types.config.service';
 import { AppConfig } from 'src/bff-service/common/configs/app.configs';

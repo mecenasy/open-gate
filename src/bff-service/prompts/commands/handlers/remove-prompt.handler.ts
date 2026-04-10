@@ -2,7 +2,7 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { BadRequestException } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { PROMPT_PROXY_SERVICE_NAME, PromptProxyServiceClient } from 'src/proto/prompt';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { RemovePromptCommand } from '../impl/remove-prompt.command';
 import { PromptSuccessType } from '../../dto/response.type';
 

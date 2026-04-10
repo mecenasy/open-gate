@@ -4,7 +4,7 @@ import { LOGIN_PROXY_SERVICE_NAME, LoginProxyServiceClient } from 'src/proto/log
 import { StatusType } from '../../dto/status.type';
 import { ResetPasswordCommand } from '../impl/reset-password.command';
 import { BadRequestException } from '@nestjs/common';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';
 
 @CommandHandler(ResetPasswordCommand)

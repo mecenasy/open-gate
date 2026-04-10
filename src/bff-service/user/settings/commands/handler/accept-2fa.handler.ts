@@ -6,7 +6,7 @@ import { AcceptType } from '../../dto/accept-2fa.type';
 import { LOGIN_PROXY_SERVICE_NAME, LoginProxyServiceClient } from 'src/proto/login';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { toDataURL } from 'qrcode';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { LoginStatusType } from 'src/bff-service/auth/login/dto/login-status.tape';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';
 

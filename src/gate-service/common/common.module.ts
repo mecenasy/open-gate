@@ -5,7 +5,7 @@ import { GetawayModule } from './getaway/getaway.module';
 import { ConfigsModule } from './configs/configs.module';
 import { TypeConfigService } from './configs/types.config.service';
 import { ConfigService } from '@nestjs/config';
-import { EventService } from './event/event.service';
+import { EventService } from '@app/event';
 import { CqrsModule } from '@nestjs/cqrs';
 import { DbGrpcModule } from '@app/db-grpc';
 import { NotifyGrpcModule } from '@app/notify-grpc';

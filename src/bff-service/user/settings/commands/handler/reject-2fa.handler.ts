@@ -3,7 +3,7 @@ import { lastValueFrom } from 'rxjs';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Reject2FaCommand } from '../impl/reject-2fa.command';
 import { SETTINGS_PROXY_SERVICE_NAME, SettingsProxyServiceClient } from 'src/proto/user-settings';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { StatusType } from 'src/bff-service/auth/login/dto/status.type';
 import { LoginStatusType } from 'src/bff-service/auth/login/dto/login-status.tape';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';

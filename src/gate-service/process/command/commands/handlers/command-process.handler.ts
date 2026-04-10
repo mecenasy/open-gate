@@ -1,4 +1,4 @@
-import { Handler } from 'src/gate-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { CommandHandler } from '@nestjs/cqrs';
 import { CommandProcessCommand } from '../impl/command-process.command';
 

@@ -2,7 +2,7 @@ import { QueryHandler } from '@nestjs/cqrs';
 import { lastValueFrom } from 'rxjs';
 import { InternalServerErrorException } from '@nestjs/common';
 import { CONFIG_SERVICE_NAME, ConfigServiceClient } from 'src/proto/config';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { GetCoreAllQuery } from '../impl/get-core-all.query';
 import { ConfigsListType } from '../../dto/response.type';
 

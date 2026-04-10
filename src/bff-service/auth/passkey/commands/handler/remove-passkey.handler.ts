@@ -2,7 +2,7 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { RemovePasskeyCommand } from '../impl/remove-passkey.command';
 import { GetPasskeysResponse, PASSKEY_PROXY_SERVICE_NAME, PasskeyProxyServiceClient } from 'src/proto/passkey';
 import { lastValueFrom } from 'rxjs';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 
 @CommandHandler(RemovePasskeyCommand)
 export class RemovePasskeyHandler extends Handler<

@@ -2,7 +2,7 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { BadRequestException } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { PROMPT_PROXY_SERVICE_NAME, PromptProxyServiceClient } from 'src/proto/prompt';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { AddPromptCommand } from '../impl/add-prompt.command';
 import { PromptResponseType } from '../../dto/response.type';
 
@@ -32,13 +32,13 @@ export class AddPromptHandler extends Handler<AddPromptCommand, PromptResponseTy
       message: response.message,
       data: response.data
         ? {
-            id: response.data.id,
-            key: response.data.key,
-            description: response.data.description,
-            commandName: response.data.commandName,
-            userType: response.data.userType,
-            prompt: response.data.prompt,
-          }
+          id: response.data.id,
+          key: response.data.key,
+          description: response.data.description,
+          commandName: response.data.commandName,
+          userType: response.data.userType,
+          prompt: response.data.prompt,
+        }
         : undefined,
     };
   }

@@ -1,4 +1,4 @@
-import { Handler } from 'src/gate-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { USER_PROXY_SERVICE_NAME, UserProxyServiceClient } from 'src/proto/user';
 import { CommandHandler } from '@nestjs/cqrs';
 import { UserMessageCommand } from '../impl/user-message.command';

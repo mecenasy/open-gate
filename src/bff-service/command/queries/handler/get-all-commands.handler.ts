@@ -2,7 +2,7 @@ import { QueryHandler } from '@nestjs/cqrs';
 import { lastValueFrom } from 'rxjs';
 import { InternalServerErrorException } from '@nestjs/common';
 import { COMMAND_SERVICE_NAME, CommandServiceClient } from 'src/proto/command';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { GetAllCommandsQuery } from '../impl/get-all-commands.query';
 import { CommandsListType } from '../../dto/response.type';
 

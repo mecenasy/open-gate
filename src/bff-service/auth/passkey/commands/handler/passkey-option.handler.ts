@@ -1,7 +1,7 @@
 import { CommandHandler } from '@nestjs/cqrs';
 import { PasskeyOptionCommand } from '../impl/passkey-option.command';
 import { generateOption } from '../../helpers/option';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { TypeConfigService } from 'src/bff-service/common/configs/types.config.service';
 import { AppConfig } from 'src/bff-service/common/configs/app.configs';
 import { saveSession } from 'src/bff-service/auth/helpers/save-session';

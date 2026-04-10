@@ -2,7 +2,7 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { QrLoginCommand } from '../impl/qr-login.command';
 import { BadRequestException } from '@nestjs/common';
 import { QrCache } from './types/types';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { StatusType } from 'src/bff-service/auth/login/dto/status.type';
 import { saveSession } from 'src/bff-service/auth/helpers/save-session';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';

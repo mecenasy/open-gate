@@ -5,7 +5,7 @@ import { lastValueFrom } from 'rxjs';
 import { LOGIN_PROXY_SERVICE_NAME, LoginProxyServiceClient } from 'src/proto/login';
 import { Verify2faCodeCommand } from '../impl/verify-2fa-code.command';
 import { StatusType } from 'src/bff-service/auth/login/dto/status.type';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { saveSession } from 'src/bff-service/auth/helpers/save-session';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';
 

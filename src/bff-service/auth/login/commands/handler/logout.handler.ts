@@ -2,7 +2,7 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { StatusType } from '../../dto/status.type';
 import { LogoutCommand } from '../impl/logout.command';
 import { InternalServerErrorException } from '@nestjs/common';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';
 
 @CommandHandler(LogoutCommand)

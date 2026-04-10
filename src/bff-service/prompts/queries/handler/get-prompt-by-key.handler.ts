@@ -2,7 +2,7 @@ import { QueryHandler } from '@nestjs/cqrs';
 import { lastValueFrom } from 'rxjs';
 import { NotFoundException } from '@nestjs/common';
 import { PROMPT_PROXY_SERVICE_NAME, PromptProxyServiceClient } from 'src/proto/prompt';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { PromptResponseType } from '../../dto/response.type';
 import { GetPromptByKeyQuery } from '../impl/get-prompt-by-key.query';
 

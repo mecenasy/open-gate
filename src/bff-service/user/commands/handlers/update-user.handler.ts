@@ -2,7 +2,7 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { BadRequestException } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { USER_PROXY_SERVICE_NAME, UserProxyServiceClient } from 'src/proto/user';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { protoToJsUserType } from 'src/utils/user-type-converter';
 import { protoToUserStatus } from 'src/utils/concert-status';
 import { UpdateUserCommand } from '../impl/update-user.command';

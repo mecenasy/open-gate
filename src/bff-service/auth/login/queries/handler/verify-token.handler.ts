@@ -1,7 +1,7 @@
 import { QueryHandler } from '@nestjs/cqrs';
 import { VerifyTokenQuery } from '../impl/verify-token.query';
 import { BadRequestException } from '@nestjs/common';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { VerifyTokenType } from '../../dto/verify-token.type';
 
 @QueryHandler(VerifyTokenQuery)

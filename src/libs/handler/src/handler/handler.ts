@@ -3,22 +3,22 @@ import { ICommand } from '@nestjs/cqrs';
 import { type ClientGrpc } from '@nestjs/microservices';
 import { DbGrpcKey } from '@app/db-grpc';
 import { CacheService } from '@app/redis';
-import { EventService } from '../event/event.service';
+import { EventService } from '@app/event';
 import { IBaseHandler } from './base-handler';
 
 export abstract class Handler<T extends ICommand, R, S extends object = any>
   implements IBaseHandler<T, R>, OnModuleInit {
-  public gRpcService: S;
+  public gRpcService!: S;
   logger: Logger;
 
   @Inject(DbGrpcKey)
-  public readonly grpcClient: ClientGrpc;
+  public readonly grpcClient!: ClientGrpc;
 
   @Inject(CacheService)
-  public readonly cache: CacheService;
+  public readonly cache!: CacheService;
 
   @Inject(EventService)
-  public readonly event: EventService;
+  public readonly event!: EventService;
 
   constructor(private readonly serviceName?: string) {
     this.logger = new Logger(this.constructor.name);
@@ -31,8 +31,4 @@ export abstract class Handler<T extends ICommand, R, S extends object = any>
   }
 
   abstract execute(command: T): Promise<R>;
-
-  public createEvent<T>(eventName: string, data: T) {
-    this.event.emit<string, T>(eventName, data);
-  }
 }

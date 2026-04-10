@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { type ClientGrpc } from '@nestjs/microservices';
-import { Handler } from 'src/gate-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { CommandHandler } from '@nestjs/cqrs';
 import { firstValueFrom } from 'rxjs';
 import { NotificationTextCommand } from '../impl/notification-text.command';

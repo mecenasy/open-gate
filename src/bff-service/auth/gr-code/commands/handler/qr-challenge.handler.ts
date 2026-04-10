@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { toDataURL } from 'qrcode';
 import { InternalServerErrorException } from '@nestjs/common';
 import { QrCache } from './types/types';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { TypeConfigService } from 'src/bff-service/common/configs/types.config.service';
 import { AppConfig } from 'src/bff-service/common/configs/app.configs';
 

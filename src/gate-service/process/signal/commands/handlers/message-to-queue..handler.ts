@@ -1,4 +1,4 @@
-import { Handler } from 'src/gate-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { CommandHandler } from '@nestjs/cqrs';
 import { UserMessageCommand } from '../impl/user-message.command';
 import { MessageToQueueCommand } from '../impl/message-to-queue.command';

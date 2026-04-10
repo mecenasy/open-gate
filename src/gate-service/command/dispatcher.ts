@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { SofCommand } from './commands/impl/sof-command';
-import { Handler } from '../common/handler/handler';
+import { Handler } from '@app/handler';
 import { Status } from '../status/status';
 import { SOF_COMMAND_KEY } from '../common/decorators/sof-handler.decorator';
 import { DiscoveryService } from '@nestjs/core';

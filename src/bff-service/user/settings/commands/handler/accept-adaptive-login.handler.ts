@@ -3,7 +3,7 @@ import { lastValueFrom } from 'rxjs';
 import { AcceptAdaptiveLoginCommand } from '../impl/accept-adaptive-login.command';
 import { SETTINGS_PROXY_SERVICE_NAME, SettingsProxyServiceClient } from 'src/proto/user-settings';
 import { AcceptAdaptiveLoginType } from '../../dto/accept-adaptive-login.type';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { LoginStatusType } from 'src/bff-service/auth/login/dto/login-status.tape';
 
 @CommandHandler(AcceptAdaptiveLoginCommand)

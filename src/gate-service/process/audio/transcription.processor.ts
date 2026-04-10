@@ -3,7 +3,7 @@ import { Process, Processor } from '@nestjs/bull';
 import { type Job } from 'bull';
 import { QueueMessageData } from '../../common/types/queue-message-data';
 import { Logger } from '@nestjs/common';
-import { EventService } from '../../common/event/event.service';
+import { EventService } from '@app/event';
 import { Readable } from 'stream';
 import ffmpeg from 'fluent-ffmpeg';
 import { QueueService, QueueType } from '@app/redis';

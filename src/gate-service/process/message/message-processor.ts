@@ -2,7 +2,7 @@ import { Process, Processor } from '@nestjs/bull';
 import { type Job } from 'bull';
 import { QueueMessageData } from '../../common/types/queue-message-data';
 import { Logger } from '@nestjs/common';
-import { EventService } from '../../common/event/event.service';
+import { EventService } from '@app/event';
 import { SofCommandEvent } from '../../command/events/sof-command.event';
 import { QueueType } from '@app/redis';
 import { OnModuleInit } from '@nestjs/common';

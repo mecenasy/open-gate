@@ -2,7 +2,7 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { BadRequestException } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { USER_PROXY_SERVICE_NAME, UserProxyServiceClient } from 'src/proto/user';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { RemoveUserCommand } from '../impl/remove-user.command';
 import { SuccessResponseType } from '../../dto/response.type';
 

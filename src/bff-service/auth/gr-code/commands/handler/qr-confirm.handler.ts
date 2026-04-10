@@ -4,7 +4,7 @@ import { QrCache } from './types/types';
 import { BadRequestException } from '@nestjs/common';
 import { PASSKEY_PROXY_SERVICE_NAME, PasskeyProxyServiceClient } from 'src/proto/passkey';
 import { lastValueFrom } from 'rxjs';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { StatusType } from 'src/bff-service/auth/login/dto/status.type';
 import { Getaway } from 'src/bff-service/common/getaway/getaway.getaway';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';

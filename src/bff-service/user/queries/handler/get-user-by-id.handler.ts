@@ -2,7 +2,7 @@ import { QueryHandler } from '@nestjs/cqrs';
 import { lastValueFrom } from 'rxjs';
 import { NotFoundException } from '@nestjs/common';
 import { USER_PROXY_SERVICE_NAME, UserProxyServiceClient } from 'src/proto/user';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { protoToJsUserType } from 'src/utils/user-type-converter';
 import { protoToUserStatus } from 'src/utils/concert-status';
 import { GetUserByIdQuery } from '../impl/get-user-by-id.query';

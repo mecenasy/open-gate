@@ -2,7 +2,7 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { GetPasskeysQuery } from '../impl/get-keys.query';
 import { lastValueFrom } from 'rxjs';
 import { GetPasskeysResponse, PASSKEY_PROXY_SERVICE_NAME, PasskeyProxyServiceClient } from 'src/proto/passkey';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 
 @CommandHandler(GetPasskeysQuery)
 export class GetPasskeysHandler extends Handler<GetPasskeysQuery, any, PasskeyProxyServiceClient> {

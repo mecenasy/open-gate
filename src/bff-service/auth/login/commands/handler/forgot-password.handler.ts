@@ -3,7 +3,7 @@ import { lastValueFrom } from 'rxjs';
 import { StatusType } from '../../dto/status.type';
 import { ForgotPasswordCommand } from '../impl/forgot-password.command';
 import { USER_PROXY_SERVICE_NAME, UserProxyServiceClient } from 'src/proto/user';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { OtpService } from 'src/bff-service/auth/otp/otp.service';
 import { SendResetTokenEvent } from 'src/bff-service/notify/common/dto/send-reset-token.event';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';

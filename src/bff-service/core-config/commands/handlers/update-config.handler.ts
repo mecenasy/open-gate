@@ -2,7 +2,7 @@ import { CommandHandler } from '@nestjs/cqrs';
 import { BadRequestException } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { CONFIG_SERVICE_NAME, ConfigServiceClient } from 'src/proto/config';
-import { Handler } from 'src/bff-service/common/handler/handler';
+import { Handler } from '@app/handler';
 import { UpdateConfigCommand } from '../impl/update-config.command';
 import { ConfigResponseType } from '../../dto/response.type';
 
@@ -29,13 +29,13 @@ export class UpdateConfigHandler extends Handler<UpdateConfigCommand, ConfigResp
       message: response.message,
       data: response.data
         ? {
-            id: response.data.id,
-            key: response.data.key,
-            value: response.data.value,
-            description: response.data.description,
-            createdAt: response.data.createdAt,
-            updatedAt: response.data.updatedAt,
-          }
+          id: response.data.id,
+          key: response.data.key,
+          value: response.data.value,
+          description: response.data.description,
+          createdAt: response.data.createdAt,
+          updatedAt: response.data.updatedAt,
+        }
         : undefined,
     };
   }

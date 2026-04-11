@@ -17,6 +17,7 @@ export class AddCommandHandler extends Handler<AddCommandCommand, CommandRespons
       this.gRpcService.addCommand({
         name: input.name,
         description: input.description,
+        command: input.command,
         actions: input.actions,
         parameters: input.parameters,
         roleNames: input.roleNames,
@@ -39,6 +40,7 @@ export class AddCommandHandler extends Handler<AddCommandCommand, CommandRespons
         description: response.data.description,
         active: response.data.active,
         actions: response.data.actions,
+        command: response.data.command,
         parameters: response.data.parameters,
         roleNames: response.data.roleNames ?? [],
         createdAt: response.data.createdAt,

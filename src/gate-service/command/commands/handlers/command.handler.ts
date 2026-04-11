@@ -7,7 +7,7 @@ import { Inject } from '@nestjs/common';
 import { UserContext } from 'src/gate-service/context/user-context';
 import { MessageType } from 'src/gate-service/process/signal/types';
 
-export abstract class SofCommandHandler extends Handler<SofCommand<number>, Status> {
+export abstract class BaseCommandHandler extends Handler<SofCommand<number>, Status> {
   @Inject()
   private readonly queueService: QueueService;
 

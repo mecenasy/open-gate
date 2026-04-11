@@ -14,6 +14,11 @@ export class AddCommandType {
   @IsNotEmpty()
   description!: string;
 
+  @Field()
+  @IsString()
+  @IsNotEmpty()
+  command!: string;
+
   @Field(() => GraphQLJSON)
   actions!: Record<string, boolean>;
 

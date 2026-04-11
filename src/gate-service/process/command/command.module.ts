@@ -1,6 +1,11 @@
 import { Module } from '@nestjs/common';
+import { CommandProcessor } from './command.processor';
+import { GroqService } from '../services/groq.service';
+import { LanguageToolService } from 'src/gate-service/language-tool/language-tool.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  providers: [],
+  imports: [HttpModule],
+  providers: [CommandProcessor, GroqService, LanguageToolService],
 })
 export class CommandModule {}

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Messages } from './entity/messages.entity';
-import { Message } from 'src/proto/messages';
+import { Messages, Type } from './entity/messages.entity';
+import { Message, MessageType } from 'src/proto/messages';
 
 @Injectable()
 export class MessagesService {
@@ -42,6 +42,11 @@ export class MessagesService {
   }
 
   entityToProto(entity: Messages): Message {
-    return { key: entity.key, value: entity.value };
+    return {
+      key: entity.key,
+      value: entity.value,
+      description: entity.description || '',
+      type: entity.type === Type.Message ? MessageType.message : MessageType.error,
+    };
   }
 }

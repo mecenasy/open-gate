@@ -13,6 +13,7 @@ service CommandService {
   
   // Fetch a single command by ID or Name
   rpc GetCommand (GetCommandRequest) returns (CommandResponse);
+  rpc GetCommandFromMatches(GetCommandFromMatchesRequest) returns (CommandResponse);
   
   // List all commands
   rpc GetAllCommands (GetAllCommandsRequest) returns (GetAllCommandsResponse);
@@ -28,6 +29,10 @@ service CommandService {
 }
 
 
+message GetCommandFromMatchesRequest {
+  repeated string matches = 1;
+}
+
 message RemoveCommandRequest {
   string id = 1;
 } 
@@ -41,22 +46,24 @@ message RemoveCommandResponse {
 message Command {
   string id = 1;
   string name = 2;
-  string description = 3;
-  bool active = 4;
-  map<string, bool> actions = 5;
-  map<string, bool> parameters = 6;
-  string created_at = 7;
-  string updated_at = 8;
-  repeated string role_names = 9;
+  string command = 3;
+  string description = 4;
+  bool active = 5;
+  map<string, bool> actions = 6;
+  map<string, bool> parameters = 7;
+  string created_at = 8;
+  string updated_at = 9;
+  repeated string role_names = 10;
 }
 
 // Request/Response messages for AddCommand
 message AddCommandRequest {
   string name = 1;
   string description = 2;
-  map<string, bool> actions = 3;
-  map<string, bool> parameters = 4;
-  repeated string role_names = 5; // List of role names to grant permissions
+  string command = 3; 
+  map<string, bool> actions = 4;
+  map<string, bool> parameters = 5;
+  repeated string role_names = 6; // List of role names to grant permissions
 }
 
 // Request/Response messages for UpdateCommand

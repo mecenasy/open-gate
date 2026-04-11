@@ -4,28 +4,31 @@ import { SofHandler } from 'src/gate-service/common/decorators/sof-handler.decor
 import { CommandAction, CommandType } from 'src/gate-service/common/types/command';
 import { Status } from 'src/gate-service/status/status';
 import { GateService } from '../../gate/gate.service';
-import { SofCommandHandler } from './command.handler';
+import { BaseCommandHandler } from './command.handler';
 import { MessageType } from 'src/gate-service/process/signal/types';
 
 @SofHandler(CommandType.Gate)
 @CommandHandler(SofCommand)
-export class GateHandler extends SofCommandHandler {
+export class GateHandler extends BaseCommandHandler {
   constructor(private readonly gateService: GateService) {
     super();
   }
   async execute({ command, context }: SofCommand<number>): Promise<Status> {
-    if (command.command !== CommandType.Gate) {
-      await this.processing(command.message, { ...context, messageType: MessageType.Unknown });
+    if (command.command !== CommandType.Gate && !command.data) {
+      await this.processing(command.message ?? '', { ...context, messageType: MessageType.Unknown });
       throw new Error('Command is required');
     }
 
     if (command.action === CommandAction.Open) {
-      await this.gateService.open(command.command, command.data);
+      await this.gateService.open(command.command as CommandType.Gate, command.data ?? 1);
     } else {
-      await this.gateService.close(command.command, command.data);
+      await this.gateService.close(command.command as CommandType.Gate, command.data ?? 1);
     }
 
-    await this.processing(command.message, context);
+    await this.processing(command.message ?? '', context);
+    const lockKey = `lock:${command.command}.${command.data}`;
+
+    await this.cache.removeFromCache({ identifier: lockKey, prefix: 'command' });
 
     this.logger.log('Gate command executed');
 

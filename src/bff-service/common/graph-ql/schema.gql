@@ -59,6 +59,7 @@ enum UserRole {
   SuperUser
   Member
   User
+  Unrecognized
 }
 
 type UsersListType {
@@ -401,6 +402,7 @@ input RemovePromptType {
 input AddCommandType {
   name: String!
   description: String!
+  command: String!
   actions: JSON!
   parameters: JSON!
   roleNames: [String!]!

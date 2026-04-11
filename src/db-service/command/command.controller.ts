@@ -7,6 +7,7 @@ import type {
   GetAllCommandsResponse,
   AddCommandRequest,
   GetCommandRequest,
+  GetCommandFromMatchesRequest,
   UpdateCommandRequest,
   GetAllCommandsRequest,
   GetAllByPermissionRequest,
@@ -24,6 +25,7 @@ import { GetCommandQuery } from './queries/impl/get-command.query';
 import { GetAllCommandsQuery } from './queries/impl/get-all-commands.query';
 import { GetAllByPermissionQuery } from './queries/impl/get-all-by-permission.query';
 import { GetByPermissionQuery } from './queries/impl/get-by-permission.query';
+import { GetCommandFromMatchesQuery } from './queries/impl/get-command-from-matches.query';
 
 @Controller()
 export class CommandGrpcController implements CommandServiceController {
@@ -90,6 +92,24 @@ export class CommandGrpcController implements CommandServiceController {
       return {
         status: false,
         message: `Failed to get command: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+  }
+
+  @GrpcMethod(COMMAND_SERVICE_NAME, 'GetCommandFromMatches')
+  async getCommandFromMatches(request: GetCommandFromMatchesRequest): Promise<CommandResponse> {
+    try {
+      const data = await this.queryBus.execute<GetCommandFromMatchesQuery, CommandProto | null>(
+        new GetCommandFromMatchesQuery(request.matches),
+      );
+      if (!data) {
+        return { status: false, message: 'Command not found' };
+      }
+      return { status: true, message: 'Command found', data };
+    } catch (error) {
+      return {
+        status: false,
+        message: `Failed to get command from matches: ${error instanceof Error ? error.message : 'Unknown error'}`,
       };
     }
   }

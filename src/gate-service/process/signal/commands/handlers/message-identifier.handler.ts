@@ -8,13 +8,15 @@ import { Status } from 'src/gate-service/status/status';
 import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
 import { lastValueFrom } from 'rxjs';
 import { MESSAGES_SERVICE_NAME, MessagesServiceClient } from 'src/proto/messages';
+import { keys } from 'src/gate-service/message-keys/keys';
+import { CommandServiceClient } from 'src/proto/command';
 
 @CommandHandler(UserMessageCommand)
 export class MassageIdentifierHandler extends Handler<UserMessageCommand, Status> {
   logger: Logger;
   messageGrpc: MessagesServiceClient;
+  commandGrpc: CommandServiceClient;
 
-  messageKey: string = 'wrong-message';
   constructor() {
     super();
     this.logger = new Logger(MassageIdentifierHandler.name);
@@ -28,6 +30,7 @@ export class MassageIdentifierHandler extends Handler<UserMessageCommand, Status
     const { dataMessage } = message;
 
     const text = dataMessage?.message;
+    console.log('🚀 ~ MassageIdentifierHandler ~ execute ~ dataMessage:', dataMessage);
     const hasText = (text?.trim().length || 0) > 0;
 
     const attachment = dataMessage?.attachments?.[0];
@@ -44,13 +47,14 @@ export class MassageIdentifierHandler extends Handler<UserMessageCommand, Status
     if (hasText) {
       if (text?.trim().startsWith('/')) {
         this.event.emit(new IdentifyMessageEvent(message, { ...context, messageType: MessageType.Command }));
-        // TODO: Pobrać listę komend z bazy danych i sprawdzić czy tekst zaczyna się od jednej z komend i ma parametry np nr bramy
+        console.log('🚀 ~ MassageIdentifierHandler ~ execute ~ message:', message);
         return {
           status: true,
           message: 'User send command',
         };
       }
 
+      console.log('🚀 ~ MassageIdentifierHandler ~ execute ~ message:', message);
       this.event.emit(new IdentifyMessageEvent(message, { ...context, messageType: MessageType.Message }));
       return {
         status: true,
@@ -68,14 +72,14 @@ export class MassageIdentifierHandler extends Handler<UserMessageCommand, Status
   private async getMessage() {
     const message = await this.cache.getFromCache<string>({
       identifier: 'message',
-      path: this.messageKey,
+      path: keys.messageWrongKey,
     });
 
     if (message) {
       return message;
     }
 
-    const response = await lastValueFrom(this.messageGrpc.getMessage({ key: this.messageKey }));
+    const response = await lastValueFrom(this.messageGrpc.getMessage({ key: keys.messageWrongKey }));
 
     if (!response?.status || !response?.data) {
       return '';
@@ -83,8 +87,9 @@ export class MassageIdentifierHandler extends Handler<UserMessageCommand, Status
 
     await this.cache.saveInCache<string>({
       identifier: 'message',
-      path: this.messageKey,
+      path: keys.messageWrongKey,
       data: response.data.value,
+      EX: 24 * 60 * 60,
     });
 
     return response.data.value;

@@ -21,9 +21,8 @@ export class CommandService {
       description: commandData.description,
       active: true,
       actions: commandData.actions,
-      //TODO: Validate parameters
       parameters: commandData.parameters,
-      userRoles: [], // Will be set after creation
+      userRoles: [],
     });
 
     const savedCommand = await this.commandRepository.save(command);
@@ -48,8 +47,20 @@ export class CommandService {
   }
 
   async findByName(name: string): Promise<Command | null> {
+    console.log('🚀 ~ CommandService ~ findByName ~ name:', name);
     return await this.commandRepository.findOne({
-      where: { name },
+      where: [{ name }, { command: name }],
+      relations: ['userRoles'],
+    });
+  }
+
+  async findByMatches(matches: string[]): Promise<Command | null> {
+    if (!matches || matches.length === 0) {
+      return null;
+    }
+    const conditions = matches.flatMap((match) => [{ name: match }, { command: match }]);
+    return await this.commandRepository.findOne({
+      where: conditions,
       relations: ['userRoles'],
     });
   }
@@ -183,6 +194,7 @@ export class CommandService {
       id: command.id,
       name: command.name,
       description: command.description || '',
+      command: command.command || '',
       active: command.active,
       actions: (typeof command.actions === 'string' ? JSON.parse(command.actions) : command.actions) as Record<
         string,

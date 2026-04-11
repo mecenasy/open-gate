@@ -12,6 +12,7 @@
   "dependencies": {
     "@apollo/client": "^4.1.6",
     "@hookform/resolvers": "^5.2.2",
+    "@parcel/watcher-linux-x64-glibc": "^2.5.6",
     "@react-spring/web": "^10.0.3",
     "@simplewebauthn/browser": "^13.3.0",
     "@tailwindcss/postcss": "^4.2.2",

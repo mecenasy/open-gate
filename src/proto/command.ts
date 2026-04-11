@@ -11,6 +11,10 @@ import { Observable } from 'rxjs';
 
 export const protobufPackage = 'command';
 
+export interface GetCommandFromMatchesRequest {
+  matches: string[];
+}
+
 export interface RemoveCommandRequest {
   id: string;
 }
@@ -24,6 +28,7 @@ export interface RemoveCommandResponse {
 export interface Command {
   id: string;
   name: string;
+  command: string;
   description: string;
   active: boolean;
   actions: { [key: string]: boolean };
@@ -47,6 +52,7 @@ export interface Command_ParametersEntry {
 export interface AddCommandRequest {
   name: string;
   description: string;
+  command: string;
   actions: { [key: string]: boolean };
   parameters: { [key: string]: boolean };
   /** List of role names to grant permissions */
@@ -161,6 +167,8 @@ export interface CommandServiceClient {
 
   getCommand(request: GetCommandRequest, metadata?: Metadata): Observable<CommandResponse>;
 
+  getCommandFromMatches(request: GetCommandFromMatchesRequest, metadata?: Metadata): Observable<CommandResponse>;
+
   /** List all commands */
 
   getAllCommands(request: GetAllCommandsRequest, metadata?: Metadata): Observable<GetAllCommandsResponse>;
@@ -207,6 +215,11 @@ export interface CommandServiceController {
     metadata?: Metadata,
   ): Promise<CommandResponse> | Observable<CommandResponse> | CommandResponse;
 
+  getCommandFromMatches(
+    request: GetCommandFromMatchesRequest,
+    metadata?: Metadata,
+  ): Promise<CommandResponse> | Observable<CommandResponse> | CommandResponse;
+
   /** List all commands */
 
   getAllCommands(
@@ -243,6 +256,7 @@ export function CommandServiceControllerMethods() {
       'removeCommand',
       'updateCommand',
       'getCommand',
+      'getCommandFromMatches',
       'getAllCommands',
       'getAllByPermission',
       'getByPermission',

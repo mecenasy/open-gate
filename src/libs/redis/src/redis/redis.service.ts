@@ -7,7 +7,7 @@ import { RedisClientKey } from './redis-keys';
 export class RedisService {
   constructor(@Inject(RedisClientKey) private readonly redis: RedisClientType) {}
 
-  public async verify<T extends RedisJSON>({ data, ...rest }: VerifyRedisData<T>): Promise<boolean> {
+  public async verify<T>({ data, ...rest }: VerifyRedisData<T>): Promise<boolean> {
     const savedCode = await this.get(rest);
 
     if (savedCode == data) {
@@ -18,13 +18,17 @@ export class RedisService {
     return false;
   }
 
-  public async save<T extends RedisJSON>({ data, identifier, EX = 300, prefix }: SaveRedisData<T>): Promise<void> {
+  public async save<T>({ data, identifier, EX = 300, prefix, NX }: SaveRedisData<T>) {
     const key = this.getIdentifier(identifier, prefix);
 
-    await this.redis.multi().json.set(key, '$', data).expire(key, EX).exec();
+    return await this.redis
+      .multi()
+      .json.set(key, '$', data as any, { NX })
+      .expire(key, EX)
+      .exec();
   }
 
-  public async get<T extends RedisJSON>({ identifier, prefix, path = '' }: RedisData): Promise<T | null> {
+  public async get<T>({ identifier, prefix, path = '' }: RedisData): Promise<T | null> {
     const key = this.getIdentifier(identifier, prefix);
     const result = await this.redis.json.get(key, {
       path: path ? `$.${path}` : '$',
@@ -33,18 +37,12 @@ export class RedisService {
     return (Array.isArray(result) ? result[0] : result) as T;
   }
 
-  public async update<T extends RedisJSON>({
-    identifier,
-    prefix,
-    path = '',
-    data,
-    EX = 300,
-  }: SaveRedisData<T>): Promise<T | null> {
+  public async update<T>({ identifier, prefix, path = '', data, EX = 300 }: SaveRedisData<T>): Promise<T | null> {
     const key = this.getIdentifier(identifier, prefix);
 
     await this.redis
       .multi()
-      .json.merge(key, path ? `$.${path}` : '$', data)
+      .json.merge(key, path ? `$.${path}` : '$', data as any)
       .expire(key, EX)
       .exec();
 

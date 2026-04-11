@@ -37,8 +37,9 @@ export function protoToJsUserType(protoUserType: ProtoUserType): JsUserType {
     case ProtoUserType.OWNER:
       return JsUserType.Owner;
     case ProtoUserType.UNRECOGNIZED: // ProtoUserType.UNRECOGNIZED
+      return JsUserType.Unrecognized;
     default:
-      throw new Error(`Unknown Proto UserType: ${protoUserType}`);
+      throw new Error(`Unknown Proto UserType: ${String(protoUserType)}`);
   }
 }
 

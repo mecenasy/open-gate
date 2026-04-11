@@ -13,6 +13,7 @@ export class MessageToQueueHandler extends Handler<UserMessageCommand, Status> {
   }
 
   async execute({ message, context }: MessageToQueueCommand): Promise<Status> {
+    console.log('🚀 ~ MessageToQueueHandler ~ execute ~ message:', message);
     switch (context.messageType) {
       case MessageType.Message: {
         await this.queueService.messageToQueue({ data: message, context });
@@ -23,6 +24,7 @@ export class MessageToQueueHandler extends Handler<UserMessageCommand, Status> {
         break;
       }
       default:
+        console.log('🚀 ~ MessageToQueueHandler ~ execute ~ message:', message);
         await this.queueService.commandToQueue({ data: message, context });
         break;
     }

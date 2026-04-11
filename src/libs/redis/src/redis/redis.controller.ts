@@ -9,9 +9,8 @@ export class RedisController {
   constructor(private readonly redisService: RedisService) {}
 
   @MessagePattern(RedisEvent.Save)
-  async save<T>(data: SaveRedisData<T>): Promise<object> {
-    await this.redisService.save<T>(data);
-    return Promise.resolve({});
+  async save<T>(data: SaveRedisData<T>) {
+    return await this.redisService.save<T>(data);
   }
 
   @MessagePattern(RedisEvent.Update)
@@ -21,7 +20,7 @@ export class RedisController {
   }
 
   @MessagePattern(RedisEvent.Verify)
-  async verify(data: VerifyRedisData): Promise<boolean> {
+  async verify<T>(data: VerifyRedisData<T>): Promise<boolean> {
     return await this.redisService.verify(data);
   }
 

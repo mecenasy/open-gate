@@ -7,7 +7,8 @@ import { EventService } from '@app/event';
 import { IBaseHandler } from './base-handler';
 
 export abstract class Handler<T extends ICommand, R, S extends object = any>
-  implements IBaseHandler<T, R>, OnModuleInit {
+  implements IBaseHandler<T, R>, OnModuleInit
+{
   public gRpcService!: S;
   logger: Logger;
 

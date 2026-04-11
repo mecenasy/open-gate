@@ -12,6 +12,9 @@ import { Status } from 'src/gate-service/status/status';
 import { protoToJsUserType } from 'src/utils/user-type-converter';
 import { protoToUserStatus } from 'src/utils/concert-status';
 import { RedisData, SaveRedisData } from '@app/redis/model/redis-data';
+import { keys } from 'src/gate-service/message-keys/keys';
+import { UserType } from 'src/db-service/user/user-type';
+import { UserStatus } from 'src/db-service/user/status';
 
 @CommandHandler(MessageCommand)
 export class MassageHandler extends Handler<MessageCommand, Status, UserProxyServiceClient> {
@@ -20,14 +23,12 @@ export class MassageHandler extends Handler<MessageCommand, Status, UserProxySer
     super(USER_PROXY_SERVICE_NAME);
   }
 
-  messageKey: string = 'phone-not-found';
-
   onModuleInit() {
     super.onModuleInit();
     this.messageGrpc = this.grpcClient.getService<MessagesServiceClient>(MESSAGES_SERVICE_NAME);
   }
   async execute({ message }: MessageCommand): Promise<Status> {
-    const { source } = message;
+    const { source, dataMessage } = message;
 
     try {
       const userContext = await this.getOrFetchUser({
@@ -36,7 +37,12 @@ export class MassageHandler extends Handler<MessageCommand, Status, UserProxySer
       });
 
       if (!userContext) {
-        await this.notifyUnknownUser(source);
+        if (dataMessage?.message?.includes('/')) {
+          this.sendEvent(message, { phone: source, type: UserType.Unrecognized, status: UserStatus.Pending });
+        } else {
+          await this.notifyUnknownUser(source);
+        }
+
         return { status: false, message: 'User not found' };
       }
 
@@ -96,7 +102,7 @@ export class MassageHandler extends Handler<MessageCommand, Status, UserProxySer
   }
 
   private async notifyUnknownUser(phone: string): Promise<void> {
-    this.event.emit(new NotificationEvent(phone, (await this.getMessage()) ?? 'User not found'));
+    // this.event.emit(new NotificationEvent(phone, (await this.getMessage()) ?? 'User not found'));
   }
 
   private sendEvent(message: SignalEnvelope, context: UserContext) {
@@ -111,14 +117,14 @@ export class MassageHandler extends Handler<MessageCommand, Status, UserProxySer
   private async getMessage() {
     const message = await this.cache.getFromCache<string>({
       identifier: 'message',
-      path: this.messageKey,
+      path: keys.phoneNotFoundKey,
     });
 
     if (message) {
       return message;
     }
 
-    const response = await lastValueFrom(this.messageGrpc.getMessage({ key: this.messageKey }));
+    const response = await lastValueFrom(this.messageGrpc.getMessage({ key: keys.phoneNotFoundKey }));
 
     if (!response?.status || !response?.data) {
       return '';
@@ -126,8 +132,9 @@ export class MassageHandler extends Handler<MessageCommand, Status, UserProxySer
 
     await this.cache.saveInCache<string>({
       identifier: 'message',
-      path: this.messageKey,
+      path: keys.phoneNotFoundKey,
       data: response.data.value,
+      EX: 24 * 60 * 60,
     });
 
     return response.data.value;

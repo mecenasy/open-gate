@@ -4,4 +4,5 @@ export enum UserType {
   SuperUser = 'super_user',
   Member = 'member',
   User = 'user',
+  Unrecognized = 'unrecognized',
 }

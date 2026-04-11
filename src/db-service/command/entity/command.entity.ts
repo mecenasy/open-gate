@@ -1,4 +1,4 @@
-import { IsBoolean, IsArray, IsJSON, IsString, IsOptional } from 'class-validator';
+import { IsBoolean, IsJSON, IsString, IsOptional } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -23,6 +23,14 @@ export class Command {
   })
   @IsString()
   name: string;
+
+  @Column({
+    type: 'varchar',
+    length: 16,
+    nullable: true,
+  })
+  @IsString()
+  command: string;
 
   @Column({
     type: 'text',

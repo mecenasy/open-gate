@@ -37,6 +37,7 @@ export class UpdateCommandHandler extends Handler<UpdateCommandCommand, CommandR
         active: response.data.active,
         actions: response.data.actions,
         parameters: response.data.parameters,
+        command: response.data.command,
         roleNames: response.data.roleNames ?? [],
         createdAt: response.data.createdAt,
         updatedAt: response.data.updatedAt,

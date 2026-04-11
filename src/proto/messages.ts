@@ -11,14 +11,24 @@ import { Observable } from 'rxjs';
 
 export const protobufPackage = 'messages';
 
+export enum MessageType {
+  message = 0,
+  error = 1,
+  UNRECOGNIZED = -1,
+}
+
 export interface Message {
   key: string;
   value: string;
+  description: string;
+  type: MessageType;
 }
 
 export interface AddMessageRequest {
   key: string;
   value: string;
+  description: string;
+  type: MessageType;
 }
 
 export interface GetMessageRequest {

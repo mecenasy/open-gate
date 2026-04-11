@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   # Serwis konfiguracyjny cały systme główny, odpowiedzialny za logikę biznesową, komunikację z bazą danych i innymi serwisami poprzez gRPC oraz udostępnianie API dla frontendu
   bff-service:
@@ -227,10 +225,21 @@ services:
     # Add a manual healthcheck if the image doesn't define one correctly
     healthcheck:
       test: ["CMD", "curl", "-a", "http://localhost:8080/v1/about"]
-      interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
+
+  # languagetool:
+  #   image: erikvl82/languagetool:latest
+  #   container_name: local_languagetool
+  #   environment:
+  #     - Java_Xms=256m
+  #     - Java_Xmx=512m
+  #   ports:
+  #     - "8010:8010"
+  #   restart: always
+  #   networks:
+  #     - backend-net
 
 volumes:
   postgres_data:

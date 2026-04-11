@@ -1,40 +1,36 @@
 import { Process, Processor } from '@nestjs/bull';
 import { type Job } from 'bull';
 import { QueueMessageData } from '../../common/types/queue-message-data';
-import { Logger } from '@nestjs/common';
-import { EventService } from '@app/event';
 import { SofCommandEvent } from '../../command/events/sof-command.event';
 import { QueueType } from '@app/redis';
-import { OnModuleInit } from '@nestjs/common';
 import { MessageContextService } from '../services/message-context.service';
-import { GroqService } from '../services/groq.service';
 import { CommandParserService } from '../services/command-parser.service';
 import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
+import { ProcessorBase } from '../processor-base';
+import { keys } from 'src/gate-service/message-keys/keys';
 
 @Processor(QueueType.Message)
-export class MessageProcessor implements OnModuleInit {
-  logger: Logger;
-
+export class MessageProcessor extends ProcessorBase {
   constructor(
     private readonly messageContextService: MessageContextService,
     private readonly commandParserService: CommandParserService,
-    private readonly groqService: GroqService,
-    private readonly eventService: EventService,
   ) {
-    this.logger = new Logger(this.constructor.name);
-  }
-
-  onModuleInit() {
-    this.logger.log('MessageProcessor initialized');
+    super();
   }
 
   @Process(QueueType.Message)
-  async analizeMessage(job: Job<QueueMessageData>) {
-    const {
-      data: { dataMessage },
-      context,
-    } = job.data;
-    const userMessage = dataMessage?.message;
+  async analyzeMessage(job: Job<QueueMessageData>) {
+    let userMessage: string;
+    const { context } = job.data;
+
+    if (job.data.data) {
+      const {
+        data: { dataMessage },
+      } = job.data;
+      userMessage = dataMessage?.message ?? '';
+    } else {
+      userMessage = job.data?.message ?? '';
+    }
 
     this.logger.debug(`Analyzing message ${context.phone}`);
 
@@ -56,16 +52,28 @@ export class MessageProcessor implements OnModuleInit {
       await this.messageContextService.saveConversation(context, messages);
 
       const command = this.commandParserService.parseCommand(chatCompletion);
+      const lockKey = `lock:${command.command}.${command.data}`;
+
+      const isLocked = await this.cache.getFromCache({ identifier: lockKey, prefix: 'command' });
+
+      if (isLocked) {
+        this.eventService.emit(new NotificationEvent(context.phone, await this.getMessage('message-command-locked')));
+        return;
+      }
+
+      await this.cache.saveInCache<boolean>({
+        identifier: lockKey,
+        prefix: 'command',
+        data: true,
+        EX: 120,
+        NX: true,
+      });
+
+      this.logger.debug(`Command for ${context.phone}: ${JSON.stringify(command)}`);
 
       this.eventService.emit(new SofCommandEvent<number>(command, context));
     } catch (error) {
-      this.eventService.emit(
-        new NotificationEvent(
-          context.phone,
-          // TOTO: komunikat z bazy
-          'Przepraszam, łapie zadyszkę, proszę wyslij komendę zamiast wiadomości. jezeli nie wiesz jaką, mogę ci wysłać samouczka jesli wyslesz mi słowo pomoc lub help',
-        ),
-      );
+      this.eventService.emit(new NotificationEvent(context.phone, await this.getMessage(keys.messageProcessorKey)));
       this.logger.error(`Error processing message for ${context.phone}:`, error);
     }
   }

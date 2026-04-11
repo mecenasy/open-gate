@@ -14,7 +14,7 @@ export class GateService {
       setTimeout(() => {
         this.logger.log(`Opened: ${type}: ${data}`);
         resolve(true);
-      }, 2000);
+      }, 10000);
     });
   }
 
@@ -25,7 +25,7 @@ export class GateService {
       setTimeout(() => {
         this.logger.log(`Closed: ${type}: ${data}`);
         resolve(true);
-      }, 2000);
+      }, 10000);
     });
   }
 }

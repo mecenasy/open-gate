@@ -2,38 +2,31 @@
 import { Process, Processor } from '@nestjs/bull';
 import { type Job } from 'bull';
 import { QueueMessageData } from '../../common/types/queue-message-data';
-import { Logger } from '@nestjs/common';
-import { EventService } from '@app/event';
 import { Readable } from 'stream';
 import ffmpeg from 'fluent-ffmpeg';
-import { QueueService, QueueType } from '@app/redis';
-import { OnModuleInit } from '@nestjs/common';
-import { GroqService } from '../services/groq.service';
+import { QueueType } from '@app/redis';
 import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
-
+import { ProcessorBase } from '../processor-base';
+import { keys } from '../../message-keys/keys';
 interface SerializedBuffer {
   type: 'Buffer';
   data: number[];
 }
 
 @Processor(QueueType.Transcription)
-export class TranscriptionProcessor implements OnModuleInit {
-  logger: Logger;
-  constructor(
-    private readonly eventService: EventService,
-    private readonly queueService: QueueService,
-    private readonly groqService: GroqService,
-  ) {
-    this.logger = new Logger(this.constructor.name);
-  }
-
-  onModuleInit() {
-    this.logger.log('AudioProcessor initialized');
+export class TranscriptionProcessor extends ProcessorBase {
+  constructor() {
+    super();
   }
 
   @Process(QueueType.Transcription)
-  async analizeAudio(job: Job<QueueMessageData>) {
+  async analyzeAudio(job: Job<QueueMessageData>) {
     this.logger.debug('Analyzing Audio message');
+    if (!job.data.data) {
+      this.logger.warn('No data found in job data');
+      return;
+    }
+
     const {
       data: { attachment },
       data,
@@ -44,8 +37,8 @@ export class TranscriptionProcessor implements OnModuleInit {
       this.eventService.emit(
         new NotificationEvent(
           context.phone,
-          // TODO: komunikat z bazy
-          'Przepraszam ale twoja notatka jes nie zrozumiała. Spokój wysłac jeszcze raz mówiąc wyraznie lub komendę.',
+
+          await this.getMessage(keys.missingAttachmentKey),
         ),
       );
       this.logger.warn('No attachment found in job data');
@@ -64,11 +57,7 @@ export class TranscriptionProcessor implements OnModuleInit {
       });
     } catch (error) {
       this.eventService.emit(
-        new NotificationEvent(
-          context.phone,
-          // TODO: komunikat z bazy
-          'Przepraszam, łapie zadyszkę, proszę wyslij komendę zamiast wiadomości. jezeli nie wiesz jaką, mogę ci wysłać samouczka jesli wyslesz mi słowo pomoc lub help',
-        ),
+        new NotificationEvent(context.phone, await this.getMessage(keys.transcriptionAttachmentKey)),
       );
       this.logger.error('Error processing audio:', error);
     }

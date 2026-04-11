@@ -1,8 +1,8 @@
 export interface SofCommand<T> {
-  action: CommandAction;
-  command: CommandType;
-  data: T;
-  message: string;
+  action?: string;
+  command?: string;
+  data?: T;
+  message?: string;
   error?: boolean;
 }
 
@@ -15,4 +15,6 @@ export enum CommandType {
   Gate = 'gate',
   SideGate = 'side_gate',
   Error = 'error',
+  Help = 'help',
+  CreateUser = 'create_user',
 }

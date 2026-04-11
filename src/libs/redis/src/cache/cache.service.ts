@@ -13,8 +13,8 @@ export class CacheService {
     return await lastValueFrom(this.client.send<T, RedisData>(RedisEvent.Get, data).pipe(timeout(5000)));
   }
 
-  public async saveInCache<T>(data: SaveRedisData<T>): Promise<void> {
-    await lastValueFrom(this.client.send<object, SaveRedisData<T>>(RedisEvent.Save, data).pipe(timeout(5000)));
+  public async saveInCache<T>(data: SaveRedisData<T>) {
+    return await lastValueFrom(this.client.send<object, SaveRedisData<T>>(RedisEvent.Save, data).pipe(timeout(5000)));
   }
 
   public async updateInCache<T>(data: SaveRedisData<T>): Promise<void> {
@@ -29,9 +29,9 @@ export class CacheService {
     return await firstValueFrom(this.client.send<boolean, RedisData>(RedisEvent.CheckExist, data).pipe(timeout(5000)));
   }
 
-  public async verifyInCache(data: VerifyRedisData): Promise<boolean> {
+  public async verifyInCache<T>(data: VerifyRedisData<T>): Promise<boolean> {
     return await firstValueFrom(
-      this.client.send<boolean, VerifyRedisData>(RedisEvent.Verify, data).pipe(timeout(5000)),
+      this.client.send<boolean, VerifyRedisData<T>>(RedisEvent.Verify, data).pipe(timeout(5000)),
     );
   }
 }

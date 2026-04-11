@@ -5,14 +5,14 @@ import { SofCommand } from '../impl/sof-command';
 import { Status } from 'src/gate-service/status/status';
 import { BaseCommandHandler } from './command.handler';
 
-@SofHandler(CommandType.Error)
+@SofHandler(CommandType.Help)
 @CommandHandler(SofCommand)
-export class ErrorHandler extends BaseCommandHandler {
+export class HelpHandler extends BaseCommandHandler {
   constructor() {
     super();
   }
-  async execute({ command, context }: SofCommand<any>): Promise<Status> {
-    await this.processing(command.message ?? '', context);
-    return { status: false, message: 'Error occurred' };
+  async execute({ command, context }: SofCommand<number>): Promise<Status> {
+    await this.processing('command.message', context);
+    return { status: true, message: 'Soft gate command executed' };
   }
 }

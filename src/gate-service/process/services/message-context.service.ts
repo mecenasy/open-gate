@@ -5,7 +5,7 @@ import type { ClientGrpc } from '@nestjs/microservices';
 import { PROMPT_PROXY_SERVICE_NAME, PromptProxyServiceClient } from '../../../proto/prompt';
 import { isValidJsUserType } from '../../../utils/user-type-converter';
 import { DbGrpcKey } from '@app/db-grpc';
-import type { ChatCompletionMessageParam } from 'groq-sdk/resources/chat/completions';
+import { ChatCompletionMessageParam } from 'groq-sdk/resources/chat/completions';
 
 @Injectable()
 export class MessageContextService implements OnModuleInit {

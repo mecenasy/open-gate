@@ -4,7 +4,7 @@ import { getGrpcOptions } from 'src/utils/get-proto-files';
 import { join } from 'path';
 
 export const initGateGrpc = (app: INestApplication) => {
-  const grpcUrl = process.env.GATE_GRPC_URL ?? 'gate-service:50053';
+  const grpcUrl = process.env.GATE_GRPC_URL ?? 'core-service:50053';
   const port = grpcUrl.split(':')[1] ?? '50053';
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,

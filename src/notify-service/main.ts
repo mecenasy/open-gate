@@ -14,7 +14,7 @@ async function bootstrap() {
     }),
   });
 
-  // gRPC server — OutgoingSignalService (gate-service calls this to send Signal messages)
+  // gRPC server — OutgoingSignalService (core-service calls this to send Signal messages)
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
     options: {

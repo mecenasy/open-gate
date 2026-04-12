@@ -14,7 +14,7 @@ export class ${toPascalCase(name)}Command extends Command<any> {
 export const createCommand = async (modulePath: string, commandName: string) => {
   const filePath = path.join(
     __dirname,
-    '../src/gate-service',
+    '../src/core-service',
     modulePath,
     'commands/impl',
     `${commandName}.command.ts`,

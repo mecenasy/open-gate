@@ -15,7 +15,7 @@ export class ${toPascalCase(name)}Input {
 `;
 
 export const createInputType = async (modulePath: string, commandName: string) => {
-  const filePath = path.join(__dirname, '../src/gate-service', modulePath, 'input-types', `${commandName}.input.ts`);
+  const filePath = path.join(__dirname, '../src/core-service', modulePath, 'input-types', `${commandName}.input.ts`);
   await createFile(filePath, commandClass(commandName));
   console.log(`Creating command: ${commandName}`, filePath);
 };

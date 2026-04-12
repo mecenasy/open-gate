@@ -12,7 +12,7 @@ export class ${toPascalCase(name)}Query extends Query<any> {
 `;
 
 export const createQuery = async (modulePath: string, queryName: string) => {
-  const filePath = path.join(__dirname, '../src/gate-service', modulePath, 'queries/impl', `${queryName}.query.ts`);
+  const filePath = path.join(__dirname, '../src/core-service', modulePath, 'queries/impl', `${queryName}.query.ts`);
   await createFile(filePath, queryClass(queryName));
   console.log(`Creating query: ${queryName}`, filePath);
 };

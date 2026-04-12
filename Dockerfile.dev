@@ -16,7 +16,7 @@ RUN npm install
 # Kopiujemy całą resztę kodu (src, proto, configi)
 COPY . .
 
-# Otwieramy porty (3002 dla Gateway, 50051 dla gRPC, 50052 notify-service gRPC, 50053 gate-service signal gRPC)
+# Otwieramy porty (3002 dla Gateway, 50051 dla gRPC, 50052 notify-service gRPC, 50053 core-service signal gRPC)
 EXPOSE 3001 3002 3003 50051 50052 50053
 
 # Domyślna komenda (zostanie nadpisana przez docker-compose)

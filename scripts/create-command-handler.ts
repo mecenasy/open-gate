@@ -22,7 +22,7 @@ export class ${toPascalCase(handlerName)}Handler extends Handler<${noCommand ? '
 export const createCommandHandler = async (modulePath: string, commandName: string, noCommand: boolean = false) => {
   const filePath = path.join(
     __dirname,
-    '../src/gate-service',
+    '../src/core-service',
     modulePath,
     'commands/handlers',
     `${commandName}.handler.ts`,

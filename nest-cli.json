@@ -52,10 +52,10 @@
         "tsConfigPath": "libs/gate-grpc/tsconfig.lib.json"
       }
     },
-    "gate-service": {
+    "core-service": {
       "type": "application",
-      "root": "apps/gate-service",
-      "entryFile": "src/gate-service/main",
+      "root": "apps/core-service",
+      "entryFile": "src/core-service/main",
       "sourceRoot": "src"
     },
     "handler": {

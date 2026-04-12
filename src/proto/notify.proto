@@ -2,12 +2,12 @@ syntax = "proto3";
 
 package notify;
 
-// Hosted by gate-service (port 50053) — receives incoming Signal messages from notify-service
+// Hosted by core-service (port 50053) — receives incoming Signal messages from notify-service
 service IncomingNotifyService {
   rpc ReceiveMessage (IncomingNotifyRequest) returns (NotifyAck);
 }
 
-// Hosted by notify-service (port 50052) — receives outbound send requests from gate-service
+// Hosted by notify-service (port 50052) — receives outbound send requests from core-service
 service OutgoingNotifyService {
   rpc SendMessage (OutgoingNotifyRequest) returns (NotifyAck);
   rpc SendVerificationCode (SendVerificationCodeRequest) returns (NotifyAck);
@@ -20,7 +20,7 @@ message OutgoingNotifyRequest {
   UnifiedMessage message = 2;
 }
 
-// Outbound message from gate-service to be sent via Signal
+// Outbound message from core-service to be sent via Signal
 message IncomingNotifyRequest {
   bool status          = 1;
   string message       = 2;

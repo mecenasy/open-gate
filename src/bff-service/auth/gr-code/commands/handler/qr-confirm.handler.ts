@@ -8,7 +8,7 @@ import { Handler } from '@app/handler';
 import { StatusType } from 'src/bff-service/auth/login/dto/status.type';
 import { Getaway } from 'src/bff-service/common/getaway/getaway.getaway';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';
-import { AppConfig } from 'src/gate-service/common/configs/app.configs';
+import { AppConfig } from 'src/core-service/common/configs/app.configs';
 import { verification } from 'src/bff-service/auth/passkey/helpers/verification';
 import { TypeConfigService } from 'src/bff-service/common/configs/types.config.service';
 

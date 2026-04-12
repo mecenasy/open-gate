@@ -27,7 +27,7 @@ export const updateResolver = async (filePath: string, moduleName: string, name:
 
   const file = path.join(
     __dirname,
-    '../src/gate-service',
+    '../src/core-service',
     moduleName,
     `${moduleName}-${type === 'command' ? 'commands' : 'queries'}.resolver.ts`,
   );
@@ -38,7 +38,7 @@ export const updateResolver = async (filePath: string, moduleName: string, name:
     } catch {
       content = `import { ${upperType}Bus } from '@nestjs/cqrs';
 import { Args, ${upperType === 'Command' ? 'Mutation' : 'Query'}, Resolver } from '@nestjs/graphql';
-import { CurrentUserId } from 'src/gate-service/common/decorators/current-user-id.decorator';
+import { CurrentUserId } from 'src/core-service/common/decorators/current-user-id.decorator';
 
 @Resolver('${pascalModuleName}')
 export class ${pascalModuleName}${upperType === 'Command' ? 'Commands' : 'Queries'}Resolver {

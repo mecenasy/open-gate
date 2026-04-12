@@ -22,7 +22,7 @@ export class ${toPascalCase(handlerName)}Handler extends Handler<${noQuery ? '' 
 export const createQueryHandler = async (modulePath: string, queryName: string, noQuery: boolean = false) => {
   const filePath = path.join(
     __dirname,
-    '../src/gate-service',
+    '../src/core-service',
     modulePath,
     'queries/handlers',
     `${queryName}.handler.ts`,

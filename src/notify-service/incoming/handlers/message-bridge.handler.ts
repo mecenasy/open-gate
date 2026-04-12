@@ -50,9 +50,9 @@ export class MessageBridgeHandler implements IEventHandler<MessageEvent>, OnModu
           status: true,
         }),
       );
-      this.logger.log(`✅ Signal message forwarded to gate-service`);
+      this.logger.log(`✅ Signal message forwarded to core-service`);
     } catch (error) {
-      this.logger.error(`❌ Failed to forward Signal message to gate-service`, error);
+      this.logger.error(`❌ Failed to forward Signal message to core-service`, error);
     }
   }
 }

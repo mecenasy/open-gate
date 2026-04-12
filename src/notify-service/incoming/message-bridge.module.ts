@@ -8,7 +8,7 @@ import { AttachmentBridgeHandler } from './handlers/attachment-bridge.handler';
 import { HttpModule } from '@nestjs/axios';
 import { CqrsModule } from '@nestjs/cqrs';
 import { SignalBridgeService } from './platforms/signal/signal-bridge.service';
-// import { SignalBridgeService } from 'src/gate-service/signal.controler';
+// import { SignalBridgeService } from 'src/core-service/signal.controler';
 
 @Module({
   imports: [CqrsModule, HttpModule],

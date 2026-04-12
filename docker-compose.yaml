@@ -55,8 +55,8 @@ services:
   #     - backend-net
 
   # Serwis główny, odpowiedzialny za logikę biznesową, komunikację z bazą danych i innymi serwisami poprzez gRPC oraz udostępnianie API dla frontendu
-  gate-service:
-    container_name: gate-service
+  core-service:
+    container_name: core-service
     # profiles:
     #   - gate
     build:
@@ -65,7 +65,7 @@ services:
     restart: unless-stopped
 
     # Komenda wymuszająca start konkretnego pliku i obserwowanie zmian
-    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/gate-service/main.ts
+    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/core-service/main.ts
     volumes:
       - .:/app
       - /app/node_modules

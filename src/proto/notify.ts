@@ -35,7 +35,7 @@ export interface OutgoingNotifyRequest {
   message: UnifiedMessage | undefined;
 }
 
-/** Outbound message from gate-service to be sent via Signal */
+/** Outbound message from core-service to be sent via Signal */
 export interface IncomingNotifyRequest {
   status: boolean;
   message: string;
@@ -99,13 +99,13 @@ export interface NotifyAck {
 
 export const NOTIFY_PACKAGE_NAME = 'notify';
 
-/** Hosted by gate-service (port 50053) — receives incoming Signal messages from notify-service */
+/** Hosted by core-service (port 50053) — receives incoming Signal messages from notify-service */
 
 export interface IncomingNotifyServiceClient {
   receiveMessage(request: IncomingNotifyRequest, metadata?: Metadata): Observable<NotifyAck>;
 }
 
-/** Hosted by gate-service (port 50053) — receives incoming Signal messages from notify-service */
+/** Hosted by core-service (port 50053) — receives incoming Signal messages from notify-service */
 
 export interface IncomingNotifyServiceController {
   receiveMessage(
@@ -131,7 +131,7 @@ export function IncomingNotifyServiceControllerMethods() {
 
 export const INCOMING_NOTIFY_SERVICE_NAME = 'IncomingNotifyService';
 
-/** Hosted by notify-service (port 50052) — receives outbound send requests from gate-service */
+/** Hosted by notify-service (port 50052) — receives outbound send requests from core-service */
 
 export interface OutgoingNotifyServiceClient {
   sendMessage(request: OutgoingNotifyRequest, metadata?: Metadata): Observable<NotifyAck>;
@@ -141,7 +141,7 @@ export interface OutgoingNotifyServiceClient {
   sendToken(request: SendTokenRequest, metadata?: Metadata): Observable<NotifyAck>;
 }
 
-/** Hosted by notify-service (port 50052) — receives outbound send requests from gate-service */
+/** Hosted by notify-service (port 50052) — receives outbound send requests from core-service */
 
 export interface OutgoingNotifyServiceController {
   sendMessage(

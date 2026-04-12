@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { Platform } from '../platform';
+import { Platform } from './platform';
 
 export enum Type {
   Text = 'text',
@@ -14,8 +13,11 @@ export interface UnifiedMessage<T = any> {
   chatId: string;
   authorId: string;
   messageId: string;
-  isGroup?: boolean;
-  groupName?: string;
+
+  group?: {
+    id: string;
+    name: string;
+  };
 
   type: Type;
   content?: string;
@@ -34,15 +36,8 @@ export interface UnifiedMessage<T = any> {
 
   reaction?: {
     emoji: string;
-    target_message_id: string;
+    targetMessageId: string;
   };
 
   raw: T;
-}
-
-@Injectable()
-export abstract class Transform {
-  platform: Platform;
-
-  abstract transform(data: any): Promise<UnifiedMessage>;
 }

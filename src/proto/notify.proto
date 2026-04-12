@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package notify;
+
+// Hosted by gate-service (port 50053) — receives incoming Signal messages from notify-service
+service IncomingNotifyService {
+  rpc ReceiveMessage (IncomingNotifyRequest) returns (NotifyAck);
+}
+
+// Hosted by notify-service (port 50052) — receives outbound send requests from gate-service
+service OutgoingNotifyService {
+  rpc SendMessage (OutgoingNotifyRequest)returns (NotifyAck);
+  rpc SendSmsCode (SendSmsRequest) returns (NotifyAck);
+  rpc SendMailCode (SendMailCodeRequest) returns (NotifyAck);
+  rpc SendResetToken (SendResetTokenRequest) returns (NotifyAck);
+}
+
+// Full SignalMessage serialized as JSON — preserves the complete, unmodified structure
+message OutgoingNotifyRequest {
+  repeated Platform platforms = 1;
+  UnifiedMessage message = 2;
+}
+
+// Outbound message from gate-service to be sent via Signal
+message IncomingNotifyRequest {
+  bool status          = 1;
+  string message       = 2;
+  UnifiedMessage data  = 3;
+}
+
+enum Platform {
+  Signal = 0;
+  Whatsapp = 1;
+  Messenger = 2;
+  Sms = 3;
+  Email = 4;
+}
+
+enum Type {
+  Text = 0;
+  Image = 2;
+  Audio = 3;
+  Poll = 4;
+  MessageReaction = 5;
+}
+
+message UnifiedMessage {
+  Platform platform =1;
+  string chatId=2;
+  string authorId = 3;
+  string messageId = 4;
+  optional bool isGroup = 5;
+  optional string groupName = 6;
+  Type type =7;
+  optional string content = 8;
+  optional Media media = 9;
+  optional Pool poll = 10;
+  optional Reaction reaction = 11;
+  string raw = 12;
+}
+
+message Media {
+  string url = 1;
+  string contentType = 2;
+  optional bytes data = 3;
+  optional int32 duration = 4;
+}
+
+message Pool {
+  string question = 1;
+  repeated Options options = 2;
+}
+
+message Options {
+  string id = 1;
+  string text = 2;
+}
+
+message Reaction {
+  string emoji = 1;
+  string targetMessageId = 2;
+}
+
+message SendSmsRequest {
+  string phoneNumber = 1;
+  int32 code = 2;
+}
+
+message SendMailCodeRequest {
+  string email = 1;
+  int32 code = 2;
+}
+
+message SendResetTokenRequest {
+  string email = 1;
+  string url = 2;
+}
+
+message NotifyAck {
+  bool success = 1;
+  string message = 2;
+}

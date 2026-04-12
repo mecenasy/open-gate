@@ -3,7 +3,7 @@ import { Inject } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { NotifyGrpcKey, type ClientGrpc } from '@app/notify-grpc';
-import { NotificationServiceClient, NOTIFICATION_SERVICE_NAME } from 'src/proto/notification';
+import { OutgoingNotifyServiceClient, OUTGOING_NOTIFY_SERVICE_NAME } from 'src/proto/notify';
 import { ResetTokenCommand } from '../impl/reset-token.command';
 import { TypeConfigService } from 'src/bff-service/common/configs/types.config.service';
 import { AppConfig } from 'src/bff-service/common/configs/app.configs';
@@ -11,13 +11,13 @@ import { AppConfig } from 'src/bff-service/common/configs/app.configs';
 @CommandHandler(ResetTokenCommand)
 export class ResetTokenHandler implements ICommandHandler<ResetTokenCommand> {
   private readonly logger = new Logger(ResetTokenHandler.name);
-  private notificationService: NotificationServiceClient;
+  private notificationService: OutgoingNotifyServiceClient;
 
   constructor(
     @Inject(NotifyGrpcKey) private readonly client: ClientGrpc,
     private readonly configService: TypeConfigService,
   ) {
-    this.notificationService = this.client.getService<NotificationServiceClient>(NOTIFICATION_SERVICE_NAME);
+    this.notificationService = this.client.getService<OutgoingNotifyServiceClient>(OUTGOING_NOTIFY_SERVICE_NAME);
   }
 
   async execute({ token, email }: ResetTokenCommand) {

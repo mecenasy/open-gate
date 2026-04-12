@@ -3,16 +3,16 @@ import { Inject } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { NotifyGrpcKey, type ClientGrpc } from '@app/notify-grpc';
-import { NotificationServiceClient, NOTIFICATION_SERVICE_NAME } from 'src/proto/notification';
+import { OutgoingNotifyServiceClient, OUTGOING_NOTIFY_SERVICE_NAME } from 'src/proto/notify';
 import { MailCodeCommand } from '../impl/mail-code.command';
 
 @CommandHandler(MailCodeCommand)
 export class MailCodeHandler implements ICommandHandler<MailCodeCommand> {
   private readonly logger = new Logger(MailCodeHandler.name);
-  private notificationService: NotificationServiceClient;
+  private notificationService: OutgoingNotifyServiceClient;
 
   constructor(@Inject(NotifyGrpcKey) private readonly client: ClientGrpc) {
-    this.notificationService = this.client.getService<NotificationServiceClient>(NOTIFICATION_SERVICE_NAME);
+    this.notificationService = this.client.getService<OutgoingNotifyServiceClient>(OUTGOING_NOTIFY_SERVICE_NAME);
   }
 
   async execute({ code, email }: MailCodeCommand) {

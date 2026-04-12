@@ -4,7 +4,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { smtpConfig, SmtpConfig } from './config/smtp.configs';
 import { SmtpService } from './smtp.service';
-import { SmtpController } from './smtp.controller';
 
 @Module({
   imports: [
@@ -40,7 +39,6 @@ import { SmtpController } from './smtp.controller';
       }),
     }),
   ],
-  controllers: [SmtpController],
   providers: [SmtpService],
   exports: [SmtpService],
 })

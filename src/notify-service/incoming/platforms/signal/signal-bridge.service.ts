@@ -2,8 +2,9 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { filter, map, Observable, Subject } from 'rxjs';
 import { WebSocket } from 'ws';
 import { EventBus } from '@nestjs/cqrs';
-import { SignalMessage } from '../types/types';
-import { SignalMessageEvent } from './events/signal-message.event';
+import { SignalMessage } from '../../../types/types';
+import { MessageEvent } from '../../event/message.event';
+import { Platform } from '../../../types/platform';
 
 @Injectable()
 export class SignalBridgeService implements OnModuleInit {
@@ -60,7 +61,7 @@ export class SignalBridgeService implements OnModuleInit {
         map((msg) => msg),
       )
       .subscribe((msg) => {
-        this.eventBus.publish(new SignalMessageEvent(msg));
+        this.eventBus.publish(new MessageEvent(msg, Platform.Signal));
       });
   }
 }

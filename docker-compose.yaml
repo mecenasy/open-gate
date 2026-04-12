@@ -33,15 +33,21 @@ services:
       #   required: false
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:${BFF_PORT:-3001}/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
 
-  # front-servise:
-  #   container_name: front-servise
+  # front-service:
+  #   container_name: front-service
   #   build:
-  #     context: ./src/front-servise
+  #     context: ./src/front-service
   #     dockerfile: Dockerfile.dev
   #   restart: unless-stopped
   #   volumes:
-  #     - ./src/front-servise:/app
+  #     - ./src/front-service:/app
   #     - /app/node_modules
   #     - /app/.next
   #   ports:
@@ -91,6 +97,12 @@ services:
         condition: service_started
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:${GATE_PORT:-3002}/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
 
     # Database service - serwis odpowiedzialny za komunikację z bazą danych i udostępnianie danych innym serwisom poprzez gRPC
   db-service:
@@ -159,6 +171,12 @@ services:
         condition: service_healthy
     networks:
       - backend-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:${NOTIFY_PORT:-3003}/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
 
       # Database
 

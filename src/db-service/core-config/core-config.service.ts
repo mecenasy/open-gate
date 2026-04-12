@@ -31,9 +31,10 @@ export class CoreConfigService {
   }
 
   async getConfigsByFeatureKey(key: string): Promise<Config[]> {
+    const keys = (configMaps as Record<string, string[]>)[key] ?? [];
     return this.configRepository.find({
       order: { key: 'ASC' },
-      where: { key: In(configMaps[key]) },
+      where: { key: In(keys) },
     });
   }
 

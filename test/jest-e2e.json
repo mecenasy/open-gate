@@ -17,7 +17,6 @@
     "^@app/handler(|/.*)$": "<rootDir>/../libs/handler/src/$1",
     "^@app/notify-grpc(|/.*)$": "<rootDir>/../libs/notify-grpc/src/$1",
     "^@app/redis(|/.*)$": "<rootDir>/../libs/redis/src/$1",
-    "^@app/shared-redis(|/.*)$": "<rootDir>/../libs/shared-redis/src/$1",
-    "^src/hendler(|/.*)$": "<rootDir>/../libs/hendler/src/$1"
+    "^@app/shared-redis(|/.*)$": "<rootDir>/../libs/shared-redis/src/$1"
   }
 }

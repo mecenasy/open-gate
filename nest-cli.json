@@ -67,15 +67,6 @@
         "tsConfigPath": "libs/handler/tsconfig.lib.json"
       }
     },
-    "hendler": {
-      "type": "library",
-      "root": "libs/hendler",
-      "entryFile": "index",
-      "sourceRoot": "libs/hendler/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/hendler/tsconfig.lib.json"
-      }
-    },
     "notify-grpc": {
       "type": "library",
       "root": "libs/notify-grpc",

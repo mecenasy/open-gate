@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
 
 export function AtLeastOneExists(property: string, validationOptions?: ValidationOptions) {
@@ -12,12 +10,12 @@ export function AtLeastOneExists(property: string, validationOptions?: Validatio
       constraints: [property],
       options: validationOptions,
       validator: {
-        validate(value: any, args: ValidationArguments) {
-          const [relatedPropertyName] = args.constraints;
-          const relatedValue = args.object[relatedPropertyName];
+        validate(value: unknown, args: ValidationArguments) {
+          const [relatedPropertyName] = args.constraints as [string];
+          const relatedValue = (args.object as Record<string, unknown>)[relatedPropertyName];
           return !!value || !!relatedValue;
         },
-        defaultMessage(args: ValidationArguments) {
+        defaultMessage(_args: ValidationArguments) {
           return `You must provide password or social account.`;
         },
       },

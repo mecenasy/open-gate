@@ -3,7 +3,6 @@ export enum QueueType {
   Message = 'message',
   Transcription = 'transcription',
   Speech = 'speech',
-  Attachment = 'attachment',
 }
 
 export interface QueueMessageData<T, C> {

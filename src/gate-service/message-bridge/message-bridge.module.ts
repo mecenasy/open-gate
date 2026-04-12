@@ -1,22 +1,5 @@
 import { Module } from '@nestjs/common';
-import { SignalTransformer } from './platforms/signal/signal.transformer';
-import { Transform } from './platforms/transformer';
-import { MessageSaga } from './message.saga';
-import { MessageBridgeHandler } from './handlers/message-bridge.handler';
+import { MessageBridgeController } from './message-bridge.controller';
 
-@Module({
-  providers: [
-    MessageSaga,
-    SignalTransformer,
-    MessageBridgeHandler,
-    {
-      provide: Transform,
-      useFactory(signalTransformer: SignalTransformer): Transform[] {
-        return [signalTransformer];
-      },
-      inject: [SignalTransformer],
-    },
-  ],
-  exports: [SignalTransformer],
-})
+@Module({ controllers: [MessageBridgeController] })
 export class MessageBridgeModule {}

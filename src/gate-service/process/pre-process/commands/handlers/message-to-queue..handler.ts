@@ -13,7 +13,9 @@ export class MessageToQueueHandler extends Handler<UserMessageCommand, Status> {
   }
 
   async execute(data: MessageToQueueCommand): Promise<Status> {
-    const toQueue = this.toQueues.find((toQueue) => toQueue.messageType === data.context.messageType);
+    const toQueue = this.toQueues.find((toQueue) => {
+      return toQueue.messageType === data.context.messageType;
+    });
 
     await toQueue?.execute(data);
     return {

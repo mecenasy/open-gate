@@ -1,16 +1,21 @@
 import { Module } from '@nestjs/common';
 import { SignalTransformer } from './platforms/signal/signal.transformer';
 import { Transform } from './platforms/transformer';
-import { MessageSaga } from './message.saga';
 import { MessageBridgeHandler } from './handlers/message-bridge.handler';
 import { Attachment } from './platforms/attachment';
 import { SignalAttachment } from './platforms/signal/signal.attachment';
 import { AttachmentBridgeHandler } from './handlers/attachment-bridge.handler';
+import { HttpModule } from '@nestjs/axios';
+import { CqrsModule } from '@nestjs/cqrs';
+import { SignalBridgeService } from './platforms/signal/signal-bridge.service';
+// import { SignalBridgeService } from 'src/gate-service/signal.controler';
 
 @Module({
+  imports: [CqrsModule, HttpModule],
   providers: [
-    MessageSaga,
+    // MessageSaga,
     SignalTransformer,
+    SignalBridgeService,
     SignalAttachment,
     MessageBridgeHandler,
     AttachmentBridgeHandler,
@@ -26,7 +31,7 @@ import { AttachmentBridgeHandler } from './handlers/attachment-bridge.handler';
       useFactory(signalAttachment: SignalAttachment): Attachment[] {
         return [signalAttachment];
       },
-      inject: [SignalTransformer],
+      inject: [SignalAttachment],
     },
   ],
   exports: [SignalTransformer],

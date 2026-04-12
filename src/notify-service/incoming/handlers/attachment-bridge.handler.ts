@@ -1,13 +1,11 @@
 import { Inject, Logger, OnModuleInit } from '@nestjs/common';
-import { EventBus, EventsHandler, IEventHandler } from '@nestjs/cqrs';
-import { Transform } from '../platforms/transformer';
+import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { firstValueFrom } from 'rxjs';
 import { INCOMING_NOTIFY_SERVICE_NAME, IncomingNotifyServiceClient } from 'src/proto/notify';
 import type { ClientGrpc } from '@nestjs/microservices';
 import { GateGrpcKey } from '@app/gate-grpc';
 import { PlatformTransformer } from 'src/utils/platform';
 import { TypeTransformer } from 'src/utils/message-type';
-import { MessageEvent } from '../event/message.event';
 import { AttachmentEvent } from '../event/attachment-event';
 import { Attachment } from '../platforms/attachment';
 
@@ -17,9 +15,8 @@ export class AttachmentBridgeHandler implements IEventHandler<AttachmentEvent>, 
   private gateClient!: IncomingNotifyServiceClient;
 
   constructor(
-    @Inject(Transform) private readonly attachments: Attachment[],
+    @Inject(Attachment) private readonly attachments: Attachment[],
     @Inject(GateGrpcKey) private readonly grpcClient: ClientGrpc,
-    private readonly eventBus: EventBus,
   ) {}
 
   onModuleInit() {

@@ -48,7 +48,9 @@ export class MessageProcessor extends ProcessorBase {
       const isLocked = await this.cache.getFromCache({ identifier: lockKey, prefix: 'command' });
 
       if (isLocked) {
-        this.eventService.emit(new NotificationEvent(context.phone, await this.getMessage('message-command-locked')));
+        this.eventService.emit(
+          new NotificationEvent(context.phone, await this.getMessage('message-command-locked'), data.platform),
+        );
         return;
       }
 
@@ -62,9 +64,11 @@ export class MessageProcessor extends ProcessorBase {
 
       this.logger.debug(`Command for ${context.phone}: ${JSON.stringify(command)}`);
 
-      this.eventService.emit(new SofCommandEvent<number>(command, context));
+      this.eventService.emit(new SofCommandEvent<number>(command, context, data.platform));
     } catch (error) {
-      this.eventService.emit(new NotificationEvent(context.phone, await this.getMessage(keys.messageProcessorKey)));
+      this.eventService.emit(
+        new NotificationEvent(context.phone, await this.getMessage(keys.messageProcessorKey), data.platform),
+      );
       this.logger.error(`Error processing message for ${context.phone}:`, error);
     }
   }

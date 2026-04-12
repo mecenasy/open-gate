@@ -15,15 +15,16 @@ export class SpeechProcessor extends ProcessorBase {
 
   @Process(QueueType.Speech)
   async analyzeAudio(job: Job<QueueMessageToAudioData>) {
-    const { context, message } = job.data;
+    this.logger.debug('Analyzing Audio message');
+    const { context, message, data } = job.data;
 
     try {
       const audioBuffer = await this.googleService.textToSpeech(message.toString());
 
-      this.eventService.emit(new NotificationEvent(context.phone, audioBuffer, 'audio'));
+      this.eventService.emit(new NotificationEvent(context.phone, audioBuffer, data.platform, 'audio'));
     } catch (error) {
       this.eventService.emit(
-        new NotificationEvent(context.phone, await this.getMessage(keys.speechProcessorKey)),
+        new NotificationEvent(context.phone, await this.getMessage(keys.speechProcessorKey), data.platform),
         'text',
       );
       this.logger.error('Error generating speech:', error);

@@ -1,7 +1,7 @@
 import { Command } from '@nestjs/cqrs';
 import { UserContext } from 'src/gate-service/context/user-context';
 import { Status } from 'src/gate-service/status/status';
-import { UnifiedMessage } from 'src/gate-service/message-bridge/platforms/transformer';
+import { UnifiedMessage } from 'src/notify-service/types/unified-message';
 
 export class MessageToQueueCommand extends Command<Status> {
   constructor(

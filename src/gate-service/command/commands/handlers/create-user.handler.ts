@@ -11,8 +11,8 @@ export class CreateUserHandler extends BaseCommandHandler {
   constructor() {
     super();
   }
-  async execute({ command, context }: SofCommand<number>): Promise<Status> {
-    await this.processing(command.message ?? '', context);
+  async execute({ command, context, platform }: SofCommand<number>): Promise<Status> {
+    await this.processing(command.message ?? '', context, platform);
     return { status: true, message: 'Soft gate command executed' };
   }
 }

@@ -47,7 +47,9 @@ export class CommandProcessor extends ProcessorBase implements OnModuleInit {
         this.processCommand(messageToProcess, command, context, job);
       }
     } catch (error) {
-      this.eventService.emit(new NotificationEvent(context.phone, await this.getMessage(keys.commandProcessorKey)));
+      this.eventService.emit(
+        new NotificationEvent(context.phone, await this.getMessage(keys.commandProcessorKey), data.platform),
+      );
       this.logger.error('Error generating speech:', error);
     }
   }
@@ -59,7 +61,9 @@ export class CommandProcessor extends ProcessorBase implements OnModuleInit {
     job: Job<QueueMessageData>,
   ) {
     if (this.isSimpleCommand.exec(messageToProcess)) {
-      this.eventService.emit(new SofCommandEvent({ command: command.command as CommandType }, context));
+      this.eventService.emit(
+        new SofCommandEvent({ command: command.command as CommandType }, context, job.data.data.platform),
+      );
     } else {
       this.eventService.emit(new IdentifyMessageEvent(job.data.data, { ...context, messageType: MessageType.Message }));
     }

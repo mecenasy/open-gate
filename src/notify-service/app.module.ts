@@ -7,11 +7,13 @@ import { SmsModule } from './sms/sms.module';
 import { SmtpModule } from './smtp/smtp.module';
 import { GateGrpcModule, config as gateGrpcConfig } from '@app/gate-grpc';
 import { MessageBridgeModule } from './incoming/message-bridge.module';
+import { OutgoingNotifyModule } from './outgoing/outgoing.-notify.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [gateGrpcConfig] }),
     MessageBridgeModule,
+    OutgoingNotifyModule,
     CqrsModule,
     SmsModule,
     SmtpModule,

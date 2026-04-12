@@ -11,8 +11,8 @@ export class ErrorHandler extends BaseCommandHandler {
   constructor() {
     super();
   }
-  async execute({ command, context }: SofCommand<any>): Promise<Status> {
-    await this.processing(command.message ?? '', context);
+  async execute({ command, context, platform }: SofCommand<any>): Promise<Status> {
+    await this.processing(command.message ?? '', context, platform);
     return { status: false, message: 'Error occurred' };
   }
 }

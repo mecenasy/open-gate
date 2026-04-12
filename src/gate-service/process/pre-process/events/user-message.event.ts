@@ -1,6 +1,6 @@
 import { AggregateRoot } from '@nestjs/cqrs';
 import { UserContext } from 'src/gate-service/context/user-context';
-import { UnifiedMessage } from 'src/gate-service/message-bridge/platforms/transformer';
+import { UnifiedMessage } from 'src/notify-service/types/unified-message';
 
 export class UserMessageEvent extends AggregateRoot {
   constructor(

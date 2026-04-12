@@ -1,5 +1,4 @@
 import { Inject } from '@nestjs/common';
-
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { OutgoingNotifyEvent } from '../event/outgoing-notify-event';
 import { Sender } from '../platforms/sender';

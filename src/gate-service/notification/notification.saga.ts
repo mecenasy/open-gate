@@ -11,8 +11,12 @@ export class NotificationSaga {
   notify = (events: Observable<NotificationEvent>): Observable<ICommand> => {
     return events.pipe(
       ofType(NotificationEvent),
-      filter((evt) => Boolean(evt.type === 'text' && typeof evt.message === 'string')),
-      map((evt) => new NotificationTextCommand(evt.phone, evt.message as string)),
+      filter((evt) => {
+        console.log('🚀 ~ NotificationSaga ~ evt:', evt);
+
+        return Boolean(evt.type === 'text' && typeof evt.message === 'string');
+      }),
+      map((evt) => new NotificationTextCommand(evt.phone, evt.message as string, evt.platform)),
     );
   };
 
@@ -20,8 +24,12 @@ export class NotificationSaga {
   notifyAudio = (events: Observable<NotificationEvent>): Observable<ICommand> => {
     return events.pipe(
       ofType(NotificationEvent),
-      filter((evt) => Boolean(evt.type === 'audio' && evt.message instanceof Buffer)),
-      map((evt) => new NotificationAudioCommand(evt.phone, Buffer.from(evt.message))),
+      filter((evt) => {
+        console.log('🚀 ~ NotificationSaga ~ evt:', evt);
+
+        return Boolean(evt.type === 'audio' && evt.message instanceof Buffer);
+      }),
+      map((evt) => new NotificationAudioCommand(evt.phone, Buffer.from(evt.message), evt.platform)),
     );
   };
 }

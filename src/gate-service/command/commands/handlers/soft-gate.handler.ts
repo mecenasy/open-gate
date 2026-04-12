@@ -12,10 +12,10 @@ export class SoftGateHandler extends BaseCommandHandler {
   constructor(private readonly softGateService: SoftGateService) {
     super();
   }
-  async execute({ command, context }: SofCommand<number>): Promise<Status> {
+  async execute({ command, context, platform }: SofCommand<number>): Promise<Status> {
     await this.softGateService.open(command.data ?? 1);
 
-    await this.processing(command.message ?? '', context);
+    await this.processing(command.message ?? '', context, platform);
     return { status: true, message: 'Soft gate command executed' };
   }
 }

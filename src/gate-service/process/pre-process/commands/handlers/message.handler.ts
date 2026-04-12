@@ -5,7 +5,7 @@ import { lastValueFrom } from 'rxjs';
 import { UserMessageEvent } from '../../events/user-message.event';
 import type { UserContext } from 'src/gate-service/context/user-context';
 import { CommandHandler } from '@nestjs/cqrs';
-import { UnifiedMessageCommand } from '../impl/message.command';
+import { UnifiedMessageEvent } from '../impl/unified-message.command';
 import { MessageType } from '../../types';
 import { NotificationEvent } from 'src/gate-service/notification/events/notification.event';
 import { Status } from 'src/gate-service/status/status';
@@ -15,10 +15,10 @@ import { RedisData, SaveRedisData } from '@app/redis/model/redis-data';
 import { keys } from 'src/gate-service/message-keys/keys';
 import { UserType } from 'src/db-service/user/user-type';
 import { UserStatus } from 'src/db-service/user/status';
-import { UnifiedMessage } from 'src/gate-service/message-bridge/platforms/transformer';
+import { UnifiedMessage } from 'src/notify-service/types/unified-message';
 
-@CommandHandler(UnifiedMessageCommand)
-export class MassageHandler extends Handler<UnifiedMessageCommand, Status, UserProxyServiceClient> {
+@CommandHandler(UnifiedMessageEvent)
+export class MassageHandler extends Handler<UnifiedMessageEvent, Status, UserProxyServiceClient> {
   messageGrpc: MessagesServiceClient;
   constructor() {
     super(USER_PROXY_SERVICE_NAME);
@@ -29,9 +29,7 @@ export class MassageHandler extends Handler<UnifiedMessageCommand, Status, UserP
     this.messageGrpc = this.grpcClient.getService<MessagesServiceClient>(MESSAGES_SERVICE_NAME);
   }
 
-  async execute({ message }: UnifiedMessageCommand): Promise<Status> {
-    console.log('🚀 ~ MassageHandler ~ execute ~ message:', message);
-
+  async execute({ message }: UnifiedMessageEvent): Promise<Status> {
     try {
       const userContext = await this.getOrFetchUser({
         identifier: message.chatId,
@@ -104,7 +102,9 @@ export class MassageHandler extends Handler<UnifiedMessageCommand, Status, UserP
   }
 
   private async notifyUnknownUser(message: UnifiedMessage): Promise<void> {
-    this.event.emit(new NotificationEvent(message.chatId, (await this.getMessage()) ?? 'User not found'));
+    this.event.emit(
+      new NotificationEvent(message.chatId, (await this.getMessage()) ?? 'User not found', message.platform),
+    );
   }
 
   private sendEvent(message: UnifiedMessage, context: UserContext) {

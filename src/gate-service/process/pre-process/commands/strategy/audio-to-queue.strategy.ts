@@ -13,7 +13,7 @@ export class AudioToQueueStrategy extends ToQueueBase {
   }
 
   async execute({ message, context }: MessageToQueueCommand): Promise<Status> {
-    await this.queueService.attachmentToQueue({ data: message, context });
+    await this.queueService.audioToTextToQueue({ data: message, context });
 
     return {
       status: true,

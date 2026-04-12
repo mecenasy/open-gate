@@ -22,7 +22,6 @@ import { Config } from '../config/redis.config';
     BullModule.registerQueue(
       { name: QueueType.Command },
       { name: QueueType.Message },
-      { name: QueueType.Attachment },
       { name: QueueType.Transcription },
       { name: QueueType.Speech },
     ),

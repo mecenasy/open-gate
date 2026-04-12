@@ -4,7 +4,6 @@ import { filter, mergeMap, Observable } from 'rxjs';
 import { SofCommand } from './commands/impl/sof-command';
 import { SofCommandEvent } from './events/sof-command.event';
 import { SofDispatcher } from './dispatcher';
-import { CommandType } from 'src/bff-service/command/dto/command.type';
 
 @Injectable()
 export class CommandSaga {
@@ -18,8 +17,8 @@ export class CommandSaga {
     return events.pipe(
       ofType(SofCommandEvent<number>),
       filter((msg) => Boolean(msg.command && msg.context)),
-      mergeMap(async ({ command, context }) => {
-        return await this.dispatcher.dispatch(new SofCommand<number>(command.command, command, context));
+      mergeMap(async ({ command, context, platform }) => {
+        return await this.dispatcher.dispatch(new SofCommand<number>(command.command, command, context, platform));
       }),
       filter(() => false),
     );

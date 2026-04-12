@@ -6,27 +6,35 @@ import { firstValueFrom } from 'rxjs';
 import { NotificationTextCommand } from '../impl/notification-text.command';
 import { Status } from 'src/gate-service/status/status';
 import { NotifyGrpcKey } from '@app/notify-grpc';
-import { OUTGOING_SIGNAL_SERVICE_NAME, OutgoingSignalServiceClient, SignalMessageType } from 'src/proto/signal';
+import { OutgoingNotifyServiceClient, OUTGOING_NOTIFY_SERVICE_NAME, Type } from 'src/proto/notify';
+import { PlatformTransformer } from 'src/utils/platform';
 
 @CommandHandler(NotificationTextCommand)
 export class NotificationTextHandler extends Handler<NotificationTextCommand, Status> {
-  private notifyClient!: OutgoingSignalServiceClient;
+  private notifyClient!: OutgoingNotifyServiceClient;
 
   @Inject(NotifyGrpcKey)
   public readonly notifyGrpcClient!: ClientGrpc;
 
   onModuleInit() {
     super.onModuleInit();
-    this.notifyClient = this.notifyGrpcClient.getService<OutgoingSignalServiceClient>(OUTGOING_SIGNAL_SERVICE_NAME);
+    this.notifyClient = this.notifyGrpcClient.getService<OutgoingNotifyServiceClient>(OUTGOING_NOTIFY_SERVICE_NAME);
   }
 
-  async execute({ message, phone }: NotificationTextCommand): Promise<Status> {
+  async execute({ message, platform, phone }: NotificationTextCommand): Promise<Status> {
     try {
       const result = await firstValueFrom(
         this.notifyClient.sendMessage({
-          source: phone,
-          message: Buffer.from(message, 'utf-8'),
-          type: SignalMessageType.TEXT,
+          message: {
+            chatId: phone,
+            messageId: '',
+            authorId: '',
+            type: Type.Text,
+            platform: PlatformTransformer.toGrpc(platform),
+            content: message,
+            raw: '',
+          },
+          platforms: [PlatformTransformer.toGrpc(platform)],
         }),
       );
 

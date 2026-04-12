@@ -47,7 +47,6 @@ export class CommandService {
   }
 
   async findByName(name: string): Promise<Command | null> {
-    console.log('🚀 ~ CommandService ~ findByName ~ name:', name);
     return await this.commandRepository.findOne({
       where: [{ name }, { command: name }],
       relations: ['userRoles'],

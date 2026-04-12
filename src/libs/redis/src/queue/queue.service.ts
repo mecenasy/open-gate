@@ -12,7 +12,6 @@ export class QueueService {
     @InjectQueue(QueueType.Message) private readonly messageQueue: Queue,
     @InjectQueue(QueueType.Transcription) private readonly transcriptionQueue: Queue,
     @InjectQueue(QueueType.Speech) private readonly speechQueue: Queue,
-    @InjectQueue(QueueType.Attachment) private readonly attachmentQueue: Queue,
   ) {
     this.logger = new Logger(this.constructor.name);
   }
@@ -56,17 +55,6 @@ export class QueueService {
   async textToAudioToQueue<T>(data: QueueMessageToAudioData<T>, delay?: number): Promise<void> {
     this.logger.debug('Adding text to audio to queue');
     await this.speechQueue.add(QueueType.Speech, data, {
-      delay,
-      attempts: 3,
-      backoff: {
-        type: 'exponential',
-        delay: 2000,
-      },
-    });
-  }
-  async attachmentToQueue<T, C>(data: QueueMessageData<T, C>, delay?: number): Promise<void> {
-    this.logger.debug('Adding attachment to queue');
-    await this.attachmentQueue.add(QueueType.Attachment, data, {
       delay,
       attempts: 3,
       backoff: {

@@ -41,6 +41,10 @@ export class SignalBridgeService implements OnModuleInit {
       this.subject.next(msg);
     });
 
+    this.signalClient.on('ping', () => {
+      this.signalClient.pong();
+    });
+
     this.signalClient.on('error', (err) => {
       this.logger.warn(`Signal WS error: ${err.message}`);
     });

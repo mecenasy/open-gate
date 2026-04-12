@@ -3,10 +3,9 @@ import { ICommand, ofType, Saga } from '@nestjs/cqrs';
 import { filter, map, Observable } from 'rxjs';
 import { UserMessageCommand } from './pre-process/commands/impl/user-message.command';
 import { UserMessageEvent } from './pre-process/events/user-message.event';
-import { UnifiedMessageCommand } from './pre-process/commands/impl/message.command';
 import { IdentifyMessageEvent } from './pre-process/events/identifier-message.event';
 import { MessageToQueueCommand } from './pre-process/commands/impl/message-to-queue.command';
-import { UnifiedMessageEvent } from '../message-bridge/event/unified-message.event';
+import { UnifiedMessageEvent } from './pre-process/commands/impl/unified-message.command';
 
 @Injectable()
 export class ProcessMessageSaga {
@@ -15,7 +14,7 @@ export class ProcessMessageSaga {
     return events.pipe(
       ofType(UnifiedMessageEvent),
       filter((msg) => Boolean(msg.message)),
-      map(({ message }) => new UnifiedMessageCommand(message)),
+      map(({ message }) => new UnifiedMessageEvent(message)),
     );
   };
 

@@ -13,9 +13,9 @@ export class GateHandler extends BaseCommandHandler {
   constructor(private readonly gateService: GateService) {
     super();
   }
-  async execute({ command, context }: SofCommand<number>): Promise<Status> {
+  async execute({ command, context, platform }: SofCommand<number>): Promise<Status> {
     if (command.command !== CommandType.Gate && !command.data) {
-      await this.processing(command.message ?? '', { ...context, messageType: MessageType.Unknown });
+      await this.processing(command.message ?? '', { ...context, messageType: MessageType.Unknown }, platform);
       throw new Error('Command is required');
     }
 
@@ -25,7 +25,7 @@ export class GateHandler extends BaseCommandHandler {
       await this.gateService.close(command.command as CommandType.Gate, command.data ?? 1);
     }
 
-    await this.processing(command.message ?? '', context);
+    await this.processing(command.message ?? '', context, platform);
     const lockKey = `lock:${command.command}.${command.data}`;
 
     await this.cache.removeFromCache({ identifier: lockKey, prefix: 'command' });

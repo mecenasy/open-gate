@@ -1,5 +1,5 @@
+import { UnifiedMessage } from 'src/notify-service/types/unified-message';
 import { UserContext } from '../../context/user-context';
-import { UnifiedMessage } from 'src/gate-service/message-bridge/platforms/transformer';
 
 export interface QueueMessageData {
   data: UnifiedMessage;
@@ -7,6 +7,7 @@ export interface QueueMessageData {
 }
 
 export interface QueueMessageToAudioData {
+  data: UnifiedMessage;
   message: string;
   context: UserContext;
 }

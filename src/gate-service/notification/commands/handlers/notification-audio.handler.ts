@@ -6,21 +6,23 @@ import { firstValueFrom } from 'rxjs';
 import { NotificationAudioCommand } from '../impl/notification-audio.command';
 import { Status } from 'src/gate-service/status/status';
 import { NotifyGrpcKey } from '@app/notify-grpc';
-import { OUTGOING_SIGNAL_SERVICE_NAME, OutgoingSignalServiceClient, SignalMessageType } from 'src/proto/signal';
+import { OutgoingNotifyServiceClient, OUTGOING_NOTIFY_SERVICE_NAME, Type } from 'src/proto/notify';
+import { PlatformTransformer } from 'src/utils/platform';
 
 @CommandHandler(NotificationAudioCommand)
 export class NotificationAudioHandler extends Handler<NotificationAudioCommand, Status> {
-  private notifyClient!: OutgoingSignalServiceClient;
+  private notifyClient!: OutgoingNotifyServiceClient;
 
   @Inject(NotifyGrpcKey)
   public readonly notifyGrpcClient!: ClientGrpc;
 
   onModuleInit() {
     super.onModuleInit();
-    this.notifyClient = this.notifyGrpcClient.getService<OutgoingSignalServiceClient>(OUTGOING_SIGNAL_SERVICE_NAME);
+    this.notifyClient = this.notifyGrpcClient.getService<OutgoingNotifyServiceClient>(OUTGOING_NOTIFY_SERVICE_NAME);
   }
 
-  async execute({ audioFile, phone }: NotificationAudioCommand): Promise<Status> {
+  async execute({ audioFile, platform, phone }: NotificationAudioCommand): Promise<Status> {
+    console.log('🚀 ~ NotificationAudioHandler ~ execute ~ audioFile, platform, phone:', audioFile, platform, phone);
     if (audioFile.length === 0) {
       this.logger.error('BŁĄD: Bufor audio jest pusty!');
     }
@@ -28,9 +30,20 @@ export class NotificationAudioHandler extends Handler<NotificationAudioCommand, 
     try {
       const result = await firstValueFrom(
         this.notifyClient.sendMessage({
-          source: phone,
-          message: audioFile,
-          type: SignalMessageType.AUDIO,
+          message: {
+            chatId: phone,
+            messageId: '',
+            authorId: '',
+            type: Type.Text,
+            platform: PlatformTransformer.toGrpc(platform),
+            media: {
+              url: '',
+              contentType: 'audio/ogg',
+              data: audioFile,
+            },
+            raw: '',
+          },
+          platforms: [PlatformTransformer.toGrpc(platform)],
         }),
       );
 

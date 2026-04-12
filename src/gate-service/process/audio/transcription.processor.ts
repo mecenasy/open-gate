@@ -35,6 +35,7 @@ export class TranscriptionProcessor extends ProcessorBase {
           context.phone,
 
           await this.getMessage(keys.missingAttachmentKey),
+          data.platform,
         ),
       );
       this.logger.warn('No attachment found in job data');
@@ -53,7 +54,7 @@ export class TranscriptionProcessor extends ProcessorBase {
       });
     } catch (error) {
       this.eventService.emit(
-        new NotificationEvent(context.phone, await this.getMessage(keys.transcriptionAttachmentKey)),
+        new NotificationEvent(context.phone, await this.getMessage(keys.transcriptionAttachmentKey), data.platform),
       );
       this.logger.error('Error processing audio:', error);
     }

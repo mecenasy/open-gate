@@ -49,7 +49,9 @@ export class OutgoingNotifyController implements OutgoingNotifyServiceController
       new OutgoingNotifyEvent(
         {
           ...message,
-          media: undefined,
+          media: message.media
+            ? { ...message.media, data: message.media.data ? Buffer.from(message.media.data) : undefined }
+            : undefined,
           platform: PlatformTransformer.fromGrpc(message.platform),
           type: TypeTransformer.fromGrpc(message.type),
         },

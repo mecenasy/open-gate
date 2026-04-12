@@ -49,7 +49,11 @@ export class MessageProcessor extends ProcessorBase {
 
       if (isLocked) {
         this.eventService.emit(
-          new NotificationEvent(context.phone, await this.getMessage('message-command-locked'), data.platform),
+          new NotificationEvent({
+            phone: context.phone,
+            message: await this.getMessage('message-command-locked'),
+            platform: data.platform,
+          }),
         );
         return;
       }
@@ -67,7 +71,11 @@ export class MessageProcessor extends ProcessorBase {
       this.eventService.emit(new SofCommandEvent<number>(command, context, data.platform));
     } catch (error) {
       this.eventService.emit(
-        new NotificationEvent(context.phone, await this.getMessage(keys.messageProcessorKey), data.platform),
+        new NotificationEvent({
+          phone: context.phone,
+          message: await this.getMessage(keys.messageProcessorKey),
+          platform: data.platform,
+        }),
       );
       this.logger.error(`Error processing message for ${context.phone}:`, error);
     }

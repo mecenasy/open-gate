@@ -21,17 +21,23 @@ export class SignalSender extends Sender {
   }
 
   async send(data: UnifiedMessage): Promise<void> {
-    const { chatId, content, type } = data;
+    const { chatId, content, media, type } = data;
 
     try {
-      if (!chatId || !content) {
+      if (!chatId) {
         throw new Error('Missing chatId or content');
       }
 
       if (type === Type.Audio) {
-        await this.sendAudio(chatId, Buffer.from(content));
+        if (!media?.data) {
+          throw new Error('Missing audio data');
+        }
+        await this.sendAudio(chatId, media.data);
       } else {
-        await this.sendText(chatId, Buffer.from(content).toString('utf-8'));
+        if (!content) {
+          throw new Error('Missing content');
+        }
+        await this.sendText(chatId, content);
       }
 
       this.logger.log(`✅ Signal message sent to ${chatId}`);

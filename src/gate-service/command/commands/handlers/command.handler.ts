@@ -19,18 +19,19 @@ export abstract class BaseCommandHandler extends Handler<SofCommand<number>, Sta
   async processing(message: string, context: UserContext, platform: Platform): Promise<Status> {
     switch (context.messageType) {
       case MessageType.Message: {
-        this.event.emit(new NotificationEvent(context.phone, message, platform));
+        this.event.emit(new NotificationEvent({ phone: context.phone, message, platform }));
         break;
       }
       case MessageType.Audio: {
         await this.queueService.textToAudioToQueue({
           message,
           context,
+          platform,
         });
         break;
       }
       case MessageType.Command: {
-        this.event.emit(new NotificationEvent(context.phone, message, platform));
+        this.event.emit(new NotificationEvent({ phone: context.phone, message, platform }));
         break;
       }
     }

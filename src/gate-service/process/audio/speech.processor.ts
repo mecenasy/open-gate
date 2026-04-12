@@ -6,6 +6,7 @@ import { NotificationEvent } from 'src/gate-service/notification/events/notifica
 import { GoogleService } from '../services/google.service';
 import { ProcessorBase } from '../processor-base';
 import { keys } from 'src/gate-service/message-keys/keys';
+import { Type } from 'src/notify-service/types/unified-message';
 
 @Processor(QueueType.Speech)
 export class SpeechProcessor extends ProcessorBase {
@@ -16,16 +17,20 @@ export class SpeechProcessor extends ProcessorBase {
   @Process(QueueType.Speech)
   async analyzeAudio(job: Job<QueueMessageToAudioData>) {
     this.logger.debug('Analyzing Audio message');
-    const { context, message, data } = job.data;
+    const { context, message, platform } = job.data;
 
     try {
       const audioBuffer = await this.googleService.textToSpeech(message.toString());
-
-      this.eventService.emit(new NotificationEvent(context.phone, audioBuffer, data.platform, 'audio'));
+      this.eventService.emit(
+        new NotificationEvent({ phone: context.phone, message: audioBuffer, platform }, Type.Audio),
+      );
     } catch (error) {
       this.eventService.emit(
-        new NotificationEvent(context.phone, await this.getMessage(keys.speechProcessorKey), data.platform),
-        'text',
+        new NotificationEvent({
+          phone: context.phone,
+          message: await this.getMessage(keys.speechProcessorKey),
+          platform,
+        }),
       );
       this.logger.error('Error generating speech:', error);
     }

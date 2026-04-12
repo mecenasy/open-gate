@@ -1,5 +1,6 @@
 import { UnifiedMessage } from 'src/notify-service/types/unified-message';
 import { UserContext } from '../../context/user-context';
+import { Platform } from 'src/notify-service/types/platform';
 
 export interface QueueMessageData {
   data: UnifiedMessage;
@@ -7,7 +8,7 @@ export interface QueueMessageData {
 }
 
 export interface QueueMessageToAudioData {
-  data: UnifiedMessage;
+  platform: Platform;
   message: string;
   context: UserContext;
 }

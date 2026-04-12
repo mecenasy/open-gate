@@ -13,4 +13,5 @@ export interface QueueMessageData<T, C> {
 export interface QueueMessageToAudioData<T> {
   message: string;
   context: T;
+  platform: string;
 }

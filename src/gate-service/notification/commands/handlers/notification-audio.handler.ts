@@ -22,9 +22,8 @@ export class NotificationAudioHandler extends Handler<NotificationAudioCommand, 
   }
 
   async execute({ audioFile, platform, phone }: NotificationAudioCommand): Promise<Status> {
-    console.log('🚀 ~ NotificationAudioHandler ~ execute ~ audioFile, platform, phone:', audioFile, platform, phone);
     if (audioFile.length === 0) {
-      this.logger.error('BŁĄD: Bufor audio jest pusty!');
+      this.logger.error('Buffer can\'t be empty!');
     }
 
     try {
@@ -34,7 +33,7 @@ export class NotificationAudioHandler extends Handler<NotificationAudioCommand, 
             chatId: phone,
             messageId: '',
             authorId: '',
-            type: Type.Text,
+            type: Type.Audio,
             platform: PlatformTransformer.toGrpc(platform),
             media: {
               url: '',

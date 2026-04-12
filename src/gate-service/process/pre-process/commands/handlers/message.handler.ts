@@ -103,7 +103,11 @@ export class MassageHandler extends Handler<UnifiedMessageEvent, Status, UserPro
 
   private async notifyUnknownUser(message: UnifiedMessage): Promise<void> {
     this.event.emit(
-      new NotificationEvent(message.chatId, (await this.getMessage()) ?? 'User not found', message.platform),
+      new NotificationEvent({
+        phone: message.chatId,
+        message: (await this.getMessage()) ?? 'User not found',
+        platform: message.platform,
+      }),
     );
   }
 

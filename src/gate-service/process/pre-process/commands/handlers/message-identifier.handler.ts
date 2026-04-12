@@ -34,7 +34,9 @@ export class MassageIdentifierHandler extends Handler<UserMessageCommand, Status
     const hasAttachments = !!attachment;
 
     if (!(hasText || hasAttachments)) {
-      this.event.emit(new NotificationEvent(message.chatId, await this.getMessage(), message.platform));
+      this.event.emit(
+        new NotificationEvent({ phone: message.chatId, message: await this.getMessage(), platform: message.platform }),
+      );
       return {
         status: false,
         message: 'No text or attachment',

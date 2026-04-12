@@ -48,7 +48,11 @@ export class CommandProcessor extends ProcessorBase implements OnModuleInit {
       }
     } catch (error) {
       this.eventService.emit(
-        new NotificationEvent(context.phone, await this.getMessage(keys.commandProcessorKey), data.platform),
+        new NotificationEvent({
+          phone: context.phone,
+          message: await this.getMessage(keys.commandProcessorKey),
+          platform: data.platform,
+        }),
       );
       this.logger.error('Error generating speech:', error);
     }

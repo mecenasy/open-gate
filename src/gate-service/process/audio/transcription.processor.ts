@@ -31,12 +31,11 @@ export class TranscriptionProcessor extends ProcessorBase {
 
     if (!data.media) {
       this.eventService.emit(
-        new NotificationEvent(
-          context.phone,
-
-          await this.getMessage(keys.missingAttachmentKey),
-          data.platform,
-        ),
+        new NotificationEvent({
+          phone: context.phone,
+          message: await this.getMessage(keys.missingAttachmentKey),
+          platform: data.platform,
+        }),
       );
       this.logger.warn('No attachment found in job data');
       return;
@@ -54,7 +53,11 @@ export class TranscriptionProcessor extends ProcessorBase {
       });
     } catch (error) {
       this.eventService.emit(
-        new NotificationEvent(context.phone, await this.getMessage(keys.transcriptionAttachmentKey), data.platform),
+        new NotificationEvent({
+          phone: context.phone,
+          message: await this.getMessage(keys.transcriptionAttachmentKey),
+          platform: data.platform,
+        }),
       );
       this.logger.error('Error processing audio:', error);
     }

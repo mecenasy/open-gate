@@ -20,17 +20,7 @@ export class MessageProcessor extends ProcessorBase {
 
   @Process(QueueType.Message)
   async analyzeMessage(job: Job<QueueMessageData>) {
-    let userMessage: string;
-    const { context } = job.data;
-
-    if (job.data.data) {
-      const {
-        data: { dataMessage },
-      } = job.data;
-      userMessage = dataMessage?.message ?? '';
-    } else {
-      userMessage = job.data?.message ?? '';
-    }
+    const { context, data } = job.data;
 
     this.logger.debug(`Analyzing message ${context.phone}`);
 
@@ -39,7 +29,7 @@ export class MessageProcessor extends ProcessorBase {
 
       messages.push({
         role: 'user',
-        content: userMessage ?? '',
+        content: data.content ?? '',
       });
 
       const chatCompletion = await this.groqService.createChatCompletion(messages);
@@ -52,6 +42,7 @@ export class MessageProcessor extends ProcessorBase {
       await this.messageContextService.saveConversation(context, messages);
 
       const command = this.commandParserService.parseCommand(chatCompletion);
+
       const lockKey = `lock:${command.command}.${command.data}`;
 
       const isLocked = await this.cache.getFromCache({ identifier: lockKey, prefix: 'command' });
@@ -65,7 +56,7 @@ export class MessageProcessor extends ProcessorBase {
         identifier: lockKey,
         prefix: 'command',
         data: true,
-        EX: 120,
+        EX: 10,
         NX: true,
       });
 

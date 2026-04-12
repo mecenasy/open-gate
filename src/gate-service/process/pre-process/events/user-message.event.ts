@@ -1,10 +1,10 @@
 import { AggregateRoot } from '@nestjs/cqrs';
 import { UserContext } from 'src/gate-service/context/user-context';
-import { SignalEnvelope } from '../types';
+import { UnifiedMessage } from 'src/gate-service/message-bridge/platforms/transformer';
 
-export class IdentifyMessageEvent extends AggregateRoot {
+export class UserMessageEvent extends AggregateRoot {
   constructor(
-    public readonly message: SignalEnvelope,
+    public readonly message: UnifiedMessage,
     public readonly context: UserContext,
   ) {
     super();

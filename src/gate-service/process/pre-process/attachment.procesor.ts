@@ -29,10 +29,10 @@ export class AttachmentsProcessor implements OnModuleInit {
   async attachment(job: Job<QueueMessageData>) {
     this.logger.debug('Analyzing attachment');
     const {
-      data: { dataMessage },
+      data: { media },
       context,
     } = job.data;
-    const attachmentId = dataMessage?.attachments?.[0]?.id;
+    const attachmentId = media?.url;
 
     if (!attachmentId) {
       this.logger.warn('Attachment job received without attachment ID');

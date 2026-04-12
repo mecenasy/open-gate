@@ -5,7 +5,7 @@ import { NotificationEvent } from 'src/gate-service/notification/events/notifica
 import { QueueService } from '@app/redis';
 import { Inject } from '@nestjs/common';
 import { UserContext } from 'src/gate-service/context/user-context';
-import { MessageType } from 'src/gate-service/process/signal/types';
+import { MessageType } from 'src/gate-service/process/pre-process/types';
 
 export abstract class BaseCommandHandler extends Handler<SofCommand<number>, Status> {
   @Inject()
@@ -30,15 +30,6 @@ export abstract class BaseCommandHandler extends Handler<SofCommand<number>, Sta
       }
       case MessageType.Command: {
         this.event.emit(new NotificationEvent(context.phone, message));
-        break;
-      }
-      default: {
-        this.event.emit(
-          new NotificationEvent(
-            context.phone,
-            'Przepraszam ale nie rozumiem. mój mózg szwankuje. wypróbuj inaczej wydać polecenie',
-          ),
-        );
         break;
       }
     }

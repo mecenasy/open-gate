@@ -9,7 +9,7 @@ import { Readable, PassThrough } from 'stream';
 import ffmpeg from 'fluent-ffmpeg';
 
 import Groq, { toFile } from 'groq-sdk';
-import { SignalMessage } from './process/signal/types';
+import { SignalMessage } from './process/pre-process/types';
 
 @Injectable()
 @WebSocketGateway()

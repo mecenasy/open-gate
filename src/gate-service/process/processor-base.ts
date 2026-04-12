@@ -46,8 +46,7 @@ export abstract class ProcessorBase implements OnModuleInit {
     }
 
     await this.cache.saveInCache<string>({
-      identifier: 'message',
-      path: key,
+      identifier: `message:${key}`,
       data: response.data.value,
       EX: 3600,
     });

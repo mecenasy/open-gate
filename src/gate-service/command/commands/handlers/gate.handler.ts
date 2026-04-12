@@ -5,7 +5,7 @@ import { CommandAction, CommandType } from 'src/gate-service/common/types/comman
 import { Status } from 'src/gate-service/status/status';
 import { GateService } from '../../gate/gate.service';
 import { BaseCommandHandler } from './command.handler';
-import { MessageType } from 'src/gate-service/process/signal/types';
+import { MessageType } from 'src/gate-service/process/pre-process/types';
 
 @SofHandler(CommandType.Gate)
 @CommandHandler(SofCommand)

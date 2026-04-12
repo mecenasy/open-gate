@@ -27,13 +27,9 @@ export class TranscriptionProcessor extends ProcessorBase {
       return;
     }
 
-    const {
-      data: { attachment },
-      data,
-      context,
-    } = job.data;
+    const { data, context } = job.data;
 
-    if (!attachment) {
+    if (!data.media) {
       this.eventService.emit(
         new NotificationEvent(
           context.phone,
@@ -46,11 +42,11 @@ export class TranscriptionProcessor extends ProcessorBase {
     }
 
     try {
-      const fileMp3 = await this.convertToMp3(attachment);
+      const fileMp3 = await this.convertToMp3(data.media.data);
 
       const message = await this.groqService.createTranscription(fileMp3);
 
-      data.dataMessage = { ...data.dataMessage, message };
+      data.content = message;
       await this.queueService.messageToQueue({
         data,
         context,

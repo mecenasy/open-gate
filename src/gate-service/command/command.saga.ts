@@ -4,6 +4,7 @@ import { filter, mergeMap, Observable } from 'rxjs';
 import { SofCommand } from './commands/impl/sof-command';
 import { SofCommandEvent } from './events/sof-command.event';
 import { SofDispatcher } from './dispatcher';
+import { CommandType } from 'src/bff-service/command/dto/command.type';
 
 @Injectable()
 export class CommandSaga {

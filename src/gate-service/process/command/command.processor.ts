@@ -8,11 +8,12 @@ import { Command, COMMAND_SERVICE_NAME, CommandServiceClient } from 'src/proto/c
 import { OnModuleInit } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { SofCommandEvent } from 'src/gate-service/command/events/sof-command.event';
-import { IdentifyMessageEvent } from '../signal/events/identifier-message.event';
-import { MessageType } from '../signal/types';
+import { IdentifyMessageEvent } from '../pre-process/events/identifier-message.event';
+import { MessageType } from '../pre-process/types';
 import { keys } from 'src/gate-service/message-keys/keys';
 import { LanguageToolService } from 'src/gate-service/language-tool/language-tool.service';
 import { UserContext } from 'src/gate-service/context/user-context';
+import { CommandType } from 'src/gate-service/common/types/command';
 
 @Processor(QueueType.Command)
 export class CommandProcessor extends ProcessorBase implements OnModuleInit {
@@ -32,7 +33,7 @@ export class CommandProcessor extends ProcessorBase implements OnModuleInit {
   @Process(QueueType.Command)
   async analyzeCommand(job: Job<QueueMessageData>) {
     const { data, context } = job.data;
-    const messageToProcess = data?.dataMessage?.message ?? '';
+    const messageToProcess = data?.content ?? '';
 
     try {
       const command = await this.getCommand(messageToProcess);
@@ -58,7 +59,7 @@ export class CommandProcessor extends ProcessorBase implements OnModuleInit {
     job: Job<QueueMessageData>,
   ) {
     if (this.isSimpleCommand.exec(messageToProcess)) {
-      this.eventService.emit(new SofCommandEvent({ command: command.command }, context));
+      this.eventService.emit(new SofCommandEvent({ command: command.command as CommandType }, context));
     } else {
       this.eventService.emit(new IdentifyMessageEvent(job.data.data, { ...context, messageType: MessageType.Message }));
     }

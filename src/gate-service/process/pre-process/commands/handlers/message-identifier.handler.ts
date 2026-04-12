@@ -27,17 +27,14 @@ export class MassageIdentifierHandler extends Handler<UserMessageCommand, Status
     this.messageGrpc = this.grpcClient.getService<MessagesServiceClient>(MESSAGES_SERVICE_NAME);
   }
   async execute({ message, context }: UserMessageCommand): Promise<Status> {
-    const { dataMessage } = message;
-
-    const text = dataMessage?.message;
-    console.log('🚀 ~ MassageIdentifierHandler ~ execute ~ dataMessage:', dataMessage);
+    const text = message.content;
     const hasText = (text?.trim().length || 0) > 0;
 
-    const attachment = dataMessage?.attachments?.[0];
+    const attachment = message.media;
     const hasAttachments = !!attachment;
+
     if (!(hasText || hasAttachments)) {
-      const errorMessage = await this.getMessage();
-      this.event.emit(new NotificationEvent(message.source, errorMessage));
+      this.event.emit(new NotificationEvent(message.chatId, await this.getMessage()));
       return {
         status: false,
         message: 'No text or attachment',
@@ -47,14 +44,12 @@ export class MassageIdentifierHandler extends Handler<UserMessageCommand, Status
     if (hasText) {
       if (text?.trim().startsWith('/')) {
         this.event.emit(new IdentifyMessageEvent(message, { ...context, messageType: MessageType.Command }));
-        console.log('🚀 ~ MassageIdentifierHandler ~ execute ~ message:', message);
         return {
           status: true,
           message: 'User send command',
         };
       }
 
-      console.log('🚀 ~ MassageIdentifierHandler ~ execute ~ message:', message);
       this.event.emit(new IdentifyMessageEvent(message, { ...context, messageType: MessageType.Message }));
       return {
         status: true,

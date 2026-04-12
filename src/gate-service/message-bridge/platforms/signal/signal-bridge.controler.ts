@@ -6,8 +6,9 @@ import {
   IncomingSignalServiceControllerMethods,
   SignalAck,
 } from 'src/proto/signal';
-import { SignalMessageEvent } from './events/signal-message.event';
-import { SignalMessage } from './types';
+import { MessageEvent } from '../../event/message.event';
+import { SignalMessage } from '../../../process/pre-process/types';
+import { Platform } from 'src/gate-service/message-bridge/platform';
 
 @Controller()
 @IncomingSignalServiceControllerMethods()
@@ -19,7 +20,8 @@ export class SignalBridgeService implements IncomingSignalServiceController {
   receiveMessage(request: IncomingSignalRequest): SignalAck {
     try {
       const message = JSON.parse(request.payload) as SignalMessage;
-      this.eventBus.publish(new SignalMessageEvent(message));
+      this.eventBus.publish(new MessageEvent(message, Platform.Signal));
+
       this.logger.log(`✅ Signal message received from notify-service`);
       return { success: true, message: 'Message received' };
     } catch (error) {

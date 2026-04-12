@@ -1,6 +1,6 @@
 export interface SofCommand<T> {
   action?: string;
-  command?: string;
+  command: CommandType;
   data?: T;
   message?: string;
   error?: boolean;

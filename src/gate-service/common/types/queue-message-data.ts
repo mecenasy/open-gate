@@ -1,8 +1,8 @@
-import { SignalEnvelope } from 'src/gate-service/process/signal/types';
 import { UserContext } from '../../context/user-context';
+import { UnifiedMessage } from 'src/gate-service/message-bridge/platforms/transformer';
 
 export interface QueueMessageData {
-  data: SignalEnvelope & { attachment?: Buffer };
+  data: UnifiedMessage;
   context: UserContext;
 }
 

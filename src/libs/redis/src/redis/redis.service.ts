@@ -64,6 +64,6 @@ export class RedisService {
   }
 
   private getIdentifier(identifier: string, prefix?: string) {
-    return prefix ? `${prefix}:${identifier}` : `otp:${identifier}`;
+    return prefix ? `${prefix}:${identifier}` : identifier;
   }
 }

@@ -1,14 +1,26 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { GetAllUsersQuery } from '../impl/get-all-users.query';
-import { UserService } from '../../user.service';
+import { User } from '../../entity/user.entity';
+import { entityToProto } from '../../utils/entity-to-proto';
 import { UserData } from 'src/proto/user';
 
 @QueryHandler(GetAllUsersQuery)
 export class GetAllUsersHandler implements IQueryHandler<GetAllUsersQuery, { data: UserData[]; total: number }> {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
 
   async execute(query: GetAllUsersQuery): Promise<{ data: UserData[]; total: number }> {
-    const { users, total } = await this.userService.findAll(query.page, query.limit);
-    return { data: users.map((u) => this.userService.entityToProto(u)), total };
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+    const [users, total] = await this.userRepository.findAndCount({
+      skip: (page - 1) * limit,
+      relations: ['userRole'],
+      take: limit,
+    });
+    return { data: users.map(entityToProto), total };
   }
 }

@@ -1,14 +1,27 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { UpdateUserStatusCommand } from '../impl/update-user-status.command';
-import { UserService } from '../../user.service';
+import { User } from '../../entity/user.entity';
+import { protoToUserStatus } from 'src/utils/concert-status';
+import { entityToProto } from '../../utils/entity-to-proto';
 import { UserData } from 'src/proto/user';
 
 @CommandHandler(UpdateUserStatusCommand)
 export class UpdateUserStatusHandler implements ICommandHandler<UpdateUserStatusCommand, UserData | null> {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
 
   async execute(command: UpdateUserStatusCommand): Promise<UserData | null> {
-    const entity = await this.userService.updateStatus(command.id, command.status);
-    return entity ? this.userService.entityToProto(entity) : null;
+    await this.userRepository.update(command.id, { status: protoToUserStatus(command.status) });
+
+    const entity = await this.userRepository.findOne({
+      where: { id: command.id },
+      relations: ['userRole'],
+    });
+
+    return entity ? entityToProto(entity) : null;
   }
 }

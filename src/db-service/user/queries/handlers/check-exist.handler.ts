@@ -1,12 +1,21 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CheckExistQuery } from '../impl/check-exist.query';
-import { UserService } from '../../user.service';
+import { User } from '../../entity/user.entity';
 
 @QueryHandler(CheckExistQuery)
 export class CheckExistHandler implements IQueryHandler<CheckExistQuery, boolean> {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
 
   async execute(query: CheckExistQuery): Promise<boolean> {
-    return !!(await this.userService.findUser(query.email));
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email: query.email })
+      .getOne();
+    return !!user;
   }
 }

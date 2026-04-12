@@ -10,6 +10,10 @@ export class PlatformTransformer {
         return Platform.Whatsapp;
       case AppPlatform.Messenger:
         return Platform.Messenger;
+      case AppPlatform.Sms:
+        return Platform.Sms;
+      case AppPlatform.Email:
+        return Platform.Email;
       default:
         return Platform.Signal;
     }
@@ -23,6 +27,10 @@ export class PlatformTransformer {
         return AppPlatform.Whatsapp;
       case Platform.Messenger:
         return AppPlatform.Messenger;
+      case Platform.Sms:
+        return AppPlatform.Sms;
+      case Platform.Email:
+        return AppPlatform.Email;
       default:
         return AppPlatform.Signal;
     }

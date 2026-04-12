@@ -23,7 +23,7 @@ export class NotificationAudioHandler extends Handler<NotificationAudioCommand, 
 
   async execute({ audioFile, platform, phone }: NotificationAudioCommand): Promise<Status> {
     if (audioFile.length === 0) {
-      this.logger.error('Buffer can\'t be empty!');
+      this.logger.error("Buffer can't be empty!");
     }
 
     try {

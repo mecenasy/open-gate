@@ -22,7 +22,6 @@ export class NotificationTextHandler extends Handler<NotificationTextCommand, St
   }
 
   async execute({ message, platform, phone }: NotificationTextCommand): Promise<Status> {
-    console.log("🚀 ~ NotificationTextHandler ~ execute ~  message, platform, phone:", message, platform, phone)
     try {
       const result = await firstValueFrom(
         this.notifyClient.sendMessage({

@@ -3,8 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SmsModule } from './sms/sms.module';
-import { SmtpModule } from './smtp/smtp.module';
 import { GateGrpcModule, config as gateGrpcConfig } from '@app/gate-grpc';
 import { MessageBridgeModule } from './incoming/message-bridge.module';
 import { OutgoingNotifyModule } from './outgoing/outgoing.-notify.module';
@@ -15,8 +13,6 @@ import { OutgoingNotifyModule } from './outgoing/outgoing.-notify.module';
     MessageBridgeModule,
     OutgoingNotifyModule,
     CqrsModule,
-    SmsModule,
-    SmtpModule,
     GateGrpcModule,
   ],
   controllers: [AppController],

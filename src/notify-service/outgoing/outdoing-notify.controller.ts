@@ -1,43 +1,49 @@
 import { Controller } from '@nestjs/common';
+import { CommandBus, EventBus } from '@nestjs/cqrs';
 
-import { SmsService } from '../sms/sms.service';
-import { SmtpService } from '../smtp/smtp.service';
 import {
   NotifyAck,
-  SendSmsRequest,
-  SendMailCodeRequest,
-  SendResetTokenRequest,
+  SendVerificationCodeRequest,
+  SendTokenRequest,
   OutgoingNotifyServiceController,
   OutgoingNotifyServiceControllerMethods,
   OutgoingNotifyRequest,
 } from 'src/proto/notify';
-import { EventBus } from '@nestjs/cqrs';
 import { OutgoingNotifyEvent } from './event/outgoing-notify-event';
 import { PlatformTransformer } from 'src/utils/platform';
 import { TypeTransformer } from 'src/utils/message-type';
+import { SendVerificationCodeCommand } from './commands/impl/send-verification-code.command';
+import { SendTokenCommand } from './commands/impl/send-token.command';
 
 @Controller()
 @OutgoingNotifyServiceControllerMethods()
 export class OutgoingNotifyController implements OutgoingNotifyServiceController {
   constructor(
+    private readonly commandBus: CommandBus,
     private readonly eventBus: EventBus,
-    private readonly smsService: SmsService,
-    private readonly smtpService: SmtpService,
   ) {}
 
-  async sendSmsCode({ phoneNumber, code }: SendSmsRequest): Promise<NotifyAck> {
-    await this.smsService.sendCode(phoneNumber, code);
-    return { success: true, message: 'SMS sent' };
+  async sendVerificationCode({ platforms, code, phoneNumber, email }: SendVerificationCodeRequest): Promise<NotifyAck> {
+    await this.commandBus.execute(
+      new SendVerificationCodeCommand(
+        platforms.map((p) => PlatformTransformer.fromGrpc(p)),
+        code,
+        phoneNumber,
+        email,
+      ),
+    );
+    return { success: true, message: 'Verification code sent' };
   }
 
-  async sendMailCode({ email, code }: SendMailCodeRequest): Promise<NotifyAck> {
-    await this.smtpService.sendVerificationCode(email, code);
-    return { success: true, message: 'Mail sent' };
-  }
-
-  async sendResetToken({ email, url }: SendResetTokenRequest): Promise<NotifyAck> {
-    await this.smtpService.sendResetToken(email, url);
-    return { success: true, message: 'Reset token sent' };
+  async sendToken({ platforms, email, url }: SendTokenRequest): Promise<NotifyAck> {
+    await this.commandBus.execute(
+      new SendTokenCommand(
+        platforms.map((p) => PlatformTransformer.fromGrpc(p)),
+        email,
+        url,
+      ),
+    );
+    return { success: true, message: 'Token sent' };
   }
 
   async sendMessage({ message, platforms }: OutgoingNotifyRequest): Promise<NotifyAck> {

@@ -79,17 +79,15 @@ export interface Reaction {
   targetMessageId: string;
 }
 
-export interface SendSmsRequest {
-  phoneNumber: string;
+export interface SendVerificationCodeRequest {
+  platforms: Platform[];
   code: number;
+  phoneNumber?: string | undefined;
+  email?: string | undefined;
 }
 
-export interface SendMailCodeRequest {
-  email: string;
-  code: number;
-}
-
-export interface SendResetTokenRequest {
+export interface SendTokenRequest {
+  platforms: Platform[];
   email: string;
   url: string;
 }
@@ -138,11 +136,9 @@ export const INCOMING_NOTIFY_SERVICE_NAME = 'IncomingNotifyService';
 export interface OutgoingNotifyServiceClient {
   sendMessage(request: OutgoingNotifyRequest, metadata?: Metadata): Observable<NotifyAck>;
 
-  sendSmsCode(request: SendSmsRequest, metadata?: Metadata): Observable<NotifyAck>;
+  sendVerificationCode(request: SendVerificationCodeRequest, metadata?: Metadata): Observable<NotifyAck>;
 
-  sendMailCode(request: SendMailCodeRequest, metadata?: Metadata): Observable<NotifyAck>;
-
-  sendResetToken(request: SendResetTokenRequest, metadata?: Metadata): Observable<NotifyAck>;
+  sendToken(request: SendTokenRequest, metadata?: Metadata): Observable<NotifyAck>;
 }
 
 /** Hosted by notify-service (port 50052) — receives outbound send requests from gate-service */
@@ -153,22 +149,17 @@ export interface OutgoingNotifyServiceController {
     metadata?: Metadata,
   ): Promise<NotifyAck> | Observable<NotifyAck> | NotifyAck;
 
-  sendSmsCode(request: SendSmsRequest, metadata?: Metadata): Promise<NotifyAck> | Observable<NotifyAck> | NotifyAck;
-
-  sendMailCode(
-    request: SendMailCodeRequest,
+  sendVerificationCode(
+    request: SendVerificationCodeRequest,
     metadata?: Metadata,
   ): Promise<NotifyAck> | Observable<NotifyAck> | NotifyAck;
 
-  sendResetToken(
-    request: SendResetTokenRequest,
-    metadata?: Metadata,
-  ): Promise<NotifyAck> | Observable<NotifyAck> | NotifyAck;
+  sendToken(request: SendTokenRequest, metadata?: Metadata): Promise<NotifyAck> | Observable<NotifyAck> | NotifyAck;
 }
 
 export function OutgoingNotifyServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['sendMessage', 'sendSmsCode', 'sendMailCode', 'sendResetToken'];
+    const grpcMethods: string[] = ['sendMessage', 'sendVerificationCode', 'sendToken'];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod('OutgoingNotifyService', method)(constructor.prototype[method], method, descriptor);

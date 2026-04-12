@@ -1,0 +1,38 @@
+import { Inject, Logger } from '@nestjs/common';
+import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+import { firstValueFrom } from 'rxjs';
+import { NotifyGrpcKey, type ClientGrpc } from '@app/notify-grpc';
+import { OutgoingNotifyServiceClient, OUTGOING_NOTIFY_SERVICE_NAME, Platform } from 'src/proto/notify';
+import { SendResetTokenEvent } from '../dto/send-reset-token.event';
+import { TypeConfigService } from 'src/bff-service/common/configs/types.config.service';
+import { AppConfig } from 'src/bff-service/common/configs/app.configs';
+
+@EventsHandler(SendResetTokenEvent)
+export class SendResetTokenEventHandler implements IEventHandler<SendResetTokenEvent> {
+  private readonly logger = new Logger(SendResetTokenEventHandler.name);
+  private notificationService: OutgoingNotifyServiceClient;
+
+  constructor(
+    @Inject(NotifyGrpcKey) client: ClientGrpc,
+    private readonly configService: TypeConfigService,
+  ) {
+    this.notificationService = client.getService<OutgoingNotifyServiceClient>(OUTGOING_NOTIFY_SERVICE_NAME);
+  }
+
+  async handle({ email, token }: SendResetTokenEvent): Promise<void> {
+    const frontendUrl = this.configService.get<AppConfig>('app')?.clientUrl;
+    const url = `${frontendUrl}/reset-password?token=${token}`;
+
+    try {
+      await firstValueFrom(
+        this.notificationService.sendToken({
+          platforms: [Platform.Email],
+          email,
+          url,
+        }),
+      );
+    } catch (error) {
+      this.logger.error('Failed to send reset token via notify-service.', error);
+    }
+  }
+}

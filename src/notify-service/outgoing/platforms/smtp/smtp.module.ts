@@ -3,7 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { smtpConfig, SmtpConfig } from './config/smtp.configs';
-import { SmtpService } from './smtp.service';
+import { MailVerificationCodePlatform } from './mail-verification-code.platform';
+import { MailTokenPlatform } from './mail-token.platform';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import { SmtpService } from './smtp.service';
       }),
     }),
   ],
-  providers: [SmtpService],
-  exports: [SmtpService],
+  providers: [MailVerificationCodePlatform, MailTokenPlatform],
+  exports: [MailVerificationCodePlatform, MailTokenPlatform],
 })
 export class SmtpModule {}

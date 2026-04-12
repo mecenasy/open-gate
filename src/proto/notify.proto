@@ -9,10 +9,9 @@ service IncomingNotifyService {
 
 // Hosted by notify-service (port 50052) — receives outbound send requests from gate-service
 service OutgoingNotifyService {
-  rpc SendMessage (OutgoingNotifyRequest)returns (NotifyAck);
-  rpc SendSmsCode (SendSmsRequest) returns (NotifyAck);
-  rpc SendMailCode (SendMailCodeRequest) returns (NotifyAck);
-  rpc SendResetToken (SendResetTokenRequest) returns (NotifyAck);
+  rpc SendMessage (OutgoingNotifyRequest) returns (NotifyAck);
+  rpc SendVerificationCode (SendVerificationCodeRequest) returns (NotifyAck);
+  rpc SendToken (SendTokenRequest) returns (NotifyAck);
 }
 
 // Full SignalMessage serialized as JSON — preserves the complete, unmodified structure
@@ -81,19 +80,17 @@ message Reaction {
   string targetMessageId = 2;
 }
 
-message SendSmsRequest {
-  string phoneNumber = 1;
+message SendVerificationCodeRequest {
+  repeated Platform platforms = 1;
   int32 code = 2;
+  optional string phoneNumber = 3;
+  optional string email = 4;
 }
 
-message SendMailCodeRequest {
-  string email = 1;
-  int32 code = 2;
-}
-
-message SendResetTokenRequest {
-  string email = 1;
-  string url = 2;
+message SendTokenRequest {
+  repeated Platform platforms = 1;
+  string email = 2;
+  string url = 3;
 }
 
 message NotifyAck {

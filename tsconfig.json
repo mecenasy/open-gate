@@ -66,6 +66,12 @@
       "@app/redis/*": [
         "src/libs/redis/src/*"
       ],
+      "@app/logger": [
+        "src/libs/logger"
+      ],
+      "@app/logger/*": [
+        "src/libs/logger/*"
+      ],
       "src/*": [
         "src/*"
       ]

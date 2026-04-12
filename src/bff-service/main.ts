@@ -6,6 +6,7 @@ import { initCorse } from './libs/corse/corse';
 import { TypeConfigService } from './common/configs/types.config.service';
 import { AppConfig } from './common/configs/app.configs';
 import { initRedis, startMicroservices } from '@app/redis';
+import { GlobalExceptionFilter, LoggingInterceptor } from '@app/logger';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -19,6 +20,10 @@ async function bootstrap() {
   initRedis(app);
   await startMicroservices(app);
   logger.log('Proxy initialized');
+
+  // Setup global logger filters and interceptors
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  app.useGlobalInterceptors(new LoggingInterceptor());
 
   await initSession(app);
   logger.log('Session initialized');

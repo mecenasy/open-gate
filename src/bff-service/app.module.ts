@@ -11,9 +11,11 @@ import { AuthModule } from './auth/auth.module';
 import { PromptsModule } from './prompts/prompts.module';
 import { CommandModule } from './command/command.module';
 import { CoreConfigModule } from './core-config/core-config.module';
+import { LoggerModule } from '@app/logger';
 
 @Module({
   imports: [
+    LoggerModule,
     UserModule,
     CommonModule,
     AuthModule,

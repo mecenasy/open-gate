@@ -28,13 +28,13 @@ Posortowane według priorytetu.
 
 - [ ] **Logowanie przez `console.*`** — 336 plików używa `console.log/error/warn`
   - Zastąpić przez `Logger` z NestJS z odpowiednimi poziomami (log/warn/error/debug)
-- [ ] **Brak obsługi transakcji** — operacje wieloetapowe w bazie bez transakcji
+- [x] **Brak obsługi transakcji** — operacje wieloetapowe w bazie bez transakcji
   - Dodać wzorzec transakcji TypeORM (`EntityManager.transaction`)
 - [ ] **Walidacja zmiennych środowiskowych** — brak schematu walidacji `.env`
   - Użyć `Joi` lub `class-validator` w `ConfigModule.forRoot({ validationSchema })`
 - [ ] **CSRF wyłączony** — `CsrfModule` i interceptor zakomentowane w `bff-service/app.module.ts`
   - Włączyć i przetestować
-- [ ] **Health-check endpointy** — brak endpointów dla Docker healthcheck *(w trakcie)*
+- [x] **Health-check endpointy** — brak endpointów dla Docker healthcheck *(w trakcie)*
   - ✅ Dodać `GET /health` do bff-service, core-service, notify-service
   - ✅ Dodać `healthcheck:` do docker-compose.yaml dla serwisów aplikacyjnych
 

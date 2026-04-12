@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConsoleLogger, Logger, ValidationPipe } from '@nestjs/common';
 import { initGateGrpc } from '@app/gate-grpc';
+import { GlobalExceptionFilter, LoggingInterceptor } from '@app/logger';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -12,6 +13,10 @@ async function bootstrap() {
   });
 
   initGateGrpc(app);
+
+  // Setup global logger filters and interceptors
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  app.useGlobalInterceptors(new LoggingInterceptor());
 
   app.useGlobalPipes(
     new ValidationPipe({

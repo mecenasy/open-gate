@@ -6,9 +6,18 @@ import { HttpModule } from '@nestjs/axios';
 import { NotificationModule } from './notification/notification.module';
 import { ProcessModule } from './process/process.module';
 import { CommandModule } from './command/command.module';
+import { LoggerModule } from '@app/logger';
 import { MessageBridgeModule } from './message-bridge/message-bridge.module';
 @Module({
-  imports: [MessageBridgeModule, HttpModule, CommonModule, NotificationModule, ProcessModule, CommandModule],
+  imports: [
+    LoggerModule,
+    MessageBridgeModule,
+    HttpModule,
+    CommonModule,
+    NotificationModule,
+    ProcessModule,
+    CommandModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

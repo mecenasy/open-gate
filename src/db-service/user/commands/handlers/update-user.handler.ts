@@ -1,4 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CustomLogger } from '@app/logger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateUserCommand } from '../impl/update-user.command';
@@ -17,31 +18,42 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, Use
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserRole)
     private readonly userRoleRepository: Repository<UserRole>,
-  ) {}
+
+    private readonly logger: CustomLogger,
+  ) {
+    this.logger.setContext(UpdateUserHandler.name);
+  }
 
   async execute(command: UpdateUserCommand): Promise<UserData | null> {
-    const { type, status, ...updateData } = command.data;
-    const dataToUpdate: Partial<User> = { ...updateData };
+    this.logger.log('Executing UpdateUser');
 
-    if (type) {
-      dataToUpdate.userRole = await this.userRoleRepository.findOneOrFail({
-        where: {
-          userType: type ? protoToJsUserType(type) : UserType.User,
-        },
+    try {
+      const { type, status, ...updateData } = command.data;
+      const dataToUpdate: Partial<User> = { ...updateData };
+
+      if (type) {
+        dataToUpdate.userRole = await this.userRoleRepository.findOneOrFail({
+          where: {
+            userType: type ? protoToJsUserType(type) : UserType.User,
+          },
+        });
+      }
+
+      if (status) {
+        dataToUpdate.status = protoToUserStatus(status);
+      }
+
+      await this.userRepository.update(command.id, dataToUpdate);
+
+      const entity = await this.userRepository.findOne({
+        where: { id: command.id },
+        relations: ['userRole'],
       });
+
+      return entity ? entityToProto(entity) : null;
+    } catch (error) {
+      this.logger.error('Error executing UpdateUser', error);
+      throw error;
     }
-
-    if (status) {
-      dataToUpdate.status = protoToUserStatus(status);
-    }
-
-    await this.userRepository.update(command.id, dataToUpdate);
-
-    const entity = await this.userRepository.findOne({
-      where: { id: command.id },
-      relations: ['userRole'],
-    });
-
-    return entity ? entityToProto(entity) : null;
   }
 }

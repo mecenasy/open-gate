@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, Logger } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { TypeConfigService } from '../config/types.config.service';
 import { Config } from '../config/redis.config';
@@ -19,9 +19,11 @@ export const initRedis = (app: INestApplication) => {
 };
 
 export const startMicroservices = async (app: INestApplication) => {
+  const logger = new Logger('Redis');
   try {
     await app.startAllMicroservices();
+    logger.log('Redis microservice started successfully');
   } catch (error) {
-    console.error('BŁĄD POŁĄCZENIA Z REDISEM:', error);
+    logger.error('Failed to start Redis microservice', error);
   }
 };

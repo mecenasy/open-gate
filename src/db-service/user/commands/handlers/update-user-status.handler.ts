@@ -1,4 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CustomLogger } from '@app/logger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateUserStatusCommand } from '../impl/update-user-status.command';
@@ -12,16 +13,27 @@ export class UpdateUserStatusHandler implements ICommandHandler<UpdateUserStatus
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+
+    private readonly logger: CustomLogger,
+  ) {
+    this.logger.setContext(UpdateUserStatusHandler.name);
+  }
 
   async execute(command: UpdateUserStatusCommand): Promise<UserData | null> {
-    await this.userRepository.update(command.id, { status: protoToUserStatus(command.status) });
+    this.logger.log('Executing UpdateUserStatus');
 
-    const entity = await this.userRepository.findOne({
-      where: { id: command.id },
-      relations: ['userRole'],
-    });
+    try {
+      await this.userRepository.update(command.id, { status: protoToUserStatus(command.status) });
 
-    return entity ? entityToProto(entity) : null;
+      const entity = await this.userRepository.findOne({
+        where: { id: command.id },
+        relations: ['userRole'],
+      });
+
+      return entity ? entityToProto(entity) : null;
+    } catch (error) {
+      this.logger.error('Error executing UpdateUserStatus', error);
+      throw error;
+    }
   }
 }

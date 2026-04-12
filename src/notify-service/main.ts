@@ -4,6 +4,7 @@ import { ConsoleLogger, Logger, ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import { getGrpcOptions } from 'src/utils/get-proto-files';
+import { GlobalExceptionFilter, LoggingInterceptor } from '@app/logger';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -22,7 +23,9 @@ async function bootstrap() {
       url: `0.0.0.0:${process.env.NOTIFY_GRPC_URL?.split(':')[1] ?? '50052'}`,
     },
   });
-
+  // Setup global logger filters and interceptors
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   await app.startAllMicroservices();

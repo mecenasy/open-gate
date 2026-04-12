@@ -1,4 +1,5 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { CustomLogger } from '@app/logger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GetUserByEmailQuery } from '../impl/get-user-by-email.query';
@@ -12,34 +13,45 @@ export class GetUserByEmailHandler implements IQueryHandler<GetUserByEmailQuery,
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+
+    private readonly logger: CustomLogger,
+  ) {
+    this.logger.setContext(GetUserByEmailHandler.name);
+  }
 
   async execute(query: GetUserByEmailQuery): Promise<UserResponse> {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.userRole', 'userRole')
-      .where('user.email = :email', { email: query.email })
-      .getOne();
+    this.logger.log('Executing GetUserByEmail');
 
-    if (user) {
+    try {
+      const user = await this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.userRole', 'userRole')
+        .where('user.email = :email', { email: query.email })
+        .getOne();
+
+      if (user) {
+        return {
+          status: true,
+          message: 'User found',
+          data: {
+            id: user.id,
+            email: user.email,
+            phone: user.phone,
+            name: user.name,
+            surname: user.surname,
+            status: userStatusToProto(user.status),
+            type: jsToProtoUserType(user.userRole.userType),
+          },
+        };
+      }
+
       return {
-        status: true,
-        message: 'User found',
-        data: {
-          id: user.id,
-          email: user.email,
-          phone: user.phone,
-          name: user.name,
-          surname: user.surname,
-          status: userStatusToProto(user.status),
-          type: jsToProtoUserType(user.userRole.userType),
-        },
+        status: false,
+        message: 'User not found',
       };
+    } catch (error) {
+      this.logger.error('Error executing GetUserByEmail', error);
+      throw error;
     }
-
-    return {
-      status: false,
-      message: 'User not found',
-    };
   }
 }

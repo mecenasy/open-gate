@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, FindOperator } from 'typeorm';
+import { DataSource, Repository, In, FindOperator } from 'typeorm';
 import { Command } from './entity/command.entity';
 import { UserRole } from '../user/entity/user-role.entity';
 import { Command as CommandProto, AddCommandRequest, UpdateCommandRequest } from 'src/proto/command';
@@ -13,30 +13,32 @@ export class CommandService {
     private readonly commandRepository: Repository<Command>,
     @InjectRepository(UserRole)
     private readonly userRoleRepository: Repository<UserRole>,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(commandData: AddCommandRequest): Promise<Command> {
-    const command = this.commandRepository.create({
-      name: commandData.name,
-      description: commandData.description,
-      active: true,
-      actions: commandData.actions,
-      parameters: commandData.parameters,
-      userRoles: [],
-    });
-
-    const savedCommand = await this.commandRepository.save(command);
-
-    // Set user roles if provided
-    if (commandData.roleNames && commandData.roleNames.length > 0) {
-      const roles = await this.userRoleRepository.find({
-        where: { userType: In(commandData.roleNames) },
+    return this.dataSource.transaction(async (manager) => {
+      const command = manager.create(Command, {
+        name: commandData.name,
+        description: commandData.description,
+        active: true,
+        actions: commandData.actions,
+        parameters: commandData.parameters,
+        userRoles: [],
       });
-      savedCommand.userRoles = roles;
-      await this.commandRepository.save(savedCommand);
-    }
 
-    return savedCommand;
+      const savedCommand = await manager.save(command);
+
+      if (commandData.roleNames && commandData.roleNames.length > 0) {
+        const roles = await manager.find(UserRole, {
+          where: { userType: In(commandData.roleNames) },
+        });
+        savedCommand.userRoles = roles;
+        await manager.save(savedCommand);
+      }
+
+      return savedCommand;
+    });
   }
 
   async findById(id: string): Promise<Command | null> {
@@ -142,34 +144,27 @@ export class CommandService {
   }
 
   async update(id: string, updateData: UpdateCommandRequest): Promise<Command | null> {
-    const command = await this.findById(id);
-    if (!command) {
-      return null;
-    }
-
-    // Update fields (name is immutable and not included in UpdateCommandRequest)
-    if (updateData.description !== undefined) {
-      command.description = updateData.description;
-    }
-    if (updateData.active !== undefined) {
-      command.active = updateData.active;
-    }
-    if (updateData.actions) {
-      command.actions = updateData.actions;
-    }
-    if (updateData.parameters !== undefined) {
-      command.parameters = updateData.parameters;
-    }
-
-    // Update user roles if provided
-    if (updateData.roleNames) {
-      const roles = await this.userRoleRepository.find({
-        where: { userType: In(updateData.roleNames) },
+    return this.dataSource.transaction(async (manager) => {
+      const command = await manager.findOne(Command, {
+        where: { id },
+        relations: ['userRoles'],
       });
-      command.userRoles = roles;
-    }
 
-    return await this.commandRepository.save(command);
+      if (!command) return null;
+
+      if (updateData.description !== undefined) command.description = updateData.description;
+      if (updateData.active !== undefined) command.active = updateData.active;
+      if (updateData.actions) command.actions = updateData.actions;
+      if (updateData.parameters !== undefined) command.parameters = updateData.parameters;
+
+      if (updateData.roleNames) {
+        command.userRoles = await manager.find(UserRole, {
+          where: { userType: In(updateData.roleNames) },
+        });
+      }
+
+      return manager.save(command);
+    });
   }
 
   async toggleActiveStatus(id: string, active: boolean): Promise<Command | null> {

@@ -39,13 +39,8 @@ export class CoreConfigService {
   }
 
   async updateConfig(key: string, value: string): Promise<Config> {
-    let config = await this.configRepository.findOne({ where: { key } });
-    if (!config) {
-      config = this.configRepository.create({ key, value });
-    } else {
-      config.value = value.toString();
-    }
-    return this.configRepository.save(config);
+    await this.configRepository.upsert({ key, value }, { conflictPaths: ['key'], skipUpdateIfNoValuesChanged: true });
+    return this.configRepository.findOneOrFail({ where: { key } });
   }
   // Helper method to convert entity to proto
   entityToProto(config: Config): ConfigProto {

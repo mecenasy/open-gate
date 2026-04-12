@@ -30,10 +30,9 @@ export class MessagesService {
   }
 
   async update(key: string, value: string): Promise<Messages | null> {
-    const message = await this.get(key);
-    if (!message) return null;
-    message.value = value;
-    return this.messagesRepository.save(message);
+    const result = await this.messagesRepository.update({ key }, { value });
+    if (!result.affected) return null;
+    return this.messagesRepository.findOne({ where: { key } });
   }
 
   async remove(key: string): Promise<boolean> {

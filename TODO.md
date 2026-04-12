@@ -18,7 +18,7 @@ Posortowane według priorytetu.
   - Usunąć lub ograniczyć wyłącznie do środowiska lokalnego z jawnym ostrzeżeniem
 - [ ] **Globalny filtr wyjątków** — brak `@Catch()`, odpowiedzi błędów są niespójne i mogą wyciekać dane
   - Zaimplementować `GlobalExceptionFilter` zwracający ustandaryzowany format `{ statusCode, message, timestamp }`
-- [ ] **TypeScript strictness** — wyłączone kluczowe opcje
+- [x] **TypeScript strictness** — wyłączone kluczowe opcje
   - Włączyć `noImplicitAny: true`, `strictBindCallApply: true`
   - Zmienić `@typescript-eslint/no-explicit-any` na `error`
 
@@ -70,4 +70,27 @@ Posortowane według priorytetu.
 
 ---
 
-_Ostatnia aktualizacja: 2026-04-12_
+## TODO w kodzie (`// TODO` komentarze)
+
+Znalezione w kodzie źródłowym — do implementacji lub przeniesienia do konfiguracji.
+
+- [ ] **`command.service.ts:89`** — zaimplementować filtr akcji (`actionFilter`) używając `ArrayContains` lub query buildera
+  - [`src/db-service/command/command.service.ts`](src/db-service/command/command.service.ts)
+- [ ] **`admin.guard.ts:10`** — zaimplementować właściwą logikę sprawdzania admina (teraz tylko sprawdza czy user istnieje)
+  - [`src/bff-service/common/guards/admin.guard.ts`](src/bff-service/common/guards/admin.guard.ts)
+- [ ] **`get-prompt-by-id.handler.ts:16`** — dodać logikę cache dla promptów (odczyt/zapis po kluczu złożonym `key+command+userType` oraz po `id`)
+  - [`src/bff-service/prompts/queries/handler/get-prompt-by-id.handler.ts`](src/bff-service/prompts/queries/handler/get-prompt-by-id.handler.ts)
+- [ ] **`gate.service.ts:12,23`** — zaimplementować logikę otwierania i zamykania bramy
+  - [`src/core-service/command/gate/gate.service.ts`](src/core-service/command/gate/gate.service.ts)
+- [ ] **`soft-gate.service.ts:13`** — zaimplementować logikę otwierania bramy (soft-gate)
+  - [`src/core-service/command/gate/soft-gate.service.ts`](src/core-service/command/gate/soft-gate.service.ts)
+- [ ] **`groq.service.ts:25,50`** — dodać alarm w systemie monitorującym przy wyczerpaniu tokenów Groq API
+  - [`src/core-service/process/services/groq.service.ts`](src/core-service/process/services/groq.service.ts)
+- [ ] **`signal.attachment.ts:19`** — przenieść URL/konfigurację Signal do config service
+  - [`src/notify-service/incoming/platforms/signal/signal.attachment.ts`](src/notify-service/incoming/platforms/signal/signal.attachment.ts)
+- [ ] **`signal-sender.ts:14`** — przenieść URL/konfigurację Signal do config service
+  - [`src/notify-service/outgoing/platforms/signal/signal-sender.ts`](src/notify-service/outgoing/platforms/signal/signal-sender.ts)
+
+---
+
+*Ostatnia aktualizacja: 2026-04-12*

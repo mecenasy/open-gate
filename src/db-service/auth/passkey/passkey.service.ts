@@ -94,16 +94,12 @@ export class PasskeyService {
   }
 
   async setCounter({ credentialID, counter }: SetCounterRequest): Promise<PasskeyResponse> {
-    const passkey = await this.passkeyRepository.findOneByOrFail({
-      credentialID,
-    });
+    const result = await this.passkeyRepository.update({ credentialID }, { counter });
 
-    passkey.counter = counter;
-    await this.passkeyRepository.save(passkey);
+    if (!result.affected) {
+      return { success: false, message: 'Passkey not found' };
+    }
 
-    return {
-      success: true,
-      message: 'Counter updated successfully',
-    };
+    return { success: true, message: 'Counter updated successfully' };
   }
 }

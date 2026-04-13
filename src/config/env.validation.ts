@@ -1,5 +1,14 @@
 import * as Joi from 'joi';
 
+interface ValidationResult {
+  error?: Joi.ValidationError;
+  value: Record<string, unknown>;
+}
+
+interface ValidatedEnv {
+  [key: string]: string | number | boolean | undefined;
+}
+
 /**
  * Environment Variables Validation Schema
  * Validates all environment variables at application startup
@@ -132,26 +141,28 @@ export const envValidationSchema = Joi.object({
     .default('false')
     .description('Development mode (enables extra logging/debugging)'),
   SERVICE_ID: Joi.string().default('unknown-service').description('Service identifier for logging'),
-});
+}).unknown(true);
 
 /**
  * Validates environment variables against the schema
  * Throws an error with detailed messages if validation fails
  *
- * @returns validated environment object
+ * @returns validated environment object with proper types
  */
-export function validateEnv(config: Record<string, unknown>) {
-  const { error, value } = envValidationSchema.validate(config, {
+export function validateEnv(config: Record<string, unknown>): ValidatedEnv {
+  const result = envValidationSchema.validate(config, {
     abortEarly: false,
-    stripUnknown: true,
-    allowUnknown: false,
-  });
+    stripUnknown: false,
+    allowUnknown: true,
+  }) as ValidationResult;
 
-  if (error) {
-    const errorMessages = error.details.map((detail) => `  - ${detail.path.join('.')}: ${detail.message}`).join('\n');
+  if (result.error) {
+    const errorMessages = result.error.details
+      .map((detail) => `  - ${detail.path.join('.')}: ${detail.message}`)
+      .join('\n');
 
     throw new Error(`\n❌ Environment Validation Failed:\n${errorMessages}`);
   }
 
-  return value;
+  return (result.value as ValidatedEnv) || {};
 }

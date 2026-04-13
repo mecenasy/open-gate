@@ -84,6 +84,12 @@
       "@app/logger/*": [
         "src/libs/logger/*"
       ],
+      "@app/tenant": [
+        "src/libs/tenant/src"
+      ],
+      "@app/tenant/*": [
+        "src/libs/tenant/src/*"
+      ],
       "src/*": [
         "src/*"
       ]

@@ -6,8 +6,9 @@ import { CoreConfigModule } from './core-config/core-config.module';
 import { AuthModule } from './auth/auth.module';
 import { CommandModule } from './command/command.module';
 import { MessagesModule } from './messages/messages.module';
+import { TenantDbModule } from './tenant/tenant.module';
 
 @Module({
-  imports: [AuthModule, CommonModule, UserModule, CoreConfigModule, PromptModule, CommandModule, MessagesModule],
+  imports: [AuthModule, CommonModule, UserModule, CoreConfigModule, PromptModule, CommandModule, MessagesModule, TenantDbModule],
 })
 export class AppModule {}

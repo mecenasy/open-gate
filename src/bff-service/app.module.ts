@@ -13,6 +13,7 @@ import { PromptsModule } from './prompts/prompts.module';
 import { CommandModule } from './command/command.module';
 import { CoreConfigModule } from './core-config/core-config.module';
 import { LoggerModule } from '@app/logger';
+import { TenantModule, TenantInterceptor } from '@app/tenant';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { LoggerModule } from '@app/logger';
       },
     ]),
     LoggerModule,
+    TenantModule,
     UserModule,
     CommonModule,
     AuthModule,
@@ -49,6 +51,10 @@ import { LoggerModule } from '@app/logger';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TenantInterceptor,
     },
     {
       provide: APP_INTERCEPTOR,

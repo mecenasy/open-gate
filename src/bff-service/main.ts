@@ -65,7 +65,6 @@ async function bootstrap() {
 
   logger.log(`Application is running on: ${url}:${process.env.BFF_PORT || 3002}`);
 }
-}
 
 bootstrap().catch((error) => {
   const logger = new Logger('Bootstrap');

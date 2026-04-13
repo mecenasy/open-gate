@@ -1,9 +1,10 @@
-import { Global, Module } from '@nestjs/common';
+import { Global, Module, APP_FILTER } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
 import { join } from 'path';
 import { Context } from '../types/context';
 import { JSONScalarDefinition } from './scalars/json.scalar';
+import { GraphqlExceptionFilter } from '../filters/graphql-exception.filter';
 
 @Global()
 @Module({
@@ -20,6 +21,12 @@ import { JSONScalarDefinition } from './scalars/json.scalar';
         'graphql-ws': true,
       },
     }),
+  ],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: GraphqlExceptionFilter,
+    },
   ],
 })
 export class GraphQlModule {}

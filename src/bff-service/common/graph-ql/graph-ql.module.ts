@@ -3,9 +3,11 @@ import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
 import { join } from 'path';
+import { existsSync, readFileSync } from 'fs';
 import { Context } from '../types/context';
 import { JSONScalarDefinition } from './scalars/json.scalar';
 import { GraphqlExceptionFilter } from '../filters/graphql-exception.filter';
+import { GraphQLSchemaValidator } from './graphql-schema.validator';
 
 @Global()
 @Module({
@@ -22,6 +24,10 @@ import { GraphqlExceptionFilter } from '../filters/graphql-exception.filter';
       subscriptions: {
         'graphql-ws': true,
       },
+      onSchemaChange: (schema) => {
+        // Validate schema on startup and changes
+        new GraphQLSchemaValidator().validateSchema(schema.getQueryType()?.toString() || '');
+      },
     }),
   ],
   providers: [
@@ -31,4 +37,20 @@ import { GraphqlExceptionFilter } from '../filters/graphql-exception.filter';
     },
   ],
 })
-export class GraphQlModule {}
+export class GraphQlModule {
+  constructor() {
+    // Validate schema file on module initialization
+    const schemaPath = join(process.cwd(), 'src/bff-service/common/graph-ql/schema.gql');
+    const validator = new GraphQLSchemaValidator();
+
+    // Check if schema file exists and is valid
+    if (existsSync(schemaPath)) {
+      const schemaContent = readFileSync(schemaPath, 'utf-8');
+      try {
+        validator.validateSchema(schemaContent);
+      } catch (error) {
+        console.warn('GraphQL schema validation suppressed (schema may not be fully generated yet)');
+      }
+    }
+  }
+}

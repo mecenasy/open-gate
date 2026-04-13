@@ -4,10 +4,10 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
 import { join } from 'path';
 import { existsSync, readFileSync } from 'fs';
-import { Context } from '../types/context';
 import { JSONScalarDefinition } from './scalars/json.scalar';
 import { GraphqlExceptionFilter } from '../filters/graphql-exception.filter';
 import { GraphQLSchemaValidator } from './graphql-schema.validator';
+import { Context } from '@app/auth';
 
 @Global()
 @Module({

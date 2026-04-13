@@ -102,6 +102,12 @@
       "@app/database/*": [
         "src/libs/database/src/*"
       ],
+      "@app/customization": [
+        "src/libs/customization/src"
+      ],
+      "@app/customization/*": [
+        "src/libs/customization/src/*"
+      ],
       "src/*": [
         "src/*"
       ]

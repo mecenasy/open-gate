@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package tenant;
+
+service TenantService {
+  rpc GetCustomization (GetCustomizationRequest) returns (GetCustomizationResponse);
+  rpc GetTenant (GetTenantRequest) returns (GetTenantResponse);
+}
+
+message GetCustomizationRequest {
+  string tenant_id = 1;
+}
+
+message GetCustomizationResponse {
+  bool status = 1;
+  string message = 2;
+  string customization_json = 3;
+}
+
+message GetTenantRequest {
+  string tenant_id = 1;
+}
+
+message GetTenantResponse {
+  bool status = 1;
+  string message = 2;
+  string id = 3;
+  string slug = 4;
+  string schema_name = 5;
+  bool is_active = 6;
+}

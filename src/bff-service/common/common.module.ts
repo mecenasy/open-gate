@@ -15,6 +15,7 @@ import { DbGrpcModule } from '@app/db-grpc';
 import { NotifyGrpcModule } from '@app/notify-grpc';
 import { CorrelationService, CORRELATION_SERVICE_TOKEN } from './correlation/correlation.service';
 import { CorrelationIdMiddleware } from './correlation/correlation.middleware';
+import { TenantCustomizationModule } from './customization/tenant-customization.module';
 
 @Global()
 @Module({
@@ -27,6 +28,7 @@ import { CorrelationIdMiddleware } from './correlation/correlation.middleware';
     HttpModule,
     GetawayModule,
     ConfigsModule,
+    TenantCustomizationModule,
     ThrottlerModule.forRoot([
       {
         name: 'short',
@@ -62,7 +64,7 @@ import { CorrelationIdMiddleware } from './correlation/correlation.middleware';
       useClass: AuthGuard,
     },
   ],
-  exports: [EventService, TypeConfigService, CqrsModule, CorrelationService],
+  exports: [EventService, TypeConfigService, CqrsModule, CorrelationService, TenantCustomizationModule],
 })
 export class CommonModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

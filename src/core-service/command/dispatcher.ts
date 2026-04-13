@@ -6,13 +6,17 @@ import { SOF_COMMAND_KEY } from '../common/decorators/sof-handler.decorator';
 import { DiscoveryService } from '@nestjs/core';
 import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
 import { CommandType } from '../common/types/command';
+import { TenantCustomizationService } from '../common/customization/tenant-customization.service';
 
 @Injectable()
 export class SofDispatcher<T> implements OnModuleInit {
   private handlers = new Map<CommandType, Handler<SofCommand<T>, Status>>();
   private logger: Logger;
 
-  constructor(private readonly discoveryService: DiscoveryService) {
+  constructor(
+    private readonly discoveryService: DiscoveryService,
+    private readonly customizationService: TenantCustomizationService,
+  ) {
     this.logger = new Logger(SofDispatcher.name);
   }
 
@@ -20,7 +24,15 @@ export class SofDispatcher<T> implements OnModuleInit {
     const handler = this.handlers.get(command.type);
     if (!handler) throw new Error(`Missing handler: ${command.type}`);
 
-    return await handler.execute(command);
+    const customization = await this.customizationService.getForCurrentTenant();
+    const timeout = customization.commands.timeout;
+
+    return await Promise.race([
+      handler.execute(command),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`Command timeout after ${timeout}ms: ${command.type}`)), timeout),
+      ),
+    ]);
   }
 
   register(type: CommandType, handler: Handler<SofCommand<T>, Status>) {

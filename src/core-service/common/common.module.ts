@@ -10,6 +10,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { DbGrpcModule } from '@app/db-grpc';
 import { NotifyGrpcModule } from '@app/notify-grpc';
 import { GateGrpcModule } from '@app/gate-grpc';
+import { TenantCustomizationModule } from './customization/tenant-customization.module';
 @Global()
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { GateGrpcModule } from '@app/gate-grpc';
     HttpModule,
     GetawayModule,
     ConfigsModule,
+    TenantCustomizationModule,
   ],
   providers: [
     EventService,
@@ -29,6 +31,6 @@ import { GateGrpcModule } from '@app/gate-grpc';
       useExisting: ConfigService,
     },
   ],
-  exports: [EventService, TypeConfigService, CqrsModule],
+  exports: [EventService, TypeConfigService, CqrsModule, TenantCustomizationModule],
 })
 export class CommonModule {}

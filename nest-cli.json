@@ -126,6 +126,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/database/tsconfig.lib.json"
       }
+    },
+    "customization": {
+      "type": "library",
+      "root": "libs/customization",
+      "entryFile": "index",
+      "sourceRoot": "libs/customization/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/customization/tsconfig.lib.json"
+      }
     }
   }
 }

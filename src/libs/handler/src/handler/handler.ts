@@ -15,8 +15,7 @@ export interface ICorrelationService {
 }
 
 export abstract class Handler<T extends ICommand, R, S extends object = object>
-  implements IBaseHandler<T, R>, OnModuleInit
-{
+  implements IBaseHandler<T, R>, OnModuleInit {
   public gRpcService!: S;
   logger: Logger;
   protected circuitBreaker: GrpcCircuitBreaker;
@@ -81,9 +80,9 @@ export abstract class Handler<T extends ICommand, R, S extends object = object>
               return result
                 .then((res) => {
                   circuitBreaker.recordSuccess();
-                  return res;
+                  return res as unknown;
                 })
-                .catch((error) => {
+                .catch((error: Error) => {
                   circuitBreaker.recordFailure();
                   logger.error(`gRPC call failed: ${error.message}`, error);
                   throw error;

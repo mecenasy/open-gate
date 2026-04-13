@@ -82,13 +82,26 @@ Posortowane według priorytetu.
   - ✅ ThrottlerModule configured in bff-service with 3 profiles: default (100/min), auth (5/min), public (30/min)
   - ✅ @Throttle decorators added to auth endpoints: login, passkey, MFA, QR code, CSRF
   - Endpoints protected with rate limiting now return 429 on quota exceeded
-- [ ] **Request/response logging middleware** — add HTTP request logging
-- [ ] **Rozmiar requestów** — add `body-parser` size limit (DOS protection)
-- [ ] **GraphQL schema validation** — add SDL validation
-- [ ] **Dokumentacja proto** — add comments to gRPC contracts
-- [ ] **Circuit breaker** — add error handling for gRPC between services (opossum or custom retry with backoff)
-  - Rozważyć `opossum` lub własny mechanizm retry z backoffem
-- [ ] **ADR (Architecture Decision Records)** — document architectural decisions
+- [x] **Request/response logging middleware** — add HTTP request logging
+  - ✅ RequestLoggingMiddleware logs incoming requests (method, path, query, IP, user-agent, userId)
+  - ✅ Logs outgoing responses (status, duration, content-length)
+  - ✅ Warns on errors, debug on success
+- [x] **Rozmiar requestów** — add `body-parser` size limit (DOS protection)
+  - ✅ Configured default 10mb limit, configurable via MAX_REQUEST_SIZE env
+  - ✅ Applied to JSON and URL-encoded payloads
+- [x] **GraphQL schema validation** — add SDL validation
+  - ✅ GraphQLSchemaValidator checks schema file and validates SDL syntax
+  - ✅ Validates on module initialization, logs type count
+- [x] **Dokumentacja proto** — add comments to gRPC contracts
+  - ✅ Added documentation to user.proto with RPC descriptions, enum values, field comments
+  - ✅ command.proto already had documentation
+- [x] **Circuit breaker** — add error handling for gRPC between services
+  - ✅ GrpcCircuitBreaker implemented with CLOSED/OPEN/HALF_OPEN states
+  - ✅ Integrated into Handler proxy layer for automatic tracking
+  - ✅ Threshold: 5 failures to open, 2 successes to close, 60s timeout
+- [x] **ADR (Architecture Decision Records)** — document architectural decisions
+  - ✅ ARCHITECTURE.md created with 12 comprehensive ADRs
+  - ✅ Documents decisions for microservices, GraphQL, gRPC, NestJS, logging, rate limiting, circuit breaker, correlation IDs, etc.
 
 ---
 

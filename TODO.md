@@ -62,7 +62,8 @@ Posortowane według priorytetu.
   - ✅ `front-servise` → `front-service` (katalog i referencje w config)
   - ✅ `hendler` → usunięty martwy wpis z `nest-cli.json` i `jest-e2e.json`
   - ✅ `outgoing.-notify.module.ts` → `outgoing-notify.module.ts`
-- [ ] **Brak `.env.example`** — nowi deweloperzy nie wiedzą jakich zmiennych potrzebują
+- [x] **Brak `.env.example`** — nowi deweloperzy nie wiedzą jakich zmiennych potrzebują
+  - ✅ Plik `.env.example` z placeholderami dla wszystkich 54+ zmiennych już istnieje
 - [ ] **Limity zasobów w Docker** — brak `mem_limit`, `cpus` w docker-compose
 - [ ] **Connection pooling** — brak konfiguracji puli połączeń dla PostgreSQL i Redis
 - [x] **Brak graceful shutdown** — NestJS nie rejestruje `SIGTERM` / `SIGINT`

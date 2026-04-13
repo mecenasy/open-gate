@@ -27,7 +27,7 @@ export class GraphqlExceptionFilter implements GqlExceptionFilter {
       const response = exception.getResponse();
 
       if (typeof response === 'object') {
-        message = (response as Record<string, unknown>).message as string || exception.message;
+        message = ((response as Record<string, unknown>).message as string) || exception.message;
       } else {
         message = response as string;
       }
@@ -38,7 +38,7 @@ export class GraphqlExceptionFilter implements GqlExceptionFilter {
       code = 'BAD_REQUEST';
       const response = exception.getResponse();
       if (typeof response === 'object') {
-        message = (response as Record<string, unknown>).message as string || 'Invalid input';
+        message = ((response as Record<string, unknown>).message as string) || 'Invalid input';
       }
     } else if (exception instanceof Error) {
       message = exception.message;

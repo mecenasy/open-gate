@@ -3,7 +3,6 @@ import { useTranslations } from 'next-intl';
 import { useMutation } from '@apollo/client/react';
 import { graphql } from '@/app/gql';
 
-
 const ACCEPT_TFA_MUTATION = graphql(`
   mutation AcceptTfa {
     accept2fa {

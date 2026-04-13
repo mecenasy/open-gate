@@ -6,6 +6,7 @@ import { DbGrpcKey } from '@app/db-grpc';
 import { CacheService } from '@app/redis';
 import { EventService } from '@app/event';
 import { IBaseHandler } from './base-handler';
+import { GrpcCircuitBreaker } from '../../grpc-circuit-breaker';
 
 export const CORRELATION_SERVICE_TOKEN = 'CORRELATION_SERVICE';
 
@@ -18,6 +19,7 @@ export abstract class Handler<T extends ICommand, R, S extends object = object>
 {
   public gRpcService!: S;
   logger: Logger;
+  protected circuitBreaker: GrpcCircuitBreaker;
 
   @Inject(DbGrpcKey)
   public readonly grpcClient!: ClientGrpc;
@@ -34,6 +36,12 @@ export abstract class Handler<T extends ICommand, R, S extends object = object>
 
   constructor(public readonly serviceName?: string) {
     this.logger = new Logger(this.constructor.name);
+    this.circuitBreaker = new GrpcCircuitBreaker({
+      name: serviceName ?? 'unknown-service',
+      failureThreshold: 5,
+      successThreshold: 2,
+      timeout: 60000,
+    });
   }
 
   onModuleInit() {
@@ -45,6 +53,8 @@ export abstract class Handler<T extends ICommand, R, S extends object = object>
 
   private createGrpcProxy<U extends object>(service: U): U {
     const correlationService = this.correlationService;
+    const circuitBreaker = this.circuitBreaker;
+    const logger = this.logger;
 
     return new Proxy(service, {
       get(target, prop) {
@@ -52,12 +62,40 @@ export abstract class Handler<T extends ICommand, R, S extends object = object>
         if (typeof value !== 'function') return value;
 
         return (data: unknown, existingMetadata?: Metadata) => {
+          // Check if circuit is open
+          if (!circuitBreaker.canAttempt()) {
+            throw new Error(`gRPC service unavailable: ${circuitBreaker.getState()}. Please retry later.`);
+          }
+
           const metadata = existingMetadata ?? new Metadata();
           const correlationId = correlationService?.getId();
           if (correlationId) {
             metadata.set('x-correlation-id', correlationId);
           }
-          return (value as (...args: unknown[]) => unknown).call(target, data, metadata);
+
+          try {
+            const result = (value as (...args: unknown[]) => unknown).call(target, data, metadata);
+
+            // If it's a promise, track success/failure
+            if (result instanceof Promise) {
+              return result
+                .then((res) => {
+                  circuitBreaker.recordSuccess();
+                  return res;
+                })
+                .catch((error) => {
+                  circuitBreaker.recordFailure();
+                  logger.error(`gRPC call failed: ${error.message}`, error);
+                  throw error;
+                });
+            }
+
+            circuitBreaker.recordSuccess();
+            return result;
+          } catch (error) {
+            circuitBreaker.recordFailure();
+            throw error;
+          }
         };
       },
     });

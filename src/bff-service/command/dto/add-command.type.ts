@@ -19,12 +19,11 @@ export class AddCommandType {
   @IsNotEmpty()
   command!: string;
 
-  @Field(() => GraphQLJSON)
-  actions!: Record<string, boolean>;
+  @Field(() => GraphQLJSON, { nullable: true })
+  actions?: Record<string, boolean>;
 
-  @Field(() => GraphQLJSON)
-  @IsNotEmpty()
-  parameters!: Record<string, boolean>;
+  @Field(() => GraphQLJSON, { nullable: true })
+  parameters?: Record<string, boolean>;
 
   @Field(() => [String])
   @IsArray()

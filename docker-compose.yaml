@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
     mem_limit: 512m
     mem_reservation: 256m
-    cpus: '0.5'
+    cpus: "0.5"
     volumes:
       - .:/app
       - /app/node_modules
@@ -37,7 +37,11 @@ services:
     networks:
       - backend-net
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:${BFF_PORT:-3001}/health || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://localhost:${BFF_PORT:-3001}/health || exit 1",
+        ]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -74,7 +78,7 @@ services:
     restart: unless-stopped
     mem_limit: 512m
     mem_reservation: 256m
-    cpus: '0.5'
+    cpus: "0.5"
 
     # Komenda wymuszająca start konkretnego pliku i obserwowanie zmian
     command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/core-service/main.ts
@@ -104,7 +108,11 @@ services:
     networks:
       - backend-net
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:${GATE_PORT:-3002}/health || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://localhost:${GATE_PORT:-3002}/health || exit 1",
+        ]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -122,7 +130,7 @@ services:
     restart: unless-stopped
     mem_limit: 256m
     mem_reservation: 128m
-    cpus: '0.25'
+    cpus: "0.25"
     ports:
       - "${GRPC_PORT}:50051"
     command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/db-service/main.ts
@@ -155,7 +163,7 @@ services:
     restart: unless-stopped
     mem_limit: 256m
     mem_reservation: 128m
-    cpus: '0.25'
+    cpus: "0.25"
     volumes:
       - .:/app
       - /app/node_modules
@@ -184,7 +192,11 @@ services:
     networks:
       - backend-net
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:${NOTIFY_PORT:-3003}/health || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://localhost:${NOTIFY_PORT:-3003}/health || exit 1",
+        ]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -201,7 +213,7 @@ services:
     restart: unless-stopped
     mem_limit: 512m
     mem_reservation: 256m
-    cpus: '0.5'
+    cpus: "0.5"
     env_file:
       - .env
     environment:
@@ -230,7 +242,7 @@ services:
     restart: unless-stopped
     mem_limit: 256m
     mem_reservation: 128m
-    cpus: '0.25'
+    cpus: "0.25"
     # Use environment variables for the password instead of overriding the command
     environment:
       - REDIS_ARGS=--requirepass ${REDIS_PASSWORD}
@@ -252,7 +264,7 @@ services:
     restart: unless-stopped
     mem_limit: 256m
     mem_reservation: 128m
-    cpus: '0.25'
+    cpus: "0.25"
     environment:
       - MODE=json-rpc
     volumes:

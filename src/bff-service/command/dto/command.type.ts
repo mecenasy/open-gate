@@ -18,7 +18,7 @@ export class CommandType {
   @Field(() => GraphQLJSON, { nullable: true })
   actions!: Record<string, boolean>;
 
-  @Field(() => GraphQLJSON)
+  @Field(() => GraphQLJSON, { nullable: true })
   parameters!: Record<string, boolean>;
 
   @Field(() => [String, { nullable: true }])

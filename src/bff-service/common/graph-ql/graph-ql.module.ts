@@ -18,6 +18,7 @@ import { GraphqlExceptionFilter } from '../filters/graphql-exception.filter';
       playground: true,
       introspection: true,
       debug: true,
+      cors: false,
       subscriptions: {
         'graphql-ws': true,
       },

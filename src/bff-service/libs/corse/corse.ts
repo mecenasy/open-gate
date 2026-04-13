@@ -29,7 +29,7 @@ export const initCorse = (app: INestApplication) => {
         callback(new Error('Not allowed by CORS'));
       }
     },
-    allowedHeaders: ['Content-Type', 'Origin', 'Accept', 'Authorization', 'X-CSRF-Token'],
+    allowedHeaders: ['Content-Type', 'Origin', 'Accept', 'Authorization', 'X-CSRF-Token', 'X-Correlation-Id'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   });
 };

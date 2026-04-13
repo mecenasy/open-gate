@@ -28,8 +28,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     // Log the full error internally
     this.logError(exception, request, status);
 
-    // Send minimal response to client
-    response.status(status).json(errorResponse);
+    // Only send response if it's HTTP context (has status method)
+    if (response && typeof response.status === 'function') {
+      response.status(status).json(errorResponse);
+    }
+    // For GraphQL and other contexts, let exception propagate
   }
 
   private buildErrorResponse(exception: unknown, status: number, request: Request): Record<string, unknown> {
@@ -38,8 +41,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response: Record<string, unknown> = {
       statusCode: status,
       timestamp: new Date().toISOString(),
-      path: request.url,
-      method: request.method,
+      path: request?.url || 'unknown',
+      method: request?.method || 'unknown',
     };
 
     if (!isProduction) {
@@ -58,11 +61,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
   private logError(exception: unknown, request: Request, status: number): void {
     const context = {
-      url: request.url,
-      method: request.method,
-      ip: request.ip,
-      userAgent: request.headers['user-agent'],
-      userId: (request as any).user?.id,
+      url: request?.url || 'unknown',
+      method: request?.method || 'unknown',
+      ip: request?.ip || 'unknown',
+      userAgent: request?.headers?.['user-agent'] || 'unknown',
+      userId: (request as any)?.user?.id,
       statusCode: status,
     };
 

@@ -160,7 +160,7 @@ type CommandType {
   description: String!
   active: Boolean!
   actions: JSON
-  parameters: JSON!
+  parameters: JSON
   roleNames: [String!]!
   createdAt: String!
   updatedAt: String!
@@ -408,8 +408,8 @@ input AddCommandType {
   name: String!
   description: String!
   command: String!
-  actions: JSON!
-  parameters: JSON!
+  actions: JSON
+  parameters: JSON
   roleNames: [String!]!
 }
 
@@ -418,8 +418,8 @@ input UpdateCommandType {
   name: String
   description: String
   active: Boolean
-  actions: JSON!
-  parameters: JSON!
+  actions: JSON
+  parameters: JSON
   roleNames: [String!]! = []
 }
 

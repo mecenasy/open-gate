@@ -1,4 +1,5 @@
-import { Global, Module, APP_FILTER } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
 import { join } from 'path';

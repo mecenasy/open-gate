@@ -1,4 +1,4 @@
-import { ArgumentsHost, BadRequestException, Catch, HttpException } from '@nestjs/common';
+import { ArgumentsHost, BadRequestException, Catch, HttpException, Injectable } from '@nestjs/common';
 import { GqlExceptionFilter } from '@nestjs/graphql';
 import { GraphQLError } from 'graphql';
 
@@ -14,6 +14,7 @@ interface GqlErrorResponse {
  * Catches all unhandled exceptions in GraphQL resolvers
  * Returns standardized error format for GraphQL queries
  */
+@Injectable()
 @Catch()
 export class GraphqlExceptionFilter implements GqlExceptionFilter {
   catch(exception: unknown, _host: ArgumentsHost): GraphQLError {

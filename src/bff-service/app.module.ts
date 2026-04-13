@@ -23,15 +23,15 @@ import { LoggerModule } from '@app/logger';
     PromptsModule,
     CommandModule,
     CoreConfigModule,
-    //  CsrfModule
+    CsrfModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    // {
-    //   provide: APP_INTERCEPTOR,
-    //   useClass: CsrfInterceptor,
-    // },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CsrfInterceptor,
+    },
   ],
 })
 export class AppModule {}

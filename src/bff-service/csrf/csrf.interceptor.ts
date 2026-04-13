@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, ForbiddenException, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { CsrfGuard } from '../common/guards/csrf.guard';
 import { CSRF_EXCLUDE_KEY } from '../common/decorators/csrf.decorator';
 
 @Injectable()
 export class CsrfInterceptor implements NestInterceptor {
-  private readonly csrfGuard = new CsrfGuard();
+  constructor(private readonly csrfGuard: CsrfGuard) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const handler = context.getHandler();
-    const isExcluded = Reflect.getMetadata(CSRF_EXCLUDE_KEY, handler);
+    const isExcluded = Reflect.getMetadata(CSRF_EXCLUDE_KEY, handler) as boolean | undefined;
 
     if (isExcluded) {
       return next.handle();
@@ -18,7 +17,7 @@ export class CsrfInterceptor implements NestInterceptor {
 
     const canActivate = this.csrfGuard.canActivate(context);
     if (!canActivate) {
-      throw new Error('Invalid CSRF token');
+      throw new ForbiddenException('Invalid CSRF token');
     }
 
     return next.handle();

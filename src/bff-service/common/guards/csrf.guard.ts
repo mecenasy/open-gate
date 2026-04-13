@@ -33,7 +33,7 @@ export class CsrfGuard implements CanActivate {
       }
     }
 
-    const token = request.headers['X-CSRF-Token'] as string;
+    const token = (request.headers['x-csrf-token'] ?? request.headers['X-CSRF-Token']) as string;
     const sessionToken = session.csrfToken;
 
     if (!token || !sessionToken) {

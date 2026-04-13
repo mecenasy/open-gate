@@ -6,5 +6,6 @@ declare module 'express-session' {
     user_id?: string;
     isRegister?: boolean;
     currentChallenge?: PublicKeyCredentialCreationOptionsJSON['challenge'];
+    csrfToken?: string;
   }
 }

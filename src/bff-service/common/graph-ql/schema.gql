@@ -71,6 +71,10 @@ type SuccessResponseType {
   success: Boolean!
 }
 
+type CsrfTokenType {
+  csrfToken: String!
+}
+
 type UserStatusType {
   id: ID!
   admin: Boolean!
@@ -219,6 +223,7 @@ type Query {
   coreConfigs: ConfigsListType!
   featureConfigs: ConfigsListType!
   featureConfig(input: GetFeatureConfigType!): ConfigsListType!
+  csrfToken: CsrfTokenType!
 }
 
 input GetAllUsersType {

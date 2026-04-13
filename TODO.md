@@ -42,8 +42,12 @@ Posortowane według priorytetu.
   - ✅ Różne typy: string, number, port, email, URI, enum z `Joi`
   - ✅ Zintegrowano w ConfigModule.forRoot() wszystkich serwisów (bff, core, db, notify, redis)
   - ✅ Lepsze komunikaty błędów przy walidacji (abortEarly: false, allowUnknown: true)
-- [ ] **CSRF wyłączony** — `CsrfModule` i interceptor zakomentowane w `bff-service/app.module.ts`
-  - Włączyć i przetestować
+- [x] **CSRF wyłączony** — `CsrfModule` i interceptor zakomentowane w `bff-service/app.module.ts`
+  - ✅ `CsrfModule` i `APP_INTERCEPTOR` włączone w `app.module.ts`
+  - ✅ Dodany resolver GraphQL `csrfToken` (query `{ csrfToken { csrfToken } }`) jako alternatywa dla REST
+  - ✅ Naprawiony case nagłówka w `CsrfGuard` (`X-CSRF-Token` → `x-csrf-token`)
+  - ✅ `CsrfInterceptor` wstrzykuje `CsrfGuard` przez DI zamiast `new CsrfGuard()`
+  - ✅ Frontend (Apollo Client v4) pobiera token GraphQL i dołącza do każdej mutacji
 - [x] **Health-check endpointy** — brak endpointów dla Docker healthcheck *(w trakcie)*
   - ✅ Dodać `GET /health` do bff-service, core-service, notify-service
   - ✅ Dodać `healthcheck:` do docker-compose.yaml dla serwisów aplikacyjnych

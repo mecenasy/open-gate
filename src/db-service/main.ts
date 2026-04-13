@@ -3,11 +3,13 @@ import { ConsoleLogger, Logger } from '@nestjs/common';
 import { initDbGrpc } from '@app/db-grpc';
 
 async function bootstrap() {
-  await initDbGrpc(AppModule, {
+  const app = await initDbGrpc(AppModule, {
     logger: new ConsoleLogger({
       timestamp: false,
     }),
   });
+
+  app.enableShutdownHooks();
 }
 
 bootstrap().catch((err) => {

@@ -17,6 +17,8 @@ async function bootstrap() {
     }),
   });
 
+  app.enableShutdownHooks();
+
   initRedis(app);
   await startMicroservices(app);
   logger.log('Proxy initialized');

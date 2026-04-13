@@ -65,8 +65,8 @@ Posortowane według priorytetu.
 - [ ] **Brak `.env.example`** — nowi deweloperzy nie wiedzą jakich zmiennych potrzebują
 - [ ] **Limity zasobów w Docker** — brak `mem_limit`, `cpus` w docker-compose
 - [ ] **Connection pooling** — brak konfiguracji puli połączeń dla PostgreSQL i Redis
-- [ ] **Brak graceful shutdown** — NestJS nie rejestruje `SIGTERM` / `SIGINT`
-  - Dodać `app.enableShutdownHooks()` do każdego `main.ts`
+- [x] **Brak graceful shutdown** — NestJS nie rejestruje `SIGTERM` / `SIGINT`
+  - ✅ Dodane `app.enableShutdownHooks()` do `bff-service`, `core-service`, `notify-service`, `db-service`
 
 ---
 

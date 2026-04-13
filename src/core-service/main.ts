@@ -12,6 +12,8 @@ async function bootstrap() {
     }),
   });
 
+  app.enableShutdownHooks();
+
   initGateGrpc(app);
 
   // Setup global logger filters and interceptors

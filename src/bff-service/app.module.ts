@@ -13,7 +13,8 @@ import { PromptsModule } from './prompts/prompts.module';
 import { CommandModule } from './command/command.module';
 import { CoreConfigModule } from './core-config/core-config.module';
 import { LoggerModule } from '@app/logger';
-import { TenantModule, TenantInterceptor } from '@app/tenant';
+import { TenantModule, TenantInterceptor, TenantService } from '@app/tenant';
+import { TENANT_SERVICE_TOKEN } from '@app/handler';
 
 @Module({
   imports: [
@@ -51,6 +52,10 @@ import { TenantModule, TenantInterceptor } from '@app/tenant';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: TENANT_SERVICE_TOKEN,
+      useExisting: TenantService,
     },
     {
       provide: APP_INTERCEPTOR,

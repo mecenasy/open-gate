@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
-import { TenantContext } from './tenant.types.js';
+import { TenantContext } from './tenant.types';
 
 @Injectable()
 export class TenantService {

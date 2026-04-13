@@ -2,8 +2,8 @@ import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } fr
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Observable } from 'rxjs';
 import type { Request } from 'express';
-import { TenantService } from '../tenant.service.js';
-import { TenantContext, TenantResolutionSource } from '../tenant.types.js';
+import { TenantService } from '../tenant.service';
+import { TenantContext, TenantResolutionSource } from '../tenant.types';
 
 @Injectable()
 export class TenantInterceptor implements NestInterceptor {

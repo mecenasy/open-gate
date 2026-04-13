@@ -1,7 +1,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import type { Request } from 'express';
-import type { TenantContext } from '../tenant.types.js';
+import type { TenantContext } from '../tenant.types';
 
 export const CurrentTenant = createParamDecorator(
   (_data: unknown, context: ExecutionContext): TenantContext | undefined => {

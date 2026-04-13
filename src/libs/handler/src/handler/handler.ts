@@ -14,6 +14,12 @@ export interface ICorrelationService {
   getId(): string | undefined;
 }
 
+export const TENANT_SERVICE_TOKEN = 'TENANT_SERVICE';
+
+export interface ITenantService {
+  getContext(): { tenantId: string } | undefined;
+}
+
 export abstract class Handler<T extends ICommand, R, S extends object = object>
   implements IBaseHandler<T, R>, OnModuleInit {
   public gRpcService!: S;
@@ -32,6 +38,10 @@ export abstract class Handler<T extends ICommand, R, S extends object = object>
   @Optional()
   @Inject(CORRELATION_SERVICE_TOKEN)
   private readonly correlationService?: ICorrelationService;
+
+  @Optional()
+  @Inject(TENANT_SERVICE_TOKEN)
+  private readonly tenantService?: ITenantService;
 
   constructor(public readonly serviceName?: string) {
     this.logger = new Logger(this.constructor.name);
@@ -52,6 +62,7 @@ export abstract class Handler<T extends ICommand, R, S extends object = object>
 
   private createGrpcProxy<U extends object>(service: U): U {
     const correlationService = this.correlationService;
+    const tenantService = this.tenantService;
     const circuitBreaker = this.circuitBreaker;
     const logger = this.logger;
 
@@ -70,6 +81,10 @@ export abstract class Handler<T extends ICommand, R, S extends object = object>
           const correlationId = correlationService?.getId();
           if (correlationId) {
             metadata.set('x-correlation-id', correlationId);
+          }
+          const tenantId = tenantService?.getContext()?.tenantId;
+          if (tenantId) {
+            metadata.set('x-tenant-id', tenantId);
           }
 
           try {

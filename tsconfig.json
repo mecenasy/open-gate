@@ -96,6 +96,12 @@
       "@app/cqrs/*": [
         "src/libs/cqrs/src/*"
       ],
+      "@app/database": [
+        "src/libs/database/src"
+      ],
+      "@app/database/*": [
+        "src/libs/database/src/*"
+      ],
       "src/*": [
         "src/*"
       ]

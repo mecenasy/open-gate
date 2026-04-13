@@ -56,8 +56,10 @@ Posortowane według priorytetu.
 
 ## Priorytet 3 — Średni
 
-- [ ] **Correlation ID** — brak ID korelacji między mikroserwisami (gRPC + HTTP)
-  - Dodać middleware generujący `X-Correlation-ID` i przekazujący go przez gRPC metadata
+- [x] **Correlation ID** — brak ID korelacji między mikroserwisami (gRPC + HTTP)
+  - ✅ `CorrelationService` (AsyncLocalStorage) — przechowuje ID w kontekście requesta
+  - ✅ `CorrelationIdMiddleware` — odczytuje `X-Correlation-Id` z nagłówka lub generuje UUID; zapisuje do `req.correlationId` i ustawia nagłówek odpowiedzi
+  - ✅ `Handler` (lib) — Proxy automatycznie wstrzykuje ID do `Metadata` każdego wywołania gRPC przez `@Optional() CORRELATION_SERVICE_TOKEN`
 - [x] **Literówki w nazwach**
   - ✅ `front-servise` → `front-service` (katalog i referencje w config)
   - ✅ `hendler` → usunięty martwy wpis z `nest-cli.json` i `jest-e2e.json`

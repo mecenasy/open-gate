@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common';
+import { Global, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { GetawayModule } from './getaway/getaway.module';
 import { GraphQlModule } from './graph-ql/graph-ql.module';
@@ -13,6 +13,9 @@ import { ConfigsModule } from './configs/configs.module';
 import { RedisModule } from '@app/redis';
 import { DbGrpcModule } from '@app/db-grpc';
 import { NotifyGrpcModule } from '@app/notify-grpc';
+import { CorrelationService, CORRELATION_SERVICE_TOKEN } from './correlation/correlation.service';
+import { CorrelationIdMiddleware } from './correlation/correlation.middleware';
+
 @Global()
 @Module({
   imports: [
@@ -44,15 +47,25 @@ import { NotifyGrpcModule } from '@app/notify-grpc';
   ],
   providers: [
     EventService,
+    CorrelationService,
+    CorrelationIdMiddleware,
     {
       provide: TypeConfigService,
       useExisting: ConfigService,
+    },
+    {
+      provide: CORRELATION_SERVICE_TOKEN,
+      useExisting: CorrelationService,
     },
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
   ],
-  exports: [EventService, TypeConfigService, CqrsModule],
+  exports: [EventService, TypeConfigService, CqrsModule, CorrelationService],
 })
-export class CommonModule {}
+export class CommonModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+  }
+}

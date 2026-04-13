@@ -4,5 +4,6 @@ declare module 'express' {
   export interface Request {
     user?: User;
     securityContext?: SecurityContext;
+    correlationId?: string;
   }
 }

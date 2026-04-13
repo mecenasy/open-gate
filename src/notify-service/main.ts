@@ -20,7 +20,7 @@ async function bootstrap() {
     transport: Transport.GRPC,
     options: {
       ...getGrpcOptions(join(__dirname, '../proto')),
-      url: `0.0.0.0:${process.env.NOTIFY_GRPC_URL?.split(':')[1] ?? '50052'}`,
+      url: `0.0.0.0:${process.env.NOTIFY_GRPC_URL?.split(':').pop() ?? '50052'}`,
     },
   });
   // Setup global logger filters and interceptors

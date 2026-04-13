@@ -11,7 +11,7 @@ export const configSchema = Joi.object({
   MODE: Joi.string().required(),
   SESSION_SECRET: Joi.string().required(),
   SESSION_NAME: Joi.string().required(),
-  SESSION_MAX_AGE: Joi.string().required(),
+  SESSION_MAX_AGE: Joi.number().required(),
   SESSION_HTTP_ONLY: Joi.string().required(),
   SESSION_FOLDER: Joi.string().required(),
   ALLOWED_ORIGIN: Joi.string().required(),

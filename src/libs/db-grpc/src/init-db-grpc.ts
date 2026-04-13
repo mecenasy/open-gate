@@ -16,15 +16,18 @@ export const initDbGrpc: typeof NestFactory.createMicroservice = async (module, 
 
   await appContext.close();
 
+  const port = grpcUrl.split(':')[1] ?? '50051';
+  const bindUrl = `0.0.0.0:${port}`;
+
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(module, {
     transport: Transport.GRPC,
     options: {
       ...getGrpcOptions(join(__dirname, '../../../proto')),
-      url: grpcUrl || '0.0.0.0:50051',
+      url: bindUrl,
     },
   });
 
-  const url = grpcUrl;
+  const url = bindUrl;
   await app.listen();
 
   logger.log(`Application is running on: ${url}`);

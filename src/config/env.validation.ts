@@ -88,18 +88,9 @@ export const envValidationSchema = Joi.object({
   REDIS_PASSWORD: Joi.string().default('').description('Redis password'),
 
   // ============ gRPC Service URLs ============
-  DB_GRPC_URL: Joi.string()
-    .pattern(/^grpc:\/\//)
-    .default('grpc://db-service:50051')
-    .description('DB gRPC service URL'),
-  GATE_GRPC_URL: Joi.string()
-    .pattern(/^grpc:\/\//)
-    .default('grpc://core-service:50053')
-    .description('Core/Gate gRPC service URL'),
-  NOTIFY_GRPC_URL: Joi.string()
-    .pattern(/^grpc:\/\//)
-    .default('grpc://notify-service:50052')
-    .description('Notify gRPC service URL'),
+  DB_GRPC_URL: Joi.string().default('db-service:50051').description('DB gRPC service URL'),
+  GATE_GRPC_URL: Joi.string().default('core-service:50053').description('Core/Gate gRPC service URL'),
+  NOTIFY_GRPC_URL: Joi.string().default('notify-service:50052').description('Notify gRPC service URL'),
 
   // ============ Email Configuration (SMTP) ============
   SMTP_HOST: Joi.string().hostname().default('localhost').description('SMTP server host'),
@@ -127,13 +118,6 @@ export const envValidationSchema = Joi.object({
   // ============ Third-Party Services ============
   POSTMAN_API_KEY: Joi.string().default('').description('Postman API key for collection sync'),
   POSTMAN_COLLECTION_ID: Joi.string().default('').description('Postman collection ID'),
-
-  // ============ Frontend Configuration (NEXT_PUBLIC_*) ============
-  NEXT_PUBLIC_API_HOST_URL: Joi.string().uri().default('http://localhost:3001').description('Frontend API host URL'),
-  NEXT_PUBLIC_HOST_URL: Joi.string().uri().default('http://localhost:4002').description('Frontend application URL'),
-  NEXT_PUBLIC_MSAL_CLIENT_ID: Joi.string().default('').description('Azure AD MSAL client ID'),
-  NEXT_PUBLIC_MSAL_TENANT_ID: Joi.string().default('').description('Azure AD MSAL tenant ID'),
-  NEXT_PUBLIC_DEMO_URL: Joi.string().uri().default('').description('Demo application URL'),
 
   // ============ Logging & Debugging ============
   DEV_MODE: Joi.string()

@@ -105,6 +105,72 @@ Posortowane według priorytetu.
 
 ---
 
+## Priorytet 5 — Future Enhancements
+
+- [ ] **Caching strategy** — implement Redis caching for frequently accessed data
+  - Use Redis for session, user data, prompts, commands caching
+  - Implement cache invalidation triggers
+  - Add @CacheKey decorators for automatic caching
+  - Consider: cache-aside vs write-through patterns
+
+- [ ] **Search and filtering optimization** — improve performance of large queries
+  - Add database indexes on frequently filtered fields
+  - Implement full-text search for commands/prompts
+  - Add pagination optimization (cursor-based vs offset)
+  - Consider Elasticsearch integration for complex queries
+
+- [ ] **API versioning strategy** — prepare for backward-compatible evolution
+  - Document versioning approach (GraphQL schema versioning)
+  - Implement deprecation warnings for old fields
+  - Plan migration path for clients
+
+- [ ] **Database migration strategy** — improve migration management
+  - Document migration naming conventions
+  - Add pre/post migration hooks
+  - Implement automated rollback testing
+  - Add migration status tracking
+
+- [ ] **Test coverage** — expand unit/integration/E2E tests
+  - Priority 1: Core services (user, command, auth) - 70% coverage target
+  - Priority 2: Handlers and resolvers - 60% coverage target
+  - Priority 3: Guards and interceptors - 50% coverage target
+  - E2E tests for entire flow (auth → command → notify)
+  - Enable SonarQube or similar for continuous tracking
+
+- [ ] **Performance monitoring** — add APM and metrics collection
+  - Consider: DataDog, New Relic, or self-hosted Prometheus
+  - Track: request duration, error rates, database query performance
+  - Set up alerts for anomalies
+  - Create performance dashboards
+
+- [ ] **Security hardening** — additional security measures
+  - SQL injection prevention review
+  - XSS protection for user inputs
+  - CORS policy refinement
+  - API key rotation strategy
+  - Audit logging for sensitive operations
+
+- [ ] **Documentation improvements** — expand developer and user docs
+  - API documentation (Swagger/OpenAPI)
+  - Database schema documentation
+  - Deployment guide for staging/production
+  - Troubleshooting guide
+  - Architecture runbook
+
+- [ ] **Frontend-Backend integration testing** — validate E2E flows
+  - Test complete auth flow (login, MFA, passkey)
+  - Test command creation and execution
+  - Test notification delivery
+  - Client error recovery scenarios
+
+- [ ] **Infrastructure as Code** — setup Terraform/Helm for deployment
+  - Kubernetes manifests
+  - Database and Redis infrastructure
+  - Load balancer configuration
+  - Monitoring stack (Prometheus, Grafana)
+
+---
+
 ## TODO w kodzie (`// TODO` komentarze)
 
 Znalezione w kodzie źródłowym — do implementacji lub przeniesienia do konfiguracji.
@@ -128,4 +194,4 @@ Znalezione w kodzie źródłowym — do implementacji lub przeniesienia do konfi
 
 ---
 
-*Ostatnia aktualizacja: 2026-04-12*
+*Ostatnia aktualizacja: 2026-04-13*

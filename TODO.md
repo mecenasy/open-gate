@@ -10,26 +10,32 @@ Posortowane według priorytetu.
 - [ ] **Testy** — brak testów jednostkowych i e2e; tylko ~2 pliki spec z ~44 liniami kodu
   - Dodać testy serwisów, handlerów CQRS, guardów i interceptorów
   - Cel: pokrycie co najmniej 70%
-- [ ] **Plik `.env` w repozytorium** — klucze API (GROQ, OpenAI, Postman) są commitowane
-  - Usunąć `.env` z git (`git rm --cached .env`)
-  - Dodać `.env.example` z placeholderami
-  - Dodać `.env` do `.gitignore`
-- [ ] **Backdoor w trybie deweloperskim** — `AuthGuard` przepuszcza wszystkie requesty gdy `DEV_MODE=true`
-  - Usunąć lub ograniczyć wyłącznie do środowiska lokalnego z jawnym ostrzeżeniem
-- [ ] **Globalny filtr wyjątków** — brak `@Catch()`, odpowiedzi błędów są niespójne i mogą wyciekać dane
-  - Zaimplementować `GlobalExceptionFilter` zwracający ustandaryzowany format `{ statusCode, message, timestamp }`
+- [x] **Plik `.env` w repozytorium** — klucze API (GROQ, OpenAI, Postman) są commitowane
+  - ✅ Usunąć `.env` z git — `.env` nie jest trackowany (per .gitignore)
+  - ✅ Dodać `.env.example` z placeholderami
+  - ✅ `.env` dodany do `.gitignore` (już było)
+- [x] **Backdoor w trybie deweloperskim** — `AuthGuard` przepuszcza wszystkie requesty gdy `DEV_MODE=true`
+  - ✅ Usunięty bypass `process.env.DEV_MODE === 'true'` z `AuthGuard`
+  - ✅ Dodane logowanie nieudanych prób dostępu
+- [x] **Globalny filtr wyjątków** — brak `@Catch()`, odpowiedzi błędów są niespójne i mogą wyciekać dane
+  - ✅ `GlobalExceptionFilter` już zaimplementowany w `src/libs/logger`
+  - ✅ Zwraca ustandaryzowany format `{ statusCode, message, timestamp, path, method }`
+  - ✅ Inne zachowanie dla production (minimalne info) vs dev (szczegóły)
 - [x] **TypeScript strictness** — wyłączone kluczowe opcje
-  - Włączyć `noImplicitAny: true`, `strictBindCallApply: true`
-  - Zmienić `@typescript-eslint/no-explicit-any` na `error`
+  - ✅ `noImplicitAny: true`, `strictBindCallApply: true`
+  - ✅ Poprawione błędy typowania w `at-least-one-exist.decorator.ts` i `core-config.service.ts`
 
 ---
 
 ## Priorytet 2 — Wysoki
 
-- [ ] **Logowanie przez `console.*`** — 336 plików używa `console.log/error/warn`
-  - Zastąpić przez `Logger` z NestJS z odpowiednimi poziomami (log/warn/error/debug)
+- [x] **Logowanie przez `console.*`** — 336 plików używa `console.log/error/warn`
+  - ✅ Zastąpić przez `Logger` z NestJS z odpowiednimi poziomami (log/warn/error/debug)
 - [x] **Brak obsługi transakcji** — operacje wieloetapowe w bazie bez transakcji
-  - Dodać wzorzec transakcji TypeORM (`EntityManager.transaction`)
+  - ✅ Dodane transakcje do `command.service.ts` (`create()`, `update()`)
+  - ✅ Zmieniono `passkey.service.ts#setCounter` na atomic `update()`
+  - ✅ Zmieniono `messages.service.ts#update` na atomic `update()`
+  - ✅ Zmieniono `core-config.service.ts#updateConfig` na atomic `upsert()`
 - [ ] **Walidacja zmiennych środowiskowych** — brak schematu walidacji `.env`
   - Użyć `Joi` lub `class-validator` w `ConfigModule.forRoot({ validationSchema })`
 - [ ] **CSRF wyłączony** — `CsrfModule` i interceptor zakomentowane w `bff-service/app.module.ts`
@@ -44,9 +50,9 @@ Posortowane według priorytetu.
 
 - [ ] **Correlation ID** — brak ID korelacji między mikroserwisami (gRPC + HTTP)
   - Dodać middleware generujący `X-Correlation-ID` i przekazujący go przez gRPC metadata
-- [ ] **Literówki w nazwach** *(w trakcie)*
-  - ✅ `front-servise` → `front-service` (katalog i referencje)
-  - ✅ `hendler` → usunąć martwy wpis z `nest-cli.json` i `jest-e2e.json`
+- [x] **Literówki w nazwach**
+  - ✅ `front-servise` → `front-service` (katalog i referencje w config)
+  - ✅ `hendler` → usunięty martwy wpis z `nest-cli.json` i `jest-e2e.json`
   - ✅ `outgoing.-notify.module.ts` → `outgoing-notify.module.ts`
 - [ ] **Brak `.env.example`** — nowi deweloperzy nie wiedzą jakich zmiennych potrzebują
 - [ ] **Limity zasobów w Docker** — brak `mem_limit`, `cpus` w docker-compose

@@ -156,17 +156,19 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^@app/db-grpc(|/.*)$": "<rootDir>/libs/db-grpc/src/$1",
-      "^@app/gate-grpc(|/.*)$": "<rootDir>/libs/gate-grpc/src/$1",
-      "^@app/handler(|/.*)$": "<rootDir>/libs/handler/src/$1",
-      "^@app/event(|/.*)$": "<rootDir>/libs/event/src/$1",
-      "^@app/notify-grpc(|/.*)$": "<rootDir>/libs/notify-grpc/src/$1",
-      "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
-      "^src/(.*)$": "<rootDir>/$1"
+      "^@app/db-grpc(|/.*)$": "<rootDir>/src/libs/db-grpc/src/$1",
+      "^@app/gate-grpc(|/.*)$": "<rootDir>/src/libs/gate-grpc/src/$1",
+      "^@app/handler(|/.*)$": "<rootDir>/src/libs/handler/src/$1",
+      "^@app/event(|/.*)$": "<rootDir>/src/libs/event/src/$1",
+      "^@app/notify-grpc(|/.*)$": "<rootDir>/src/libs/notify-grpc/src/$1",
+      "^@app/redis(|/.*)$": "<rootDir>/src/libs/redis/src/$1",
+      "^@app/auth(|/.*)$": "<rootDir>/src/libs/auth/src/$1",
+      "^@app/config(|/.*)$": "<rootDir>/src/libs/config/src/$1",
+      "^@app/logger(|/.*)$": "<rootDir>/src/libs/logger/$1",
+      "^src/(.*)$": "<rootDir>/src/$1"
     },
     "roots": [
-      "<rootDir>/src/",
-      "<rootDir>/libs/"
+      "<rootDir>/src/"
     ]
   }
 }

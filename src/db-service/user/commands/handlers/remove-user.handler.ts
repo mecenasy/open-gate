@@ -1,31 +1,26 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CustomLogger } from '@app/logger';
+import { CommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CustomLogger } from '@app/logger';
+import { BaseCommandHandler } from '@app/cqrs';
 import { RemoveUserCommand } from '../impl/remove-user.command';
 import { User } from '../../entity/user.entity';
 
 @CommandHandler(RemoveUserCommand)
-export class RemoveUserHandler implements ICommandHandler<RemoveUserCommand, boolean> {
+export class RemoveUserHandler extends BaseCommandHandler<RemoveUserCommand, boolean> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(RemoveUserHandler.name);
+    super(logger);
   }
 
-  async execute(command: RemoveUserCommand): Promise<boolean> {
-    this.logger.log('Executing RemoveUser');
-
-    try {
+  execute(command: RemoveUserCommand): Promise<boolean> {
+    return this.run('RemoveUser', async () => {
       const result = await this.userRepository.delete({ id: command.id });
       await this.userRepository.delete({ ownerId: command.id });
       return (result?.affected ?? 0) > 0;
-    } catch (error) {
-      this.logger.error('Error executing RemoveUser', error);
-      throw error;
-    }
+    });
   }
 }

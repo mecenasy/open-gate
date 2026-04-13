@@ -1,7 +1,8 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CustomLogger } from '@app/logger';
+import { CommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CustomLogger } from '@app/logger';
+import { BaseCommandHandler } from '@app/cqrs';
 import { UpdateUserCommand } from '../impl/update-user.command';
 import { User } from '../../entity/user.entity';
 import { UserRole } from '../../entity/user-role.entity';
@@ -12,30 +13,25 @@ import { entityToProto } from '../../utils/entity-to-proto';
 import { UserData } from 'src/proto/user';
 
 @CommandHandler(UpdateUserCommand)
-export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, UserData | null> {
+export class UpdateUserHandler extends BaseCommandHandler<UpdateUserCommand, UserData | null> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserRole)
     private readonly userRoleRepository: Repository<UserRole>,
-
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(UpdateUserHandler.name);
+    super(logger);
   }
 
-  async execute(command: UpdateUserCommand): Promise<UserData | null> {
-    this.logger.log('Executing UpdateUser');
-
-    try {
+  execute(command: UpdateUserCommand): Promise<UserData | null> {
+    return this.run('UpdateUser', async () => {
       const { type, status, ...updateData } = command.data;
       const dataToUpdate: Partial<User> = { ...updateData };
 
       if (type) {
         dataToUpdate.userRole = await this.userRoleRepository.findOneOrFail({
-          where: {
-            userType: type ? protoToJsUserType(type) : UserType.User,
-          },
+          where: { userType: type ? protoToJsUserType(type) : UserType.User },
         });
       }
 
@@ -51,9 +47,6 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, Use
       });
 
       return entity ? entityToProto(entity) : null;
-    } catch (error) {
-      this.logger.error('Error executing UpdateUser', error);
-      throw error;
-    }
+    });
   }
 }

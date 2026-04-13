@@ -1,4 +1,4 @@
-import { Inject, Logger, OnModuleInit, Optional } from '@nestjs/common';
+import { BadRequestException, Inject, Logger, OnModuleInit, Optional } from '@nestjs/common';
 import { ICommand } from '@nestjs/cqrs';
 import { type ClientGrpc } from '@nestjs/microservices';
 import { Metadata } from '@grpc/grpc-js';
@@ -98,6 +98,16 @@ export abstract class Handler<T extends ICommand, R, S extends object = object>
         };
       },
     });
+  }
+
+  protected checkGrpcResponse<U extends { status?: boolean; message?: string }>(
+    response: U | null | undefined,
+    errorMessage?: string,
+  ): U {
+    if (!response || response.status === false) {
+      throw new BadRequestException(response?.message ?? errorMessage ?? 'Request failed');
+    }
+    return response;
   }
 
   abstract execute(command: T): Promise<R>;

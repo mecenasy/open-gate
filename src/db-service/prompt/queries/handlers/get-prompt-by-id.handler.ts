@@ -1,27 +1,23 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { QueryHandler } from '@nestjs/cqrs';
 import { CustomLogger } from '@app/logger';
+import { BaseQueryHandler } from '@app/cqrs';
 import { GetPromptByIdQuery } from '../impl/get-prompt-by-id.query';
 import { PromptService } from '../../prompt.service';
 import { Prompt as PromptProto } from 'src/proto/prompt';
 
 @QueryHandler(GetPromptByIdQuery)
-export class GetPromptByIdHandler implements IQueryHandler<GetPromptByIdQuery, PromptProto | null> {
+export class GetPromptByIdHandler extends BaseQueryHandler<GetPromptByIdQuery, PromptProto | null> {
   constructor(
     private readonly promptService: PromptService,
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(GetPromptByIdHandler.name);
+    super(logger);
   }
 
-  async execute(query: GetPromptByIdQuery): Promise<PromptProto | null> {
-    this.logger.log('Executing GetPromptById');
-
-    try {
+  execute(query: GetPromptByIdQuery): Promise<PromptProto | null> {
+    return this.run('GetPromptById', async () => {
       const entity = await this.promptService.findById(query.id);
       return entity ? this.promptService.entityToProto(entity) : null;
-    } catch (error) {
-      this.logger.error('Error executing GetPromptById', error);
-      throw error;
-    }
+    });
   }
 }

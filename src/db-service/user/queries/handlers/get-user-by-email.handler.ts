@@ -1,7 +1,8 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { CustomLogger } from '@app/logger';
+import { QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CustomLogger } from '@app/logger';
+import { BaseQueryHandler } from '@app/cqrs';
 import { GetUserByEmailQuery } from '../impl/get-user-by-email.query';
 import { User } from '../../entity/user.entity';
 import { userStatusToProto } from 'src/utils/concert-status';
@@ -9,20 +10,17 @@ import { jsToProtoUserType } from 'src/utils/user-type-converter';
 import { UserResponse } from 'src/proto/user';
 
 @QueryHandler(GetUserByEmailQuery)
-export class GetUserByEmailHandler implements IQueryHandler<GetUserByEmailQuery, UserResponse> {
+export class GetUserByEmailHandler extends BaseQueryHandler<GetUserByEmailQuery, UserResponse> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(GetUserByEmailHandler.name);
+    super(logger);
   }
 
-  async execute(query: GetUserByEmailQuery): Promise<UserResponse> {
-    this.logger.log('Executing GetUserByEmail');
-
-    try {
+  execute(query: GetUserByEmailQuery): Promise<UserResponse> {
+    return this.run('GetUserByEmail', async () => {
       const user = await this.userRepository
         .createQueryBuilder('user')
         .leftJoinAndSelect('user.userRole', 'userRole')
@@ -45,13 +43,7 @@ export class GetUserByEmailHandler implements IQueryHandler<GetUserByEmailQuery,
         };
       }
 
-      return {
-        status: false,
-        message: 'User not found',
-      };
-    } catch (error) {
-      this.logger.error('Error executing GetUserByEmail', error);
-      throw error;
-    }
+      return { status: false, message: 'User not found' };
+    });
   }
 }

@@ -1,7 +1,8 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CustomLogger } from '@app/logger';
+import { BaseCommandHandler } from '@app/cqrs';
 import { AddUserCommand } from '../impl/add-user.command';
 import { User } from '../../entity/user.entity';
 import { UserRole } from '../../entity/user-role.entity';
@@ -14,7 +15,7 @@ import { entityToProto } from '../../utils/entity-to-proto';
 import { UserData } from 'src/proto/user';
 
 @CommandHandler(AddUserCommand)
-export class AddUserHandler implements ICommandHandler<AddUserCommand, UserData> {
+export class AddUserHandler extends BaseCommandHandler<AddUserCommand, UserData> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -22,57 +23,47 @@ export class AddUserHandler implements ICommandHandler<AddUserCommand, UserData>
     private readonly userRoleRepository: Repository<UserRole>,
     private readonly passwordService: PasswordService,
     private readonly userSettingsService: UserSettingsService,
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(AddUserHandler.name);
+    super(logger);
   }
 
-  async execute(command: AddUserCommand): Promise<UserData> {
-    this.logger.log('Executing AddUserCommand', {
-      email: command.request.email,
-      type: command.request.type,
-    });
+  execute(command: AddUserCommand): Promise<UserData> {
+    return this.run(
+      'AddUser',
+      async () => {
+        const { email, phone, password, name, surname, type, phoneOwner } = command.request;
 
-    try {
-      const { email, phone, password, name, surname, type, phoneOwner } = command.request;
-
-      const userType = await this.userRoleRepository.findOneOrFail({
-        where: {
-          userType: type ? protoToJsUserType(type) : UserType.User,
-        },
-      });
-
-      const user = this.userRepository.create({
-        email,
-        phone,
-        name,
-        surname,
-        status: UserStatus.Pending,
-        userRole: userType,
-        userSettings: this.userSettingsService.create(),
-      });
-
-      if (phoneOwner) {
-        const owner = await this.userRepository.findOneOrFail({
-          where: { phone: phoneOwner },
+        const userType = await this.userRoleRepository.findOneOrFail({
+          where: { userType: type ? protoToJsUserType(type) : UserType.User },
         });
-        user.ownerId = owner.id;
-      }
 
-      if (password) {
-        user.password = this.passwordService.createPassword(password);
-      }
+        const user = this.userRepository.create({
+          email,
+          phone,
+          name,
+          surname,
+          status: UserStatus.Pending,
+          userRole: userType,
+          userSettings: this.userSettingsService.create(),
+        });
 
-      const entity = await this.userRepository.save(user);
-      const result = entityToProto(entity);
+        if (phoneOwner) {
+          const owner = await this.userRepository.findOneOrFail({ where: { phone: phoneOwner } });
+          user.ownerId = owner.id;
+        }
 
-      this.logger.log('User added successfully', { userId: result.id });
-      return result;
-    } catch (error) {
-      this.logger.error('Failed to add user', error, {
-        email: command.request.email,
-      });
-      throw error;
-    }
+        if (password) {
+          user.password = this.passwordService.createPassword(password);
+        }
+
+        const entity = await this.userRepository.save(user);
+        const result = entityToProto(entity);
+
+        this.logger.log('User added successfully', { userId: result.id });
+        return result;
+      },
+      { email: command.request.email, type: command.request.type },
+    );
   }
 }

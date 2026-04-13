@@ -1,26 +1,20 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { QueryHandler } from '@nestjs/cqrs';
 import { CustomLogger } from '@app/logger';
+import { BaseQueryHandler } from '@app/cqrs';
 import { LoginQuery } from '../impl/login.query';
 import { LoginService } from '../../login.service';
 import { LoginResponse } from 'src/proto/login';
 
 @QueryHandler(LoginQuery)
-export class LoginHandler implements IQueryHandler<LoginQuery, LoginResponse> {
+export class LoginHandler extends BaseQueryHandler<LoginQuery, LoginResponse> {
   constructor(
     private readonly loginService: LoginService,
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(LoginHandler.name);
+    super(logger);
   }
 
   execute(query: LoginQuery): Promise<LoginResponse> {
-    this.logger.log('Executing Login');
-
-    try {
-      return this.loginService.login(query.email, query.password);
-    } catch (error) {
-      this.logger.error('Error executing Login', error);
-      throw error;
-    }
+    return this.run('Login', () => this.loginService.login(query.email, query.password));
   }
 }

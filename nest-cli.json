@@ -108,6 +108,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/tenant/tsconfig.lib.json"
       }
+    },
+    "cqrs": {
+      "type": "library",
+      "root": "libs/cqrs",
+      "entryFile": "index",
+      "sourceRoot": "libs/cqrs/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/cqrs/tsconfig.lib.json"
+      }
     }
   }
 }

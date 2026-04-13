@@ -1,30 +1,23 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { QueryHandler } from '@nestjs/cqrs';
 import { CustomLogger } from '@app/logger';
+import { BaseQueryHandler } from '@app/cqrs';
 import { GetAllPromptsQuery } from '../impl/get-all-prompts.query';
 import { PromptService } from '../../prompt.service';
 import { PromptSimply } from 'src/proto/prompt';
 
 @QueryHandler(GetAllPromptsQuery)
-export class GetAllPromptsHandler implements IQueryHandler<
-  GetAllPromptsQuery,
-  { data: PromptSimply[]; total: number }
-> {
+export class GetAllPromptsHandler extends BaseQueryHandler<GetAllPromptsQuery, { data: PromptSimply[]; total: number }> {
   constructor(
     private readonly promptService: PromptService,
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(GetAllPromptsHandler.name);
+    super(logger);
   }
 
-  async execute(query: GetAllPromptsQuery): Promise<{ data: PromptSimply[]; total: number }> {
-    this.logger.log('Executing GetAllPrompts');
-
-    try {
+  execute(query: GetAllPromptsQuery): Promise<{ data: PromptSimply[]; total: number }> {
+    return this.run('GetAllPrompts', async () => {
       const { prompts, total } = await this.promptService.findAll(query.page, query.limit, query.userType);
       return { data: prompts.map((p) => this.promptService.entityToSimplyProto(p)), total };
-    } catch (error) {
-      this.logger.error('Error executing GetAllPrompts', error);
-      throw error;
-    }
+    });
   }
 }

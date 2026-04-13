@@ -1,26 +1,20 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { QueryHandler } from '@nestjs/cqrs';
 import { CustomLogger } from '@app/logger';
+import { BaseQueryHandler } from '@app/cqrs';
 import { GetPasskeysQuery } from '../impl/get-passkeys.query';
 import { PasskeyService } from '../../passkey.service';
 import { GetPasskeysResponse } from 'src/proto/passkey';
 
 @QueryHandler(GetPasskeysQuery)
-export class GetPasskeysHandler implements IQueryHandler<GetPasskeysQuery, GetPasskeysResponse> {
+export class GetPasskeysHandler extends BaseQueryHandler<GetPasskeysQuery, GetPasskeysResponse> {
   constructor(
     private readonly passkeyService: PasskeyService,
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(GetPasskeysHandler.name);
+    super(logger);
   }
 
   execute(query: GetPasskeysQuery): Promise<GetPasskeysResponse> {
-    this.logger.log('Executing GetPasskeys');
-
-    try {
-      return this.passkeyService.getPasskeys(query.request);
-    } catch (error) {
-      this.logger.error('Error executing GetPasskeys', error);
-      throw error;
-    }
+    return this.run('GetPasskeys', () => this.passkeyService.getPasskeys(query.request));
   }
 }

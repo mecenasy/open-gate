@@ -1,7 +1,8 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CustomLogger } from '@app/logger';
+import { CommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CustomLogger } from '@app/logger';
+import { BaseCommandHandler } from '@app/cqrs';
 import { UpdateUserStatusCommand } from '../impl/update-user-status.command';
 import { User } from '../../entity/user.entity';
 import { protoToUserStatus } from 'src/utils/concert-status';
@@ -9,31 +10,23 @@ import { entityToProto } from '../../utils/entity-to-proto';
 import { UserData } from 'src/proto/user';
 
 @CommandHandler(UpdateUserStatusCommand)
-export class UpdateUserStatusHandler implements ICommandHandler<UpdateUserStatusCommand, UserData | null> {
+export class UpdateUserStatusHandler extends BaseCommandHandler<UpdateUserStatusCommand, UserData | null> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(UpdateUserStatusHandler.name);
+    super(logger);
   }
 
-  async execute(command: UpdateUserStatusCommand): Promise<UserData | null> {
-    this.logger.log('Executing UpdateUserStatus');
-
-    try {
+  execute(command: UpdateUserStatusCommand): Promise<UserData | null> {
+    return this.run('UpdateUserStatus', async () => {
       await this.userRepository.update(command.id, { status: protoToUserStatus(command.status) });
-
       const entity = await this.userRepository.findOne({
         where: { id: command.id },
         relations: ['userRole'],
       });
-
       return entity ? entityToProto(entity) : null;
-    } catch (error) {
-      this.logger.error('Error executing UpdateUserStatus', error);
-      throw error;
-    }
+    });
   }
 }

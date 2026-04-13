@@ -1,33 +1,28 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { CustomLogger } from '@app/logger';
+import { QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CustomLogger } from '@app/logger';
+import { BaseQueryHandler } from '@app/cqrs';
 import { CheckExistQuery } from '../impl/check-exist.query';
 import { User } from '../../entity/user.entity';
 
 @QueryHandler(CheckExistQuery)
-export class CheckExistHandler implements IQueryHandler<CheckExistQuery, boolean> {
+export class CheckExistHandler extends BaseQueryHandler<CheckExistQuery, boolean> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(CheckExistHandler.name);
+    super(logger);
   }
 
-  async execute(query: CheckExistQuery): Promise<boolean> {
-    this.logger.log('Executing CheckExist');
-
-    try {
+  execute(query: CheckExistQuery): Promise<boolean> {
+    return this.run('CheckExist', async () => {
       const user = await this.userRepository
         .createQueryBuilder('user')
         .where('user.email = :email', { email: query.email })
         .getOne();
       return !!user;
-    } catch (error) {
-      this.logger.error('Error executing CheckExist', error);
-      throw error;
-    }
+    });
   }
 }

@@ -1,25 +1,24 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { QueryHandler } from '@nestjs/cqrs';
 import { CustomLogger } from '@app/logger';
+import { BaseQueryHandler } from '@app/cqrs';
 import { GetAllCommandsQuery } from '../impl/get-all-commands.query';
 import { CommandService } from '../../command.service';
 import { Command as CommandProto } from 'src/proto/command';
 
 @QueryHandler(GetAllCommandsQuery)
-export class GetAllCommandsHandler implements IQueryHandler<
+export class GetAllCommandsHandler extends BaseQueryHandler<
   GetAllCommandsQuery,
   { data: CommandProto[]; total: number }
 > {
   constructor(
     private readonly commandService: CommandService,
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(GetAllCommandsHandler.name);
+    super(logger);
   }
 
-  async execute(query: GetAllCommandsQuery): Promise<{ data: CommandProto[]; total: number }> {
-    this.logger.log('Executing GetAllCommands');
-
-    try {
+  execute(query: GetAllCommandsQuery): Promise<{ data: CommandProto[]; total: number }> {
+    return this.run('GetAllCommands', async () => {
       const { commands, total } = await this.commandService.findAll(
         query.page,
         query.limit,
@@ -27,9 +26,6 @@ export class GetAllCommandsHandler implements IQueryHandler<
         query.actionFilter,
       );
       return { data: commands.map((c) => this.commandService.entityToProto(c)), total };
-    } catch (error) {
-      this.logger.error('Error executing GetAllCommands', error);
-      throw error;
-    }
+    });
   }
 }

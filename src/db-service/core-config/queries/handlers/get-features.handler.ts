@@ -1,27 +1,23 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { QueryHandler } from '@nestjs/cqrs';
 import { CustomLogger } from '@app/logger';
+import { BaseQueryHandler } from '@app/cqrs';
 import { GetFeaturesQuery } from '../impl/get-features.query';
 import { CoreConfigService } from '../../core-config.service';
 import { Config as ConfigProto } from 'src/proto/config';
 
 @QueryHandler(GetFeaturesQuery)
-export class GetFeaturesHandler implements IQueryHandler<GetFeaturesQuery, ConfigProto[]> {
+export class GetFeaturesHandler extends BaseQueryHandler<GetFeaturesQuery, ConfigProto[]> {
   constructor(
     private readonly configService: CoreConfigService,
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(GetFeaturesHandler.name);
+    super(logger);
   }
 
-  async execute(): Promise<ConfigProto[]> {
-    this.logger.log('Executing GetFeatures');
-
-    try {
+  execute(): Promise<ConfigProto[]> {
+    return this.run('GetFeatures', async () => {
       const entities = await this.configService.fetchAllFeatures();
       return entities.map((e) => this.configService.entityToProto(e));
-    } catch (error) {
-      this.logger.error('Error executing GetFeatures', error);
-      throw error;
-    }
+    });
   }
 }

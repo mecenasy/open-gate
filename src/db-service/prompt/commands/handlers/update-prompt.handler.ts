@@ -1,27 +1,23 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler } from '@nestjs/cqrs';
 import { CustomLogger } from '@app/logger';
+import { BaseCommandHandler } from '@app/cqrs';
 import { UpdatePromptCommand } from '../impl/update-prompt.command';
 import { PromptService } from '../../prompt.service';
 import { Prompt as PromptProto } from 'src/proto/prompt';
 
 @CommandHandler(UpdatePromptCommand)
-export class UpdatePromptHandler implements ICommandHandler<UpdatePromptCommand, PromptProto | null> {
+export class UpdatePromptHandler extends BaseCommandHandler<UpdatePromptCommand, PromptProto | null> {
   constructor(
     private readonly promptService: PromptService,
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(UpdatePromptHandler.name);
+    super(logger);
   }
 
-  async execute(command: UpdatePromptCommand): Promise<PromptProto | null> {
-    this.logger.log('Executing UpdatePrompt');
-
-    try {
+  execute(command: UpdatePromptCommand): Promise<PromptProto | null> {
+    return this.run('UpdatePrompt', async () => {
       const entity = await this.promptService.update(command.id, command.data);
       return entity ? this.promptService.entityToProto(entity) : null;
-    } catch (error) {
-      this.logger.error('Error executing UpdatePrompt', error);
-      throw error;
-    }
+    });
   }
 }

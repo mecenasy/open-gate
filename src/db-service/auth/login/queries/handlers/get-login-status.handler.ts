@@ -1,26 +1,20 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { QueryHandler } from '@nestjs/cqrs';
 import { CustomLogger } from '@app/logger';
+import { BaseQueryHandler } from '@app/cqrs';
 import { GetLoginStatusQuery } from '../impl/get-login-status.query';
 import { LoginService } from '../../login.service';
 import { LoginStatusResponse } from 'src/proto/login';
 
 @QueryHandler(GetLoginStatusQuery)
-export class GetLoginStatusHandler implements IQueryHandler<GetLoginStatusQuery, LoginStatusResponse> {
+export class GetLoginStatusHandler extends BaseQueryHandler<GetLoginStatusQuery, LoginStatusResponse> {
   constructor(
     private readonly loginService: LoginService,
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(GetLoginStatusHandler.name);
+    super(logger);
   }
 
   execute(query: GetLoginStatusQuery): Promise<LoginStatusResponse> {
-    this.logger.log('Executing GetLoginStatus');
-
-    try {
-      return this.loginService.getLoginStatus(query.userId);
-    } catch (error) {
-      this.logger.error('Error executing GetLoginStatus', error);
-      throw error;
-    }
+    return this.run('GetLoginStatus', () => this.loginService.getLoginStatus(query.userId));
   }
 }

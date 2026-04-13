@@ -1,27 +1,25 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { CustomLogger } from '@app/logger';
+import { QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CustomLogger } from '@app/logger';
+import { BaseQueryHandler } from '@app/cqrs';
 import { GetAllUsersQuery } from '../impl/get-all-users.query';
 import { User } from '../../entity/user.entity';
 import { entityToProto } from '../../utils/entity-to-proto';
 import { UserData } from 'src/proto/user';
 
 @QueryHandler(GetAllUsersQuery)
-export class GetAllUsersHandler implements IQueryHandler<GetAllUsersQuery, { data: UserData[]; total: number }> {
+export class GetAllUsersHandler extends BaseQueryHandler<GetAllUsersQuery, { data: UserData[]; total: number }> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(GetAllUsersHandler.name);
+    super(logger);
   }
 
-  async execute(query: GetAllUsersQuery): Promise<{ data: UserData[]; total: number }> {
-    this.logger.log('Executing GetAllUsers');
-
-    try {
+  execute(query: GetAllUsersQuery): Promise<{ data: UserData[]; total: number }> {
+    return this.run('GetAllUsers', async () => {
       const page = query.page ?? 1;
       const limit = query.limit ?? 10;
       const [users, total] = await this.userRepository.findAndCount({
@@ -30,9 +28,6 @@ export class GetAllUsersHandler implements IQueryHandler<GetAllUsersQuery, { dat
         take: limit,
       });
       return { data: users.map(entityToProto), total };
-    } catch (error) {
-      this.logger.error('Error executing GetAllUsers', error);
-      throw error;
-    }
+    });
   }
 }

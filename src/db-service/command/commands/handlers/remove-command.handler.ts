@@ -1,25 +1,19 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler } from '@nestjs/cqrs';
 import { CustomLogger } from '@app/logger';
+import { BaseCommandHandler } from '@app/cqrs';
 import { RemoveCommandCommand } from '../impl/remove-command.command';
 import { CommandService } from '../../command.service';
 
 @CommandHandler(RemoveCommandCommand)
-export class RemoveCommandHandler implements ICommandHandler<RemoveCommandCommand, boolean> {
+export class RemoveCommandHandler extends BaseCommandHandler<RemoveCommandCommand, boolean> {
   constructor(
     private readonly commandService: CommandService,
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(RemoveCommandHandler.name);
+    super(logger);
   }
 
   execute(command: RemoveCommandCommand): Promise<boolean> {
-    this.logger.log('Executing RemoveCommand');
-
-    try {
-      return this.commandService.remove(command.id);
-    } catch (error) {
-      this.logger.error('Error executing RemoveCommand', error);
-      throw error;
-    }
+    return this.run('RemoveCommand', () => this.commandService.remove(command.id));
   }
 }

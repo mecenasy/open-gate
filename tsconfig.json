@@ -90,6 +90,12 @@
       "@app/tenant/*": [
         "src/libs/tenant/src/*"
       ],
+      "@app/cqrs": [
+        "src/libs/cqrs/src"
+      ],
+      "@app/cqrs/*": [
+        "src/libs/cqrs/src/*"
+      ],
       "src/*": [
         "src/*"
       ]

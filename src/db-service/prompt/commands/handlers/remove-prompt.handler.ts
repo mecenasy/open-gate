@@ -1,25 +1,19 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler } from '@nestjs/cqrs';
 import { CustomLogger } from '@app/logger';
+import { BaseCommandHandler } from '@app/cqrs';
 import { RemovePromptCommand } from '../impl/remove-prompt.command';
 import { PromptService } from '../../prompt.service';
 
 @CommandHandler(RemovePromptCommand)
-export class RemovePromptHandler implements ICommandHandler<RemovePromptCommand, boolean> {
+export class RemovePromptHandler extends BaseCommandHandler<RemovePromptCommand, boolean> {
   constructor(
     private readonly promptService: PromptService,
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(RemovePromptHandler.name);
+    super(logger);
   }
 
   execute(command: RemovePromptCommand): Promise<boolean> {
-    this.logger.log('Executing RemovePrompt');
-
-    try {
-      return this.promptService.remove(command.id);
-    } catch (error) {
-      this.logger.error('Error executing RemovePrompt', error);
-      throw error;
-    }
+    return this.run('RemovePrompt', () => this.promptService.remove(command.id));
   }
 }

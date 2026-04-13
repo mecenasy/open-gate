@@ -1,27 +1,23 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { QueryHandler } from '@nestjs/cqrs';
 import { CustomLogger } from '@app/logger';
+import { BaseQueryHandler } from '@app/cqrs';
 import { GetMessageQuery } from '../impl/get-message.query';
 import { MessagesService } from '../../messages.service';
 import { Message } from 'src/proto/messages';
 
 @QueryHandler(GetMessageQuery)
-export class GetMessageHandler implements IQueryHandler<GetMessageQuery, Message | null> {
+export class GetMessageHandler extends BaseQueryHandler<GetMessageQuery, Message | null> {
   constructor(
     private readonly messagesService: MessagesService,
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(GetMessageHandler.name);
+    super(logger);
   }
 
-  async execute(query: GetMessageQuery): Promise<Message | null> {
-    this.logger.log('Executing GetMessage');
-
-    try {
+  execute(query: GetMessageQuery): Promise<Message | null> {
+    return this.run('GetMessage', async () => {
       const entity = await this.messagesService.get(query.key);
       return entity ? this.messagesService.entityToProto(entity) : null;
-    } catch (error) {
-      this.logger.error('Error executing GetMessage', error);
-      throw error;
-    }
+    });
   }
 }

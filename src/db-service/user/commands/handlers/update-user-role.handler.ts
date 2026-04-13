@@ -1,7 +1,8 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CustomLogger } from '@app/logger';
+import { CommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CustomLogger } from '@app/logger';
+import { BaseCommandHandler } from '@app/cqrs';
 import { UpdateUserRoleCommand } from '../impl/update-user-role.command';
 import { User } from '../../entity/user.entity';
 import { UserRole } from '../../entity/user-role.entity';
@@ -10,26 +11,21 @@ import { entityToProto } from '../../utils/entity-to-proto';
 import { UserData } from 'src/proto/user';
 
 @CommandHandler(UpdateUserRoleCommand)
-export class UpdateUserRoleHandler implements ICommandHandler<UpdateUserRoleCommand, UserData | null> {
+export class UpdateUserRoleHandler extends BaseCommandHandler<UpdateUserRoleCommand, UserData | null> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserRole)
     private readonly userRoleRepository: Repository<UserRole>,
-
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(UpdateUserRoleHandler.name);
+    super(logger);
   }
 
-  async execute(command: UpdateUserRoleCommand): Promise<UserData | null> {
-    this.logger.log('Executing UpdateUserRole');
-
-    try {
+  execute(command: UpdateUserRoleCommand): Promise<UserData | null> {
+    return this.run('UpdateUserRole', async () => {
       const userRole = await this.userRoleRepository.findOneOrFail({
-        where: {
-          userType: protoToJsUserType(command.type),
-        },
+        where: { userType: protoToJsUserType(command.type) },
       });
 
       const user = await this.userRepository.findOne({
@@ -37,9 +33,7 @@ export class UpdateUserRoleHandler implements ICommandHandler<UpdateUserRoleComm
         relations: ['userRole'],
       });
 
-      if (!user) {
-        return null;
-      }
+      if (!user) return null;
 
       user.userRole = userRole;
       await this.userRepository.save(user);
@@ -50,9 +44,6 @@ export class UpdateUserRoleHandler implements ICommandHandler<UpdateUserRoleComm
       });
 
       return updated ? entityToProto(updated) : null;
-    } catch (error) {
-      this.logger.error('Error executing UpdateUserRole', error);
-      throw error;
-    }
+    });
   }
 }

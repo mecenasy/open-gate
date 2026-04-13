@@ -1,27 +1,23 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler } from '@nestjs/cqrs';
 import { CustomLogger } from '@app/logger';
+import { BaseCommandHandler } from '@app/cqrs';
 import { ToggleActiveStatusCommand } from '../impl/toggle-active-status.command';
 import { CommandService } from '../../command.service';
 import { Command as CommandProto } from 'src/proto/command';
 
 @CommandHandler(ToggleActiveStatusCommand)
-export class ToggleActiveStatusHandler implements ICommandHandler<ToggleActiveStatusCommand, CommandProto | null> {
+export class ToggleActiveStatusHandler extends BaseCommandHandler<ToggleActiveStatusCommand, CommandProto | null> {
   constructor(
     private readonly commandService: CommandService,
-    private readonly logger: CustomLogger,
+    logger: CustomLogger,
   ) {
-    this.logger.setContext(ToggleActiveStatusHandler.name);
+    super(logger);
   }
 
-  async execute(command: ToggleActiveStatusCommand): Promise<CommandProto | null> {
-    this.logger.log('Executing ToggleActiveStatus');
-
-    try {
+  execute(command: ToggleActiveStatusCommand): Promise<CommandProto | null> {
+    return this.run('ToggleActiveStatus', async () => {
       const entity = await this.commandService.toggleActiveStatus(command.id, command.active);
       return entity ? this.commandService.entityToProto(entity) : null;
-    } catch (error) {
-      this.logger.error('Error executing ToggleActiveStatus', error);
-      throw error;
-    }
+    });
   }
 }

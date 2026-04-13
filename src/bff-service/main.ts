@@ -27,7 +27,22 @@ async function bootstrap() {
   app.use(new RequestLoggingMiddleware().use.bind(new RequestLoggingMiddleware()));
   logger.log('Request logging middleware initialized');
 
-  // Setup global logger filters and interceptors
+  // Setup request size limit to prevent DOS attacks
+  app.use((req, res, next) => {
+    const maxSize = process.env.MAX_REQUEST_SIZE || '10mb';
+    res.setHeader('X-Max-Content-Length', maxSize);
+    next();
+  });
+
+  // Configure express bodyParser limits
+  const bodyParserJson = require('express').json({ limit: process.env.MAX_REQUEST_SIZE || '10mb' });
+  const bodyParserUrlencoded = require('express').urlencoded({
+    limit: process.env.MAX_REQUEST_SIZE || '10mb',
+    extended: true,
+  });
+  app.use(bodyParserJson);
+  app.use(bodyParserUrlencoded);
+  logger.log(`Request size limit set to: ${process.env.MAX_REQUEST_SIZE || '10mb'}`);
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalInterceptors(new LoggingInterceptor());
 

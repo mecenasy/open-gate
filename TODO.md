@@ -66,7 +66,9 @@ Posortowane według priorytetu.
   - ✅ Plik `.env.example` z placeholderami dla wszystkich 54+ zmiennych już istnieje
 - [x] **Limity zasobów w Docker** — brak `mem_limit`, `cpus` w docker-compose
   - ✅ Dodane `mem_limit`, `mem_reservation`, `cpus` do wszystkich serwisów (bff/core/db/notify: 512/256m + 0.5 CPU; infra: 256/128m + 0.25 CPU)
-- [ ] **Connection pooling** — brak konfiguracji puli połączeń dla PostgreSQL i Redis
+- [x] **Connection pooling** — brak konfiguracji puli połączeń dla PostgreSQL i Redis
+  - ✅ PostgreSQL (TypeORM `extra`): min/max connections, idle timeout, connection timeout; konfigurowane przez `POSTGRES_POOL_MIN/MAX`
+  - ✅ Redis: `keepAlive` + `commandsQueueMaxLength` (konfigurowane przez `REDIS_QUEUE_MAX`); node-redis używa zalecanego wzorca single persistent connection z kolejkowaniem komend
 - [x] **Brak graceful shutdown** — NestJS nie rejestruje `SIGTERM` / `SIGINT`
   - ✅ Dodane `app.enableShutdownHooks()` do `bff-service`, `core-service`, `notify-service`, `db-service`
 

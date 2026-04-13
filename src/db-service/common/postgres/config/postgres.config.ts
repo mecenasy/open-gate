@@ -3,6 +3,15 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 const isProductionDB = typeof process.env.MODE === 'string' && process.env.MODE === 'production';
 
+const poolOptions = {
+  extra: {
+    max: parseInt(process.env.POSTGRES_POOL_MAX ?? '10'),
+    min: parseInt(process.env.POSTGRES_POOL_MIN ?? '2'),
+    idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 3_000,
+  },
+};
+
 export type PostgresConfig = TypeOrmModuleOptions;
 
 export const postgresConfig = registerAs(
@@ -16,6 +25,7 @@ export const postgresConfig = registerAs(
           },
           url: process.env.DATABASE_URL,
           synchronize: false,
+          ...poolOptions,
         }
       : {
           type: 'postgres',
@@ -25,5 +35,6 @@ export const postgresConfig = registerAs(
             .replace('${DATABASE_PORT}', process.env.DATABASE_PORT ?? '')
             .replace('${DATABASE_DB}', process.env.DATABASE_DB ?? ''),
           synchronize: process.env.DATABASE_SYNC === '1',
+          ...poolOptions,
         },
 );

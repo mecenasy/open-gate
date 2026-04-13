@@ -10,3 +10,4 @@ export * from './logger.module';
 export * from './global-exception.filter';
 export * from './logging.interceptor';
 export * from './correlation-id.middleware';
+export * from './request-logging.middleware';

@@ -1,19 +1,8 @@
-// import { useMutation } from '@tanstack/react-query';
 import { use, useEffect, useState } from 'react';
-// import axios from '../../src/api/api';
 import { useTranslations } from 'next-intl';
 import { useMutation } from '@apollo/client/react';
-import { AuthStatus } from '@/app/gql/graphql';
 import { graphql } from '@/app/gql';
 
-type TfaStatus =
-  | {
-    status: 'accept2fa';
-    dataUrl: string;
-  }
-  | {
-    status: Exclude<AuthStatus, 'accept2fa'>;
-  };
 
 const ACCEPT_TFA_MUTATION = graphql(`
   mutation AcceptTfa {

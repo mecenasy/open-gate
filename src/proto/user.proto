@@ -2,112 +2,139 @@ syntax = "proto3";
 
 package user;
 
+// UserProxyService manages user data and operations
+// Provides CRUD operations, search, and permissions management
 service UserProxyService {
+  // Create a new user
   rpc AddUser (AddUserRequest) returns (UserResponse);
+  // Retrieve user by ID
   rpc GetUser (GetUserRequest) returns (UserResponse);
+  // Search user by email
   rpc GetUserByEmail (GetUserByEmailRequest) returns (UserResponse);
+  // Search user by phone number
   rpc GetUserByPhone (GetUserByPhoneRequest) returns (UserResponse);
+  // Update user information (all optional fields)
   rpc UpdateUser (UpdateUserRequest) returns (UserResponse);
+  // Update user status (ACTIVE, SUSPENDED, BANNED, etc.)
   rpc UpdateUserStatus (UpdateUserStatusRequest) returns (UserResponse);
+  // Update user role/type permissions
   rpc UpdateUserRole (UpdateUserRoleRequest) returns (UserResponse);
+  // Delete user by ID
   rpc RemoveUser (RemoveUserRequest) returns (UserResponse);
+  // Retrieve all users with pagination
   rpc GetAllUsers (GetAllUsersRequest) returns (GetAllUsersResponse);
+  // Check if user exists by email
   rpc CheckExist(CheckExistRequest) returns (CheckExistResponse);
 }
 
+// User account status
 enum Status {
-  PENDING = 0;
-  ACTIVE = 1;
-  SUSPENDED = 2;
-  BANNED = 3;
+  PENDING = 0;   // Newly created, awaiting verification
+  ACTIVE = 1;    // Active and verified
+  SUSPENDED = 2; // Temporarily disabled
+  BANNED = 3;    // Permanently banned
 }
 
+// User permission level/role
 enum UserType {
-  OWNER = 0;
-  ADMIN = 1;
-  SUPER_USER = 2;
-  MEMBER = 3;
-  USER = 4;
+  OWNER = 0;      // System owner - full access
+  ADMIN = 1;      // Administrator - can manage users and settings
+  SUPER_USER = 2; // Power user - can create resources
+  MEMBER = 3;     // Team member - standard access
+  USER = 4;       // Basic user - limited access
 }
 
+// Check if user exists by email
 message CheckExistRequest {
-  string email = 1;
+  string email = 1; // Email to check existence
 }
+
 message CheckExistResponse {
-  bool exist = 1;
+  bool exist = 1; // True if user exists
 }
 
+// Get user by email address
 message GetUserByEmailRequest {
-  string email = 1;
+  string email = 1; // User email address
 }
 
+// Create new user
 message AddUserRequest {
-  string email = 1;
-  string phone = 2;
-  string name = 3;
-  string surname = 4;
-  optional Status status = 5;
-  optional string phoneOwner = 6;
-  optional UserType type = 7;
-  optional string password = 8;
+  string email = 1;              // User email (unique)
+  string phone = 2;              // Phone number
+  string name = 3;               // First name
+  string surname = 4;            // Last name
+  optional Status status = 5;    // Account status (default: PENDING)
+  optional string phoneOwner = 6; // Phone owner information
+  optional UserType type = 7;    // User role (default: USER)
+  optional string password = 8;  // Initial password (if provided)
 }
 
+// Retrieve user by ID
 message GetUserRequest {
-  string id = 1;
+  string id = 1; // User ID (UUID)
 }
 
+// Get user by phone number
 message GetUserByPhoneRequest {
-  string phone = 1;
+  string phone = 1; // Phone number
 }
 
+// Update user information
 message UpdateUserRequest {
-  string id = 1;
-  optional string email = 2;
-  optional string phone = 3;
-  optional string name = 4;
-  optional string surname = 5;
-  optional Status status = 6;
-  optional UserType type = 7;
+  string id = 1;                 // User ID to update
+  optional string email = 2;     // New email
+  optional string phone = 3;     // New phone
+  optional string name = 4;      // New first name
+  optional string surname = 5;   // New last name
+  optional Status status = 6;    // New status
+  optional UserType type = 7;    // New role
 }
 
+// Update only user status
 message UpdateUserStatusRequest {
-  string id = 1;
-  Status status = 2;
+  string id = 1;      // User ID
+  Status status = 2;  // New status
 }
 
+// Update only user role/type
 message UpdateUserRoleRequest {
-  string id = 1;
-  UserType type = 2;
+  string id = 1;      // User ID
+  UserType type = 2;  // New role
 }
-
+// Delete user by ID (soft delete)
 message RemoveUserRequest {
-  string id = 1;
+  string id = 1; // User ID to delete
 }
 
+// Pagination parameters for user list
 message GetAllUsersRequest {
-  int32 page = 1;
-  int32 limit = 2;
+  int32 page = 1;   // Page number (0-indexed)
+  int32 limit = 2;  // Items per page
 }
 
+// Generic user operation response
 message UserResponse {
-  bool status = 1;
-  string message = 2;
-  optional UserData data = 3;
+  bool status = 1;          // Operation success flag
+  string message = 2;       // Response message
+  optional UserData data = 3; // Response data (if applicable)
 }
 
+// Paginated user list response
 message GetAllUsersResponse {
-  bool status = 1;
-  string message = 2;
-  repeated UserData data = 3;
-  int32 total = 4;
+  bool status = 1;       // Operation success flag
+  string message = 2;    // Response message
+  repeated UserData data = 3; // List of users
+  int32 total = 4;       // Total count of users matching query
 }
 
+// User data object
 message UserData {
-  string id = 1;
-  string email = 2;
-  string phone = 3;
-  string name = 4;
-  string surname = 5;
-  Status status = 6;
-  UserType type = 7;
+  string id = 1;         // User ID (UUID)
+  string email = 2;      // Email address
+  string phone = 3;      // Phone number
+  string name = 4;       // First name
+  string surname = 5;    // Last name
+  Status status = 6;     // Account status
+  UserType type = 7;     // User role/type
 }

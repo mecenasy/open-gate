@@ -78,15 +78,17 @@ Posortowane według priorytetu.
 
 ## Priorytet 4 — Niski / Nice to have
 
-- [ ] **Rate limiting** — brak limitu zapytań per endpoint
-  - Użyć `@nestjs/throttler`
-- [ ] **Request/response logging middleware** — brak logowania HTTP requestów
-- [ ] **Rozmiar requestów** — brak limitu `body-parser` (ryzyko DoS)
-- [ ] **GraphQL schema validation** — brak walidacji SDL
-- [ ] **Dokumentacja proto** — kontrakty gRPC bez komentarzy
-- [ ] **Circuit breaker** — brak obsługi awarii gRPC między serwisami
+- [x] **Rate limiting** — add limit per endpoint using `@nestjs/throttler`
+  - ✅ ThrottlerModule configured in bff-service with 3 profiles: default (100/min), auth (5/min), public (30/min)
+  - ✅ @Throttle decorators added to auth endpoints: login, passkey, MFA, QR code, CSRF
+  - Endpoints protected with rate limiting now return 429 on quota exceeded
+- [ ] **Request/response logging middleware** — add HTTP request logging
+- [ ] **Rozmiar requestów** — add `body-parser` size limit (DOS protection)
+- [ ] **GraphQL schema validation** — add SDL validation
+- [ ] **Dokumentacja proto** — add comments to gRPC contracts
+- [ ] **Circuit breaker** — add error handling for gRPC between services (opossum or custom retry with backoff)
   - Rozważyć `opossum` lub własny mechanizm retry z backoffem
-- [ ] **ADR (Architecture Decision Records)** — brak dokumentacji decyzji architektonicznych
+- [ ] **ADR (Architecture Decision Records)** — document architectural decisions
 
 ---
 

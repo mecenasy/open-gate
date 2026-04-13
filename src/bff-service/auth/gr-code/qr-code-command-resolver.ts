@@ -1,5 +1,6 @@
 import { CommandBus } from '@nestjs/cqrs';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
+import { Throttle } from '@nestjs/throttler';
 import { QrChallengeType } from './dto/qr-challenge.type';
 import { StatusType } from '../login/dto/status.type';
 import { QrLoginCommand } from './commands/impl/qr-login.command';
@@ -17,24 +18,28 @@ export class QrCodeCommandsResolver {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => QrChallengeType)
   async qrChallenge(@Args('nonce') nonce: string) {
     return this.commandBus.execute<QrChallengeCommand, QrChallengeType>(new QrChallengeCommand(nonce));
   }
 
   @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => StatusType)
   async qrReject(@Context() ctx: express.Response, @Args('challenge') challenge: string) {
     return this.commandBus.execute<QrRejectCommand, void>(new QrRejectCommand(ctx.req.session, challenge));
   }
 
   @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => StatusType)
   async qrLogin(@Context() ctx: express.Response, @Args('challenge') challenge: string, @Args('nonce') nonce: string) {
     return this.commandBus.execute<QrLoginCommand, StatusType>(new QrLoginCommand(ctx.req.session, challenge, nonce));
   }
 
   @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => GraphQLJSON)
   async qrOption(@Context() ctx: express.Response, @Args('challenge') challenge: string, @Args('nonce') nonce: string) {
     return await this.commandBus.execute<QrOptionCommand, PublicKeyCredentialRequestOptionsJSON>(
@@ -43,6 +48,7 @@ export class QrCodeCommandsResolver {
   }
 
   @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => StatusType)
   async qrConfirm(
     @Context() ctx: express.Response,

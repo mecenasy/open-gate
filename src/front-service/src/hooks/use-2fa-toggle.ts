@@ -8,12 +8,12 @@ import { graphql } from '@/app/gql';
 
 type TfaStatus =
   | {
-      status: AuthStatus.accept2fa;
-      dataUrl: string;
-    }
+    status: 'accept2fa';
+    dataUrl: string;
+  }
   | {
-      status: Exclude<AuthStatus, AuthStatus.accept2fa>;
-    };
+    status: Exclude<AuthStatus, 'accept2fa'>;
+  };
 
 const ACCEPT_TFA_MUTATION = graphql(`
   mutation AcceptTfa {

@@ -1,5 +1,6 @@
 import { CommandBus } from '@nestjs/cqrs';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
+import { Throttle } from '@nestjs/throttler';
 import { RemovePasskeyCommand } from './commands/impl/remove-passkey.command';
 import { RemovePasskeyType } from './dto/remove.passkey';
 import GraphQLJSON from 'graphql-type-json';
@@ -22,12 +23,14 @@ import { Public } from 'src/bff-service/common/decorators/public.decorator';
 export class PasskeyCommandsResolver {
   constructor(private readonly commandBus: CommandBus) {}
 
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => RemovePasskeyType)
   async removePasskey(@Args('id') id: string, @CurrentUserId() userId: string) {
     return this.commandBus.execute<RemovePasskeyCommand, RemovePasskeyType>(new RemovePasskeyCommand(id, userId));
   }
 
   @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => GraphQLJSON)
   async optionPasskey(@Context() ctx: express.Response) {
     return await this.commandBus.execute<PasskeyOptionCommand, PublicKeyCredentialRequestOptionsJSON>(
@@ -36,6 +39,7 @@ export class PasskeyCommandsResolver {
   }
 
   @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => GraphQLJSON)
   async registerOptionPasskey(@CurrentUserId() userId: string) {
     return await this.commandBus.execute<RegisterPasskeyOptionCommand, PublicKeyCredentialCreationOptionsJSON>(
@@ -44,6 +48,7 @@ export class PasskeyCommandsResolver {
   }
 
   @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => StatusType)
   async registerOptionPasskeyVerify(
     @Args('data', { type: () => GraphQLJSON }) data: RegistrationResponseJSON,
@@ -56,6 +61,7 @@ export class PasskeyCommandsResolver {
   }
 
   @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => StatusType)
   async optionPasskeyVerify(
     @Args('data', { type: () => GraphQLJSON }) data: AuthenticationResponseJSON,

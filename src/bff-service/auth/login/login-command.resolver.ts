@@ -1,5 +1,6 @@
 import { Resolver, Mutation, Args } from '@nestjs/graphql';
 import { CommandBus } from '@nestjs/cqrs';
+import { Throttle } from '@nestjs/throttler';
 import { LoginType } from './dto/login-type';
 import { LoginCommand } from './commands/impl/login.command';
 import { StatusType } from './dto/status.type';
@@ -27,17 +28,19 @@ export class LoginCommandsResolver {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => StatusType)
   async loginUser(@Args('input') input: LoginType, @SecurityContext() security: Security) {
     return this.commandBus.execute<LoginCommand, StatusType>(new LoginCommand(input.email, input.password, security));
   }
 
-  @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => StatusType)
   async logoutUser(@CurrentUserId() userId: string, @Context() ctx: express.Response) {
     return this.commandBus.execute<LogoutCommand, StatusType>(new LogoutCommand(userId, ctx.req.session));
   }
 
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => StatusType)
   async changePassword(@CurrentUserId() userId: string, @Args('input') input: ChangePasswordType) {
     return this.commandBus.execute<ChangePasswordCommand, StatusType>(
@@ -46,6 +49,7 @@ export class LoginCommandsResolver {
   }
 
   @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => StatusType)
   async resetPassword(@Args('input') input: ResetPasswordType) {
     return this.commandBus.execute<ResetPasswordCommand, StatusType>(
@@ -53,6 +57,7 @@ export class LoginCommandsResolver {
     );
   }
   @Public()
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => StatusType)
   async forgotPassword(@Args('input') input: ForgotPasswordType) {
     return this.commandBus.execute<ForgotPasswordCommand, StatusType>(new ForgotPasswordCommand(input.email));

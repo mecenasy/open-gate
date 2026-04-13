@@ -36,8 +36,12 @@ Posortowane według priorytetu.
   - ✅ Zmieniono `passkey.service.ts#setCounter` na atomic `update()`
   - ✅ Zmieniono `messages.service.ts#update` na atomic `update()`
   - ✅ Zmieniono `core-config.service.ts#updateConfig` na atomic `upsert()`
-- [ ] **Walidacja zmiennych środowiskowych** — brak schematu walidacji `.env`
-  - Użyć `Joi` lub `class-validator` w `ConfigModule.forRoot({ validationSchema })`
+- [x] **Walidacja zmiennych środowiskowych** — brak schematu walidacji `.env`
+  - ✅ Utworzony plik `src/config/env.validation.ts` z pełnym schematem Joi
+  - ✅ 54 zmienne środowiskowe zwalidowane (porty, DB, Redis, API, auth, etc.)
+  - ✅ Różne typy: string, number, port, email, URI, enum z `Joi`
+  - ✅ Zintegrowano w ConfigModule.forRoot() wszystkich serwisów (bff, core, db, notify, redis)
+  - ✅ Lepsze komunikaty błędów przy walidacji (abortEarly: false, allowUnknown: true)
 - [ ] **CSRF wyłączony** — `CsrfModule` i interceptor zakomentowane w `bff-service/app.module.ts`
   - Włączyć i przetestować
 - [x] **Health-check endpointy** — brak endpointów dla Docker healthcheck *(w trakcie)*

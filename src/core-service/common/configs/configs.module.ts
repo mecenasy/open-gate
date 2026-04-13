@@ -7,15 +7,17 @@ import { config as redisConfig, schema as redisSchema } from '@app/redis';
 import { config as dbConfig, schema as dbSchema } from '@app/db-grpc';
 import { config as notifyGrpcConfig } from '@app/notify-grpc';
 import { config as gateGrpcConfig } from '@app/gate-grpc';
+import { envValidationSchema } from 'src/config/env.validation';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, redisConfig, dbConfig, notifyGrpcConfig, gateGrpcConfig],
-      validationSchema: configSchema.concat(redisSchema).concat(dbSchema),
+      validationSchema: envValidationSchema.concat(configSchema).concat(redisSchema).concat(dbSchema),
       validationOptions: {
-        abortEarly: true,
+        abortEarly: false,
+        allowUnknown: true,
       },
     }),
   ],

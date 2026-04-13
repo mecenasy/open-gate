@@ -2,7 +2,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { Security } from '../interceptors/security-context.interceptor';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { Context } from '../types/context';
+import { Context } from '@app/auth';
 
 export const SecurityContext = createParamDecorator((data: unknown, context: ExecutionContext): Security => {
   const ctx = GqlExecutionContext.create(context);

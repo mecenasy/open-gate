@@ -1,7 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { Public } from './common/decorators/public.decorator';
-import { ExcludeCsrf } from './common/decorators/csrf.decorator';
+import { Public, ExcludeCsrf } from '@app/auth';
 
 @Controller()
 export class AppController {

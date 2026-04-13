@@ -10,7 +10,7 @@ import { QrOptionCommand } from './commands/impl/qr-option.command';
 import GraphQLJSON from 'graphql-type-json';
 import { QrConfirmCommand } from './commands/impl/qr-confirm.command';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/server';
-import { Public } from 'src/bff-service/common/decorators/public.decorator';
+import { Public } from '@app/auth';
 import { QrChallengeCommand } from './commands/impl/qr-challenge.command';
 
 @Resolver('QrCode')

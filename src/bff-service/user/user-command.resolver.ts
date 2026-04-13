@@ -12,7 +12,7 @@ import { UpdateUserCommand } from './commands/impl/update-user.command';
 import { UpdateUserStatusCommand } from './commands/impl/update-user-status.command';
 import { UpdateUserRoleCommand } from './commands/impl/update-user-role.command';
 import { RemoveUserCommand } from './commands/impl/remove-user.command';
-import { Public } from '../common/decorators/public.decorator';
+import { Public } from '@app/auth';
 import { CreateSimpleUserType } from './dto/create-simple-user.type.';
 import { CreateSimpleUserCommand } from './commands/impl/create-simple-user.command';
 

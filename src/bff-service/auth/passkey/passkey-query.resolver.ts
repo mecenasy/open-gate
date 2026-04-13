@@ -2,7 +2,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { Query, Resolver } from '@nestjs/graphql';
 import { GetPasskeysQuery } from './queries/impl/get-keys.query';
 import { PassKeyType } from './dto/passkey-list-type';
-import { CurrentUserId } from 'src/bff-service/common/decorators/current-user-id.decorator';
+import { CurrentUserId } from '@app/auth';
 
 @Resolver('Passkey')
 export class PasskeyQueriesResolver {

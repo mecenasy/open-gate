@@ -18,9 +18,8 @@ import {
   type Security,
   SecurityContextInterceptor,
 } from 'src/bff-service/common/interceptors/security-context.interceptor';
-import { Public } from 'src/bff-service/common/decorators/public.decorator';
+import { Public, CurrentUserId } from '@app/auth';
 import { SecurityContext } from 'src/bff-service/common/decorators/security-context.decorator';
-import { CurrentUserId } from 'src/bff-service/common/decorators/current-user-id.decorator';
 
 @Resolver('Login')
 @UseInterceptors(SecurityContextInterceptor)

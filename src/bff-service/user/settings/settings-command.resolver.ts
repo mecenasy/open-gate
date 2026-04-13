@@ -6,7 +6,7 @@ import { AcceptType } from './dto/accept-2fa.type';
 import { Verify2faCommand } from './commands/impl/verify-2fa.command';
 import { AcceptAdaptiveLoginCommand } from './commands/impl/accept-adaptive-login.command';
 import { AcceptAdaptiveLoginType } from './dto/accept-adaptive-login.type';
-import { CurrentUserId } from 'src/bff-service/common/decorators/current-user-id.decorator';
+import { CurrentUserId } from '@app/auth';
 import { StatusType } from 'src/bff-service/auth/login/dto/status.type';
 
 @Resolver('Settings')

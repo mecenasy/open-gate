@@ -66,6 +66,18 @@
       "@app/redis/*": [
         "src/libs/redis/src/*"
       ],
+      "@app/auth": [
+        "src/libs/auth/src"
+      ],
+      "@app/auth/*": [
+        "src/libs/auth/src/*"
+      ],
+      "@app/config": [
+        "src/libs/config/src"
+      ],
+      "@app/config/*": [
+        "src/libs/config/src/*"
+      ],
       "@app/logger": [
         "src/libs/logger"
       ],

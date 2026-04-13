@@ -1,7 +1,6 @@
 import { CallHandler, ExecutionContext, ForbiddenException, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { CsrfGuard } from '../common/guards/csrf.guard';
-import { CSRF_EXCLUDE_KEY } from '../common/decorators/csrf.decorator';
+import { CsrfGuard, CSRF_EXCLUDE_KEY } from '@app/auth';
 
 @Injectable()
 export class CsrfInterceptor implements NestInterceptor {

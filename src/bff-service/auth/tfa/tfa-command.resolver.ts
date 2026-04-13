@@ -4,7 +4,7 @@ import { StatusType } from '../login/dto/status.type';
 import express from 'express';
 import { Verify2faCodeCommand } from './commands/impl/verify-2fa-code.command';
 import { Verify2faCodeType } from './dto/verify-2fa-code.type';
-import { Public } from 'src/bff-service/common/decorators/public.decorator';
+import { Public } from '@app/auth';
 
 @Resolver('Verify2faCode')
 export class Verify2faCodeResolver {

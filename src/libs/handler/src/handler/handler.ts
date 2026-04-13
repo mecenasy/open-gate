@@ -6,7 +6,7 @@ import { DbGrpcKey } from '@app/db-grpc';
 import { CacheService } from '@app/redis';
 import { EventService } from '@app/event';
 import { IBaseHandler } from './base-handler';
-import { GrpcCircuitBreaker } from '../../grpc-circuit-breaker';
+import { GrpcCircuitBreaker } from '../grpc-circuit-breaker';
 
 export const CORRELATION_SERVICE_TOKEN = 'CORRELATION_SERVICE';
 

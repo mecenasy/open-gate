@@ -16,8 +16,7 @@ import type {
 import { RegisterPasskeyOptionCommand } from './commands/impl/register-passkey-option.command';
 import { VerifyRegistrationOptionCommand } from './commands/impl/verify-registration-option.command';
 import { Headers } from '@nestjs/common';
-import { CurrentUserId } from 'src/bff-service/common/decorators/current-user-id.decorator';
-import { Public } from 'src/bff-service/common/decorators/public.decorator';
+import { CurrentUserId, Public } from '@app/auth';
 
 @Resolver('Passkey')
 export class PasskeyCommandsResolver {

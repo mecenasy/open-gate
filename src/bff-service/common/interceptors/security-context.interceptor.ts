@@ -3,7 +3,7 @@ import express from 'express';
 import { Observable } from 'rxjs';
 import { GeoService, Location } from '../geo/geo.service';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { Context } from '../types/context';
+import { Context } from '@app/auth';
 
 export interface Security {
   origin: string;

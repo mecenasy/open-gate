@@ -1,8 +1,7 @@
 import { Controller, Get, Res, Session } from '@nestjs/common';
 import type { Response } from 'express';
 import { CsrfService } from './csrf.service';
-import { Public } from '../common/decorators/public.decorator';
-import { ExcludeCsrf } from '../common/decorators/csrf.decorator';
+import { Public, ExcludeCsrf } from '@app/auth';
 
 @Controller('csrf')
 export class CsrfController {

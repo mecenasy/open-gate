@@ -44,17 +44,14 @@ export class CsrfGuard implements CanActivate {
   }
 
   private isGraphQLQuery(request: Request): boolean {
-    // Check if this is a GraphQL request
     if (request.body && typeof request.body === 'object') {
       const body = request.body as GraphQLOperation | GraphQLOperation[];
 
-      // Check for single query operation
       if ('query' in body && typeof body.query === 'string') {
         const query = body.query.trim().toLowerCase();
         return query.startsWith('query') && !query.includes('mutation') && !query.includes('subscription');
       }
 
-      // Check for batched operations
       if (Array.isArray(body)) {
         return body.every(
           (op) =>

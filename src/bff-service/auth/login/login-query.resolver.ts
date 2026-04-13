@@ -3,8 +3,7 @@ import { QueryBus } from '@nestjs/cqrs';
 import { StatusAuthQuery } from './queries/impl/status-auth.query';
 import { LoginStatusType } from './dto/login-status.tape';
 import { VerifyTokenQuery } from './queries/impl/verify-token.query';
-import { Public } from 'src/bff-service/common/decorators/public.decorator';
-import { CurrentUserId } from 'src/bff-service/common/decorators/current-user-id.decorator';
+import { Public, CurrentUserId } from '@app/auth';
 import { VerifyTokenType } from './dto/verify-token.type';
 
 @Resolver('Login')

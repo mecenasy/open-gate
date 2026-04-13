@@ -5,7 +5,7 @@ import { StatusType } from '../login/dto/status.type';
 import { VerifyCodeCommand } from './commands/impl/verify-code.command';
 import { VerifyCodeType } from './dto/verify-code.type';
 import express from 'express';
-import { Public } from 'src/bff-service/common/decorators/public.decorator';
+import { Public } from '@app/auth';
 
 @Resolver('VerifyMfaCode')
 export class CommandVerifyMfaResolver {

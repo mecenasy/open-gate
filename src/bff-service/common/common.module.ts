@@ -6,7 +6,7 @@ import { EventService } from '@app/event';
 import { ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { AuthGuard } from './guards/user.guard';
+import { AuthGuard } from '@app/auth';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeConfigService } from './configs/types.config.service';
 import { ConfigsModule } from './configs/configs.module';

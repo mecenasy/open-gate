@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { CacheService } from '@app/redis';
-import { Context } from '../types/context';
+import { Context } from '@app/auth';
 import { UserStatusType } from 'src/bff-service/auth/login/dto/login-status.tape';
 
 @Injectable()

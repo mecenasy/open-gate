@@ -2,8 +2,7 @@ import { Resolver, Query, Context } from '@nestjs/graphql';
 import { Throttle } from '@nestjs/throttler';
 import { CsrfService } from './csrf.service';
 import { CsrfTokenType } from './dto/csrf-token.type';
-import { Public } from '../common/decorators/public.decorator';
-import { ExcludeCsrf } from '../common/decorators/csrf.decorator';
+import { Public, ExcludeCsrf } from '@app/auth';
 import type { Request } from 'express';
 import type { SessionData } from 'express-session';
 

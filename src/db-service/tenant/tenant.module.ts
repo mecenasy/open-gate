@@ -9,9 +9,10 @@ import { PlatformCredentialsService } from './platform-credentials.service';
 import { TenantGrpcInterceptor } from './interceptors/tenant-grpc.interceptor';
 import { TenantController } from './tenant.controller';
 import { TenantModule } from '@app/tenant';
+import { DatabaseModule } from '@app/database';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Tenant, CustomizationConfig, PlatformCredentials]), TenantModule],
+  imports: [TypeOrmModule.forFeature([Tenant, CustomizationConfig, PlatformCredentials]), TenantModule, DatabaseModule],
   controllers: [TenantController],
   providers: [TenantDbService, PlatformCredentialsService, TenantGrpcInterceptor, { provide: APP_INTERCEPTOR, useClass: TenantGrpcInterceptor }],
   exports: [TypeOrmModule, TenantDbService, PlatformCredentialsService],

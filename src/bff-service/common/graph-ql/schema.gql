@@ -218,6 +218,24 @@ type TenantFeaturesType {
   maxUsersPerTenant: Int!
 }
 
+type TenantType {
+  id: String!
+  slug: String!
+  schemaName: String!
+  isActive: Boolean!
+}
+
+type CreateTenantResult {
+  id: String!
+  slug: String!
+  schemaName: String!
+}
+
+type MutationResult {
+  status: Boolean!
+  message: String!
+}
+
 type Query {
   users(input: GetAllUsersType): UsersListType!
   user(input: GetUserType!): UserSummaryType!
@@ -235,6 +253,7 @@ type Query {
   featureConfigs: ConfigsListType!
   featureConfig(input: GetFeatureConfigType!): ConfigsListType!
   tenantFeatures: TenantFeaturesType!
+  tenants: [TenantType!]!
   csrfToken: CsrfTokenType!
 }
 
@@ -326,6 +345,9 @@ type Mutation {
   toggleActiveStatus(input: ToggleActiveStatusType!): CommandResponseType!
   removeCommand(input: RemoveCommandType!): CommandResponseType!
   updateConfig(input: UpdateConfigType!): ConfigResponseType!
+  createTenant(input: CreateTenantInput!): CreateTenantResult!
+  updateTenantCustomization(input: UpdateCustomizationInput!): MutationResult!
+  upsertPlatformCredentials(input: UpsertPlatformCredentialsInput!): MutationResult!
 }
 
 input CreateUserType {
@@ -447,4 +469,19 @@ input RemoveCommandType {
 input UpdateConfigType {
   key: String!
   value: String!
+}
+
+input CreateTenantInput {
+  slug: String!
+}
+
+input UpdateCustomizationInput {
+  tenantId: String!
+  customizationJson: String!
+}
+
+input UpsertPlatformCredentialsInput {
+  tenantId: String!
+  platform: String!
+  configJson: String!
 }

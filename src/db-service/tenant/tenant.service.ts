@@ -8,6 +8,7 @@ import {
   DEFAULT_CUSTOMIZATION,
   validateMessagingChannels,
 } from './entity/customization-config.entity';
+import { TenantSchemaManager } from '@app/database';
 
 @Injectable()
 export class TenantDbService {
@@ -16,6 +17,7 @@ export class TenantDbService {
     private readonly tenantRepo: Repository<Tenant>,
     @InjectRepository(CustomizationConfig)
     private readonly customizationRepo: Repository<CustomizationConfig>,
+    private readonly schemaManager: TenantSchemaManager,
   ) {}
 
   findById(id: string): Promise<Tenant | null> {
@@ -42,6 +44,7 @@ export class TenantDbService {
     const savedConfig = await this.customizationRepo.save(config);
 
     await this.tenantRepo.update(saved.id, { customizationId: savedConfig.id });
+    await this.schemaManager.provisionSchema(schemaName);
 
     return { ...saved, customizationId: savedConfig.id };
   }

@@ -60,6 +60,54 @@ export interface GetTenantsWithPlatformResponse {
   entries: TenantPlatformEntry[];
 }
 
+export interface CreateTenantRequest {
+  slug: string;
+}
+
+export interface CreateTenantResponse {
+  status: boolean;
+  message: string;
+  id: string;
+  slug: string;
+  schemaName: string;
+}
+
+export interface TenantEntry {
+  id: string;
+  slug: string;
+  schemaName: string;
+  isActive: boolean;
+}
+
+export interface GetAllTenantsRequest {}
+
+export interface GetAllTenantsResponse {
+  status: boolean;
+  message: string;
+  tenants: TenantEntry[];
+}
+
+export interface UpdateCustomizationRequest {
+  tenantId: string;
+  customizationJson: string;
+}
+
+export interface UpdateCustomizationResponse {
+  status: boolean;
+  message: string;
+}
+
+export interface UpsertPlatformCredentialsRequest {
+  tenantId: string;
+  platform: string;
+  configJson: string;
+}
+
+export interface UpsertPlatformCredentialsResponse {
+  status: boolean;
+  message: string;
+}
+
 export const TENANT_PACKAGE_NAME = 'tenant';
 
 export interface TenantServiceClient {
@@ -67,6 +115,10 @@ export interface TenantServiceClient {
   getTenant(request: GetTenantRequest, metadata?: Metadata): Observable<GetTenantResponse>;
   getPlatformCredentials(request: GetPlatformCredentialsRequest, metadata?: Metadata): Observable<GetPlatformCredentialsResponse>;
   getTenantsWithPlatform(request: GetTenantsWithPlatformRequest, metadata?: Metadata): Observable<GetTenantsWithPlatformResponse>;
+  createTenant(request: CreateTenantRequest, metadata?: Metadata): Observable<CreateTenantResponse>;
+  getAllTenants(request: GetAllTenantsRequest, metadata?: Metadata): Observable<GetAllTenantsResponse>;
+  updateCustomization(request: UpdateCustomizationRequest, metadata?: Metadata): Observable<UpdateCustomizationResponse>;
+  upsertPlatformCredentials(request: UpsertPlatformCredentialsRequest, metadata?: Metadata): Observable<UpsertPlatformCredentialsResponse>;
 }
 
 export interface TenantServiceController {
@@ -89,11 +141,40 @@ export interface TenantServiceController {
     request: GetTenantsWithPlatformRequest,
     metadata?: Metadata,
   ): Promise<GetTenantsWithPlatformResponse> | Observable<GetTenantsWithPlatformResponse> | GetTenantsWithPlatformResponse;
+
+  createTenant(
+    request: CreateTenantRequest,
+    metadata?: Metadata,
+  ): Promise<CreateTenantResponse> | Observable<CreateTenantResponse> | CreateTenantResponse;
+
+  getAllTenants(
+    request: GetAllTenantsRequest,
+    metadata?: Metadata,
+  ): Promise<GetAllTenantsResponse> | Observable<GetAllTenantsResponse> | GetAllTenantsResponse;
+
+  updateCustomization(
+    request: UpdateCustomizationRequest,
+    metadata?: Metadata,
+  ): Promise<UpdateCustomizationResponse> | Observable<UpdateCustomizationResponse> | UpdateCustomizationResponse;
+
+  upsertPlatformCredentials(
+    request: UpsertPlatformCredentialsRequest,
+    metadata?: Metadata,
+  ): Promise<UpsertPlatformCredentialsResponse> | Observable<UpsertPlatformCredentialsResponse> | UpsertPlatformCredentialsResponse;
 }
 
 export function TenantServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['getCustomization', 'getTenant', 'getPlatformCredentials', 'getTenantsWithPlatform'];
+    const grpcMethods: string[] = [
+      'getCustomization',
+      'getTenant',
+      'getPlatformCredentials',
+      'getTenantsWithPlatform',
+      'createTenant',
+      'getAllTenants',
+      'updateCustomization',
+      'upsertPlatformCredentials',
+    ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod('TenantService', method)(constructor.prototype[method], method, descriptor);

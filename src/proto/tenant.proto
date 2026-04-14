@@ -7,6 +7,10 @@ service TenantService {
   rpc GetTenant (GetTenantRequest) returns (GetTenantResponse);
   rpc GetPlatformCredentials (GetPlatformCredentialsRequest) returns (GetPlatformCredentialsResponse);
   rpc GetTenantsWithPlatform (GetTenantsWithPlatformRequest) returns (GetTenantsWithPlatformResponse);
+  rpc CreateTenant (CreateTenantRequest) returns (CreateTenantResponse);
+  rpc GetAllTenants (GetAllTenantsRequest) returns (GetAllTenantsResponse);
+  rpc UpdateCustomization (UpdateCustomizationRequest) returns (UpdateCustomizationResponse);
+  rpc UpsertPlatformCredentials (UpsertPlatformCredentialsRequest) returns (UpsertPlatformCredentialsResponse);
 }
 
 message GetCustomizationRequest {
@@ -56,4 +60,52 @@ message GetTenantsWithPlatformResponse {
   bool status = 1;
   string message = 2;
   repeated TenantPlatformEntry entries = 3;
+}
+
+message CreateTenantRequest {
+  string slug = 1;
+}
+
+message CreateTenantResponse {
+  bool status = 1;
+  string message = 2;
+  string id = 3;
+  string slug = 4;
+  string schema_name = 5;
+}
+
+message TenantEntry {
+  string id = 1;
+  string slug = 2;
+  string schema_name = 3;
+  bool is_active = 4;
+}
+
+message GetAllTenantsRequest {}
+
+message GetAllTenantsResponse {
+  bool status = 1;
+  string message = 2;
+  repeated TenantEntry tenants = 3;
+}
+
+message UpdateCustomizationRequest {
+  string tenant_id = 1;
+  string customization_json = 2;
+}
+
+message UpdateCustomizationResponse {
+  bool status = 1;
+  string message = 2;
+}
+
+message UpsertPlatformCredentialsRequest {
+  string tenant_id = 1;
+  string platform = 2;
+  string config_json = 3;
+}
+
+message UpsertPlatformCredentialsResponse {
+  bool status = 1;
+  string message = 2;
 }

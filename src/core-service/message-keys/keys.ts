@@ -9,6 +9,7 @@ const transcriptionAttachmentKey: string = 'transcription-attachment-error';
 // Messages
 const phoneNotFoundKey: string = 'phone-not-found';
 const commandLook = 'command-look';
+const platformDisabledKey: string = 'platform-disabled';
 
 export const keys = {
   messageProcessorKey,
@@ -19,4 +20,5 @@ export const keys = {
   missingAttachmentKey,
   phoneNotFoundKey,
   commandLook,
+  platformDisabledKey,
 };

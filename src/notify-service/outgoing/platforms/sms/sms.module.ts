@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { smsConfig } from './config/sms.configs';
 import { SmsVerificationCodePlatform } from './sms-verification-code.platform';
+import { TenantModule } from '@app/tenant';
+import { PlatformConfigModule } from '../../../platform-config/platform-config.module';
 
 @Module({
-  imports: [ConfigModule.forFeature(smsConfig)],
+  imports: [TenantModule, PlatformConfigModule],
   providers: [SmsVerificationCodePlatform],
   exports: [SmsVerificationCodePlatform],
 })

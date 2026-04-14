@@ -5,6 +5,7 @@ export class MessageEvent<T = any> extends AggregateRoot {
   constructor(
     public readonly message: T,
     public readonly platform: Platform,
+    public readonly tenantId?: string,
   ) {
     super();
   }

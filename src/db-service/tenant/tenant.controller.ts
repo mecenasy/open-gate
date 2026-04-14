@@ -6,13 +6,21 @@ import {
   GetCustomizationResponse,
   GetTenantRequest,
   GetTenantResponse,
+  GetPlatformCredentialsRequest,
+  GetPlatformCredentialsResponse,
+  GetTenantsWithPlatformRequest,
+  GetTenantsWithPlatformResponse,
 } from 'src/proto/tenant';
 import { TenantDbService } from './tenant.service';
+import { PlatformCredentialsService } from './platform-credentials.service';
 
 @Controller()
 @TenantServiceControllerMethods()
 export class TenantController implements TenantServiceController {
-  constructor(private readonly tenantDbService: TenantDbService) {}
+  constructor(
+    private readonly tenantDbService: TenantDbService,
+    private readonly platformCredentialsService: PlatformCredentialsService,
+  ) {}
 
   async getCustomization({ tenantId }: GetCustomizationRequest): Promise<GetCustomizationResponse> {
     const config = await this.tenantDbService.getCustomization(tenantId);
@@ -35,6 +43,27 @@ export class TenantController implements TenantServiceController {
       slug: tenant.slug,
       schemaName: tenant.schemaName,
       isActive: tenant.isActive,
+    };
+  }
+
+  async getPlatformCredentials({ tenantId, platform }: GetPlatformCredentialsRequest): Promise<GetPlatformCredentialsResponse> {
+    const creds = await this.platformCredentialsService.findByTenantAndPlatform(tenantId, platform);
+    if (!creds) {
+      return { status: false, message: 'No credentials found', configJson: '' };
+    }
+    return {
+      status: true,
+      message: 'Credentials retrieved',
+      configJson: JSON.stringify(creds.config),
+    };
+  }
+
+  async getTenantsWithPlatform({ platform }: GetTenantsWithPlatformRequest): Promise<GetTenantsWithPlatformResponse> {
+    const list = await this.platformCredentialsService.findTenantsWithPlatform(platform);
+    return {
+      status: true,
+      message: 'OK',
+      entries: list.map((c) => ({ tenantId: c.tenantId, configJson: JSON.stringify(c.config) })),
     };
   }
 }

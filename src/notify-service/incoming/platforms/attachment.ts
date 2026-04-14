@@ -6,5 +6,5 @@ import { UnifiedMessage } from 'src/notify-service/types/unified-message';
 export abstract class Attachment {
   platform: Platform;
 
-  abstract download(data: UnifiedMessage): Promise<Buffer>;
+  abstract download(data: UnifiedMessage, tenantId?: string): Promise<Buffer>;
 }

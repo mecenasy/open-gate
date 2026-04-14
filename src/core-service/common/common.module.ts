@@ -11,7 +11,8 @@ import { DbGrpcModule } from '@app/db-grpc';
 import { NotifyGrpcModule } from '@app/notify-grpc';
 import { GateGrpcModule } from '@app/gate-grpc';
 import { TenantCustomizationModule } from './customization/tenant-customization.module';
-import { TenantModule } from '@app/tenant';
+import { TenantModule, TenantService } from '@app/tenant';
+import { TENANT_SERVICE_TOKEN } from '@app/handler';
 @Global()
 @Module({
   imports: [
@@ -32,7 +33,11 @@ import { TenantModule } from '@app/tenant';
       provide: TypeConfigService,
       useExisting: ConfigService,
     },
+    {
+      provide: TENANT_SERVICE_TOKEN,
+      useExisting: TenantService,
+    },
   ],
-  exports: [EventService, TypeConfigService, CqrsModule, TenantCustomizationModule],
+  exports: [EventService, TypeConfigService, CqrsModule, TenantCustomizationModule, TENANT_SERVICE_TOKEN],
 })
 export class CommonModule {}

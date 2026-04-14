@@ -16,11 +16,18 @@ import { keys } from 'src/core-service/message-keys/keys';
 import { UserType } from 'src/db-service/user/user-type';
 import { UserStatus } from 'src/db-service/user/status';
 import { UnifiedMessage } from 'src/notify-service/types/unified-message';
+import { Inject, Optional } from '@nestjs/common';
+import { TenantCustomizationService } from 'src/core-service/common/customization/tenant-customization.service';
+import { Platform } from 'src/notify-service/types/platform';
 
 @CommandHandler(UnifiedMessageEvent)
 export class MassageHandler extends Handler<UnifiedMessageEvent, Status, UserProxyServiceClient> {
   messageGrpc: MessagesServiceClient;
-  constructor() {
+
+  constructor(
+    @Optional() @Inject(TenantCustomizationService)
+    private readonly customizationService?: TenantCustomizationService,
+  ) {
     super(USER_PROXY_SERVICE_NAME);
   }
 
@@ -31,6 +38,11 @@ export class MassageHandler extends Handler<UnifiedMessageEvent, Status, UserPro
 
   async execute({ message }: UnifiedMessageEvent): Promise<Status> {
     try {
+      if (await this.isPlatformDisabled(message.platform)) {
+        await this.notifyPlatformDisabled(message);
+        return { status: false, message: 'Platform disabled for this tenant' };
+      }
+
       const userContext = await this.getOrFetchUser({
         identifier: message.chatId,
         prefix: 'user',
@@ -118,6 +130,43 @@ export class MassageHandler extends Handler<UnifiedMessageEvent, Status, UserPro
         messageType: context.messageType ?? MessageType.Unknown,
       }),
     );
+  }
+
+  private async isPlatformDisabled(platform: Platform): Promise<boolean> {
+    if (!this.customizationService) {
+      return false;
+    }
+    const features = (await this.customizationService.getForCurrentTenant()).features;
+    if (platform === Platform.Signal && !features.enableSignal) return true;
+    if (platform === Platform.Whatsapp && !features.enableWhatsApp) return true;
+    if (platform === Platform.Messenger && !features.enableMessenger) return true;
+    return false;
+  }
+
+  private async notifyPlatformDisabled(message: UnifiedMessage): Promise<void> {
+    const text = await this.getPlatformDisabledMessage();
+    this.event.emit(
+      new NotificationEvent({ phone: message.chatId, message: text, platform: message.platform }),
+    );
+  }
+
+  private async getPlatformDisabledMessage(): Promise<string> {
+    const cached = await this.cache.getFromCache<string>({
+      identifier: 'message',
+      path: keys.platformDisabledKey,
+    });
+    if (cached) return cached;
+
+    const response = await lastValueFrom(this.messageGrpc.getMessage({ key: keys.platformDisabledKey }));
+    const text = response?.status && response?.data ? response.data.value : 'This service is not available.';
+
+    await this.cache.saveInCache<string>({
+      identifier: 'message',
+      path: keys.platformDisabledKey,
+      data: text,
+      EX: 24 * 60 * 60,
+    });
+    return text;
   }
 
   private async getMessage() {

@@ -6,6 +6,7 @@ export class AttachmentEvent extends AggregateRoot {
   constructor(
     public readonly message: UnifiedMessage,
     public readonly platform: Platform,
+    public readonly tenantId?: string,
   ) {
     super();
   }

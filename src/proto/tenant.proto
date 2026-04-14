@@ -5,6 +5,8 @@ package tenant;
 service TenantService {
   rpc GetCustomization (GetCustomizationRequest) returns (GetCustomizationResponse);
   rpc GetTenant (GetTenantRequest) returns (GetTenantResponse);
+  rpc GetPlatformCredentials (GetPlatformCredentialsRequest) returns (GetPlatformCredentialsResponse);
+  rpc GetTenantsWithPlatform (GetTenantsWithPlatformRequest) returns (GetTenantsWithPlatformResponse);
 }
 
 message GetCustomizationRequest {
@@ -28,4 +30,30 @@ message GetTenantResponse {
   string slug = 4;
   string schema_name = 5;
   bool is_active = 6;
+}
+
+message GetPlatformCredentialsRequest {
+  string tenant_id = 1;
+  string platform = 2;
+}
+
+message GetPlatformCredentialsResponse {
+  bool status = 1;
+  string message = 2;
+  string config_json = 3;
+}
+
+message TenantPlatformEntry {
+  string tenant_id = 1;
+  string config_json = 2;
+}
+
+message GetTenantsWithPlatformRequest {
+  string platform = 1;
+}
+
+message GetTenantsWithPlatformResponse {
+  bool status = 1;
+  string message = 2;
+  repeated TenantPlatformEntry entries = 3;
 }

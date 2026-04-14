@@ -1,5 +1,6 @@
-import { Controller, Logger } from '@nestjs/common';
+import { Controller, Logger, UseInterceptors } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
+import { TenantGrpcInterceptor } from '../tenant/tenant-grpc.interceptor';
 import {
   IncomingNotifyServiceControllerMethods,
   IncomingNotifyServiceController,
@@ -11,6 +12,7 @@ import { TypeTransformer } from 'src/utils/message-type';
 import { UnifiedMessageEvent } from 'src/core-service/process/pre-process/commands/impl/unified-message.command';
 
 @Controller()
+@UseInterceptors(TenantGrpcInterceptor)
 @IncomingNotifyServiceControllerMethods()
 export class MessageBridgeController implements IncomingNotifyServiceController {
   private readonly logger = new Logger(MessageBridgeController.name);

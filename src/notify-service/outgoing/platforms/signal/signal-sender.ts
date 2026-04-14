@@ -1,29 +1,24 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Sender } from '../sender';
 import { Platform } from 'src/notify-service/types/platform';
 import { Type, UnifiedMessage } from 'src/notify-service/types/unified-message';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { isAxiosError } from 'axios';
-import type { SignalConfig } from './config/signal.config';
+import { TenantService } from '@app/tenant';
+import { PlatformConfigService, SignalCredentials } from '../../../platform-config/platform-config.service';
 
 @Injectable()
 export class SignalSender extends Sender {
   platform: Platform = Platform.Signal;
-
-  private logger: Logger;
-  private readonly baseUrl: string;
-  private readonly botNumber: string;
+  private readonly logger = new Logger(SignalSender.name);
 
   constructor(
     private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
+    private readonly tenantService: TenantService,
+    private readonly platformConfigService: PlatformConfigService,
   ) {
     super();
-    this.logger = new Logger(SignalSender.name);
-    this.baseUrl = this.configService.get<SignalConfig>('signal')!.apiUrl;
-    this.botNumber = this.configService.get<SignalConfig>('signal')!.account;
   }
 
   async send(data: UnifiedMessage): Promise<void> {
@@ -31,19 +26,21 @@ export class SignalSender extends Sender {
 
     try {
       if (!chatId) {
-        throw new Error('Missing chatId or content');
+        throw new Error('Missing chatId');
+      }
+
+      const config = await this.resolveConfig();
+      if (!config) {
+        this.logger.warn(`No Signal config found for tenant, skipping send to ${chatId}`);
+        return;
       }
 
       if (type === Type.Audio) {
-        if (!media?.data) {
-          throw new Error('Missing audio data');
-        }
-        await this.sendAudio(chatId, media.data);
+        if (!media?.data) throw new Error('Missing audio data');
+        await this.sendAudio(config, chatId, media.data);
       } else {
-        if (!content) {
-          throw new Error('Missing content');
-        }
-        await this.sendText(chatId, content);
+        if (!content) throw new Error('Missing content');
+        await this.sendText(config, chatId, content);
       }
 
       this.logger.log(`✅ Signal message sent to ${chatId}`);
@@ -53,22 +50,31 @@ export class SignalSender extends Sender {
     }
   }
 
-  private async sendText(phone: string, text: string): Promise<void> {
+  private async resolveConfig(): Promise<SignalCredentials | null> {
+    const tenantId = this.tenantService.getContext()?.tenantId;
+    if (tenantId) {
+      return this.platformConfigService.getConfig(tenantId, 'signal');
+    }
+    // No tenant context — use env fallback via PlatformConfigService
+    return this.platformConfigService.envFallback('signal') as SignalCredentials | null;
+  }
+
+  private async sendText(config: SignalCredentials, phone: string, text: string): Promise<void> {
     await firstValueFrom(
-      this.httpService.post(`${this.baseUrl}/v1/send`, {
+      this.httpService.post(`${config.apiUrl}/v1/send`, {
         message: text,
-        number: this.botNumber,
+        number: config.account,
         recipients: [phone],
       }),
     );
   }
 
-  private async sendAudio(phone: string, audioFile: Buffer): Promise<void> {
+  private async sendAudio(config: SignalCredentials, phone: string, audioFile: Buffer): Promise<void> {
     await firstValueFrom(
       this.httpService.post(
-        `${this.baseUrl}/v2/send`,
+        `${config.apiUrl}/v2/send`,
         {
-          number: this.botNumber,
+          number: config.account,
           recipients: [phone],
           message: '',
           base64_attachments: [`data:audio/aac;base64,${audioFile.toString('base64')}`],

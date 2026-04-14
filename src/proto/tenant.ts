@@ -34,11 +34,39 @@ export interface GetTenantResponse {
   isActive: boolean;
 }
 
+export interface GetPlatformCredentialsRequest {
+  tenantId: string;
+  platform: string;
+}
+
+export interface GetPlatformCredentialsResponse {
+  status: boolean;
+  message: string;
+  configJson: string;
+}
+
+export interface TenantPlatformEntry {
+  tenantId: string;
+  configJson: string;
+}
+
+export interface GetTenantsWithPlatformRequest {
+  platform: string;
+}
+
+export interface GetTenantsWithPlatformResponse {
+  status: boolean;
+  message: string;
+  entries: TenantPlatformEntry[];
+}
+
 export const TENANT_PACKAGE_NAME = 'tenant';
 
 export interface TenantServiceClient {
   getCustomization(request: GetCustomizationRequest, metadata?: Metadata): Observable<GetCustomizationResponse>;
   getTenant(request: GetTenantRequest, metadata?: Metadata): Observable<GetTenantResponse>;
+  getPlatformCredentials(request: GetPlatformCredentialsRequest, metadata?: Metadata): Observable<GetPlatformCredentialsResponse>;
+  getTenantsWithPlatform(request: GetTenantsWithPlatformRequest, metadata?: Metadata): Observable<GetTenantsWithPlatformResponse>;
 }
 
 export interface TenantServiceController {
@@ -51,11 +79,21 @@ export interface TenantServiceController {
     request: GetTenantRequest,
     metadata?: Metadata,
   ): Promise<GetTenantResponse> | Observable<GetTenantResponse> | GetTenantResponse;
+
+  getPlatformCredentials(
+    request: GetPlatformCredentialsRequest,
+    metadata?: Metadata,
+  ): Promise<GetPlatformCredentialsResponse> | Observable<GetPlatformCredentialsResponse> | GetPlatformCredentialsResponse;
+
+  getTenantsWithPlatform(
+    request: GetTenantsWithPlatformRequest,
+    metadata?: Metadata,
+  ): Promise<GetTenantsWithPlatformResponse> | Observable<GetTenantsWithPlatformResponse> | GetTenantsWithPlatformResponse;
 }
 
 export function TenantServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['getCustomization', 'getTenant'];
+    const grpcMethods: string[] = ['getCustomization', 'getTenant', 'getPlatformCredentials', 'getTenantsWithPlatform'];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod('TenantService', method)(constructor.prototype[method], method, descriptor);

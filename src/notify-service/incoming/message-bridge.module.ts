@@ -7,15 +7,14 @@ import { SignalAttachment } from './platforms/signal/signal.attachment';
 import { AttachmentBridgeHandler } from './handlers/attachment-bridge.handler';
 import { HttpModule } from '@nestjs/axios';
 import { CqrsModule } from '@nestjs/cqrs';
-import { SignalBridgeService } from './platforms/signal/signal-bridge.service';
-// import { SignalBridgeService } from 'src/core-service/signal.controler';
+import { SignalBridgeManager } from './platforms/signal/signal-bridge.manager';
+import { PlatformConfigModule } from '../platform-config/platform-config.module';
 
 @Module({
-  imports: [CqrsModule, HttpModule],
+  imports: [CqrsModule, HttpModule, PlatformConfigModule],
   providers: [
-    // MessageSaga,
     SignalTransformer,
-    SignalBridgeService,
+    SignalBridgeManager,
     SignalAttachment,
     MessageBridgeHandler,
     AttachmentBridgeHandler,

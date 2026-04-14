@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
 import { CqrsModule } from '@nestjs/cqrs';
 import { OutgoingNotifyController } from './outdoing-notify.controller';
@@ -14,9 +13,11 @@ import { SmsVerificationCodePlatform } from './platforms/sms/sms-verification-co
 import { MailVerificationCodePlatform } from './platforms/smtp/mail-verification-code.platform';
 import { MailTokenPlatform } from './platforms/smtp/mail-token.platform';
 import { commandHandlers } from './commands/handlers';
+import { TenantModule } from '@app/tenant';
+import { PlatformConfigModule } from '../platform-config/platform-config.module';
 
 @Module({
-  imports: [HttpModule, ConfigModule, CqrsModule, SmsModule, SmtpModule],
+  imports: [HttpModule, CqrsModule, SmsModule, SmtpModule, TenantModule, PlatformConfigModule],
   providers: [
     SignalSender,
     OutgoingNotifyBridgeHandler,

@@ -9,6 +9,7 @@ import { MessageBridgeModule } from './incoming/message-bridge.module';
 import { OutgoingNotifyModule } from './outgoing/outgoing-notify.module';
 import { LoggerModule } from '@app/logger';
 import { envValidationSchema } from 'src/config/env.validation';
+import { PlatformConfigModule } from './platform-config/platform-config.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { envValidationSchema } from 'src/config/env.validation';
     OutgoingNotifyModule,
     CqrsModule,
     GateGrpcModule,
+    PlatformConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService],

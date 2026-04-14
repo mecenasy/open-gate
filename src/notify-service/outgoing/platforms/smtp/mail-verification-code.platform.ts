@@ -1,14 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
 import { Platform } from 'src/notify-service/types/platform';
 import { VerificationCodePlatform } from '../base/verification-code-platform';
+import { DynamicSmtpService } from './dynamic-smtp.service';
 
 @Injectable()
 export class MailVerificationCodePlatform extends VerificationCodePlatform {
   platform = Platform.Email;
   private readonly logger = new Logger(MailVerificationCodePlatform.name);
 
-  constructor(private readonly mailerService: MailerService) {
+  constructor(private readonly smtp: DynamicSmtpService) {
     super();
   }
 
@@ -19,11 +19,11 @@ export class MailVerificationCodePlatform extends VerificationCodePlatform {
     }
 
     try {
-      await this.mailerService.sendMail({
+      await this.smtp.sendMail({
         to: email,
         subject: 'Your verification code',
-        template: './verification',
-        context: { code: code.toString() },
+        text: `Your verification code is: ${code}`,
+        html: `<p>Your verification code is: <strong>${code}</strong></p>`,
       });
     } catch (error) {
       this.logger.error('Failed to send OTP email.', error);

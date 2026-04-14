@@ -207,6 +207,17 @@ type ConfigsListType {
   data: [ConfigType!]!
 }
 
+type TenantFeaturesType {
+  enableSignal: Boolean!
+  enableWhatsApp: Boolean!
+  enableMessenger: Boolean!
+  enableGate: Boolean!
+  enablePayment: Boolean!
+  enableCommandScheduling: Boolean!
+  enableAnalytics: Boolean!
+  maxUsersPerTenant: Int!
+}
+
 type Query {
   users(input: GetAllUsersType): UsersListType!
   user(input: GetUserType!): UserSummaryType!
@@ -223,6 +234,7 @@ type Query {
   coreConfigs: ConfigsListType!
   featureConfigs: ConfigsListType!
   featureConfig(input: GetFeatureConfigType!): ConfigsListType!
+  tenantFeatures: TenantFeaturesType!
   csrfToken: CsrfTokenType!
 }
 

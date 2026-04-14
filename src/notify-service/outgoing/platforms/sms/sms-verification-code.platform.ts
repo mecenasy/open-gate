@@ -1,20 +1,20 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Twilio } from 'twilio';
 import { Platform } from 'src/notify-service/types/platform';
 import { VerificationCodePlatform } from '../base/verification-code-platform';
-import { SmsConfig } from './config/sms.configs';
+import { TenantService } from '@app/tenant';
+import { PlatformConfigService, SmsCredentials } from '../../../platform-config/platform-config.service';
 
 @Injectable()
 export class SmsVerificationCodePlatform extends VerificationCodePlatform {
   platform = Platform.Sms;
-  private client: Twilio;
   private readonly logger = new Logger(SmsVerificationCodePlatform.name);
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly tenantService: TenantService,
+    private readonly platformConfigService: PlatformConfigService,
+  ) {
     super();
-    const config = this.configService.get<SmsConfig>('sms');
-    this.client = new Twilio(config?.sid, config?.token);
   }
 
   async send({ phoneNumber }: { phoneNumber?: string; email?: string }, code: number): Promise<void> {
@@ -23,15 +23,29 @@ export class SmsVerificationCodePlatform extends VerificationCodePlatform {
       return;
     }
 
-    const phone = this.configService.get<SmsConfig>('sms')?.phone;
+    const config = await this.resolveConfig();
+    if (!config) {
+      this.logger.warn(`No SMS config for tenant, skipping send to ${phoneNumber}`);
+      return;
+    }
+
     try {
-      await this.client.messages.create({
+      const client = new Twilio(config.sid, config.token);
+      await client.messages.create({
         body: `Your code is: ${code}`,
-        from: phone,
+        from: config.phone,
         to: phoneNumber,
       });
     } catch (error) {
       this.logger.error('Failed to send SMS.', error);
     }
+  }
+
+  private async resolveConfig(): Promise<SmsCredentials | null> {
+    const tenantId = this.tenantService.getContext()?.tenantId;
+    if (tenantId) {
+      return this.platformConfigService.getConfig(tenantId, 'sms');
+    }
+    return this.platformConfigService.envFallback('sms') as SmsCredentials | null;
   }
 }

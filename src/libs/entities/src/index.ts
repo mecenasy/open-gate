@@ -31,3 +31,4 @@ export * from './config/config.entity';
 // Tenant
 export * from './tenant/tenant.entity';
 export * from './tenant/customization-config.entity';
+export * from './tenant/platform-credentials.entity';

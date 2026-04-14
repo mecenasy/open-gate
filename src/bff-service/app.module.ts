@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { PromptsModule } from './prompts/prompts.module';
 import { CommandModule } from './command/command.module';
 import { CoreConfigModule } from './core-config/core-config.module';
+import { TenantBffModule } from './tenant/tenant.module';
 import { LoggerModule } from '@app/logger';
 import { TenantModule, TenantInterceptor, TenantService } from '@app/tenant';
 import { TENANT_SERVICE_TOKEN } from '@app/handler';
@@ -45,6 +46,7 @@ import { TENANT_SERVICE_TOKEN } from '@app/handler';
     PromptsModule,
     CommandModule,
     CoreConfigModule,
+    TenantBffModule,
     CsrfModule,
   ],
   controllers: [AppController],

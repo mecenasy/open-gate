@@ -1,4 +1,5 @@
 import { Inject, Logger, OnModuleInit } from '@nestjs/common';
+import { Metadata } from '@grpc/grpc-js';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { firstValueFrom } from 'rxjs';
 import { INCOMING_NOTIFY_SERVICE_NAME, IncomingNotifyServiceClient } from 'src/proto/notify';
@@ -23,19 +24,21 @@ export class AttachmentBridgeHandler implements IEventHandler<AttachmentEvent>, 
     this.gateClient = this.grpcClient.getService<IncomingNotifyServiceClient>(INCOMING_NOTIFY_SERVICE_NAME);
   }
 
-  async handle({ message, platform }: AttachmentEvent): Promise<void> {
+  async handle({ message, platform, tenantId }: AttachmentEvent): Promise<void> {
     const attachments = this.attachments.find((t) => t.platform === platform);
     if (!attachments) {
       throw new Error(`No transformer found for platform ${platform}`);
     }
 
-    const data = await attachments.download(message);
+    const data = await attachments.download(message, tenantId);
 
     if (!data || !message.media?.url) {
       throw new Error('No data found');
     }
 
     try {
+      const metadata = new Metadata();
+      if (tenantId) metadata.set('x-tenant-id', tenantId);
       await firstValueFrom(
         this.gateClient.receiveMessage({
           data: {
@@ -44,11 +47,11 @@ export class AttachmentBridgeHandler implements IEventHandler<AttachmentEvent>, 
             platform: PlatformTransformer.toGrpc(message.platform),
             type: TypeTransformer.toGrpc(message.type),
           },
-          message: 'message transformed to string ',
+          message: 'message transformed to string',
           status: true,
-        }),
+        }, metadata),
       );
-      this.logger.log(`✅ Signal message forwarded to core-service`);
+      this.logger.log(`✅ Attachment forwarded to core-service [tenant=${tenantId ?? 'unset'}]`);
     } catch (error) {
       this.logger.error(`❌ Failed to forward Signal message to core-service`, error);
     }

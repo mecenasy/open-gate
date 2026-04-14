@@ -9,6 +9,7 @@ import { PlatformTransformer } from 'src/utils/platform';
 import { TypeTransformer } from 'src/utils/message-type';
 import { MessageEvent } from '../event/message.event';
 import { AttachmentEvent } from '../event/attachment-event';
+import { Metadata } from '@grpc/grpc-js';
 
 @EventsHandler(MessageEvent)
 export class MessageBridgeHandler implements IEventHandler<MessageEvent>, OnModuleInit {
@@ -25,7 +26,7 @@ export class MessageBridgeHandler implements IEventHandler<MessageEvent>, OnModu
     this.gateClient = this.grpcClient.getService<IncomingNotifyServiceClient>(INCOMING_NOTIFY_SERVICE_NAME);
   }
 
-  async handle({ message: data, platform }: MessageEvent): Promise<void> {
+  async handle({ message: data, platform, tenantId }: MessageEvent): Promise<void> {
     const transformer = this.transformers.find((t) => t.platform === platform);
     if (!transformer) {
       throw new Error(`No transformer found for platform ${platform}`);
@@ -34,25 +35,33 @@ export class MessageBridgeHandler implements IEventHandler<MessageEvent>, OnModu
     const message = await transformer.transform(data);
 
     if (message.media) {
-      await this.eventBus.publish(new AttachmentEvent(message, platform));
+      await this.eventBus.publish(new AttachmentEvent(message, platform, tenantId));
       return;
     }
 
     try {
+      const metadata = new Metadata();
+      if (tenantId) {
+        metadata.set('x-tenant-id', tenantId);
+      }
+
       await firstValueFrom(
-        this.gateClient.receiveMessage({
-          data: {
-            ...message,
-            platform: PlatformTransformer.toGrpc(message.platform),
-            type: TypeTransformer.toGrpc(message.type),
+        this.gateClient.receiveMessage(
+          {
+            data: {
+              ...message,
+              platform: PlatformTransformer.toGrpc(message.platform),
+              type: TypeTransformer.toGrpc(message.type),
+            },
+            message: 'message transformed to string',
+            status: true,
           },
-          message: 'message transformed to string ',
-          status: true,
-        }),
+          metadata,
+        ),
       );
-      this.logger.log(`✅ Signal message forwarded to core-service`);
+      this.logger.log(`✅ Message forwarded to core-service [tenant=${tenantId ?? 'unset'}, platform=${platform}]`);
     } catch (error) {
-      this.logger.error(`❌ Failed to forward Signal message to core-service`, error);
+      this.logger.error(`❌ Failed to forward message to core-service`, error);
     }
   }
 }

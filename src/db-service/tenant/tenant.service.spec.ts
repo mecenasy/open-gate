@@ -30,9 +30,7 @@ const makeCustomization = (overrides: Partial<CustomizationConfig> = {}): Custom
 describe('TenantDbService', () => {
   let service: TenantDbService;
   let tenantRepo: jest.Mocked<Pick<Repository<Tenant>, 'findOne' | 'find' | 'create' | 'save' | 'update'>>;
-  let customizationRepo: jest.Mocked<
-    Pick<Repository<CustomizationConfig>, 'findOne' | 'create' | 'save'>
-  >;
+  let customizationRepo: jest.Mocked<Pick<Repository<CustomizationConfig>, 'findOne' | 'create' | 'save'>>;
 
   beforeEach(() => {
     tenantRepo = {
@@ -111,9 +109,7 @@ describe('TenantDbService', () => {
       expect(tenantRepo.create).toHaveBeenCalledWith(
         expect.objectContaining({ slug: 'acme', schemaName: 'tenant_acme' }),
       );
-      expect(customizationRepo.create).toHaveBeenCalledWith(
-        expect.objectContaining({ config: DEFAULT_CUSTOMIZATION }),
-      );
+      expect(customizationRepo.create).toHaveBeenCalledWith(expect.objectContaining({ config: DEFAULT_CUSTOMIZATION }));
       expect(result.customizationId).toBe(cust.id);
     });
 
@@ -128,9 +124,7 @@ describe('TenantDbService', () => {
 
       await service.create('my-company');
 
-      expect(tenantRepo.create).toHaveBeenCalledWith(
-        expect.objectContaining({ schemaName: 'tenant_my_company' }),
-      );
+      expect(tenantRepo.create).toHaveBeenCalledWith(expect.objectContaining({ schemaName: 'tenant_my_company' }));
     });
   });
 
@@ -170,9 +164,7 @@ describe('TenantDbService', () => {
     it('throws NotFoundException when customization record does not exist', async () => {
       customizationRepo.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.updateCustomization('missing-id', { branding: {} }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.updateCustomization('missing-id', { branding: {} })).rejects.toThrow(NotFoundException);
     });
 
     it('throws BadRequestException when priorityChannels removes both sms and email', async () => {

@@ -36,9 +36,7 @@ describe('LoginStatusHandler', () => {
       saveInCache: jest.fn().mockResolvedValue(undefined),
     };
     mockGrpcService = {
-      getLoginStatus: jest.fn().mockReturnValue(
-        of({ message: null, userStatus: grpcUserStatus }),
-      ),
+      getLoginStatus: jest.fn().mockReturnValue(of({ message: null, userStatus: grpcUserStatus })),
     };
 
     handler = new LoginStatusHandler(mockConfigService as unknown as TypeConfigService);
@@ -67,9 +65,7 @@ describe('LoginStatusHandler', () => {
 
   it('should fetch from gRPC and cache result when cache is empty', async () => {
     mockCache.getFromCache.mockResolvedValue(null);
-    mockGrpcService.getLoginStatus.mockReturnValue(
-      of({ message: null, userStatus: grpcUserStatus }),
-    );
+    mockGrpcService.getLoginStatus.mockReturnValue(of({ message: null, userStatus: grpcUserStatus }));
 
     const result = await handler.execute(new StatusAuthQuery('user-1'));
 
@@ -87,9 +83,7 @@ describe('LoginStatusHandler', () => {
 
   it('should return logout status when gRPC returns message (user not found)', async () => {
     mockCache.getFromCache.mockResolvedValue(null);
-    mockGrpcService.getLoginStatus.mockReturnValue(
-      of({ message: 'USER_NOT_FOUND', userStatus: null }),
-    );
+    mockGrpcService.getLoginStatus.mockReturnValue(of({ message: 'USER_NOT_FOUND', userStatus: null }));
 
     const result = await handler.execute(new StatusAuthQuery('ghost-user'));
 
@@ -99,9 +93,7 @@ describe('LoginStatusHandler', () => {
 
   it('should return logout status when gRPC returns no userStatus', async () => {
     mockCache.getFromCache.mockResolvedValue(null);
-    mockGrpcService.getLoginStatus.mockReturnValue(
-      of({ message: null, userStatus: null }),
-    );
+    mockGrpcService.getLoginStatus.mockReturnValue(of({ message: null, userStatus: null }));
 
     const result = await handler.execute(new StatusAuthQuery('user-1'));
 

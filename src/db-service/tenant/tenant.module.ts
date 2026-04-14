@@ -11,11 +11,7 @@ import { TenantModule } from '@app/tenant';
 @Module({
   imports: [TypeOrmModule.forFeature([Tenant, CustomizationConfig]), TenantModule],
   controllers: [TenantController],
-  providers: [
-    TenantDbService,
-    TenantGrpcInterceptor,
-    { provide: APP_INTERCEPTOR, useClass: TenantGrpcInterceptor },
-  ],
+  providers: [TenantDbService, TenantGrpcInterceptor, { provide: APP_INTERCEPTOR, useClass: TenantGrpcInterceptor }],
   exports: [TypeOrmModule, TenantDbService],
 })
 export class TenantDbModule {}

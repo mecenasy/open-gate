@@ -31,9 +31,7 @@ describe('GetAllCommandsHandler', () => {
   });
 
   it('should return mapped commands list', async () => {
-    mockGrpc.getAllCommands.mockReturnValue(
-      of({ status: true, data: protoCommands, total: 1, page: 1, limit: 10 }),
-    );
+    mockGrpc.getAllCommands.mockReturnValue(of({ status: true, data: protoCommands, total: 1, page: 1, limit: 10 }));
 
     const result = await handler.execute(new GetAllCommandsQuery(1, 10));
 
@@ -47,15 +45,11 @@ describe('GetAllCommandsHandler', () => {
   it('should throw InternalServerErrorException when status=false', async () => {
     mockGrpc.getAllCommands.mockReturnValue(of({ status: false, message: 'DB error' }));
 
-    await expect(handler.execute(new GetAllCommandsQuery())).rejects.toThrow(
-      InternalServerErrorException,
-    );
+    await expect(handler.execute(new GetAllCommandsQuery())).rejects.toThrow(InternalServerErrorException);
   });
 
   it('should pass filters to gRPC', async () => {
-    mockGrpc.getAllCommands.mockReturnValue(
-      of({ status: true, data: [], total: 0, page: 1, limit: 5 }),
-    );
+    mockGrpc.getAllCommands.mockReturnValue(of({ status: true, data: [], total: 0, page: 1, limit: 5 }));
 
     await handler.execute(new GetAllCommandsQuery(2, 5, true, { execute: true }));
 
@@ -65,14 +59,10 @@ describe('GetAllCommandsHandler', () => {
   });
 
   it('should use empty object as default actionFilter', async () => {
-    mockGrpc.getAllCommands.mockReturnValue(
-      of({ status: true, data: [], total: 0, page: 1, limit: 10 }),
-    );
+    mockGrpc.getAllCommands.mockReturnValue(of({ status: true, data: [], total: 0, page: 1, limit: 10 }));
 
     await handler.execute(new GetAllCommandsQuery(1, 10, false));
 
-    expect(mockGrpc.getAllCommands).toHaveBeenCalledWith(
-      expect.objectContaining({ actionFilter: {} }),
-    );
+    expect(mockGrpc.getAllCommands).toHaveBeenCalledWith(expect.objectContaining({ actionFilter: {} }));
   });
 });

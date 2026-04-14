@@ -41,9 +41,7 @@ describe('GetCommandHandler', () => {
   it('should throw NotFoundException when no data is returned', async () => {
     mockGrpc.getCommand.mockReturnValue(of({ status: false, message: 'Not found', data: null }));
 
-    await expect(handler.execute(new GetCommandQuery({ id: 'bad-id' }))).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(handler.execute(new GetCommandQuery({ id: 'bad-id' }))).rejects.toThrow(NotFoundException);
   });
 
   it('should pass id and name to gRPC', async () => {

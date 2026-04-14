@@ -47,9 +47,7 @@ describe('Accept2faHandler', () => {
 
   it('should fetch user email from gRPC when not in cache', async () => {
     mockCache.getFromCache.mockResolvedValue(null);
-    mockGrpc.getLoginStatus.mockReturnValue(
-      of({ message: null, userStatus: { email: 'grpc@example.com' } }),
-    );
+    mockGrpc.getLoginStatus.mockReturnValue(of({ message: null, userStatus: { email: 'grpc@example.com' } }));
 
     const result = await handler.execute(new Accept2faCommand('user-1'));
 
@@ -59,9 +57,7 @@ describe('Accept2faHandler', () => {
 
   it('should throw NotFoundException when gRPC returns message and no user', async () => {
     mockCache.getFromCache.mockResolvedValue(null);
-    mockGrpc.getLoginStatus.mockReturnValue(
-      of({ message: 'USER_NOT_FOUND', userStatus: null }),
-    );
+    mockGrpc.getLoginStatus.mockReturnValue(of({ message: 'USER_NOT_FOUND', userStatus: null }));
 
     await expect(handler.execute(new Accept2faCommand('bad-id'))).rejects.toThrow(NotFoundException);
   });

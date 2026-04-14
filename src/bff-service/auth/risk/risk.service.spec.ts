@@ -113,9 +113,7 @@ describe('RiskService', () => {
 
     it('should cap score at 100', async () => {
       (service as any).reverseDns = jest.fn().mockResolvedValue(['127.0.0.2']);
-      mockGrpcService.getUnusualTime.mockReturnValue(
-        of({ similarLogins: 0, totalLogins: 10 }),
-      );
+      mockGrpcService.getUnusualTime.mockReturnValue(of({ similarLogins: 0, totalLogins: 10 }));
       // With no history, only NEW_DEVICE (+50) is scored, others need history
       const result = await service.calculateRisk('user-1', null as unknown as History, makeSecurity());
 
@@ -128,9 +126,7 @@ describe('RiskService', () => {
   describe('calculateRisk – login lock', () => {
     it('should throw UnauthorizedException when account is locked', async () => {
       (geoIp.lookup as jest.Mock).mockReturnValue({ ll: [52.2297, 21.0122] });
-      mockGrpcService.getUnusualTime.mockReturnValue(
-        of({ similarLogins: 5, totalLogins: 20 }),
-      );
+      mockGrpcService.getUnusualTime.mockReturnValue(of({ similarLogins: 5, totalLogins: 20 }));
 
       const recentFailureTime = new Date(Date.now() - 30 * 1000).toISOString(); // 30 seconds ago
       const lockedHistory = makeHistory({
@@ -138,16 +134,14 @@ describe('RiskService', () => {
         lastFailureAt: recentFailureTime,
       });
 
-      await expect(
-        service.calculateRisk('user-1', lockedHistory, makeSecurity()),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(service.calculateRisk('user-1', lockedHistory, makeSecurity())).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should NOT throw when lock duration has passed', async () => {
       (geoIp.lookup as jest.Mock).mockReturnValue({ ll: [52.2297, 21.0122] });
-      mockGrpcService.getUnusualTime.mockReturnValue(
-        of({ similarLogins: 5, totalLogins: 20 }),
-      );
+      mockGrpcService.getUnusualTime.mockReturnValue(of({ similarLogins: 5, totalLogins: 20 }));
 
       const oldFailureTime = new Date(Date.now() - 10 * 60 * 1000).toISOString(); // 10 min ago
       const unlockedHistory = makeHistory({
@@ -155,9 +149,7 @@ describe('RiskService', () => {
         lastFailureAt: oldFailureTime,
       });
 
-      await expect(
-        service.calculateRisk('user-1', unlockedHistory, makeSecurity()),
-      ).resolves.not.toThrow();
+      await expect(service.calculateRisk('user-1', unlockedHistory, makeSecurity())).resolves.not.toThrow();
     });
   });
 
@@ -166,9 +158,7 @@ describe('RiskService', () => {
   describe('calculateRisk – PREVIOUS_HIGH_RISK', () => {
     it('should add PREVIOUS_HIGH_RISK (+20) when last score >= 80 within 7 days', async () => {
       (geoIp.lookup as jest.Mock).mockReturnValue({ ll: [52.2297, 21.0122] });
-      mockGrpcService.getUnusualTime.mockReturnValue(
-        of({ similarLogins: 5, totalLogins: 20 }),
-      );
+      mockGrpcService.getUnusualTime.mockReturnValue(of({ similarLogins: 5, totalLogins: 20 }));
 
       const recentHighRiskHistory = makeHistory({
         lastScore: 85,
@@ -182,9 +172,7 @@ describe('RiskService', () => {
 
     it('should NOT add PREVIOUS_HIGH_RISK when last score >= 80 but older than 7 days', async () => {
       (geoIp.lookup as jest.Mock).mockReturnValue({ ll: [52.2297, 21.0122] });
-      mockGrpcService.getUnusualTime.mockReturnValue(
-        of({ similarLogins: 5, totalLogins: 20 }),
-      );
+      mockGrpcService.getUnusualTime.mockReturnValue(of({ similarLogins: 5, totalLogins: 20 }));
 
       const oldHighRiskHistory = makeHistory({
         lastScore: 85,
@@ -202,9 +190,7 @@ describe('RiskService', () => {
   describe('calculateRisk – MULTIPLE_FAILURES', () => {
     it('should add MULTIPLE_FAILURES (+60) when failureCount > 3', async () => {
       (geoIp.lookup as jest.Mock).mockReturnValue(null);
-      mockGrpcService.getUnusualTime.mockReturnValue(
-        of({ similarLogins: 5, totalLogins: 20 }),
-      );
+      mockGrpcService.getUnusualTime.mockReturnValue(of({ similarLogins: 5, totalLogins: 20 }));
 
       const highFailureHistory = makeHistory({ failureCount: 5, lastFailureAt: null });
       const result = await service.calculateRisk('user-1', highFailureHistory, makeSecurity());
@@ -214,9 +200,7 @@ describe('RiskService', () => {
 
     it('should NOT add MULTIPLE_FAILURES when failureCount <= 3', async () => {
       (geoIp.lookup as jest.Mock).mockReturnValue(null);
-      mockGrpcService.getUnusualTime.mockReturnValue(
-        of({ similarLogins: 5, totalLogins: 20 }),
-      );
+      mockGrpcService.getUnusualTime.mockReturnValue(of({ similarLogins: 5, totalLogins: 20 }));
 
       const lowFailureHistory = makeHistory({ failureCount: 3 });
       const result = await service.calculateRisk('user-1', lowFailureHistory, makeSecurity());
@@ -230,9 +214,7 @@ describe('RiskService', () => {
   describe('calculateRisk – SUSPICIOUS_USER_AGENT', () => {
     it('should flag headless browser as suspicious', async () => {
       (geoIp.lookup as jest.Mock).mockReturnValue(null);
-      mockGrpcService.getUnusualTime.mockReturnValue(
-        of({ similarLogins: 5, totalLogins: 20 }),
-      );
+      mockGrpcService.getUnusualTime.mockReturnValue(of({ similarLogins: 5, totalLogins: 20 }));
 
       const security = makeSecurity({ userAgent: 'HeadlessChrome/91.0.4472.124' });
       const result = await service.calculateRisk('user-1', makeHistory(), security);
@@ -242,9 +224,7 @@ describe('RiskService', () => {
 
     it('should flag missing user agent as suspicious', async () => {
       (geoIp.lookup as jest.Mock).mockReturnValue(null);
-      mockGrpcService.getUnusualTime.mockReturnValue(
-        of({ similarLogins: 5, totalLogins: 20 }),
-      );
+      mockGrpcService.getUnusualTime.mockReturnValue(of({ similarLogins: 5, totalLogins: 20 }));
 
       const security = makeSecurity({ userAgent: undefined });
       const result = await service.calculateRisk('user-1', makeHistory(), security);
@@ -254,9 +234,7 @@ describe('RiskService', () => {
 
     it('should flag OS change between sessions as suspicious', async () => {
       (geoIp.lookup as jest.Mock).mockReturnValue(null);
-      mockGrpcService.getUnusualTime.mockReturnValue(
-        of({ similarLogins: 5, totalLogins: 20 }),
-      );
+      mockGrpcService.getUnusualTime.mockReturnValue(of({ similarLogins: 5, totalLogins: 20 }));
 
       const previousWindows = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
       const currentMac = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36';
@@ -277,9 +255,7 @@ describe('RiskService', () => {
       // Simulate login from a new location (Berlin ~524 km from Warsaw)
       // geoip returns Berlin coords for lastIp, current location is Warsaw → distance > 300 km
       (geoIp.lookup as jest.Mock).mockReturnValue({ ll: [52.52, 13.405] }); // Berlin
-      mockGrpcService.getUnusualTime.mockReturnValue(
-        of({ similarLogins: 0, totalLogins: 10 }),
-      );
+      mockGrpcService.getUnusualTime.mockReturnValue(of({ similarLogins: 0, totalLogins: 10 }));
 
       // Use very old updatedAt so IMPOSSIBLE_TRAVEL doesn't trigger
       const oldHistory = makeHistory({
@@ -305,9 +281,7 @@ describe('RiskService', () => {
     it('should add score (+5) but NOT add UNUSUAL_TIME to reasons without NEW_LOCATION', async () => {
       // Same location → no NEW_LOCATION, but unusual time
       (geoIp.lookup as jest.Mock).mockReturnValue({ ll: [52.2297, 21.0122] }); // Warsaw
-      mockGrpcService.getUnusualTime.mockReturnValue(
-        of({ similarLogins: 0, totalLogins: 10 }),
-      );
+      mockGrpcService.getUnusualTime.mockReturnValue(of({ similarLogins: 0, totalLogins: 10 }));
 
       const normalHistory = makeHistory({ lastScore: 10 });
       const result = await service.calculateRisk('user-1', normalHistory, makeSecurity());
@@ -318,9 +292,7 @@ describe('RiskService', () => {
 
     it('should NOT add UNUSUAL_TIME when totalLogins is 0', async () => {
       (geoIp.lookup as jest.Mock).mockReturnValue({ ll: [52.2297, 21.0122] });
-      mockGrpcService.getUnusualTime.mockReturnValue(
-        of({ similarLogins: 0, totalLogins: 0 }),
-      );
+      mockGrpcService.getUnusualTime.mockReturnValue(of({ similarLogins: 0, totalLogins: 0 }));
 
       const result = await service.calculateRisk('user-1', makeHistory(), makeSecurity());
 

@@ -33,18 +33,14 @@ describe('Verify2faHandler', () => {
   it('should throw BadRequestException when no 2fa-state in cache', async () => {
     mockCache.getFromCache.mockResolvedValueOnce(null);
 
-    await expect(handler.execute(new Verify2faCommand('user-1', '123456'))).rejects.toThrow(
-      BadRequestException,
-    );
+    await expect(handler.execute(new Verify2faCommand('user-1', '123456'))).rejects.toThrow(BadRequestException);
   });
 
   it('should throw BadRequestException when TOTP code is invalid', async () => {
     mockCache.getFromCache.mockResolvedValueOnce('SECRETKEY');
     (authenticator.check as jest.Mock).mockReturnValue(false);
 
-    await expect(handler.execute(new Verify2faCommand('user-1', '000000'))).rejects.toThrow(
-      BadRequestException,
-    );
+    await expect(handler.execute(new Verify2faCommand('user-1', '000000'))).rejects.toThrow(BadRequestException);
   });
 
   it('should throw InternalServerErrorException when gRPC verify fails', async () => {
@@ -59,8 +55,8 @@ describe('Verify2faHandler', () => {
 
   it('should return reject2fa status on success', async () => {
     mockCache.getFromCache
-      .mockResolvedValueOnce('SECRETKEY')  // 2fa-state
-      .mockResolvedValueOnce(null);          // user-state (not cached)
+      .mockResolvedValueOnce('SECRETKEY') // 2fa-state
+      .mockResolvedValueOnce(null); // user-state (not cached)
     (authenticator.check as jest.Mock).mockReturnValue(true);
     mockGrpc.verify2Fa.mockReturnValue(of({ status: true, message: null }));
 
@@ -73,7 +69,14 @@ describe('Verify2faHandler', () => {
   it('should update user-state cache to set is2faEnabled=true', async () => {
     mockCache.getFromCache
       .mockResolvedValueOnce('SECRETKEY')
-      .mockResolvedValueOnce({ id: 'user-1', email: 'u@e.com', is2faEnabled: false, admin: false, owner: false, isAdaptiveLoginEnabled: false });
+      .mockResolvedValueOnce({
+        id: 'user-1',
+        email: 'u@e.com',
+        is2faEnabled: false,
+        admin: false,
+        owner: false,
+        isAdaptiveLoginEnabled: false,
+      });
     (authenticator.check as jest.Mock).mockReturnValue(true);
     mockGrpc.verify2Fa.mockReturnValue(of({ status: true, message: null }));
 

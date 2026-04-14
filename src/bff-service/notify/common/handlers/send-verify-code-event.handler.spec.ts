@@ -35,9 +35,7 @@ describe('SendVerifyCodeEventHandler', () => {
   });
 
   it('should NOT throw when notification service fails (error is caught)', async () => {
-    mockNotificationService.sendVerificationCode.mockReturnValue(
-      throwError(() => new Error('gRPC unavailable')),
-    );
+    mockNotificationService.sendVerificationCode.mockReturnValue(throwError(() => new Error('gRPC unavailable')));
 
     await expect(
       handler.handle(new SendVerifyCodeEvent('+48100200300', 'user@example.com', 111111)),

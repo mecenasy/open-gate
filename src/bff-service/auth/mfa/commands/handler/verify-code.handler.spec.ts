@@ -22,7 +22,10 @@ describe('MFA VerifyCodeHandler', () => {
     };
 
     handler = new VerifyCodeHandler();
-    Object.assign(handler, { cache: mockCache, logger: { error: jest.fn(), log: jest.fn(), warn: jest.fn(), debug: jest.fn() } });
+    Object.assign(handler, {
+      cache: mockCache,
+      logger: { error: jest.fn(), log: jest.fn(), warn: jest.fn(), debug: jest.fn() },
+    });
   });
 
   it('should return login status and set session.user_id when code matches', async () => {

@@ -24,9 +24,7 @@ describe('saveSession', () => {
       save: jest.fn((cb: (err: Error) => void) => cb(err)),
     } as unknown as SessionData;
 
-    await expect(saveSession(session, mockLogger as Logger)).rejects.toThrow(
-      InternalServerErrorException,
-    );
+    await expect(saveSession(session, mockLogger as Logger)).rejects.toThrow(InternalServerErrorException);
     expect(mockLogger.error).toHaveBeenCalledWith(err);
   });
 

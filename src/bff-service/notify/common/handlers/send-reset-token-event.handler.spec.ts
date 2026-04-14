@@ -39,13 +39,9 @@ describe('SendResetTokenEventHandler', () => {
   });
 
   it('should NOT throw when notification service fails (error is caught)', async () => {
-    mockNotificationService.sendToken.mockReturnValue(
-      throwError(() => new Error('gRPC timeout')),
-    );
+    mockNotificationService.sendToken.mockReturnValue(throwError(() => new Error('gRPC timeout')));
 
-    await expect(
-      handler.handle(new SendResetTokenEvent('user@example.com', 'token-123')),
-    ).resolves.toBeUndefined();
+    await expect(handler.handle(new SendResetTokenEvent('user@example.com', 'token-123'))).resolves.toBeUndefined();
   });
 
   it('should construct URL from config clientUrl and token', async () => {

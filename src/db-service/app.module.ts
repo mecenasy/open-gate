@@ -9,6 +9,15 @@ import { MessagesModule } from './messages/messages.module';
 import { TenantDbModule } from './tenant/tenant.module';
 
 @Module({
-  imports: [AuthModule, CommonModule, UserModule, CoreConfigModule, PromptModule, CommandModule, MessagesModule, TenantDbModule],
+  imports: [
+    AuthModule,
+    CommonModule,
+    UserModule,
+    CoreConfigModule,
+    PromptModule,
+    CommandModule,
+    MessagesModule,
+    TenantDbModule,
+  ],
 })
 export class AppModule {}

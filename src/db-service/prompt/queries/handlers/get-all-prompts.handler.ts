@@ -6,7 +6,10 @@ import { PromptService } from '../../prompt.service';
 import { PromptSimply } from 'src/proto/prompt';
 
 @QueryHandler(GetAllPromptsQuery)
-export class GetAllPromptsHandler extends BaseQueryHandler<GetAllPromptsQuery, { data: PromptSimply[]; total: number }> {
+export class GetAllPromptsHandler extends BaseQueryHandler<
+  GetAllPromptsQuery,
+  { data: PromptSimply[]; total: number }
+> {
   constructor(
     private readonly promptService: PromptService,
     logger: CustomLogger,

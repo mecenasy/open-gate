@@ -5,7 +5,7 @@
  */
 
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import { CustomLogger } from './custom-logger.service';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class RequestLoggingMiddleware implements NestMiddleware {
     this.logger = new CustomLogger({ serviceId: 'request-logging' });
   }
 
-  use(req: Request, res: Response, next: NextFunction): void {
+  use(req: express.Request, res: express.Response, next: express.NextFunction): void {
     const startTime = Date.now();
     const method = req.method;
     const originalUrl = req.originalUrl;
@@ -24,21 +24,18 @@ export class RequestLoggingMiddleware implements NestMiddleware {
     const userAgent = req.get('user-agent') || 'unknown';
 
     // Log incoming request
-    this.logger.log(
-      `[${method}] ${originalUrl}`,
-      {
-        method,
-        path: req.path,
-        query: req.query,
-        ip,
-        userAgent,
-        userId: (req as any).user?.id,
-      },
-    );
+    this.logger.log(`[${method}] ${originalUrl}`, {
+      method,
+      path: req.path,
+      query: req.query,
+      ip,
+      userAgent,
+      userId: req.user?.id,
+    });
 
     // Capture original response methods
     const originalSend = res.send;
-    const logger = this.logger;
+    const logger: CustomLogger = this.logger;
 
     // Override res.send to capture response
     res.send = function (data: any) {
@@ -47,7 +44,7 @@ export class RequestLoggingMiddleware implements NestMiddleware {
 
       // Log outgoing response
       const logFn = statusCode >= 400 ? 'warn' : 'log';
-      (logger as any)[logFn](
+      logger[logFn](
         `[${method}] ${originalUrl} - ${statusCode}`,
         {
           method,
@@ -56,7 +53,7 @@ export class RequestLoggingMiddleware implements NestMiddleware {
           duration: `${duration}ms`,
           ip,
           userAgent,
-          userId: (req as any).user?.id,
+          userId: req.user?.id,
           contentLength: res.get('content-length'),
         },
         'outgoing-response',

@@ -50,10 +50,7 @@ describe('LoginHandler', () => {
     mockEvent = { emit: jest.fn() };
     mockGrpcService = { login: jest.fn() };
 
-    handler = new LoginHandler(
-      mockOtpService as unknown as OtpService,
-      mockRiskService as unknown as RiskService,
-    );
+    handler = new LoginHandler(mockOtpService as unknown as OtpService, mockRiskService as unknown as RiskService);
     Object.assign(handler, {
       cache: mockCache,
       event: mockEvent,

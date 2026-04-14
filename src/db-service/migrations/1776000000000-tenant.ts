@@ -31,9 +31,7 @@ export class Tenant1776000000000 implements MigrationInterface {
       )`,
     );
 
-    await queryRunner.query(
-      `CREATE INDEX "IDX_shared_config_tenants_slug" ON "shared_config"."tenants" ("slug")`,
-    );
+    await queryRunner.query(`CREATE INDEX "IDX_shared_config_tenants_slug" ON "shared_config"."tenants" ("slug")`);
 
     await queryRunner.query(
       `CREATE INDEX "IDX_shared_config_customization_tenant_id" ON "shared_config"."customization_config" ("tenant_id")`,

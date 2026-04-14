@@ -29,8 +29,6 @@ describe('LogoutHandler', () => {
     const err = new Error('session store unreachable');
     const session = makeSession((cb) => cb(err));
 
-    await expect(handler.execute(new LogoutCommand('user-1', session))).rejects.toThrow(
-      InternalServerErrorException,
-    );
+    await expect(handler.execute(new LogoutCommand('user-1', session))).rejects.toThrow(InternalServerErrorException);
   });
 });

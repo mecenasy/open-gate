@@ -25,13 +25,13 @@ describe('ResetPasswordHandler', () => {
   it('should throw BadRequestException with TOKEN_EXPIRED when token is not in cache', async () => {
     mockCache.getFromCache.mockResolvedValue(null);
 
-    await expect(
-      handler.execute(new ResetPasswordCommand('expired-token', 'NewPass1!')),
-    ).rejects.toThrow(BadRequestException);
+    await expect(handler.execute(new ResetPasswordCommand('expired-token', 'NewPass1!'))).rejects.toThrow(
+      BadRequestException,
+    );
 
-    await expect(
-      handler.execute(new ResetPasswordCommand('expired-token', 'NewPass1!')),
-    ).rejects.toThrow('TOKEN_EXPIRED');
+    await expect(handler.execute(new ResetPasswordCommand('expired-token', 'NewPass1!'))).rejects.toThrow(
+      'TOKEN_EXPIRED',
+    );
   });
 
   it('should return resetPassword status on successful reset', async () => {
@@ -49,13 +49,11 @@ describe('ResetPasswordHandler', () => {
 
   it('should throw BadRequestException with gRPC error message when reset fails', async () => {
     mockCache.getFromCache.mockResolvedValue('user@example.com');
-    mockGrpcService.resetPassword.mockReturnValue(
-      of({ success: false, message: 'PASSWORD_REUSE_NOT_ALLOWED' }),
-    );
+    mockGrpcService.resetPassword.mockReturnValue(of({ success: false, message: 'PASSWORD_REUSE_NOT_ALLOWED' }));
 
-    await expect(
-      handler.execute(new ResetPasswordCommand('valid-token', 'OldPass1!')),
-    ).rejects.toThrow('PASSWORD_REUSE_NOT_ALLOWED');
+    await expect(handler.execute(new ResetPasswordCommand('valid-token', 'OldPass1!'))).rejects.toThrow(
+      'PASSWORD_REUSE_NOT_ALLOWED',
+    );
   });
 
   it('should look up cache with correct prefix and token as identifier', async () => {

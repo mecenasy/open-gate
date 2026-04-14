@@ -44,9 +44,7 @@ describe('OtpService', () => {
   describe('generateToken', () => {
     it('should return a valid UUID v4 string', () => {
       const token = service.generateToken();
-      expect(token).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
-      );
+      expect(token).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
     });
 
     it('should return unique tokens on multiple calls', () => {

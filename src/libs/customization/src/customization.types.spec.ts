@@ -1,8 +1,4 @@
-import {
-  validateMessagingChannels,
-  DEFAULT_CUSTOMIZATION,
-  MessagingChannel,
-} from './customization.types';
+import { validateMessagingChannels, DEFAULT_CUSTOMIZATION, MessagingChannel } from './customization.types';
 
 describe('validateMessagingChannels', () => {
   it('passes when sms is present', () => {
@@ -48,9 +44,7 @@ describe('DEFAULT_CUSTOMIZATION', () => {
   });
 
   it('passes validateMessagingChannels', () => {
-    expect(() =>
-      validateMessagingChannels(DEFAULT_CUSTOMIZATION.messaging.priorityChannels),
-    ).not.toThrow();
+    expect(() => validateMessagingChannels(DEFAULT_CUSTOMIZATION.messaging.priorityChannels)).not.toThrow();
   });
 
   it('has positive timeout', () => {

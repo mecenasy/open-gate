@@ -15,8 +15,7 @@ describe('GraphqlExceptionFilter', () => {
     filter = new GraphqlExceptionFilter();
   });
 
-  const call = (exception: unknown) =>
-    filter.catch(exception, {} as any);
+  const call = (exception: unknown) => filter.catch(exception, {} as any);
 
   it('should return a GraphQLError instance', () => {
     const result = call(new Error('fail'));

@@ -32,22 +32,18 @@ describe('ChangePasswordHandler', () => {
   });
 
   it('should throw BadRequestException with gRPC error message on failure', async () => {
-    mockGrpcService.changePassword.mockReturnValue(
-      of({ success: false, message: 'OLD_PASSWORD_INCORRECT' }),
-    );
+    mockGrpcService.changePassword.mockReturnValue(of({ success: false, message: 'OLD_PASSWORD_INCORRECT' }));
 
-    await expect(
-      handler.execute(new ChangePasswordCommand('user-1', 'wrongOld', 'newPass1!')),
-    ).rejects.toThrow(BadRequestException);
+    await expect(handler.execute(new ChangePasswordCommand('user-1', 'wrongOld', 'newPass1!'))).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('should include the gRPC error message in the exception', async () => {
-    mockGrpcService.changePassword.mockReturnValue(
-      of({ success: false, message: 'PASSWORD_TOO_WEAK' }),
-    );
+    mockGrpcService.changePassword.mockReturnValue(of({ success: false, message: 'PASSWORD_TOO_WEAK' }));
 
-    await expect(
-      handler.execute(new ChangePasswordCommand('user-1', 'old', 'weak')),
-    ).rejects.toThrow('PASSWORD_TOO_WEAK');
+    await expect(handler.execute(new ChangePasswordCommand('user-1', 'old', 'weak'))).rejects.toThrow(
+      'PASSWORD_TOO_WEAK',
+    );
   });
 });

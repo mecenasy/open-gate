@@ -9,7 +9,7 @@ const makeCustomization = (overrides: Partial<CommunityCustomization['features']
   features: { ...DEFAULT_CUSTOMIZATION.features, ...overrides },
 });
 
-const makeContext = (): ExecutionContext => ({} as ExecutionContext);
+const makeContext = (): ExecutionContext => ({}) as ExecutionContext;
 
 describe('FeatureFlagGuard', () => {
   let customizationService: jest.Mocked<Pick<TenantCustomizationService, 'getForCurrentTenant'>>;
@@ -21,9 +21,7 @@ describe('FeatureFlagGuard', () => {
   });
 
   it('returns true when the feature is enabled', async () => {
-    customizationService.getForCurrentTenant.mockResolvedValue(
-      makeCustomization({ enableGate: true }),
-    );
+    customizationService.getForCurrentTenant.mockResolvedValue(makeCustomization({ enableGate: true }));
 
     const GuardClass = FeatureFlagGuard('enableGate');
     const guard = new GuardClass(customizationService as unknown as TenantCustomizationService);
@@ -33,9 +31,7 @@ describe('FeatureFlagGuard', () => {
   });
 
   it('returns false when the feature is disabled', async () => {
-    customizationService.getForCurrentTenant.mockResolvedValue(
-      makeCustomization({ enableGate: false }),
-    );
+    customizationService.getForCurrentTenant.mockResolvedValue(makeCustomization({ enableGate: false }));
 
     const GuardClass = FeatureFlagGuard('enableGate');
     const guard = new GuardClass(customizationService as unknown as TenantCustomizationService);
@@ -45,9 +41,7 @@ describe('FeatureFlagGuard', () => {
   });
 
   it('works for enablePayment flag', async () => {
-    customizationService.getForCurrentTenant.mockResolvedValue(
-      makeCustomization({ enablePayment: true }),
-    );
+    customizationService.getForCurrentTenant.mockResolvedValue(makeCustomization({ enablePayment: true }));
 
     const GuardClass = FeatureFlagGuard('enablePayment');
     const guard = new GuardClass(customizationService as unknown as TenantCustomizationService);

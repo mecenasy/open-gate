@@ -39,9 +39,7 @@ describe('ForgotPasswordHandler', () => {
   });
 
   it('should generate token, cache email, and emit event when user is found', async () => {
-    mockGrpcService.getUserByEmail.mockReturnValue(
-      of({ data: { email: 'user@example.com', id: 'user-1' } }),
-    );
+    mockGrpcService.getUserByEmail.mockReturnValue(of({ data: { email: 'user@example.com', id: 'user-1' } }));
 
     await handler.execute(new ForgotPasswordCommand('user@example.com'));
 
@@ -67,9 +65,7 @@ describe('ForgotPasswordHandler', () => {
   });
 
   it('should return forgotPassword status even when user exists', async () => {
-    mockGrpcService.getUserByEmail.mockReturnValue(
-      of({ data: { email: 'user@example.com', id: 'user-1' } }),
-    );
+    mockGrpcService.getUserByEmail.mockReturnValue(of({ data: { email: 'user@example.com', id: 'user-1' } }));
 
     const result = await handler.execute(new ForgotPasswordCommand('user@example.com'));
 

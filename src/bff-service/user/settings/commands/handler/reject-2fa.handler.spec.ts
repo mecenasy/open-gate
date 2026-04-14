@@ -34,9 +34,7 @@ describe('Reject2faHandler', () => {
   it('should throw InternalServerErrorException when gRPC returns message', async () => {
     mockGrpc.reject2Fa.mockReturnValue(of({ status: false, message: 'Failed' }));
 
-    await expect(handler.execute(new Reject2FaCommand('user-1'))).rejects.toThrow(
-      InternalServerErrorException,
-    );
+    await expect(handler.execute(new Reject2FaCommand('user-1'))).rejects.toThrow(InternalServerErrorException);
   });
 
   it('should update cache entry to set is2faEnabled=false when user exists in cache', async () => {

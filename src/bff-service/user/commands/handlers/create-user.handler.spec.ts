@@ -39,9 +39,7 @@ describe('CreateUserHandler', () => {
 
   it('should return id and email on successful creation', async () => {
     mockGrpc.checkExist.mockReturnValue(of({ exist: false }));
-    mockGrpc.addUser.mockReturnValue(
-      of({ status: true, data: { id: 'user-1', email: 'new@example.com' } }),
-    );
+    mockGrpc.addUser.mockReturnValue(of({ status: true, data: { id: 'user-1', email: 'new@example.com' } }));
 
     const result = await handler.execute(new CreateUserCommand(mockUser));
 
@@ -69,14 +67,10 @@ describe('CreateUserHandler', () => {
 
   it('should convert JS UserType to Proto UserType when calling addUser', async () => {
     mockGrpc.checkExist.mockReturnValue(of({ exist: false }));
-    mockGrpc.addUser.mockReturnValue(
-      of({ status: true, data: { id: 'u1', email: 'x@x.com' } }),
-    );
+    mockGrpc.addUser.mockReturnValue(of({ status: true, data: { id: 'u1', email: 'x@x.com' } }));
 
     await handler.execute(new CreateUserCommand(mockUser));
 
-    expect(mockGrpc.addUser).toHaveBeenCalledWith(
-      expect.objectContaining({ type: ProtoUserType.USER }),
-    );
+    expect(mockGrpc.addUser).toHaveBeenCalledWith(expect.objectContaining({ type: ProtoUserType.USER }));
   });
 });

@@ -48,10 +48,7 @@ describe('TenantGrpcInterceptor', () => {
     tenantService = new TenantService();
     tenantDbService = { findById: jest.fn() };
 
-    interceptor = new TenantGrpcInterceptor(
-      tenantService,
-      tenantDbService as unknown as TenantDbService,
-    );
+    interceptor = new TenantGrpcInterceptor(tenantService, tenantDbService as unknown as TenantDbService);
   });
 
   it('passes through without context when x-tenant-id header is absent', (done) => {

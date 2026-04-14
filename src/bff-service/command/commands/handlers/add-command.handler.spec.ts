@@ -50,17 +50,13 @@ describe('AddCommandHandler', () => {
   it('should throw BadRequestException when status=false', async () => {
     mockGrpc.addCommand.mockReturnValue(of({ status: false, message: 'Duplicate name' }));
 
-    await expect(handler.execute(new AddCommandCommand(inputFixture))).rejects.toThrow(
-      BadRequestException,
-    );
+    await expect(handler.execute(new AddCommandCommand(inputFixture))).rejects.toThrow(BadRequestException);
   });
 
   it('should throw BadRequestException with gRPC message', async () => {
     mockGrpc.addCommand.mockReturnValue(of({ status: false, message: 'DUPLICATE_COMMAND' }));
 
-    await expect(handler.execute(new AddCommandCommand(inputFixture))).rejects.toThrow(
-      'DUPLICATE_COMMAND',
-    );
+    await expect(handler.execute(new AddCommandCommand(inputFixture))).rejects.toThrow('DUPLICATE_COMMAND');
   });
 
   it('should pass all input fields to gRPC', async () => {

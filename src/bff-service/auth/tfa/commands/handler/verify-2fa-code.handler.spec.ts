@@ -37,9 +37,7 @@ describe('TFA VerifyCodeHandler', () => {
 
   it('should return login status and set session.user_id when TOTP code is valid', async () => {
     const session = makeSession();
-    mockGrpcService.getUser2FaSecret.mockReturnValue(
-      of({ secret: 'BASE32SECRET', userId: 'user-1' }),
-    );
+    mockGrpcService.getUser2FaSecret.mockReturnValue(of({ secret: 'BASE32SECRET', userId: 'user-1' }));
     (authenticator.check as jest.Mock).mockReturnValue(true);
 
     const result = await handler.execute(new Verify2faCodeCommand('user@example.com', '123456', session));
@@ -51,44 +49,36 @@ describe('TFA VerifyCodeHandler', () => {
 
   it('should throw BadRequestException when TOTP code is invalid', async () => {
     const session = makeSession();
-    mockGrpcService.getUser2FaSecret.mockReturnValue(
-      of({ secret: 'BASE32SECRET', userId: 'user-1' }),
-    );
+    mockGrpcService.getUser2FaSecret.mockReturnValue(of({ secret: 'BASE32SECRET', userId: 'user-1' }));
     (authenticator.check as jest.Mock).mockReturnValue(false);
 
-    await expect(
-      handler.execute(new Verify2faCodeCommand('user@example.com', '000000', session)),
-    ).rejects.toThrow(BadRequestException);
+    await expect(handler.execute(new Verify2faCodeCommand('user@example.com', '000000', session))).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('should throw BadRequestException with "Wrong code" message when code is invalid', async () => {
     const session = makeSession();
-    mockGrpcService.getUser2FaSecret.mockReturnValue(
-      of({ secret: 'BASE32SECRET', userId: 'user-1' }),
-    );
+    mockGrpcService.getUser2FaSecret.mockReturnValue(of({ secret: 'BASE32SECRET', userId: 'user-1' }));
     (authenticator.check as jest.Mock).mockReturnValue(false);
 
-    await expect(
-      handler.execute(new Verify2faCodeCommand('user@example.com', '000000', session)),
-    ).rejects.toThrow('Wrong code');
+    await expect(handler.execute(new Verify2faCodeCommand('user@example.com', '000000', session))).rejects.toThrow(
+      'Wrong code',
+    );
   });
 
   it('should throw BadRequestException when gRPC returns no secret', async () => {
     const session = makeSession();
-    mockGrpcService.getUser2FaSecret.mockReturnValue(
-      of({ secret: null, userId: null }),
-    );
+    mockGrpcService.getUser2FaSecret.mockReturnValue(of({ secret: null, userId: null }));
 
-    await expect(
-      handler.execute(new Verify2faCodeCommand('user@example.com', '123456', session)),
-    ).rejects.toThrow(BadRequestException);
+    await expect(handler.execute(new Verify2faCodeCommand('user@example.com', '123456', session))).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('should call getUser2FaSecret with the correct login email', async () => {
     const session = makeSession();
-    mockGrpcService.getUser2FaSecret.mockReturnValue(
-      of({ secret: 'SECRET', userId: 'u1' }),
-    );
+    mockGrpcService.getUser2FaSecret.mockReturnValue(of({ secret: 'SECRET', userId: 'u1' }));
     (authenticator.check as jest.Mock).mockReturnValue(true);
 
     await handler.execute(new Verify2faCodeCommand('test@example.com', '123456', session));
@@ -98,9 +88,7 @@ describe('TFA VerifyCodeHandler', () => {
 
   it('should save session after successful verification', async () => {
     const session = makeSession();
-    mockGrpcService.getUser2FaSecret.mockReturnValue(
-      of({ secret: 'SECRET', userId: 'u1' }),
-    );
+    mockGrpcService.getUser2FaSecret.mockReturnValue(of({ secret: 'SECRET', userId: 'u1' }));
     (authenticator.check as jest.Mock).mockReturnValue(true);
 
     await handler.execute(new Verify2faCodeCommand('user@example.com', '123456', session));

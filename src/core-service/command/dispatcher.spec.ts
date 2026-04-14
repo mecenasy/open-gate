@@ -16,9 +16,7 @@ const makeCustomization = (timeout: number) => ({
 
 describe('SofDispatcher', () => {
   let dispatcher: SofDispatcher<unknown>;
-  let customizationService: jest.Mocked<
-    Pick<TenantCustomizationService, 'getForCurrentTenant'>
-  >;
+  let customizationService: jest.Mocked<Pick<TenantCustomizationService, 'getForCurrentTenant'>>;
   let mockDiscovery: jest.Mocked<Pick<DiscoveryService, 'getProviders'>>;
 
   beforeEach(() => {
@@ -34,19 +32,15 @@ describe('SofDispatcher', () => {
 
   describe('dispatch', () => {
     it('throws when no handler is registered for the command type', async () => {
-      customizationService.getForCurrentTenant.mockResolvedValue(
-        makeCustomization(30000),
-      );
+      customizationService.getForCurrentTenant.mockResolvedValue(makeCustomization(30000));
 
-      await expect(
-        dispatcher.dispatch(new SofCommand(COMMAND_TYPE, {})),
-      ).rejects.toThrow(`Missing handler: ${COMMAND_TYPE}`);
+      await expect(dispatcher.dispatch(new SofCommand(COMMAND_TYPE, {}))).rejects.toThrow(
+        `Missing handler: ${COMMAND_TYPE}`,
+      );
     });
 
     it('executes the handler and returns its result', async () => {
-      customizationService.getForCurrentTenant.mockResolvedValue(
-        makeCustomization(30000),
-      );
+      customizationService.getForCurrentTenant.mockResolvedValue(makeCustomization(30000));
 
       const mockStatus = { success: true } as unknown as Status;
       const mockHandler = {
@@ -64,16 +58,16 @@ describe('SofDispatcher', () => {
     it('rejects with timeout error when handler exceeds the tenant timeout', async () => {
       customizationService.getForCurrentTenant.mockResolvedValue(makeCustomization(10));
 
-      const neverResolves = new Promise<Status>(() => {/* intentionally hangs */});
+      const neverResolves = new Promise<Status>(() => {
+        /* intentionally hangs */
+      });
       const slowHandler = {
         execute: jest.fn().mockReturnValue(neverResolves),
       } as unknown as Handler<SofCommand<unknown>, Status>;
 
       dispatcher.register(COMMAND_TYPE, slowHandler);
 
-      await expect(
-        dispatcher.dispatch(new SofCommand(COMMAND_TYPE, {})),
-      ).rejects.toThrow(/timeout/i);
+      await expect(dispatcher.dispatch(new SofCommand(COMMAND_TYPE, {}))).rejects.toThrow(/timeout/i);
     }, 2000);
 
     it('includes timeout value and command type in the error message', async () => {
@@ -85,9 +79,9 @@ describe('SofDispatcher', () => {
 
       dispatcher.register(COMMAND_TYPE, slowHandler);
 
-      await expect(
-        dispatcher.dispatch(new SofCommand(COMMAND_TYPE, {})),
-      ).rejects.toThrow(`Command timeout after 10ms: ${COMMAND_TYPE}`);
+      await expect(dispatcher.dispatch(new SofCommand(COMMAND_TYPE, {}))).rejects.toThrow(
+        `Command timeout after 10ms: ${COMMAND_TYPE}`,
+      );
     }, 2000);
   });
 });

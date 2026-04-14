@@ -11,7 +11,10 @@ describe('VerifyTokensHandler', () => {
     mockCache = { checkExistsInCache: jest.fn() };
 
     handler = new VerifyTokensHandler();
-    Object.assign(handler, { cache: mockCache, logger: { error: jest.fn(), log: jest.fn(), warn: jest.fn(), debug: jest.fn() } });
+    Object.assign(handler, {
+      cache: mockCache,
+      logger: { error: jest.fn(), log: jest.fn(), warn: jest.fn(), debug: jest.fn() },
+    });
   });
 
   it('should return verify=true when token exists in cache', async () => {
@@ -29,16 +32,12 @@ describe('VerifyTokensHandler', () => {
   it('should throw BadRequestException when token does not exist in cache', async () => {
     mockCache.checkExistsInCache.mockResolvedValue(false);
 
-    await expect(handler.execute(new VerifyTokenQuery('expired-token'))).rejects.toThrow(
-      BadRequestException,
-    );
+    await expect(handler.execute(new VerifyTokenQuery('expired-token'))).rejects.toThrow(BadRequestException);
   });
 
   it('should throw BadRequestException with "Invalid token" message', async () => {
     mockCache.checkExistsInCache.mockResolvedValue(false);
 
-    await expect(handler.execute(new VerifyTokenQuery('expired-token'))).rejects.toThrow(
-      'Invalid token',
-    );
+    await expect(handler.execute(new VerifyTokenQuery('expired-token'))).rejects.toThrow('Invalid token');
   });
 });

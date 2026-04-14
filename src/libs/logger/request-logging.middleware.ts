@@ -34,11 +34,11 @@ export class RequestLoggingMiddleware implements NestMiddleware {
         userAgent,
         userId: (req as any).user?.id,
       },
-      'incoming-request',
     );
 
     // Capture original response methods
     const originalSend = res.send;
+    const logger = this.logger;
 
     // Override res.send to capture response
     res.send = function (data: any) {
@@ -47,7 +47,7 @@ export class RequestLoggingMiddleware implements NestMiddleware {
 
       // Log outgoing response
       const logFn = statusCode >= 400 ? 'warn' : 'log';
-      (this.logger as any)[logFn](
+      (logger as any)[logFn](
         `[${method}] ${originalUrl} - ${statusCode}`,
         {
           method,

@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConsoleLogger, Logger, ValidationPipe } from '@nestjs/common';
@@ -28,7 +32,7 @@ async function bootstrap() {
   logger.log('Request logging middleware initialized');
 
   // Setup request size limit to prevent DOS attacks
-  app.use((req, res, next) => {
+  app.use((req: import('express').Request, res: import('express').Response, next: import('express').NextFunction) => {
     const maxSize = process.env.MAX_REQUEST_SIZE || '10mb';
     res.setHeader('X-Max-Content-Length', maxSize);
     next();

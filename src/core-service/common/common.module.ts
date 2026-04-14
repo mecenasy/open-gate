@@ -11,6 +11,7 @@ import { DbGrpcModule } from '@app/db-grpc';
 import { NotifyGrpcModule } from '@app/notify-grpc';
 import { GateGrpcModule } from '@app/gate-grpc';
 import { TenantCustomizationModule } from './customization/tenant-customization.module';
+import { TenantModule } from '@app/tenant';
 @Global()
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TenantCustomizationModule } from './customization/tenant-customization.
     HttpModule,
     GetawayModule,
     ConfigsModule,
+    TenantModule,
     TenantCustomizationModule,
   ],
   providers: [

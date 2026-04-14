@@ -10,4 +10,4 @@ import { ConfigService } from '@nestjs/config';
  *   export class TypeConfigService extends TypedConfigService<ConfigTypes> {}
  */
 @Injectable()
-export class TypedConfigService<T extends Record<string, unknown> = Record<string, unknown>> extends ConfigService<T> {}
+export class TypedConfigService<T extends Record<string, any> = Record<string, any>> extends ConfigService<T> {}

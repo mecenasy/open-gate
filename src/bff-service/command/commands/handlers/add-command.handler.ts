@@ -18,8 +18,8 @@ export class AddCommandHandler extends Handler<AddCommandCommand, CommandRespons
         name: input.name,
         description: input.description,
         command: input.command,
-        actions: input.actions,
-        parameters: input.parameters,
+        actions: input.actions ?? {},
+        parameters: input.parameters ?? {},
         roleNames: input.roleNames,
       }),
     );

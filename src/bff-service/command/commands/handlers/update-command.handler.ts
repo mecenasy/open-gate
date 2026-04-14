@@ -18,8 +18,8 @@ export class UpdateCommandHandler extends Handler<UpdateCommandCommand, CommandR
         id: input.id,
         description: input.description,
         active: input.active,
-        actions: input.actions,
-        parameters: input.parameters,
+        actions: input.actions ?? {},
+        parameters: input.parameters ?? {},
         roleNames: input.roleNames,
       }),
     );

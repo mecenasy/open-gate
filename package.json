@@ -18,7 +18,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "typeorm": "typeorm-ts-node-commonjs",
+    "typeorm": "node -r tsconfig-paths/register node_modules/typeorm/cli-ts-node-commonjs.js",
     "db:drop": "typeorm schema:drop -- -d typeorm.config.ts",
     "migration:create": "npm run typeorm migration:create",
     "migration:generate": "npm run typeorm migration:generate -- -d typeorm.config.ts",
@@ -165,6 +165,10 @@
       "^@app/auth(|/.*)$": "<rootDir>/src/libs/auth/src/$1",
       "^@app/config(|/.*)$": "<rootDir>/src/libs/config/src/$1",
       "^@app/logger(|/.*)$": "<rootDir>/src/libs/logger/$1",
+      "^@app/tenant(|/.*)$": "<rootDir>/src/libs/tenant/src/$1",
+      "^@app/cqrs(|/.*)$": "<rootDir>/src/libs/cqrs/src/$1",
+      "^@app/database(|/.*)$": "<rootDir>/src/libs/database/src/$1",
+      "^@app/customization(|/.*)$": "<rootDir>/src/libs/customization/src/$1",
       "^src/(.*)$": "<rootDir>/src/$1"
     },
     "roots": [

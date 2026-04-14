@@ -33,7 +33,7 @@ export const redisProvider = {
       socket: {
         ...(isTls ? socketOptions : {}),
         connectTimeout: 5000,
-        keepAlive: 30_000,
+        keepAlive: true,
         reconnectStrategy: (retries) => {
           if (retries > 3) {
             logger.error(`❌ [RedisProvider] Too many retries (${retries}), giving up`);

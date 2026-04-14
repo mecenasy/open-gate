@@ -6,9 +6,10 @@ import { CustomizationConfig } from './entity/customization-config.entity';
 import { TenantDbService } from './tenant.service';
 import { TenantGrpcInterceptor } from './interceptors/tenant-grpc.interceptor';
 import { TenantController } from './tenant.controller';
+import { TenantModule } from '@app/tenant';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Tenant, CustomizationConfig])],
+  imports: [TypeOrmModule.forFeature([Tenant, CustomizationConfig]), TenantModule],
   controllers: [TenantController],
   providers: [
     TenantDbService,

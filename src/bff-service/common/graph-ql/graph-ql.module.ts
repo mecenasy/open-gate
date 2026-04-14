@@ -24,7 +24,7 @@ import { Context } from '@app/auth';
       subscriptions: {
         'graphql-ws': true,
       },
-      onSchemaChange: (schema) => {
+      onSchemaChange: (schema: any) => {
         // Validate schema on startup and changes
         new GraphQLSchemaValidator().validateSchema(schema.getQueryType()?.toString() || '');
       },

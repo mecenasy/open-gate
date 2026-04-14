@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Platform } from '../../../types/platform';
 import { SignalMessage } from './types';
 import { UnifiedMessage } from 'src/notify-service/types/unified-message';
@@ -9,24 +10,25 @@ import { isAxiosError } from 'axios';
 import { GateGrpcKey } from '@app/gate-grpc';
 import type { ClientGrpc } from '@nestjs/microservices';
 import { INCOMING_NOTIFY_SERVICE_NAME, IncomingNotifyServiceClient } from 'src/proto/notify';
+import type { SignalConfig } from '../../../outgoing/platforms/signal/config/signal.config';
 
 type Message = UnifiedMessage<SignalMessage>;
 
 @Injectable()
 export class SignalAttachment extends Attachment implements OnModuleInit {
   private logger: Logger;
-
-  // TODO move to config
-  private baseUrl = process.env.SIGNAL_API_URL ?? 'http://signal_bridge:8080';
+  private readonly baseUrl: string;
   private gateClient!: IncomingNotifyServiceClient;
 
   public platform = Platform.Signal;
   constructor(
     private readonly httpService: HttpService,
     @Inject(GateGrpcKey) private readonly grpcClient: ClientGrpc,
+    private readonly configService: ConfigService,
   ) {
     super();
     this.logger = new Logger(SignalAttachment.name);
+    this.baseUrl = this.configService.get<SignalConfig>('signal')!.apiUrl;
   }
 
   onModuleInit() {

@@ -1,7 +1,7 @@
 # Multi-Tenant Architecture Plan — Open Gate
 
 **Data**: Kwiecień 2026  
-**Status**: Plan koncepcyjny  
+**Status**: Fazy 1–4 + entities + dto + testy integracyjne + RUNBOOK ✅ ZREALIZOWANE  
 **Cel**: Projekt jednego systemu dla wielu wspólnot z eliminacją duplikacji  
 
 ---
@@ -522,72 +522,87 @@ EFEKT: 14 plików w BFF zaktualizowanych — importują z @app/auth.
   filters/index.ts re-eksportuje teraz GlobalExceptionFilter z @app/logger.
 ```
 
-#### 🆕 Do Utworzenia (pozostałe)
+#### ✅ Zrealizowane (2026-04-13 — 2026-04-14)
 
 ```text
-@app/config — ROZSZERZYĆ
-├── config.module.ts            (opcjonalnie — każdy serwis ma własny ConfigsModule)
-└── schemas/                    (shared Joi schemas — app, db, redis)
-
-@app/auth — ROZSZERZYĆ
-├── utils/
-│   ├── jwt.utils.ts            (centralizacja logiki JWT z BFF i DB)
-│   ├── passkey.utils.ts        (centralizacja Passkey z BFF i DB)
-│   └── role.utils.ts
-└── guards/
-    └── tenant.guard.ts         (po wdrożeniu multi-tenant)
-
-@app/tenant
+@app/tenant ✅ DONE
 ├── tenant.module.ts
-├── tenant.service.ts           (AsyncLocalStorage)
+├── tenant.service.ts           (AsyncLocalStorage — izolacja per request)
 ├── interceptors/
-│   └── tenant.interceptor.ts
-├── middleware/
-│   └── tenant.middleware.ts
+│   └── tenant.interceptor.ts   (HTTP/GraphQL: session → subdomain → header)
+├── decorators/
+│   └── current-tenant.decorator.ts
 ├── types/
 │   └── tenant.types.ts
-└── README.md
+└── tenant.service.integration.spec.ts  ← testy izolacji ALS
 
-@app/cqrs                       ← NASTĘPNY KROK
-├── cqrs.module.ts
+@app/cqrs ✅ DONE
 ├── base/
-│   ├── base.command-handler.ts
-│   ├── base.query-handler.ts
-│   └── handler.types.ts
-├── decorators/
-│   ├── @EventEmitter()
-│   └── @Authorize()
-└── README.md
-
-@app/database
-├── database.module.ts
-├── dynamic-datasource.provider.ts
-├── tenant-orm.adapter.ts
-├── migrations/
-│   ├── migration.runner.ts
-│   └── schema-manager.ts
-└── README.md
-
-@app/entities
-├── user.entity.ts
-├── user-role.entity.ts
-├── command.entity.ts
-├── message.entity.ts
-├── prompt.entity.ts
+│   ├── base-command.handler.ts ← 44 handlery db-service zmigrowane, ~440 linii boilerplate usunięto
+│   └── base-query.handler.ts
 └── index.ts
 
-@app/dto
+@app/database ✅ DONE
+├── database.module.ts
+├── dynamic-data-source.provider.ts  ← per-tenant DataSource cache + search_path
+├── tenant-schema.manager.ts         ← CREATE SCHEMA IF NOT EXISTS
+├── dynamic-data-source.provider.spec.ts  ← testy cache, izolacji, destroy
+└── tenant-schema.manager.spec.ts         ← testy provisioning, SQL injection
+
+@app/customization ✅ DONE
+├── customization.types.ts      ← CommunityCustomization interface + DEFAULT_CUSTOMIZATION
+└── index.ts
+EFEKT: FeatureFlagGuard w BFF, TenantCustomizationService w BFF+Core,
+       SofDispatcher (core) z per-tenant timeout.
+
+@app/entities ✅ DONE (2026-04-14)
+├── enums/
+│   ├── user-type.enum.ts       ← UserType (owner/admin/super_user/member/user)
+│   ├── user-status.enum.ts     ← UserStatus (pending/active/suspended/banned)
+│   ├── risk-reason.enum.ts     ← RiskReason + RiskWeight + RiskScoreMapping
+│   ├── risk-tolerance.enum.ts  ← RiskToleranceLevel
+│   ├── config-type.enum.ts     ← ConfigType + ConfigSubType
+│   └── message-type.enum.ts    ← MessageType
 ├── user/
-│   ├── user.dto.ts
-│   └── user-role.dto.ts
-├── command/
-│   ├── command.dto.ts
-│   └── action.dto.ts
-├── message/
-│   └── message.dto.ts
-└── common/
-    ├── pagination.dto.ts
-    └── list-response.dto.ts
+│   ├── user.entity.ts
+│   ├── user-role.entity.ts
+│   ├── user-settings.entity.ts
+│   ├── password.entity.ts
+│   └── history.entity.ts
+├── auth/passkey.entity.ts
+├── command/command.entity.ts
+├── messages/messages.entity.ts
+├── prompt/prompt.entity.ts
+├── config/config.entity.ts
+├── tenant/tenant.entity.ts
+├── tenant/customization-config.entity.ts
+└── index.ts
+EFEKT: db-service entity files → cienkie re-eksporty z @app/entities.
+       src/types/risk-reason.ts + user/user-type.ts + user/status.ts → re-eksporty.
+       core-config/entity/types.ts → re-export.
+
+@app/dto ✅ DONE (2026-04-14)
+├── pagination/
+│   ├── pagination-query.dto.ts ← page + limit + get skip()
+│   └── list-response.dto.ts    ← data + total + totalPages + hasNextPage + ListResponseDto.from()
+└── index.ts
+```
+
+#### 🆕 Pozostało do zrealizowania
+
+```text
+@app/auth — ROZSZERZYC
+└── utils/
+    ├── jwt.utils.ts            (centralizacja logiki JWT z BFF i DB)
+    ├── passkey.utils.ts        (centralizacja Passkey z BFF i DB)
+    └── tenant.guard.ts         (guard sprawdzajacy is_active tenanta)
+
+Gate-Service (src/gate-service/)  ← GLOWNY BRAKUJACY ELEMENT
+├── api-bridge/                 (REST <-> gRPC adapter)
+├── db-adapter/                 (legacy DB <-> new schema)
+├── sms-router/                 (multi-provider SMS)
+├── orchestration/              (saga handlers: user-migration, command-sync)
+└── common/tenant-mapper/       (TenantMapping, UserMapping entities)
 ```
 
 ### Migration Path: Config Consolidation

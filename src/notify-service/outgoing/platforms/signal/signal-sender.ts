@@ -1,23 +1,29 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Sender } from '../sender';
 import { Platform } from 'src/notify-service/types/platform';
 import { Type, UnifiedMessage } from 'src/notify-service/types/unified-message';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { isAxiosError } from 'axios';
+import type { SignalConfig } from './config/signal.config';
 
 @Injectable()
 export class SignalSender extends Sender {
   platform: Platform = Platform.Signal;
 
   private logger: Logger;
-  // TODO : mow to config
-  private baseUrl = process.env.SIGNAL_API_URL ?? 'http://signal_bridge:8080';
-  private botNumber = process.env.SIGNAL_ACCOUNT ?? '+48608447495';
+  private readonly baseUrl: string;
+  private readonly botNumber: string;
 
-  constructor(private readonly httpService: HttpService) {
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {
     super();
     this.logger = new Logger(SignalSender.name);
+    this.baseUrl = this.configService.get<SignalConfig>('signal')!.apiUrl;
+    this.botNumber = this.configService.get<SignalConfig>('signal')!.account;
   }
 
   async send(data: UnifiedMessage): Promise<void> {

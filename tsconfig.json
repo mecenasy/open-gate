@@ -108,6 +108,18 @@
       "@app/customization/*": [
         "src/libs/customization/src/*"
       ],
+      "@app/entities": [
+        "src/libs/entities/src"
+      ],
+      "@app/entities/*": [
+        "src/libs/entities/src/*"
+      ],
+      "@app/dto": [
+        "src/libs/dto/src"
+      ],
+      "@app/dto/*": [
+        "src/libs/dto/src/*"
+      ],
       "src/*": [
         "src/*"
       ]

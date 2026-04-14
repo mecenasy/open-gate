@@ -130,12 +130,14 @@ Posortowane według priorytetu.
   - Implement automated rollback testing
   - Add migration status tracking
 
-- [ ] **Test coverage** — expand unit/integration/E2E tests
-  - Priority 1: Core services (user, command, auth) - 70% coverage target
-  - Priority 2: Handlers and resolvers - 60% coverage target
-  - Priority 3: Guards and interceptors - 50% coverage target
-  - E2E tests for entire flow (auth → command → notify)
-  - Enable SonarQube or similar for continuous tracking
+- [x] **Test coverage (multi-tenant)** — ✅ integration tests for tenant isolation added
+  - ✅ `TenantService.integration.spec.ts` — AsyncLocalStorage isolation, nested contexts, leak prevention
+  - ✅ `DynamicDataSourceProvider.spec.ts` — per-tenant DataSource caching, schema isolation, destroy
+  - ✅ `TenantSchemaManager.spec.ts` — provisioning, idempotency, SQL injection prevention
+  - ✅ `TenantGrpcInterceptor.integration.spec.ts` — context propagation, concurrent isolation
+  - [ ] Remaining: Core services (user, command, auth) — 70% coverage target
+  - [ ] E2E tests for entire flow (auth → command → notify)
+  - [ ] Enable SonarQube or similar for continuous tracking
 
 - [ ] **Performance monitoring** — add APM and metrics collection
   - Consider: DataDog, New Relic, or self-hosted Prometheus
@@ -150,12 +152,12 @@ Posortowane według priorytetu.
   - API key rotation strategy
   - Audit logging for sensitive operations
 
-- [ ] **Documentation improvements** — expand developer and user docs
-  - API documentation (Swagger/OpenAPI)
-  - Database schema documentation
-  - Deployment guide for staging/production
-  - Troubleshooting guide
-  - Architecture runbook
+- [x] **Documentation improvements** — ✅ partially done
+  - ✅ `RUNBOOK.md` — tenant provisioning, rollback, security audit, monitoring
+  - ✅ `ARCHITECTURE-MULTI-TENANT.md` — updated with completed phases
+  - [ ] API documentation (Swagger/OpenAPI)
+  - [ ] Database schema documentation
+  - [ ] Deployment guide for staging/production
 
 - [ ] **Frontend-Backend integration testing** — validate E2E flows
   - Test complete auth flow (login, MFA, passkey)
@@ -187,11 +189,11 @@ Znalezione w kodzie źródłowym — do implementacji lub przeniesienia do konfi
   - [`src/core-service/command/gate/soft-gate.service.ts`](src/core-service/command/gate/soft-gate.service.ts)
 - [ ] **`groq.service.ts:25,50`** — dodać alarm w systemie monitorującym przy wyczerpaniu tokenów Groq API
   - [`src/core-service/process/services/groq.service.ts`](src/core-service/process/services/groq.service.ts)
-- [ ] **`signal.attachment.ts:19`** — przenieść URL/konfigurację Signal do config service
+- [x] **`signal.attachment.ts`** — URL/konfiguracja Signal przeniesiona do `signalConfig` (`@nestjs/config`)
   - [`src/notify-service/incoming/platforms/signal/signal.attachment.ts`](src/notify-service/incoming/platforms/signal/signal.attachment.ts)
-- [ ] **`signal-sender.ts:14`** — przenieść URL/konfigurację Signal do config service
+- [x] **`signal-sender.ts`** — URL/konfiguracja Signal przeniesiona do `signalConfig` (`@nestjs/config`)
   - [`src/notify-service/outgoing/platforms/signal/signal-sender.ts`](src/notify-service/outgoing/platforms/signal/signal-sender.ts)
 
 ---
 
-*Ostatnia aktualizacja: 2026-04-13*
+*Ostatnia aktualizacja: 2026-04-14*

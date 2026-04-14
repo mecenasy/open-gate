@@ -8,9 +8,13 @@ import {
   CreateTenantInput,
   CreateTenantResult,
   MutationResult,
+  TenantCommandConfigType,
+  TenantPromptOverrideType,
   TenantType,
   UpdateCustomizationInput,
   UpsertPlatformCredentialsInput,
+  UpsertTenantCommandConfigInput,
+  UpsertTenantPromptOverrideInput,
 } from './dto/tenant-admin.types';
 
 @Resolver('Tenant')
@@ -20,11 +24,15 @@ export class TenantResolver {
     private readonly tenantAdminService: TenantAdminService,
   ) {}
 
+  // ── Public (auth-guarded only) ──────────────────────────────────────────────
+
   @Query(() => TenantFeaturesType)
   async tenantFeatures(): Promise<TenantFeaturesType> {
     const customization = await this.customizationService.getForCurrentTenant();
     return customization.features;
   }
+
+  // ── Owner-only ──────────────────────────────────────────────────────────────
 
   @UseGuards(OwnerGuard)
   @Query(() => [TenantType])
@@ -48,5 +56,44 @@ export class TenantResolver {
   @Mutation(() => MutationResult)
   async upsertPlatformCredentials(@Args('input') input: UpsertPlatformCredentialsInput): Promise<MutationResult> {
     return this.tenantAdminService.upsertPlatformCredentials(input.tenantId, input.platform, input.configJson);
+  }
+
+  // ── Command config per tenant ───────────────────────────────────────────────
+
+  @UseGuards(OwnerGuard)
+  @Query(() => [TenantCommandConfigType])
+  tenantCommandConfigs(@Args('tenantId') tenantId: string): Promise<TenantCommandConfigType[]> {
+    return this.tenantAdminService.getTenantCommandConfigs(tenantId);
+  }
+
+  @UseGuards(OwnerGuard)
+  @Mutation(() => MutationResult)
+  upsertTenantCommandConfig(@Args('input') input: UpsertTenantCommandConfigInput): Promise<MutationResult> {
+    return this.tenantAdminService.upsertTenantCommandConfig(
+      input.tenantId,
+      input.commandId,
+      input.active,
+      input.parametersOverrideJson,
+    );
+  }
+
+  // ── Prompt overrides per tenant ─────────────────────────────────────────────
+
+  @UseGuards(OwnerGuard)
+  @Query(() => [TenantPromptOverrideType])
+  tenantPromptOverrides(@Args('tenantId') tenantId: string): Promise<TenantPromptOverrideType[]> {
+    return this.tenantAdminService.getTenantPromptOverrides(tenantId);
+  }
+
+  @UseGuards(OwnerGuard)
+  @Mutation(() => MutationResult)
+  upsertTenantPromptOverride(@Args('input') input: UpsertTenantPromptOverrideInput): Promise<MutationResult> {
+    return this.tenantAdminService.upsertTenantPromptOverride(
+      input.tenantId,
+      input.userType,
+      input.prompt,
+      input.commandId,
+      input.description,
+    );
   }
 }

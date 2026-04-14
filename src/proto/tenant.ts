@@ -108,6 +108,80 @@ export interface UpsertPlatformCredentialsResponse {
   message: string;
 }
 
+export interface TenantCommandConfigEntry {
+  id: string;
+  commandId: string;
+  commandName: string;
+  active: boolean;
+  parametersOverrideJson: string;
+}
+
+export interface GetTenantCommandConfigsRequest {
+  tenantId: string;
+}
+
+export interface GetTenantCommandConfigsResponse {
+  status: boolean;
+  message: string;
+  configs: TenantCommandConfigEntry[];
+}
+
+export interface UpsertTenantCommandConfigRequest {
+  tenantId: string;
+  commandId: string;
+  active: boolean;
+  parametersOverrideJson: string;
+}
+
+export interface UpsertTenantCommandConfigResponse {
+  status: boolean;
+  message: string;
+}
+
+export interface GetPromptForContextRequest {
+  tenantId: string;
+  commandId: string;
+  userType: string;
+}
+
+export interface GetPromptForContextResponse {
+  status: boolean;
+  message: string;
+  prompt: string;
+}
+
+export interface TenantPromptOverrideEntry {
+  id: string;
+  tenantId: string;
+  commandId: string;
+  userType: string;
+  description: string;
+  prompt: string;
+}
+
+export interface UpsertTenantPromptOverrideRequest {
+  tenantId: string;
+  commandId: string;
+  userType: string;
+  description: string;
+  prompt: string;
+}
+
+export interface UpsertTenantPromptOverrideResponse {
+  status: boolean;
+  message: string;
+}
+
+export interface GetTenantPromptOverridesRequest {
+  tenantId: string;
+}
+
+export interface GetTenantPromptOverridesResponse {
+  status: boolean;
+  message: string;
+  overrides: TenantPromptOverrideEntry[];
+}
+
 export const TENANT_PACKAGE_NAME = 'tenant';
 
 export interface TenantServiceClient {
@@ -119,6 +193,11 @@ export interface TenantServiceClient {
   getAllTenants(request: GetAllTenantsRequest, metadata?: Metadata): Observable<GetAllTenantsResponse>;
   updateCustomization(request: UpdateCustomizationRequest, metadata?: Metadata): Observable<UpdateCustomizationResponse>;
   upsertPlatformCredentials(request: UpsertPlatformCredentialsRequest, metadata?: Metadata): Observable<UpsertPlatformCredentialsResponse>;
+  getTenantCommandConfigs(request: GetTenantCommandConfigsRequest, metadata?: Metadata): Observable<GetTenantCommandConfigsResponse>;
+  upsertTenantCommandConfig(request: UpsertTenantCommandConfigRequest, metadata?: Metadata): Observable<UpsertTenantCommandConfigResponse>;
+  getPromptForContext(request: GetPromptForContextRequest, metadata?: Metadata): Observable<GetPromptForContextResponse>;
+  upsertTenantPromptOverride(request: UpsertTenantPromptOverrideRequest, metadata?: Metadata): Observable<UpsertTenantPromptOverrideResponse>;
+  getTenantPromptOverrides(request: GetTenantPromptOverridesRequest, metadata?: Metadata): Observable<GetTenantPromptOverridesResponse>;
 }
 
 export interface TenantServiceController {
@@ -161,6 +240,31 @@ export interface TenantServiceController {
     request: UpsertPlatformCredentialsRequest,
     metadata?: Metadata,
   ): Promise<UpsertPlatformCredentialsResponse> | Observable<UpsertPlatformCredentialsResponse> | UpsertPlatformCredentialsResponse;
+
+  getTenantCommandConfigs(
+    request: GetTenantCommandConfigsRequest,
+    metadata?: Metadata,
+  ): Promise<GetTenantCommandConfigsResponse> | Observable<GetTenantCommandConfigsResponse> | GetTenantCommandConfigsResponse;
+
+  upsertTenantCommandConfig(
+    request: UpsertTenantCommandConfigRequest,
+    metadata?: Metadata,
+  ): Promise<UpsertTenantCommandConfigResponse> | Observable<UpsertTenantCommandConfigResponse> | UpsertTenantCommandConfigResponse;
+
+  getPromptForContext(
+    request: GetPromptForContextRequest,
+    metadata?: Metadata,
+  ): Promise<GetPromptForContextResponse> | Observable<GetPromptForContextResponse> | GetPromptForContextResponse;
+
+  upsertTenantPromptOverride(
+    request: UpsertTenantPromptOverrideRequest,
+    metadata?: Metadata,
+  ): Promise<UpsertTenantPromptOverrideResponse> | Observable<UpsertTenantPromptOverrideResponse> | UpsertTenantPromptOverrideResponse;
+
+  getTenantPromptOverrides(
+    request: GetTenantPromptOverridesRequest,
+    metadata?: Metadata,
+  ): Promise<GetTenantPromptOverridesResponse> | Observable<GetTenantPromptOverridesResponse> | GetTenantPromptOverridesResponse;
 }
 
 export function TenantServiceControllerMethods() {
@@ -174,6 +278,11 @@ export function TenantServiceControllerMethods() {
       'getAllTenants',
       'updateCustomization',
       'upsertPlatformCredentials',
+      'getTenantCommandConfigs',
+      'upsertTenantCommandConfig',
+      'getPromptForContext',
+      'upsertTenantPromptOverride',
+      'getTenantPromptOverrides',
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

@@ -236,6 +236,23 @@ type MutationResult {
   message: String!
 }
 
+type TenantCommandConfigType {
+  id: String!
+  commandId: String!
+  commandName: String!
+  active: Boolean!
+  parametersOverrideJson: String
+}
+
+type TenantPromptOverrideType {
+  id: String!
+  tenantId: String!
+  commandId: String
+  userType: String!
+  description: String
+  prompt: String!
+}
+
 type Query {
   users(input: GetAllUsersType): UsersListType!
   user(input: GetUserType!): UserSummaryType!
@@ -254,6 +271,8 @@ type Query {
   featureConfig(input: GetFeatureConfigType!): ConfigsListType!
   tenantFeatures: TenantFeaturesType!
   tenants: [TenantType!]!
+  tenantCommandConfigs(tenantId: String!): [TenantCommandConfigType!]!
+  tenantPromptOverrides(tenantId: String!): [TenantPromptOverrideType!]!
   csrfToken: CsrfTokenType!
 }
 
@@ -348,6 +367,8 @@ type Mutation {
   createTenant(input: CreateTenantInput!): CreateTenantResult!
   updateTenantCustomization(input: UpdateCustomizationInput!): MutationResult!
   upsertPlatformCredentials(input: UpsertPlatformCredentialsInput!): MutationResult!
+  upsertTenantCommandConfig(input: UpsertTenantCommandConfigInput!): MutationResult!
+  upsertTenantPromptOverride(input: UpsertTenantPromptOverrideInput!): MutationResult!
 }
 
 input CreateUserType {
@@ -484,4 +505,19 @@ input UpsertPlatformCredentialsInput {
   tenantId: String!
   platform: String!
   configJson: String!
+}
+
+input UpsertTenantCommandConfigInput {
+  tenantId: String!
+  commandId: String!
+  active: Boolean!
+  parametersOverrideJson: String
+}
+
+input UpsertTenantPromptOverrideInput {
+  tenantId: String!
+  commandId: String
+  userType: String!
+  description: String
+  prompt: String!
 }

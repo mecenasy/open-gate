@@ -32,3 +32,5 @@ export * from './config/config.entity';
 export * from './tenant/tenant.entity';
 export * from './tenant/customization-config.entity';
 export * from './tenant/platform-credentials.entity';
+export * from './tenant/tenant-command-config.entity';
+export * from './tenant/tenant-prompt-override.entity';

@@ -11,6 +11,11 @@ service TenantService {
   rpc GetAllTenants (GetAllTenantsRequest) returns (GetAllTenantsResponse);
   rpc UpdateCustomization (UpdateCustomizationRequest) returns (UpdateCustomizationResponse);
   rpc UpsertPlatformCredentials (UpsertPlatformCredentialsRequest) returns (UpsertPlatformCredentialsResponse);
+  rpc GetTenantCommandConfigs (GetTenantCommandConfigsRequest) returns (GetTenantCommandConfigsResponse);
+  rpc UpsertTenantCommandConfig (UpsertTenantCommandConfigRequest) returns (UpsertTenantCommandConfigResponse);
+  rpc GetPromptForContext (GetPromptForContextRequest) returns (GetPromptForContextResponse);
+  rpc UpsertTenantPromptOverride (UpsertTenantPromptOverrideRequest) returns (UpsertTenantPromptOverrideResponse);
+  rpc GetTenantPromptOverrides (GetTenantPromptOverridesRequest) returns (GetTenantPromptOverridesResponse);
 }
 
 message GetCustomizationRequest {
@@ -108,4 +113,78 @@ message UpsertPlatformCredentialsRequest {
 message UpsertPlatformCredentialsResponse {
   bool status = 1;
   string message = 2;
+}
+
+message TenantCommandConfigEntry {
+  string id = 1;
+  string command_id = 2;
+  string command_name = 3;
+  bool active = 4;
+  string parameters_override_json = 5;
+}
+
+message GetTenantCommandConfigsRequest {
+  string tenant_id = 1;
+}
+
+message GetTenantCommandConfigsResponse {
+  bool status = 1;
+  string message = 2;
+  repeated TenantCommandConfigEntry configs = 3;
+}
+
+message UpsertTenantCommandConfigRequest {
+  string tenant_id = 1;
+  string command_id = 2;
+  bool active = 3;
+  string parameters_override_json = 4;
+}
+
+message UpsertTenantCommandConfigResponse {
+  bool status = 1;
+  string message = 2;
+}
+
+message GetPromptForContextRequest {
+  string tenant_id = 1;
+  string command_id = 2;
+  string user_type = 3;
+}
+
+message GetPromptForContextResponse {
+  bool status = 1;
+  string message = 2;
+  string prompt = 3;
+}
+
+message TenantPromptOverrideEntry {
+  string id = 1;
+  string tenant_id = 2;
+  string command_id = 3;
+  string user_type = 4;
+  string description = 5;
+  string prompt = 6;
+}
+
+message UpsertTenantPromptOverrideRequest {
+  string tenant_id = 1;
+  string command_id = 2;
+  string user_type = 3;
+  string description = 4;
+  string prompt = 5;
+}
+
+message UpsertTenantPromptOverrideResponse {
+  bool status = 1;
+  string message = 2;
+}
+
+message GetTenantPromptOverridesRequest {
+  string tenant_id = 1;
+}
+
+message GetTenantPromptOverridesResponse {
+  bool status = 1;
+  string message = 2;
+  repeated TenantPromptOverrideEntry overrides = 3;
 }

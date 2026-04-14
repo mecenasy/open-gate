@@ -25,7 +25,7 @@ export class MessageProcessor extends ProcessorBase {
     this.logger.debug(`Analyzing message ${context.phone}`);
 
     try {
-      const messages = await this.messageContextService.getOrCreateConversation(context);
+      const messages = await this.messageContextService.getOrCreateConversation({ phone: context.phone, type: context.type });
 
       messages.push({
         role: 'user',
@@ -39,7 +39,7 @@ export class MessageProcessor extends ProcessorBase {
         content: chatCompletion,
       });
 
-      await this.messageContextService.saveConversation(context, messages);
+      await this.messageContextService.saveConversation({ phone: context.phone, type: context.type }, messages);
 
       const command = this.commandParserService.parseCommand(chatCompletion);
 

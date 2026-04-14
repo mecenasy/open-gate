@@ -64,3 +64,80 @@ export class MutationResult {
   @Field()
   message!: string;
 }
+
+// ─── Tenant command config ────────────────────────────────────────────────────
+
+@ObjectType()
+export class TenantCommandConfigType {
+  @Field()
+  id!: string;
+
+  @Field()
+  commandId!: string;
+
+  @Field()
+  commandName!: string;
+
+  @Field()
+  active!: boolean;
+
+  @Field({ nullable: true })
+  parametersOverrideJson?: string;
+}
+
+@InputType()
+export class UpsertTenantCommandConfigInput {
+  @Field()
+  tenantId!: string;
+
+  @Field()
+  commandId!: string;
+
+  @Field()
+  active!: boolean;
+
+  @Field({ nullable: true })
+  parametersOverrideJson?: string;
+}
+
+// ─── Tenant prompt overrides ──────────────────────────────────────────────────
+
+@ObjectType()
+export class TenantPromptOverrideType {
+  @Field()
+  id!: string;
+
+  @Field()
+  tenantId!: string;
+
+  @Field({ nullable: true })
+  commandId?: string;
+
+  @Field()
+  userType!: string;
+
+  @Field({ nullable: true })
+  description?: string;
+
+  @Field()
+  prompt!: string;
+}
+
+@InputType()
+export class UpsertTenantPromptOverrideInput {
+  @Field()
+  tenantId!: string;
+
+  /** Empty string or omitted = general context (not command-specific) */
+  @Field({ nullable: true })
+  commandId?: string;
+
+  @Field()
+  userType!: string;
+
+  @Field({ nullable: true })
+  description?: string;
+
+  @Field()
+  prompt!: string;
+}

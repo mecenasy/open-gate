@@ -4,6 +4,7 @@ import { lastValueFrom } from 'rxjs';
 import { DbGrpcKey } from '@app/db-grpc';
 import { TENANT_SERVICE_NAME, TenantServiceClient } from 'src/proto/tenant';
 import type { CreateTenantResult, MutationResult, TenantType } from './dto/tenant-admin.types';
+import type { TenantCommandConfigType, TenantPromptOverrideType } from './dto/tenant-admin.types';
 
 @Injectable()
 export class TenantAdminService implements OnModuleInit {
@@ -37,13 +38,68 @@ export class TenantAdminService implements OnModuleInit {
     return { status: res.status, message: res.message };
   }
 
-  async upsertPlatformCredentials(
-    tenantId: string,
-    platform: string,
-    configJson: string,
-  ): Promise<MutationResult> {
+  async upsertPlatformCredentials(tenantId: string, platform: string, configJson: string): Promise<MutationResult> {
     const res = await lastValueFrom(
       this.tenantGrpcService.upsertPlatformCredentials({ tenantId, platform, configJson }),
+    );
+    return { status: res.status, message: res.message };
+  }
+
+  async getTenantCommandConfigs(tenantId: string): Promise<TenantCommandConfigType[]> {
+    const res = await lastValueFrom(this.tenantGrpcService.getTenantCommandConfigs({ tenantId }));
+    return res.configs.map((c) => ({
+      id: c.id,
+      commandId: c.commandId,
+      commandName: c.commandName,
+      active: c.active,
+      parametersOverrideJson: c.parametersOverrideJson || undefined,
+    }));
+  }
+
+  async upsertTenantCommandConfig(
+    tenantId: string,
+    commandId: string,
+    active: boolean,
+    parametersOverrideJson?: string,
+  ): Promise<MutationResult> {
+    const res = await lastValueFrom(
+      this.tenantGrpcService.upsertTenantCommandConfig({
+        tenantId,
+        commandId,
+        active,
+        parametersOverrideJson: parametersOverrideJson ?? '',
+      }),
+    );
+    return { status: res.status, message: res.message };
+  }
+
+  async getTenantPromptOverrides(tenantId: string): Promise<TenantPromptOverrideType[]> {
+    const res = await lastValueFrom(this.tenantGrpcService.getTenantPromptOverrides({ tenantId }));
+    return res.overrides.map((o) => ({
+      id: o.id,
+      tenantId: o.tenantId,
+      commandId: o.commandId || undefined,
+      userType: o.userType,
+      description: o.description || undefined,
+      prompt: o.prompt,
+    }));
+  }
+
+  async upsertTenantPromptOverride(
+    tenantId: string,
+    userType: string,
+    prompt: string,
+    commandId?: string,
+    description?: string,
+  ): Promise<MutationResult> {
+    const res = await lastValueFrom(
+      this.tenantGrpcService.upsertTenantPromptOverride({
+        tenantId,
+        commandId: commandId ?? '',
+        userType,
+        prompt,
+        description: description ?? '',
+      }),
     );
     return { status: res.status, message: res.message };
   }

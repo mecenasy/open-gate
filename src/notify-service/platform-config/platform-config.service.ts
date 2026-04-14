@@ -87,12 +87,15 @@ export class PlatformConfigService implements OnModuleInit {
 
     // 2. gRPC → DB
     try {
-      const response = await lastValueFrom(
-        this.tenantGrpcService.getPlatformCredentials({ tenantId, platform }),
-      );
+      const response = await lastValueFrom(this.tenantGrpcService.getPlatformCredentials({ tenantId, platform }));
       if (response.status && response.configJson) {
         const config = JSON.parse(response.configJson) as PlatformCredentialMap[P];
-        await this.cache.saveInCache({ identifier: cacheKey, prefix: 'platform-config', data: config, EX: CACHE_TTL_SECONDS });
+        await this.cache.saveInCache({
+          identifier: cacheKey,
+          prefix: 'platform-config',
+          data: config,
+          EX: CACHE_TTL_SECONDS,
+        });
         return config;
       }
     } catch (err) {
@@ -111,9 +114,7 @@ export class PlatformConfigService implements OnModuleInit {
     platform: P,
   ): Promise<Array<{ tenantId: string; config: PlatformCredentialMap[P] }>> {
     try {
-      const response = await lastValueFrom(
-        this.tenantGrpcService.getTenantsWithPlatform({ platform }),
-      );
+      const response = await lastValueFrom(this.tenantGrpcService.getTenantsWithPlatform({ platform }));
       if (!response.status) return [];
       return response.entries
         .map((e) => {

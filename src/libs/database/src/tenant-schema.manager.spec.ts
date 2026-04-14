@@ -19,9 +19,7 @@ describe('TenantSchemaManager', () => {
 
       await manager.provisionSchema('tenant_abc123');
 
-      expect(dataSource.query).toHaveBeenCalledWith(
-        'CREATE SCHEMA IF NOT EXISTS "tenant_abc123"',
-      );
+      expect(dataSource.query).toHaveBeenCalledWith('CREATE SCHEMA IF NOT EXISTS "tenant_abc123"');
     });
 
     it('should use quoted schema name to prevent SQL injection', async () => {
@@ -53,10 +51,9 @@ describe('TenantSchemaManager', () => {
       const result = await manager.schemaExists('tenant_exists');
 
       expect(result).toBe(true);
-      expect(dataSource.query).toHaveBeenCalledWith(
-        expect.stringContaining('information_schema.schemata'),
-        ['tenant_exists'],
-      );
+      expect(dataSource.query).toHaveBeenCalledWith(expect.stringContaining('information_schema.schemata'), [
+        'tenant_exists',
+      ]);
     });
 
     it('should return false when schema does not exist', async () => {

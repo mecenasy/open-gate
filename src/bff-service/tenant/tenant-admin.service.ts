@@ -32,9 +32,7 @@ export class TenantAdminService implements OnModuleInit {
   }
 
   async updateCustomization(tenantId: string, customizationJson: string): Promise<MutationResult> {
-    const res = await lastValueFrom(
-      this.tenantGrpcService.updateCustomization({ tenantId, customizationJson }),
-    );
+    const res = await lastValueFrom(this.tenantGrpcService.updateCustomization({ tenantId, customizationJson }));
     return { status: res.status, message: res.message };
   }
 

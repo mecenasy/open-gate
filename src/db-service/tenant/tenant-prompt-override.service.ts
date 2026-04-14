@@ -71,9 +71,7 @@ export class TenantPromptOverrideService {
     if (existing) {
       await this.overrideRepo.update(existing.id, { prompt, description });
     } else {
-      await this.overrideRepo.save(
-        this.overrideRepo.create({ tenantId, commandId, userType, prompt, description }),
-      );
+      await this.overrideRepo.save(this.overrideRepo.create({ tenantId, commandId, userType, prompt, description }));
     }
   }
 }

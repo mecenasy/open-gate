@@ -25,7 +25,8 @@ export class MassageHandler extends Handler<UnifiedMessageEvent, Status, UserPro
   messageGrpc: MessagesServiceClient;
 
   constructor(
-    @Optional() @Inject(TenantCustomizationService)
+    @Optional()
+    @Inject(TenantCustomizationService)
     private readonly customizationService?: TenantCustomizationService,
   ) {
     super(USER_PROXY_SERVICE_NAME);
@@ -145,9 +146,7 @@ export class MassageHandler extends Handler<UnifiedMessageEvent, Status, UserPro
 
   private async notifyPlatformDisabled(message: UnifiedMessage): Promise<void> {
     const text = await this.getPlatformDisabledMessage();
-    this.event.emit(
-      new NotificationEvent({ phone: message.chatId, message: text, platform: message.platform }),
-    );
+    this.event.emit(new NotificationEvent({ phone: message.chatId, message: text, platform: message.platform }));
   }
 
   private async getPlatformDisabledMessage(): Promise<string> {

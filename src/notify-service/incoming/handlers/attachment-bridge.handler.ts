@@ -40,16 +40,19 @@ export class AttachmentBridgeHandler implements IEventHandler<AttachmentEvent>, 
       const metadata = new Metadata();
       if (tenantId) metadata.set('x-tenant-id', tenantId);
       await firstValueFrom(
-        this.gateClient.receiveMessage({
-          data: {
-            ...message,
-            media: { ...message.media, data },
-            platform: PlatformTransformer.toGrpc(message.platform),
-            type: TypeTransformer.toGrpc(message.type),
+        this.gateClient.receiveMessage(
+          {
+            data: {
+              ...message,
+              media: { ...message.media, data },
+              platform: PlatformTransformer.toGrpc(message.platform),
+              type: TypeTransformer.toGrpc(message.type),
+            },
+            message: 'message transformed to string',
+            status: true,
           },
-          message: 'message transformed to string',
-          status: true,
-        }, metadata),
+          metadata,
+        ),
       );
       this.logger.log(`✅ Attachment forwarded to core-service [tenant=${tenantId ?? 'unset'}]`);
     } catch (error) {

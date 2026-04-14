@@ -1,11 +1,5 @@
 import { IsString, IsOptional } from 'class-validator';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { ConfigType } from '../enums/config-type.enum';
 
 @Entity('configs')

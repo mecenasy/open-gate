@@ -107,30 +107,28 @@ describe('TenantGrpcInterceptor — integration', () => {
     const ctx = makeContext(meta) as never;
     const handler = makeHandler();
 
-    await expect(lastValueFrom(interceptor.intercept(ctx, handler))).rejects.toThrow(
-      'DB connection lost',
-    );
+    await expect(lastValueFrom(interceptor.intercept(ctx, handler))).rejects.toThrow('DB connection lost');
   });
 
   it('should isolate tenant contexts between concurrent gRPC calls', async () => {
     const tenantA = { ...fakeTenant, id: 'aaaa', slug: 'community-a', schemaName: 'tenant_aaaa' } as Tenant;
     const tenantB = { ...fakeTenant, id: 'bbbb', slug: 'community-b', schemaName: 'tenant_bbbb' } as Tenant;
 
-    tenantDbService.findById
-      .mockResolvedValueOnce(tenantA)
-      .mockResolvedValueOnce(tenantB);
+    tenantDbService.findById.mockResolvedValueOnce(tenantA).mockResolvedValueOnce(tenantB);
 
     const capturedContexts: Array<ReturnType<TenantService['getContext']>> = [];
 
     const makeCapturingHandler = (delay: number) => ({
       handle: () => {
-        return new (jest.requireActual<typeof import('rxjs')>('rxjs').Observable)((sub: import('rxjs').Subscriber<string>) => {
-          setTimeout(() => {
-            capturedContexts.push(tenantService.getContext());
-            sub.next('done');
-            sub.complete();
-          }, delay);
-        });
+        return new (jest.requireActual<typeof import('rxjs')>('rxjs').Observable)(
+          (sub: import('rxjs').Subscriber<string>) => {
+            setTimeout(() => {
+              capturedContexts.push(tenantService.getContext());
+              sub.next('done');
+              sub.complete();
+            }, delay);
+          },
+        );
       },
     });
 

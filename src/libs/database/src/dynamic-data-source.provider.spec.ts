@@ -57,8 +57,9 @@ describe('DynamicDataSourceProvider', () => {
     it('should create separate DataSources for different tenants', async () => {
       const inst1 = { isInitialized: false, initialize: jest.fn().mockResolvedValue(undefined), destroy: jest.fn() };
       const inst2 = { isInitialized: false, initialize: jest.fn().mockResolvedValue(undefined), destroy: jest.fn() };
-      MockedDataSource.mockImplementationOnce(() => inst1 as unknown as DataSource)
-        .mockImplementationOnce(() => inst2 as unknown as DataSource);
+      MockedDataSource.mockImplementationOnce(() => inst1 as unknown as DataSource).mockImplementationOnce(
+        () => inst2 as unknown as DataSource,
+      );
 
       const ds1 = await provider.getDataSource('tenant-a', 'schema_a');
       const ds2 = await provider.getDataSource('tenant-b', 'schema_b');
@@ -107,8 +108,9 @@ describe('DynamicDataSourceProvider', () => {
     it('should use different search_path for different tenants', async () => {
       const inst1 = { isInitialized: false, initialize: jest.fn().mockResolvedValue(undefined), destroy: jest.fn() };
       const inst2 = { isInitialized: false, initialize: jest.fn().mockResolvedValue(undefined), destroy: jest.fn() };
-      MockedDataSource.mockImplementationOnce(() => inst1 as unknown as DataSource)
-        .mockImplementationOnce(() => inst2 as unknown as DataSource);
+      MockedDataSource.mockImplementationOnce(() => inst1 as unknown as DataSource).mockImplementationOnce(
+        () => inst2 as unknown as DataSource,
+      );
 
       await provider.getDataSource('t1', 'schema_tenant_1');
       await provider.getDataSource('t2', 'schema_tenant_2');

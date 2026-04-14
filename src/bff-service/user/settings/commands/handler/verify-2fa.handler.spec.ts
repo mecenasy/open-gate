@@ -67,16 +67,14 @@ describe('Verify2faHandler', () => {
   });
 
   it('should update user-state cache to set is2faEnabled=true', async () => {
-    mockCache.getFromCache
-      .mockResolvedValueOnce('SECRETKEY')
-      .mockResolvedValueOnce({
-        id: 'user-1',
-        email: 'u@e.com',
-        is2faEnabled: false,
-        admin: false,
-        owner: false,
-        isAdaptiveLoginEnabled: false,
-      });
+    mockCache.getFromCache.mockResolvedValueOnce('SECRETKEY').mockResolvedValueOnce({
+      id: 'user-1',
+      email: 'u@e.com',
+      is2faEnabled: false,
+      admin: false,
+      owner: false,
+      isAdaptiveLoginEnabled: false,
+    });
     (authenticator.check as jest.Mock).mockReturnValue(true);
     mockGrpc.verify2Fa.mockReturnValue(of({ status: true, message: null }));
 

@@ -23,11 +23,7 @@ export class ListResponseDto<T> {
     return this.page > 1;
   }
 
-  static from<T>(
-    data: T[],
-    total: number,
-    query: { page: number; limit: number },
-  ): ListResponseDto<T> {
+  static from<T>(data: T[], total: number, query: { page: number; limit: number }): ListResponseDto<T> {
     return new ListResponseDto(data, total, query.page, query.limit);
   }
 }

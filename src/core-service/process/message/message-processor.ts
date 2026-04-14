@@ -25,7 +25,10 @@ export class MessageProcessor extends ProcessorBase {
     this.logger.debug(`Analyzing message ${context.phone}`);
 
     try {
-      const messages = await this.messageContextService.getOrCreateConversation({ phone: context.phone, type: context.type });
+      const messages = await this.messageContextService.getOrCreateConversation({
+        phone: context.phone,
+        type: context.type,
+      });
 
       messages.push({
         role: 'user',

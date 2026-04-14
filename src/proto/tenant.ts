@@ -187,17 +187,44 @@ export const TENANT_PACKAGE_NAME = 'tenant';
 export interface TenantServiceClient {
   getCustomization(request: GetCustomizationRequest, metadata?: Metadata): Observable<GetCustomizationResponse>;
   getTenant(request: GetTenantRequest, metadata?: Metadata): Observable<GetTenantResponse>;
-  getPlatformCredentials(request: GetPlatformCredentialsRequest, metadata?: Metadata): Observable<GetPlatformCredentialsResponse>;
-  getTenantsWithPlatform(request: GetTenantsWithPlatformRequest, metadata?: Metadata): Observable<GetTenantsWithPlatformResponse>;
+  getPlatformCredentials(
+    request: GetPlatformCredentialsRequest,
+    metadata?: Metadata,
+  ): Observable<GetPlatformCredentialsResponse>;
+  getTenantsWithPlatform(
+    request: GetTenantsWithPlatformRequest,
+    metadata?: Metadata,
+  ): Observable<GetTenantsWithPlatformResponse>;
   createTenant(request: CreateTenantRequest, metadata?: Metadata): Observable<CreateTenantResponse>;
   getAllTenants(request: GetAllTenantsRequest, metadata?: Metadata): Observable<GetAllTenantsResponse>;
-  updateCustomization(request: UpdateCustomizationRequest, metadata?: Metadata): Observable<UpdateCustomizationResponse>;
-  upsertPlatformCredentials(request: UpsertPlatformCredentialsRequest, metadata?: Metadata): Observable<UpsertPlatformCredentialsResponse>;
-  getTenantCommandConfigs(request: GetTenantCommandConfigsRequest, metadata?: Metadata): Observable<GetTenantCommandConfigsResponse>;
-  upsertTenantCommandConfig(request: UpsertTenantCommandConfigRequest, metadata?: Metadata): Observable<UpsertTenantCommandConfigResponse>;
-  getPromptForContext(request: GetPromptForContextRequest, metadata?: Metadata): Observable<GetPromptForContextResponse>;
-  upsertTenantPromptOverride(request: UpsertTenantPromptOverrideRequest, metadata?: Metadata): Observable<UpsertTenantPromptOverrideResponse>;
-  getTenantPromptOverrides(request: GetTenantPromptOverridesRequest, metadata?: Metadata): Observable<GetTenantPromptOverridesResponse>;
+  updateCustomization(
+    request: UpdateCustomizationRequest,
+    metadata?: Metadata,
+  ): Observable<UpdateCustomizationResponse>;
+  upsertPlatformCredentials(
+    request: UpsertPlatformCredentialsRequest,
+    metadata?: Metadata,
+  ): Observable<UpsertPlatformCredentialsResponse>;
+  getTenantCommandConfigs(
+    request: GetTenantCommandConfigsRequest,
+    metadata?: Metadata,
+  ): Observable<GetTenantCommandConfigsResponse>;
+  upsertTenantCommandConfig(
+    request: UpsertTenantCommandConfigRequest,
+    metadata?: Metadata,
+  ): Observable<UpsertTenantCommandConfigResponse>;
+  getPromptForContext(
+    request: GetPromptForContextRequest,
+    metadata?: Metadata,
+  ): Observable<GetPromptForContextResponse>;
+  upsertTenantPromptOverride(
+    request: UpsertTenantPromptOverrideRequest,
+    metadata?: Metadata,
+  ): Observable<UpsertTenantPromptOverrideResponse>;
+  getTenantPromptOverrides(
+    request: GetTenantPromptOverridesRequest,
+    metadata?: Metadata,
+  ): Observable<GetTenantPromptOverridesResponse>;
 }
 
 export interface TenantServiceController {
@@ -214,12 +241,18 @@ export interface TenantServiceController {
   getPlatformCredentials(
     request: GetPlatformCredentialsRequest,
     metadata?: Metadata,
-  ): Promise<GetPlatformCredentialsResponse> | Observable<GetPlatformCredentialsResponse> | GetPlatformCredentialsResponse;
+  ):
+    | Promise<GetPlatformCredentialsResponse>
+    | Observable<GetPlatformCredentialsResponse>
+    | GetPlatformCredentialsResponse;
 
   getTenantsWithPlatform(
     request: GetTenantsWithPlatformRequest,
     metadata?: Metadata,
-  ): Promise<GetTenantsWithPlatformResponse> | Observable<GetTenantsWithPlatformResponse> | GetTenantsWithPlatformResponse;
+  ):
+    | Promise<GetTenantsWithPlatformResponse>
+    | Observable<GetTenantsWithPlatformResponse>
+    | GetTenantsWithPlatformResponse;
 
   createTenant(
     request: CreateTenantRequest,
@@ -239,17 +272,26 @@ export interface TenantServiceController {
   upsertPlatformCredentials(
     request: UpsertPlatformCredentialsRequest,
     metadata?: Metadata,
-  ): Promise<UpsertPlatformCredentialsResponse> | Observable<UpsertPlatformCredentialsResponse> | UpsertPlatformCredentialsResponse;
+  ):
+    | Promise<UpsertPlatformCredentialsResponse>
+    | Observable<UpsertPlatformCredentialsResponse>
+    | UpsertPlatformCredentialsResponse;
 
   getTenantCommandConfigs(
     request: GetTenantCommandConfigsRequest,
     metadata?: Metadata,
-  ): Promise<GetTenantCommandConfigsResponse> | Observable<GetTenantCommandConfigsResponse> | GetTenantCommandConfigsResponse;
+  ):
+    | Promise<GetTenantCommandConfigsResponse>
+    | Observable<GetTenantCommandConfigsResponse>
+    | GetTenantCommandConfigsResponse;
 
   upsertTenantCommandConfig(
     request: UpsertTenantCommandConfigRequest,
     metadata?: Metadata,
-  ): Promise<UpsertTenantCommandConfigResponse> | Observable<UpsertTenantCommandConfigResponse> | UpsertTenantCommandConfigResponse;
+  ):
+    | Promise<UpsertTenantCommandConfigResponse>
+    | Observable<UpsertTenantCommandConfigResponse>
+    | UpsertTenantCommandConfigResponse;
 
   getPromptForContext(
     request: GetPromptForContextRequest,
@@ -259,12 +301,18 @@ export interface TenantServiceController {
   upsertTenantPromptOverride(
     request: UpsertTenantPromptOverrideRequest,
     metadata?: Metadata,
-  ): Promise<UpsertTenantPromptOverrideResponse> | Observable<UpsertTenantPromptOverrideResponse> | UpsertTenantPromptOverrideResponse;
+  ):
+    | Promise<UpsertTenantPromptOverrideResponse>
+    | Observable<UpsertTenantPromptOverrideResponse>
+    | UpsertTenantPromptOverrideResponse;
 
   getTenantPromptOverrides(
     request: GetTenantPromptOverridesRequest,
     metadata?: Metadata,
-  ): Promise<GetTenantPromptOverridesResponse> | Observable<GetTenantPromptOverridesResponse> | GetTenantPromptOverridesResponse;
+  ):
+    | Promise<GetTenantPromptOverridesResponse>
+    | Observable<GetTenantPromptOverridesResponse>
+    | GetTenantPromptOverridesResponse;
 }
 
 export function TenantServiceControllerMethods() {

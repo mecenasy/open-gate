@@ -1,8 +1,4 @@
-export {
-  CustomizationConfig,
-  DEFAULT_CUSTOMIZATION,
-  validateMessagingChannels,
-} from '@app/entities';
+export { CustomizationConfig, DEFAULT_CUSTOMIZATION, validateMessagingChannels } from '@app/entities';
 export type {
   CommunityCustomization,
   CommunityCustomizationBranding,

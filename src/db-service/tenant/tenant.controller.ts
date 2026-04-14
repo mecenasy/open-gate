@@ -69,7 +69,10 @@ export class TenantController implements TenantServiceController {
     };
   }
 
-  async getPlatformCredentials({ tenantId, platform }: GetPlatformCredentialsRequest): Promise<GetPlatformCredentialsResponse> {
+  async getPlatformCredentials({
+    tenantId,
+    platform,
+  }: GetPlatformCredentialsRequest): Promise<GetPlatformCredentialsResponse> {
     const creds = await this.platformCredentialsService.findByTenantAndPlatform(tenantId, platform);
     if (!creds) {
       return { status: false, message: 'No credentials found', configJson: '' };

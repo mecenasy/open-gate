@@ -59,9 +59,13 @@
     "passwordPlaceholder": "••••••••",
     "passwordHint": "Min. 8 znaków, wielka i mała litera, cyfra, znak specjalny",
     "confirmPassword": "Powtórz hasło",
+    "tenantSlug": "Nazwa firmy (subdomena)",
+    "tenantSlugPlaceholder": "moja-firma",
+    "tenantSlugHint": "Tylko małe litery, cyfry i myślniki. Będzie Twoim adresem: moja-firma.app.com",
     "submit": "Zarejestruj się",
     "submitting": "Rejestracja…",
-    "cancel": "Anuluj"
+    "cancel": "Anuluj",
+    "registerWrong": "Rejestracja nie powiodła się. Sprawdź dane i spróbuj ponownie."
   },
   "auth": {
     "tfaWrong": "Błąd podczas zmiany ustawień 2FA"
@@ -179,6 +183,8 @@
     "passwordsMismatch": "Hasła nie są identyczne",
     "fieldMin2": "Minimum 2 znaki",
     "phoneMin": "Minimum 9 cyfr",
-    "phoneInvalid": "Nieprawidłowy numer telefonu"
+    "phoneInvalid": "Nieprawidłowy numer telefonu",
+    "slugInvalid": "Tylko małe litery, cyfry i myślniki",
+    "slugMin": "Minimum 3 znaki"
   }
 }

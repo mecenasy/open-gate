@@ -59,9 +59,13 @@
     "passwordPlaceholder": "••••••••",
     "passwordHint": "Min. 8 chars, uppercase, lowercase, digit, special character",
     "confirmPassword": "Confirm password",
+    "tenantSlug": "Company name (subdomain)",
+    "tenantSlugPlaceholder": "my-company",
+    "tenantSlugHint": "Lowercase letters, numbers and hyphens only. This will be your address: my-company.app.com",
     "submit": "Create account",
     "submitting": "Creating account…",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "registerWrong": "Registration failed. Please check your details and try again."
   },
   "auth": {
     "tfaWrong": "Failed to change 2FA settings"
@@ -179,6 +183,8 @@
     "passwordsMismatch": "Passwords do not match",
     "fieldMin2": "Minimum 2 characters",
     "phoneMin": "Minimum 9 digits",
-    "phoneInvalid": "Invalid phone number"
+    "phoneInvalid": "Invalid phone number",
+    "slugInvalid": "Only lowercase letters, numbers and hyphens",
+    "slugMin": "Minimum 3 characters"
   }
 }

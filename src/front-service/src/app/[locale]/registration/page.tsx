@@ -11,14 +11,7 @@ export default function RegistrationPage() {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const { register,
-    errors,
-    onSubmit,
-    loading,
-
-  } = useRegister(setServerError)
-
-
+  const { register, errors, onSubmit, loading } = useRegister(setServerError);
 
   return (
     <Modal
@@ -32,6 +25,15 @@ export default function RegistrationPage() {
       }
     >
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        <Input
+          id="tenantSlug"
+          label={t('tenantSlug')}
+          placeholder={t('tenantSlugPlaceholder')}
+          hint={t('tenantSlugHint')}
+          error={errors.tenantSlug?.message}
+          {...register('tenantSlug')}
+        />
+
         <div className="grid grid-cols-2 gap-4">
           <Input
             id="name"

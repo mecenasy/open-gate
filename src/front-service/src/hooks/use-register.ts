@@ -7,10 +7,9 @@ import { useMutation } from '@apollo/client/react';
 import { graphql } from '@/app/gql';
 
 export const REGISTER_MUTATION = graphql(`
-  mutation Register($input: CreateUserType!) {
-    createUser(input: $input) {
-      id
-      email
+  mutation Register($input: RegisterInput!) {
+    register(input: $input) {
+      success
     }
   }
 `);
@@ -36,6 +35,10 @@ function useRegisterSchema() {
         .regex(/^\+?[0-9\s\-]+$/, t('phoneInvalid')),
       password: passwordSchema,
       confirmPassword: z.string(),
+      tenantSlug: z
+        .string()
+        .min(3, t('slugMin'))
+        .regex(/^[a-z0-9-]+$/, t('slugInvalid')),
     })
     .refine((d) => d.password === d.confirmPassword, {
       message: t('passwordsMismatch'),
@@ -44,7 +47,7 @@ function useRegisterSchema() {
 }
 
 export const useRegister = (setError: (message: string) => void) => {
-  const [createUser, { loading }] = useMutation(REGISTER_MUTATION);
+  const [registerMutation, { loading }] = useMutation(REGISTER_MUTATION);
   const t = useTranslations('register');
   const schemas = useRegisterSchema();
   const router = useRouter();
@@ -61,10 +64,9 @@ export const useRegister = (setError: (message: string) => void) => {
   const onSubmit = async (data: z.infer<typeof schemas>) => {
     try {
       const { confirmPassword: _, ...rest } = data;
-      await createUser({ variables: { input: { ...rest, type: 'user' } } });
-
+      await registerMutation({ variables: { input: rest } });
       reset();
-      router.replace('/');
+      router.replace('/login');
     } catch (error) {
       setError(t('registerWrong'));
     }

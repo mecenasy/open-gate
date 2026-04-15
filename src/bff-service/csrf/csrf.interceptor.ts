@@ -1,16 +1,23 @@
 import { CallHandler, ExecutionContext, ForbiddenException, Injectable, NestInterceptor } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { CsrfGuard, CSRF_EXCLUDE_KEY } from '@app/auth';
+import { CsrfGuard, CSRF_EXCLUDE_KEY, IS_PUBLIC_KEY } from '@app/auth';
 
 @Injectable()
 export class CsrfInterceptor implements NestInterceptor {
-  constructor(private readonly csrfGuard: CsrfGuard) {}
+  constructor(
+    private readonly csrfGuard: CsrfGuard,
+    private readonly reflector: Reflector,
+  ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const handler = context.getHandler();
-    const isExcluded = Reflect.getMetadata(CSRF_EXCLUDE_KEY, handler) as boolean | undefined;
+    const classRef = context.getClass();
 
-    if (isExcluded) {
+    const isExcluded = this.reflector.getAllAndOverride<boolean>(CSRF_EXCLUDE_KEY, [handler, classRef]);
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [handler, classRef]);
+
+    if (isExcluded || isPublic) {
       return next.handle();
     }
 

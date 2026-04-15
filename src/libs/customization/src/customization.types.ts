@@ -58,13 +58,13 @@ export interface CommunityCustomization {
 export const DEFAULT_CUSTOMIZATION: CommunityCustomization = {
   branding: {},
   features: {
-    enableSignal: false,
-    enableWhatsApp: false,
-    enableMessenger: false,
+    enableSignal: true,
+    enableWhatsApp: true,
+    enableMessenger: true,
     enableGate: true,
-    enablePayment: false,
+    enablePayment: true,
     enableCommandScheduling: true,
-    enableAnalytics: false,
+    enableAnalytics: true,
     maxUsersPerTenant: 1000,
   },
   messaging: {

@@ -10,20 +10,16 @@ export const initCorse = (app: INestApplication) => {
     credentials: true,
     exposedHeaders: ['Set-Cookie'],
     origin: (origin: string, callback: (er: Error | null, allow?: boolean) => void) => {
-      // Allow the configured origin and localhost for development
-      const allowedOrigins = [
-        allowedOrigin,
-        'http://localhost:4002',
-        'http://localhost:4000',
-        'http://localhost:3000',
-        'http://localhost:3001',
-        'http://127.0.0.1:4002',
-        'http://127.0.0.1:4000',
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:3001',
-      ];
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
 
-      if (!origin || allowedOrigins.includes(origin)) {
+      const isConfiguredOrigin = origin === allowedOrigin;
+      const isLocalhost = /^https?:\/\/([\w-]+\.)*localhost(:\d+)?$/.test(origin);
+      const is127 = /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(origin);
+
+      if (isConfiguredOrigin || isLocalhost || is127) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));

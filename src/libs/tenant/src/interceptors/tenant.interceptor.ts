@@ -71,7 +71,7 @@ export class TenantInterceptor implements NestInterceptor {
 
     // 2. Subdomain: {slug}.domain.tld
     const host = (request.headers.host ?? '').split(':')[0];
-    const subdomainMatch = /^([a-z0-9-]+)\.[^.]+\.[^.]+$/.exec(host);
+    const subdomainMatch = /^([a-z0-9-]+)\.(?:[^.]+\.[^.]+|localhost)$/.exec(host);
     if (subdomainMatch && subdomainMatch[1] !== 'www') {
       const slug = subdomainMatch[1];
       this.logger.debug(`Resolved tenant from subdomain: ${slug}`);

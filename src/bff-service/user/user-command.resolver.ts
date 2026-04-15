@@ -12,13 +12,22 @@ import { UpdateUserCommand } from './commands/impl/update-user.command';
 import { UpdateUserStatusCommand } from './commands/impl/update-user-status.command';
 import { UpdateUserRoleCommand } from './commands/impl/update-user-role.command';
 import { RemoveUserCommand } from './commands/impl/remove-user.command';
+import { RegisterCommand } from './commands/impl/register.command';
 import { Public } from '@app/auth';
 import { CreateSimpleUserType } from './dto/create-simple-user.type.';
 import { CreateSimpleUserCommand } from './commands/impl/create-simple-user.command';
+import { RegisterInput } from './dto/register.input';
 
 @Resolver()
 export class UserCommandResolver {
   constructor(private readonly commandBus: CommandBus) {}
+
+  @Public()
+  @Mutation(() => SuccessResponseType)
+  async register(@Args('input') input: RegisterInput): Promise<SuccessResponseType> {
+    await this.commandBus.execute<RegisterCommand, void>(new RegisterCommand(input));
+    return { success: true };
+  }
 
   @Public()
   @Mutation(() => UserType)

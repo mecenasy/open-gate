@@ -329,6 +329,7 @@ input GetFeatureConfigType {
 }
 
 type Mutation {
+  register(input: RegisterInput!): SuccessResponseType!
   createUser(input: CreateUserType!): UserType!
   createSimpleUser(input: CreateSimpleUserType!): UserType!
   updateUser(input: UpdateUserType!): UserSummaryType!
@@ -369,6 +370,15 @@ type Mutation {
   upsertPlatformCredentials(input: UpsertPlatformCredentialsInput!): MutationResult!
   upsertTenantCommandConfig(input: UpsertTenantCommandConfigInput!): MutationResult!
   upsertTenantPromptOverride(input: UpsertTenantPromptOverrideInput!): MutationResult!
+}
+
+input RegisterInput {
+  email: String!
+  phone: String!
+  name: String!
+  surname: String!
+  password: String!
+  tenantSlug: String!
 }
 
 input CreateUserType {

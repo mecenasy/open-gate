@@ -1,15 +1,18 @@
 import { Resolver, Query, Args } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { GetAllUsersQuery } from './queries/impl/get-all-users.query';
 import { GetUserByIdQuery } from './queries/impl/get-user-by-id.query';
 import { UserSummaryType, UsersListType } from './dto/response.type';
 import { GetAllUsersType } from './dto/get-all-users.type';
 import { GetUserType } from './dto/get-user.type';
+import { AdminGuard } from '../common/guards/admin.guard';
 
 @Resolver('User')
 export class UserQueryResolver {
   constructor(private readonly queryBus: QueryBus) {}
 
+  @UseGuards(AdminGuard)
   @Query(() => UsersListType)
   async users(@Args('input', { nullable: true }) input?: GetAllUsersType) {
     return this.queryBus.execute<GetAllUsersQuery, UsersListType>(

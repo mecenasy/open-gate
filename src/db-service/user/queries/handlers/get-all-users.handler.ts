@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CustomLogger } from '@app/logger';
 import { BaseQueryHandler } from '@app/cqrs';
+import { TenantService } from '@app/tenant';
 import { GetAllUsersQuery } from '../impl/get-all-users.query';
 import { User } from '../../entity/user.entity';
 import { entityToProto } from '../../utils/entity-to-proto';
@@ -13,6 +14,7 @@ export class GetAllUsersHandler extends BaseQueryHandler<GetAllUsersQuery, { dat
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly tenantService: TenantService,
     logger: CustomLogger,
   ) {
     super(logger);
@@ -22,7 +24,9 @@ export class GetAllUsersHandler extends BaseQueryHandler<GetAllUsersQuery, { dat
     return this.run('GetAllUsers', async () => {
       const page = query.page ?? 1;
       const limit = query.limit ?? 10;
+      const tenantId = this.tenantService.getContext()?.tenantId;
       const [users, total] = await this.userRepository.findAndCount({
+        where: tenantId ? { tenantId } : undefined,
         skip: (page - 1) * limit,
         relations: ['userRole'],
         take: limit,

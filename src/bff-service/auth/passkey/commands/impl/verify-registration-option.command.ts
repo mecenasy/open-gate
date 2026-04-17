@@ -7,6 +7,7 @@ export class VerifyRegistrationOptionCommand extends Command<StatusType> {
     public readonly userId: string,
     public readonly option: RegistrationResponseJSON,
     public readonly ua: string,
+    public readonly origin: string | undefined,
   ) {
     super();
   }

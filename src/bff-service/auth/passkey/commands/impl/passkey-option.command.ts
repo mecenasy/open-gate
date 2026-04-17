@@ -3,7 +3,10 @@ import { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/server';
 import { SessionData } from 'express-session';
 
 export class PasskeyOptionCommand extends Command<PublicKeyCredentialRequestOptionsJSON> {
-  constructor(public readonly session: SessionData) {
+  constructor(
+    public readonly session: SessionData,
+    public readonly origin: string | undefined,
+  ) {
     super();
   }
 }

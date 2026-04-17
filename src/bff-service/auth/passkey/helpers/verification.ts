@@ -1,19 +1,21 @@
 import { AuthenticationResponseJSON, verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { GetPasskeyResponse } from 'src/proto/passkey';
+import { getRpId } from './get-rpid';
 
 export const verification = async (
   response: AuthenticationResponseJSON,
-  clientUrl: string,
+  origin: string | undefined,
+  fallbackUrl: string,
   challenge: string,
   passkey: GetPasskeyResponse,
 ) => {
-  const url = new URL(clientUrl);
-  const expectedRPID = url.hostname;
+  const expectedRPID = getRpId(origin, fallbackUrl);
+  const expectedOrigin = origin || fallbackUrl;
 
   return await verifyAuthenticationResponse({
     response,
     expectedChallenge: challenge,
-    expectedOrigin: clientUrl,
+    expectedOrigin,
     expectedRPID,
     credential: {
       id: passkey.credentialID ?? '',

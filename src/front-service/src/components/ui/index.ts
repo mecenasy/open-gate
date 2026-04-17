@@ -17,3 +17,6 @@ export type { SelectOption } from './Select';
 
 export { TagInput } from './TagInput';
 export { MultiSelect } from './MultiSelect';
+
+export { Tabs } from './Tabs';
+export type { TabDef } from './Tabs';

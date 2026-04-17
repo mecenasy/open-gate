@@ -18,7 +18,7 @@ export class VerifyPasskeyHandler extends Handler<VerifyPasskeyCommand, StatusTy
     this.clientUrl = this.configService.get<AppConfig>('app')?.clientUrl ?? '';
   }
 
-  async execute({ session, response }: VerifyPasskeyCommand) {
+  async execute({ session, response, origin }: VerifyPasskeyCommand) {
     const challenge = session.currentChallenge;
 
     if (!challenge) {
@@ -31,7 +31,7 @@ export class VerifyPasskeyHandler extends Handler<VerifyPasskeyCommand, StatusTy
       return { status: AuthStatus.logout };
     }
 
-    const verify = await verification(response, this.clientUrl, challenge, passkey);
+    const verify = await verification(response, origin as string | undefined, this.clientUrl, challenge, passkey);
 
     if (verify.verified) {
       session.user_id = passkey.userId;

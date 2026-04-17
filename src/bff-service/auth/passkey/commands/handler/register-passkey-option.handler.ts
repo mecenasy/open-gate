@@ -5,6 +5,7 @@ import { Handler } from '@app/handler';
 import { TypeConfigService } from 'src/bff-service/common/configs/types.config.service';
 import { AppConfig } from 'src/bff-service/common/configs/app.configs';
 import { LoginStatusType } from 'src/bff-service/auth/login/dto/login-status.tape';
+import { getRpId } from '../../helpers/get-rpid';
 
 @CommandHandler(RegisterPasskeyOptionCommand)
 export class RegisterPasskeyOptionHandler extends Handler<
@@ -19,14 +20,13 @@ export class RegisterPasskeyOptionHandler extends Handler<
     this.clientUrl = this.configService.get<AppConfig>('app')?.clientUrl ?? '';
   }
 
-  async execute({ userId }: RegisterPasskeyOptionCommand): Promise<PublicKeyCredentialCreationOptionsJSON> {
+  async execute({ userId, origin }: RegisterPasskeyOptionCommand): Promise<PublicKeyCredentialCreationOptionsJSON> {
     const user = await this.cache.getFromCache<LoginStatusType['user']>({
       identifier: userId,
       prefix: 'user-state',
     });
 
-    const url = new URL(this.clientUrl);
-    const expectedRPID = url.hostname;
+    const expectedRPID = getRpId(origin as string | undefined, this.clientUrl);
 
     const options = await generateRegistrationOptions({
       rpName: 'Autenticator',

@@ -34,7 +34,6 @@ export class LoginCommandsResolver {
     @SecurityContext() security: Security,
     @Context() ctx: express.Response,
   ) {
-    console.log("🚀 ~ LoginCommandsResolver ~ loginUser ~ input:", ctx)
     return this.commandBus.execute<LoginCommand, StatusType>(
       new LoginCommand(input.email, input.password, security, ctx.req.session),
     );

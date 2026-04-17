@@ -32,17 +32,19 @@ export class PasskeyCommandsResolver {
   @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => GraphQLJSON)
   async optionPasskey(@Context() ctx: express.Response) {
+    const origin = ctx.req.headers?.origin;
     return await this.commandBus.execute<PasskeyOptionCommand, PublicKeyCredentialRequestOptionsJSON>(
-      new PasskeyOptionCommand(ctx.req.session),
+      new PasskeyOptionCommand(ctx.req.session, origin),
     );
   }
 
   @Public()
   @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => GraphQLJSON)
-  async registerOptionPasskey(@CurrentUserId() userId: string) {
+  async registerOptionPasskey(@CurrentUserId() userId: string, @Context() ctx: express.Response) {
+    const origin = ctx.req.headers?.origin;
     return await this.commandBus.execute<RegisterPasskeyOptionCommand, PublicKeyCredentialCreationOptionsJSON>(
-      new RegisterPasskeyOptionCommand(userId),
+      new RegisterPasskeyOptionCommand(userId, origin),
     );
   }
 
@@ -53,9 +55,11 @@ export class PasskeyCommandsResolver {
     @Args('data', { type: () => GraphQLJSON }) data: RegistrationResponseJSON,
     @Headers('user-agent') ua: string,
     @CurrentUserId() userId: string,
+    @Context() ctx: express.Response,
   ) {
+    const origin = ctx.req.headers?.origin;
     return await this.commandBus.execute<VerifyRegistrationOptionCommand, StatusType>(
-      new VerifyRegistrationOptionCommand(userId, data, ua),
+      new VerifyRegistrationOptionCommand(userId, data, ua, origin),
     );
   }
 
@@ -66,8 +70,9 @@ export class PasskeyCommandsResolver {
     @Args('data', { type: () => GraphQLJSON }) data: AuthenticationResponseJSON,
     @Context() ctx: express.Response,
   ) {
+    const origin = ctx.req.headers?.origin;
     return await this.commandBus.execute<VerifyPasskeyCommand, StatusType>(
-      new VerifyPasskeyCommand(ctx.req.session, data),
+      new VerifyPasskeyCommand(ctx.req.session, data, origin),
     );
   }
 }

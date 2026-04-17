@@ -16,8 +16,8 @@ export class PasskeyOptionHandler extends Handler<PasskeyOptionCommand, PublicKe
     this.clientUrl = this.configService.get<AppConfig>('app')?.clientUrl ?? '';
   }
 
-  async execute({ session }: PasskeyOptionCommand): Promise<PublicKeyCredentialRequestOptionsJSON> {
-    const options = await generateOption(this.clientUrl ?? '');
+  async execute({ session, origin }: PasskeyOptionCommand): Promise<PublicKeyCredentialRequestOptionsJSON> {
+    const options = await generateOption(origin, this.clientUrl ?? '');
 
     session.currentChallenge = options.challenge;
 

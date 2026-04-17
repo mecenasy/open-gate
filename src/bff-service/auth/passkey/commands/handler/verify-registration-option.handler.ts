@@ -9,6 +9,7 @@ import { StatusType } from 'src/bff-service/auth/login/dto/status.type';
 import { TypeConfigService } from 'src/bff-service/common/configs/types.config.service';
 import { AppConfig } from 'src/bff-service/common/configs/app.configs';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';
+import { getRpId } from '../../helpers/get-rpid';
 
 @CommandHandler(VerifyRegistrationOptionCommand)
 export class VerifyRegistrationOptionHandler extends Handler<
@@ -22,7 +23,7 @@ export class VerifyRegistrationOptionHandler extends Handler<
     this.clientUrl = this.configService.get<AppConfig>('app')?.clientUrl ?? '';
   }
 
-  async execute({ option, userId, ua }: VerifyRegistrationOptionCommand): Promise<StatusType> {
+  async execute({ option, userId, ua, origin }: VerifyRegistrationOptionCommand): Promise<StatusType> {
     const challenge = await this.cache.getFromCache<string>({
       identifier: userId,
       prefix: 'passkey-option',
@@ -32,13 +33,14 @@ export class VerifyRegistrationOptionHandler extends Handler<
       return { status: AuthStatus.logout };
     }
 
-    const url = new URL(this.clientUrl);
-    const expectedRPID = url.hostname;
+    const safeOrigin = origin as string | undefined;
+    const expectedRPID = getRpId(safeOrigin, this.clientUrl);
+    const expectedOrigin = safeOrigin || this.clientUrl;
 
     const verification = await verifyRegistrationResponse({
       response: option,
       expectedChallenge: challenge,
-      expectedOrigin: this.clientUrl,
+      expectedOrigin,
       expectedRPID,
     });
 

@@ -94,7 +94,12 @@
     "removeKeyTitle": "Usuń klucz",
     "removeKeyConfirm": "Czy na pewno chcesz usunąć klucz „{name}\"? Nie będzie już można użyć go do logowania.",
     "cancel": "Anuluj",
-    "remove": "Usuń"
+    "remove": "Usuń",
+    "tabAuth": "Auth",
+    "tabFeature": "Feature",
+    "tabFeatureSettings": "Feature Settings",
+    "tabCommands": "Commands",
+    "tabPrompts": "Prompts"
   },
   "schemas": {
     "codeMin": "Minimum 6 cyfr",

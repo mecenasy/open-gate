@@ -94,7 +94,12 @@
     "removeKeyTitle": "Remove passkey",
     "removeKeyConfirm": "Are you sure you want to remove the passkey \"{name}\"? You won't be able to use it to sign in anymore.",
     "cancel": "Cancel",
-    "remove": "Remove"
+    "remove": "Remove",
+    "tabAuth": "Auth",
+    "tabFeature": "Feature",
+    "tabFeatureSettings": "Feature Settings",
+    "tabCommands": "Commands",
+    "tabPrompts": "Prompts"
   },
   "schemas": {
     "codeMin": "Minimum 6 digits",

@@ -1,11 +1,11 @@
 import { generateAuthenticationOptions } from '@simplewebauthn/server';
+import { getRpId } from './get-rpid';
 
-export const generateOption = async (clientUrl: string) => {
-  const url = new URL(clientUrl);
-  const expectedRPID = url.hostname;
+export const generateOption = async (origin: string | undefined, fallbackUrl: string) => {
+  const rpID = getRpId(origin, fallbackUrl);
 
   return await generateAuthenticationOptions({
-    rpID: expectedRPID,
+    rpID,
     allowCredentials: [],
     userVerification: 'required',
   });

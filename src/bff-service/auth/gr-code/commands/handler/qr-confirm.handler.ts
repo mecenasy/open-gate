@@ -42,7 +42,7 @@ export class QrConfirmHandler extends Handler<QrConfirmCommand, StatusType, Pass
     }
     const clientUrl = this.configService.get<AppConfig>('app')?.clientUrl ?? '';
 
-    const verify = await verification(response, clientUrl, result.optionChallenge ?? '', passkey);
+    const verify = await verification(response, undefined, clientUrl, result.optionChallenge ?? '', passkey);
 
     await lastValueFrom(
       this.gRpcService.setCounter({

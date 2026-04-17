@@ -10,6 +10,7 @@ import { GateGrpcKey } from '@app/gate-grpc';
 import type { ClientGrpc } from '@nestjs/microservices';
 import { INCOMING_NOTIFY_SERVICE_NAME, IncomingNotifyServiceClient } from 'src/proto/notify';
 import { PlatformConfigService } from '../../../platform-config/platform-config.service';
+import type { SignalCredentials } from '../../../platform-config/platform-config.service';
 
 type Message = UnifiedMessage<SignalMessage>;
 
@@ -40,8 +41,8 @@ export class SignalAttachment extends Attachment implements OnModuleInit {
       }
 
       const config = tenantId
-        ? await this.platformConfigService.getConfig(tenantId, 'signal')
-        : this.platformConfigService.envFallback('signal');
+        ? await this.platformConfigService.getConfig<'signal'>(tenantId, 'signal')
+        : (this.platformConfigService.envFallback('signal') as SignalCredentials | null);
 
       const baseUrl = config?.apiUrl ?? 'http://signal_bridge:8080';
 

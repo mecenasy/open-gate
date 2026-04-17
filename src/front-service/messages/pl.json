@@ -178,6 +178,37 @@
     "saving": "Zapisywanie…",
     "cancel": "Anuluj"
   },
+  "fetcherSettings": {
+    "empty": "Brak aktywnych platform.",
+    "defaultBadge": "domyślna",
+    "modalTitle": "Konfiguruj: {platform}",
+    "save": "Zapisz",
+    "saving": "Zapisywanie…",
+    "cancel": "Anuluj",
+    "platforms": {
+      "signal": "Signal",
+      "sms": "SMS",
+      "smtp": "Email (SMTP)",
+      "whatsapp": "WhatsApp",
+      "messenger": "Messenger"
+    },
+    "fields": {
+      "apiUrl": "Adres API",
+      "account": "Konto",
+      "sid": "SID konta",
+      "token": "Token autoryzacyjny",
+      "phone": "Numer telefonu",
+      "host": "Host SMTP",
+      "port": "Port",
+      "user": "Nazwa użytkownika",
+      "password": "Hasło",
+      "from": "Adres nadawcy",
+      "phoneNumberId": "ID numeru telefonu",
+      "accessToken": "Token dostępu",
+      "pageAccessToken": "Token dostępu do strony",
+      "pageId": "ID strony"
+    }
+  },
   "validation": {
     "emailInvalid": "Nieprawidłowy adres e-mail",
     "passwordMin": "Minimum 8 znaków",
@@ -191,5 +222,40 @@
     "phoneInvalid": "Nieprawidłowy numer telefonu",
     "slugInvalid": "Tylko małe litery, cyfry i myślniki",
     "slugMin": "Minimum 3 znaki"
+  },
+  "tenantFeatures": {
+    "empty": "Brak dostępnych funkcji.",
+    "enableSignal": {
+      "title": "Signal",
+      "description": "Włącz komunikację przez kanał Signal."
+    },
+    "enableWhatsApp": {
+      "title": "WhatsApp",
+      "description": "Włącz komunikację przez WhatsApp."
+    },
+    "enableMessenger": {
+      "title": "Messenger",
+      "description": "Włącz komunikację przez Facebook Messenger."
+    },
+    "enableGate": {
+      "title": "Gate",
+      "description": "Włącz moduł bramki dostępu."
+    },
+    "enablePayment": {
+      "title": "Płatności",
+      "description": "Włącz obsługę płatności w platformie."
+    },
+    "enableCommandScheduling": {
+      "title": "Harmonogramowanie komend",
+      "description": "Pozwól na planowanie komend z opóźnieniem lub według harmonogramu."
+    },
+    "enableAnalytics": {
+      "title": "Analityka",
+      "description": "Włącz zbieranie i podgląd danych analitycznych."
+    },
+    "enableAudioRecognition": {
+      "title": "Rozpoznawanie audio",
+      "description": "Włącz rozpoznawanie mowy i przetwarzanie dźwięku."
+    }
   }
 }

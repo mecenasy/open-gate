@@ -28,7 +28,7 @@ export class QrOptionHandler extends Handler<QrOptionCommand, PublicKeyCredentia
       throw new BadRequestException('Wrong challenge.');
     }
 
-    const options = await generateOption(this.configService.get<AppConfig>('app')?.clientUrl ?? '');
+    const options = await generateOption(undefined, this.configService.get<AppConfig>('app')?.clientUrl ?? '');
 
     session.currentChallenge = result.challenge;
 

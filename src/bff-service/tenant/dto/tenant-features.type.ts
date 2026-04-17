@@ -23,6 +23,9 @@ export class TenantFeaturesType {
   @Field()
   enableAnalytics!: boolean;
 
+  @Field()
+  enableAudioRecognition!: boolean;
+
   @Field(() => Int)
   maxUsersPerTenant!: number;
 }

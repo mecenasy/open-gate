@@ -3,8 +3,18 @@ import type { ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { DbGrpcKey } from '@app/db-grpc';
 import { TENANT_SERVICE_NAME, TenantServiceClient } from 'src/proto/tenant';
-import type { CreateTenantResult, MutationResult, TenantType } from './dto/tenant-admin.types';
-import type { TenantCommandConfigType, TenantPromptOverrideType } from './dto/tenant-admin.types';
+import type {
+  CreateTenantResult,
+  MutationResult,
+  TenantType,
+  UpdateTenantFeaturesInput,
+} from './dto/tenant-admin.types';
+import type {
+  TenantCommandConfigType,
+  TenantPromptOverrideType,
+  TenantPlatformCredentialType,
+} from './dto/tenant-admin.types';
+import type { CommunityCustomization } from '@app/customization';
 
 @Injectable()
 export class TenantAdminService implements OnModuleInit {
@@ -31,9 +41,37 @@ export class TenantAdminService implements OnModuleInit {
     }));
   }
 
+  async updateFeatures(
+    tenantId: string,
+    current: CommunityCustomization,
+    input: UpdateTenantFeaturesInput,
+  ): Promise<MutationResult> {
+    const updated: CommunityCustomization = {
+      ...current,
+      features: {
+        ...current.features,
+        ...(input.enableSignal !== undefined && { enableSignal: input.enableSignal }),
+        ...(input.enableWhatsApp !== undefined && { enableWhatsApp: input.enableWhatsApp }),
+        ...(input.enableMessenger !== undefined && { enableMessenger: input.enableMessenger }),
+        ...(input.enableGate !== undefined && { enableGate: input.enableGate }),
+        ...(input.enablePayment !== undefined && { enablePayment: input.enablePayment }),
+        ...(input.enableCommandScheduling !== undefined && { enableCommandScheduling: input.enableCommandScheduling }),
+        ...(input.enableAnalytics !== undefined && { enableAnalytics: input.enableAnalytics }),
+        ...(input.enableAudioRecognition !== undefined && { enableAudioRecognition: input.enableAudioRecognition }),
+        ...(input.maxUsersPerTenant !== undefined && { maxUsersPerTenant: input.maxUsersPerTenant }),
+      },
+    };
+    return this.updateCustomization(tenantId, JSON.stringify(updated));
+  }
+
   async updateCustomization(tenantId: string, customizationJson: string): Promise<MutationResult> {
     const res = await lastValueFrom(this.tenantGrpcService.updateCustomization({ tenantId, customizationJson }));
     return { status: res.status, message: res.message };
+  }
+
+  async getTenantPlatformCredentials(tenantId: string): Promise<TenantPlatformCredentialType[]> {
+    const res = await lastValueFrom(this.tenantGrpcService.getAllPlatformCredentials({ tenantId }));
+    return res.items.map((i) => ({ platform: i.platform, configJson: i.configJson, isDefault: i.isDefault }));
   }
 
   async upsertPlatformCredentials(tenantId: string, platform: string, configJson: string): Promise<MutationResult> {

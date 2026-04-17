@@ -1,4 +1,4 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 
 @InputType()
 export class CreateTenantInput {
@@ -63,6 +63,61 @@ export class MutationResult {
 
   @Field()
   message!: string;
+}
+
+// ─── Tenant platform credentials ──────────────────────────────────────────────
+
+@ObjectType()
+export class TenantPlatformCredentialType {
+  @Field()
+  platform!: string;
+
+  @Field()
+  configJson!: string;
+
+  @Field()
+  isDefault!: boolean;
+}
+
+@InputType()
+export class UpdateMyPlatformCredentialsInput {
+  @Field()
+  platform!: string;
+
+  @Field()
+  configJson!: string;
+}
+
+// ─── Tenant features update ───────────────────────────────────────────────────
+
+@InputType()
+export class UpdateTenantFeaturesInput {
+  @Field({ nullable: true })
+  enableSignal?: boolean;
+
+  @Field({ nullable: true })
+  enableWhatsApp?: boolean;
+
+  @Field({ nullable: true })
+  enableMessenger?: boolean;
+
+  @Field({ nullable: true })
+  enableGate?: boolean;
+
+  @Field({ nullable: true })
+  enablePayment?: boolean;
+
+  @Field({ nullable: true })
+  enableCommandScheduling?: boolean;
+
+  @Field({ nullable: true })
+  enableAnalytics?: boolean;
+
+  @Field({ nullable: true })
+  enableAudioRecognition?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  maxUsersPerTenant?: number;
 }
 
 // ─── Tenant command config ────────────────────────────────────────────────────

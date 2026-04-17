@@ -20,6 +20,8 @@ export class UserStatusType {
 
   @Field()
   isAdaptiveLoginEnabled!: boolean;
+
+  tenantId?: string;
 }
 
 @ObjectType()

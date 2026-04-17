@@ -3,24 +3,26 @@
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Toggle } from '@/components/ui';
-import { useCoreConfigs } from '@/hooks/use-core-configs';
+import { useTenantFeatures } from '@/hooks/use-tenant-features';
+import type { TenantFeatureKey } from '@/hooks/use-tenant-features';
 import configIcon from '@/assets/config.svg';
 
-interface ConfigCardProps {
-  configKey: string;
+interface FeatureCardProps {
+  featureKey: TenantFeatureKey;
+  title: string;
   description: string;
   checked: boolean;
   disabled: boolean;
   onChange: () => void;
 }
 
-function ConfigCard({ configKey, description, checked, disabled, onChange }: ConfigCardProps) {
+function FeatureCard({ title, description, checked, disabled, onChange }: FeatureCardProps) {
   return (
     <div className="flex items-center justify-between gap-6 p-5 bg-surface border border-border rounded-2xl">
       <div className="flex items-start gap-4">
         <Image src={configIcon} alt="" width={22} height={22} className="nav-icon mt-0.5 shrink-0" unoptimized />
         <div>
-          <p className="text-sm font-semibold text-text">{configKey}</p>
+          <p className="text-sm font-semibold text-text">{title}</p>
           <p className="text-xs text-muted mt-1 max-w-sm leading-relaxed">{description}</p>
         </div>
       </div>
@@ -29,26 +31,38 @@ function ConfigCard({ configKey, description, checked, disabled, onChange }: Con
   );
 }
 
+const FEATURE_KEYS: TenantFeatureKey[] = [
+  'enableSignal',
+  'enableWhatsApp',
+  'enableMessenger',
+  'enableGate',
+  'enablePayment',
+  'enableCommandScheduling',
+  'enableAnalytics',
+  'enableAudioRecognition',
+];
+
 export function FeatureTab() {
-  const t = useTranslations('coreConfig');
-  const { configs, isLoading, toggleConfig, pendingKeys } = useCoreConfigs();
+  const t = useTranslations('tenantFeatures');
+  const { features, isLoading, toggleFeature, pendingKeys } = useTenantFeatures();
 
   return (
     <div className="max-w-2xl mx-auto relative">
-      {configs.length === 0 && !isLoading ? (
+      {!features && !isLoading ? (
         <div className="p-5 bg-surface border border-border rounded-2xl text-center text-sm text-muted">
           {t('empty')}
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {configs.map((cfg) => (
-            <ConfigCard
-              key={cfg.key}
-              configKey={cfg.key}
-              description={cfg.description}
-              checked={cfg.value === 'true'}
-              disabled={pendingKeys.has(cfg.key)}
-              onChange={() => toggleConfig(cfg.key, cfg.value)}
+          {FEATURE_KEYS.map((key) => (
+            <FeatureCard
+              key={key}
+              featureKey={key}
+              title={t(`${key}.title` as Parameters<typeof t>[0])}
+              description={t(`${key}.description` as Parameters<typeof t>[0])}
+              checked={features ? Boolean(features[key]) : false}
+              disabled={pendingKeys.has(key)}
+              onChange={() => features && toggleFeature(key, Boolean(features[key]))}
             />
           ))}
         </div>

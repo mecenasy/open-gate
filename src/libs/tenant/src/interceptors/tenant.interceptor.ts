@@ -1,15 +1,19 @@
-import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor, Optional } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { Observable } from 'rxjs';
+import { from, Observable, switchMap } from 'rxjs';
 import type { Request } from 'express';
 import { TenantService } from '../tenant.service';
 import { TenantContext, TenantResolutionSource } from '../tenant.types';
+import { CacheService } from '@app/redis';
 
 @Injectable()
 export class TenantInterceptor implements NestInterceptor {
   private readonly logger = new Logger(TenantInterceptor.name);
 
-  constructor(private readonly tenantService: TenantService) {}
+  constructor(
+    private readonly tenantService: TenantService,
+    @Optional() private readonly cacheService?: CacheService,
+  ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = this.extractRequest(context);
@@ -18,14 +22,29 @@ export class TenantInterceptor implements NestInterceptor {
       return next.handle();
     }
 
-    const tenantContext = this.resolveTenant(request);
+    const syncContext = this.resolveTenantSync(request);
 
-    if (!tenantContext) {
+    if (syncContext) {
+      request.tenantContext = syncContext;
+      return this.runInContext(syncContext, next);
+    }
+
+    // Fallback: resolve tenant from cached user state when only user_id is in session
+    const userId = request.session?.user_id;
+    if (!userId || !this.cacheService) {
       return next.handle();
     }
 
-    request.tenantContext = tenantContext;
+    return from(this.resolveTenantFromCache(userId, request)).pipe(
+      switchMap((tenantContext) => {
+        if (!tenantContext) return next.handle();
+        request.tenantContext = tenantContext;
+        return this.runInContext(tenantContext, next);
+      }),
+    );
+  }
 
+  private runInContext(tenantContext: TenantContext, next: CallHandler): Observable<unknown> {
     return new Observable((subscriber) => {
       this.tenantService.runInContext(tenantContext, () => {
         next.handle().subscribe({
@@ -35,6 +54,27 @@ export class TenantInterceptor implements NestInterceptor {
         });
       });
     });
+  }
+
+  private async resolveTenantFromCache(userId: string, request: Request): Promise<TenantContext | null> {
+    try {
+      const userState = await this.cacheService!.getFromCache<{ tenantId?: string }>({
+        identifier: userId,
+        prefix: 'user-state',
+      });
+      if (!userState?.tenantId) return null;
+      const correlationId = (request.headers['x-correlation-id'] as string) ?? crypto.randomUUID();
+      return {
+        tenantId: userState.tenantId,
+        tenantSlug: '',
+        schemaName: `tenant_${userState.tenantId.replace(/-/g, '')}`,
+        correlationId,
+        resolutionSource: TenantResolutionSource.SESSION,
+        userId,
+      };
+    } catch {
+      return null;
+    }
   }
 
   private extractRequest(context: ExecutionContext): Request | null {
@@ -53,7 +93,7 @@ export class TenantInterceptor implements NestInterceptor {
     }
   }
 
-  private resolveTenant(request: Request): TenantContext | null {
+  private resolveTenantSync(request: Request): TenantContext | null {
     const correlationId = (request.headers['x-correlation-id'] as string) ?? crypto.randomUUID();
 
     // 1. Session: set after login

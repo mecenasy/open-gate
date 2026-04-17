@@ -46,7 +46,7 @@ export function Button({
       onMouseUp={() => !disabled && api.start({ scale: 1.04 })}
       disabled={disabled}
       className={[
-        'rounded-lg font-medium shadow-lg transition-colors cursor-pointer',
+        'rounded-lg font-medium shadow-md transition-colors cursor-pointer',
         'disabled:opacity-40 disabled:cursor-not-allowed',
         variantClasses[variant],
         sizeClasses[size],

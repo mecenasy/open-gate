@@ -21,6 +21,7 @@ export class OwnerGuard implements CanActivate {
       identifier: userId,
       prefix: 'user-state',
     });
+    console.log('🚀 ~ OwnerGuard ~ canActivate ~ userState:', userState);
 
     if (!userState?.owner) {
       throw new ForbiddenException('Access denied: owner role required');

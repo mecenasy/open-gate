@@ -7,6 +7,7 @@ service TenantService {
   rpc GetTenant (GetTenantRequest) returns (GetTenantResponse);
   rpc GetPlatformCredentials (GetPlatformCredentialsRequest) returns (GetPlatformCredentialsResponse);
   rpc GetTenantsWithPlatform (GetTenantsWithPlatformRequest) returns (GetTenantsWithPlatformResponse);
+  rpc GetAllPlatformCredentials (GetAllPlatformCredentialsRequest) returns (GetAllPlatformCredentialsResponse);
   rpc CreateTenant (CreateTenantRequest) returns (CreateTenantResponse);
   rpc GetAllTenants (GetAllTenantsRequest) returns (GetAllTenantsResponse);
   rpc UpdateCustomization (UpdateCustomizationRequest) returns (UpdateCustomizationResponse);
@@ -50,6 +51,23 @@ message GetPlatformCredentialsResponse {
   bool status = 1;
   string message = 2;
   string config_json = 3;
+  bool is_default = 4;
+}
+
+message PlatformCredentialItem {
+  string platform = 1;
+  string config_json = 2;
+  bool is_default = 3;
+}
+
+message GetAllPlatformCredentialsRequest {
+  string tenant_id = 1;
+}
+
+message GetAllPlatformCredentialsResponse {
+  bool status = 1;
+  string message = 2;
+  repeated PlatformCredentialItem items = 3;
 }
 
 message TenantPlatformEntry {

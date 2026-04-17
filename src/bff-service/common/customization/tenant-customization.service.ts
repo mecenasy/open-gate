@@ -37,7 +37,12 @@ export class TenantCustomizationService implements OnModuleInit {
       if (!response.status || !response.customizationJson) {
         return DEFAULT_CUSTOMIZATION;
       }
-      const data = JSON.parse(response.customizationJson) as CommunityCustomization;
+      const parsed = JSON.parse(response.customizationJson) as CommunityCustomization;
+      const data: CommunityCustomization = {
+        ...DEFAULT_CUSTOMIZATION,
+        ...parsed,
+        features: { ...DEFAULT_CUSTOMIZATION.features, ...parsed.features },
+      };
       this.cache.set(tenantId, { data, expiresAt: Date.now() + this.ttlMs });
       return data;
     } catch {

@@ -1,5 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
+import { TenantService } from '@app/tenant';
 import { TenantCustomizationService } from '../common/customization/tenant-customization.service';
 import { OwnerGuard } from '../common/guards/owner.guard';
 import { TenantAdminService } from './tenant-admin.service';
@@ -9,9 +10,12 @@ import {
   CreateTenantResult,
   MutationResult,
   TenantCommandConfigType,
+  TenantPlatformCredentialType,
   TenantPromptOverrideType,
   TenantType,
   UpdateCustomizationInput,
+  UpdateMyPlatformCredentialsInput,
+  UpdateTenantFeaturesInput,
   UpsertPlatformCredentialsInput,
   UpsertTenantCommandConfigInput,
   UpsertTenantPromptOverrideInput,
@@ -20,6 +24,7 @@ import {
 @Resolver('Tenant')
 export class TenantResolver {
   constructor(
+    private readonly tenantService: TenantService,
     private readonly customizationService: TenantCustomizationService,
     private readonly tenantAdminService: TenantAdminService,
   ) {}
@@ -30,6 +35,28 @@ export class TenantResolver {
   async tenantFeatures(): Promise<TenantFeaturesType> {
     const customization = await this.customizationService.getForCurrentTenant();
     return customization.features;
+  }
+
+  @UseGuards(OwnerGuard)
+  @Query(() => [TenantPlatformCredentialType])
+  async tenantPlatformCredentials(): Promise<TenantPlatformCredentialType[]> {
+    const { tenantId } = this.tenantService.getContextOrThrow();
+    const customization = await this.customizationService.getForTenant(tenantId);
+    const all = await this.tenantAdminService.getTenantPlatformCredentials(tenantId);
+    const ALWAYS_SHOWN = new Set(['sms', 'smtp']);
+    const featureMap: Record<string, boolean> = {
+      signal: customization.features.enableSignal,
+      whatsapp: customization.features.enableWhatsApp,
+      messenger: customization.features.enableMessenger,
+    };
+    return all.filter((p) => ALWAYS_SHOWN.has(p.platform) || featureMap[p.platform]);
+  }
+
+  @UseGuards(OwnerGuard)
+  @Mutation(() => MutationResult)
+  async updateMyPlatformCredentials(@Args('input') input: UpdateMyPlatformCredentialsInput): Promise<MutationResult> {
+    const { tenantId } = this.tenantService.getContextOrThrow();
+    return this.tenantAdminService.upsertPlatformCredentials(tenantId, input.platform, input.configJson);
   }
 
   // ── Owner-only ──────────────────────────────────────────────────────────────
@@ -44,6 +71,16 @@ export class TenantResolver {
   @Mutation(() => CreateTenantResult)
   async createTenant(@Args('input') input: CreateTenantInput): Promise<CreateTenantResult> {
     return this.tenantAdminService.createTenant(input.slug);
+  }
+
+  @UseGuards(OwnerGuard)
+  @Mutation(() => MutationResult)
+  async updateTenantFeatures(@Args('input') input: UpdateTenantFeaturesInput): Promise<MutationResult> {
+    const { tenantId } = this.tenantService.getContextOrThrow();
+    const current = await this.customizationService.getForTenant(tenantId);
+    const result = await this.tenantAdminService.updateFeatures(tenantId, current, input);
+    this.customizationService.invalidate(tenantId);
+    return result;
   }
 
   @UseGuards(OwnerGuard)

@@ -12,6 +12,16 @@ service OutgoingNotifyService {
   rpc SendMessage (OutgoingNotifyRequest) returns (NotifyAck);
   rpc SendVerificationCode (SendVerificationCodeRequest) returns (NotifyAck);
   rpc SendToken (SendTokenRequest) returns (NotifyAck);
+
+    // TODO
+  // rpc GetGroups (GetGroupsRequest) returns (GetGroupsResponse);
+  // rpc GetContacts (GetContactsRequest) returns (GetContactsResponse);
+  // rpc GetGroupMembers (GetGroupMembersRequest) returns (GetGroupMembersResponse);
+ //  rpc CreateGroup() returns (NotifyAck);
+  // rpc AddMemberToGroup() returns (NotifyAsk);
+  // rpc RemoveMemberFromGroup() returns (NotifyAck);
+  // rpc RemoveGroup() returns (NotifyAck);
+  // rpc //
 }
 
 // Full SignalMessage serialized as JSON — preserves the complete, unmodified structure

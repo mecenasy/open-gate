@@ -22,14 +22,12 @@ export class SmsVerificationCodePlatform extends VerificationCodePlatform {
   }
 
   async send({ phoneNumber }: { phoneNumber?: string; email?: string }, code: number): Promise<void> {
-    console.log("🚀 ~ SmsVerificationCodePlatform ~ send ~ phoneNumber:", phoneNumber)
     if (!phoneNumber) {
       this.logger.warn('SMS platform: phoneNumber is missing, skipping.');
       return;
     }
 
     const config = await this.resolveConfig();
-    console.log('🚀 ~ SmsVerificationCodePlatform ~ send ~ config:', config);
     if (!config) {
       this.logger.warn(`No SMS config for tenant, skipping send to ${phoneNumber}`);
       return;

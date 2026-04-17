@@ -215,6 +215,7 @@ type TenantFeaturesType {
   enablePayment: Boolean!
   enableCommandScheduling: Boolean!
   enableAnalytics: Boolean!
+  enableAudioRecognition: Boolean!
   maxUsersPerTenant: Int!
 }
 
@@ -234,6 +235,12 @@ type CreateTenantResult {
 type MutationResult {
   status: Boolean!
   message: String!
+}
+
+type TenantPlatformCredentialType {
+  platform: String!
+  configJson: String!
+  isDefault: Boolean!
 }
 
 type TenantCommandConfigType {
@@ -270,6 +277,7 @@ type Query {
   featureConfigs: ConfigsListType!
   featureConfig(input: GetFeatureConfigType!): ConfigsListType!
   tenantFeatures: TenantFeaturesType!
+  tenantPlatformCredentials: [TenantPlatformCredentialType!]!
   tenants: [TenantType!]!
   tenantCommandConfigs(tenantId: String!): [TenantCommandConfigType!]!
   tenantPromptOverrides(tenantId: String!): [TenantPromptOverrideType!]!
@@ -366,7 +374,9 @@ type Mutation {
   toggleActiveStatus(input: ToggleActiveStatusType!): CommandResponseType!
   removeCommand(input: RemoveCommandType!): CommandResponseType!
   updateConfig(input: UpdateConfigType!): ConfigResponseType!
+  updateMyPlatformCredentials(input: UpdateMyPlatformCredentialsInput!): MutationResult!
   createTenant(input: CreateTenantInput!): CreateTenantResult!
+  updateTenantFeatures(input: UpdateTenantFeaturesInput!): MutationResult!
   updateTenantCustomization(input: UpdateCustomizationInput!): MutationResult!
   upsertPlatformCredentials(input: UpsertPlatformCredentialsInput!): MutationResult!
   upsertTenantCommandConfig(input: UpsertTenantCommandConfigInput!): MutationResult!
@@ -503,8 +513,25 @@ input UpdateConfigType {
   value: String!
 }
 
+input UpdateMyPlatformCredentialsInput {
+  platform: String!
+  configJson: String!
+}
+
 input CreateTenantInput {
   slug: String!
+}
+
+input UpdateTenantFeaturesInput {
+  enableSignal: Boolean
+  enableWhatsApp: Boolean
+  enableMessenger: Boolean
+  enableGate: Boolean
+  enablePayment: Boolean
+  enableCommandScheduling: Boolean
+  enableAnalytics: Boolean
+  enableAudioRecognition: Boolean
+  maxUsersPerTenant: Int
 }
 
 input UpdateCustomizationInput {

@@ -44,20 +44,16 @@ export class RequestLoggingMiddleware implements NestMiddleware {
 
       // Log outgoing response
       const logFn = statusCode >= 400 ? 'warn' : 'log';
-      logger[logFn](
-        `[${method}] ${originalUrl} - ${statusCode}`,
-        {
-          method,
-          path: req.path,
-          statusCode,
-          duration: `${duration}ms`,
-          ip,
-          userAgent,
-          userId: req.user?.id,
-          contentLength: res.get('content-length'),
-        },
-        'outgoing-response',
-      );
+      logger[logFn](`[${method}] ${originalUrl} - ${statusCode}`, {
+        method,
+        path: req.path,
+        statusCode,
+        duration: `${duration}ms`,
+        ip,
+        userAgent,
+        userId: req.user?.id,
+        contentLength: res.get('content-length'),
+      });
 
       // Call original send
       res.send = originalSend;

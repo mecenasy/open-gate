@@ -178,6 +178,37 @@
     "saving": "Saving…",
     "cancel": "Cancel"
   },
+  "fetcherSettings": {
+    "empty": "No active platforms.",
+    "defaultBadge": "default",
+    "modalTitle": "Configure: {platform}",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "platforms": {
+      "signal": "Signal",
+      "sms": "SMS",
+      "smtp": "Email (SMTP)",
+      "whatsapp": "WhatsApp",
+      "messenger": "Messenger"
+    },
+    "fields": {
+      "apiUrl": "API URL",
+      "account": "Account",
+      "sid": "Account SID",
+      "token": "Auth Token",
+      "phone": "Phone number",
+      "host": "SMTP host",
+      "port": "Port",
+      "user": "Username",
+      "password": "Password",
+      "from": "From address",
+      "phoneNumberId": "Phone number ID",
+      "accessToken": "Access token",
+      "pageAccessToken": "Page access token",
+      "pageId": "Page ID"
+    }
+  },
   "validation": {
     "emailInvalid": "Invalid email address",
     "passwordMin": "Minimum 8 characters",
@@ -191,5 +222,40 @@
     "phoneInvalid": "Invalid phone number",
     "slugInvalid": "Only lowercase letters, numbers and hyphens",
     "slugMin": "Minimum 3 characters"
+  },
+  "tenantFeatures": {
+    "empty": "No features available.",
+    "enableSignal": {
+      "title": "Signal",
+      "description": "Enable communication via the Signal channel."
+    },
+    "enableWhatsApp": {
+      "title": "WhatsApp",
+      "description": "Enable communication via WhatsApp."
+    },
+    "enableMessenger": {
+      "title": "Messenger",
+      "description": "Enable communication via Facebook Messenger."
+    },
+    "enableGate": {
+      "title": "Gate",
+      "description": "Enable the access gate module."
+    },
+    "enablePayment": {
+      "title": "Payments",
+      "description": "Enable payment processing within the platform."
+    },
+    "enableCommandScheduling": {
+      "title": "Command Scheduling",
+      "description": "Allow scheduling commands with a delay or on a recurring schedule."
+    },
+    "enableAnalytics": {
+      "title": "Analytics",
+      "description": "Enable collection and viewing of analytics data."
+    },
+    "enableAudioRecognition": {
+      "title": "Audio Recognition",
+      "description": "Enable speech recognition and audio processing."
+    }
   }
 }

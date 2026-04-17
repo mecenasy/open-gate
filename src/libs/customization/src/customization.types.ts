@@ -16,6 +16,7 @@ export interface CommunityCustomizationFeatures {
   enablePayment: boolean;
   enableCommandScheduling: boolean;
   enableAnalytics: boolean;
+  enableAudioRecognition: boolean;
   maxUsersPerTenant: number;
 }
 
@@ -65,6 +66,7 @@ export const DEFAULT_CUSTOMIZATION: CommunityCustomization = {
     enablePayment: true,
     enableCommandScheduling: true,
     enableAnalytics: true,
+    enableAudioRecognition: false,
     maxUsersPerTenant: 1000,
   },
   messaging: {

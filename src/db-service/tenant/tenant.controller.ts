@@ -10,6 +10,8 @@ import {
   GetPlatformCredentialsResponse,
   GetTenantsWithPlatformRequest,
   GetTenantsWithPlatformResponse,
+  GetAllPlatformCredentialsRequest,
+  GetAllPlatformCredentialsResponse,
   CreateTenantRequest,
   CreateTenantResponse,
   GetAllTenantsResponse,
@@ -73,14 +75,26 @@ export class TenantController implements TenantServiceController {
     tenantId,
     platform,
   }: GetPlatformCredentialsRequest): Promise<GetPlatformCredentialsResponse> {
-    const creds = await this.platformCredentialsService.findByTenantAndPlatform(tenantId, platform);
-    if (!creds) {
-      return { status: false, message: 'No credentials found', configJson: '' };
+    const found = await this.platformCredentialsService.findByTenantAndPlatform(tenantId, platform);
+    if (!found) {
+      return { status: false, message: 'No credentials found', configJson: '', isDefault: false };
     }
     return {
       status: true,
       message: 'Credentials retrieved',
-      configJson: JSON.stringify(creds.config),
+      configJson: JSON.stringify(found.creds.config),
+      isDefault: found.isDefault,
+    };
+  }
+
+  async getAllPlatformCredentials({
+    tenantId,
+  }: GetAllPlatformCredentialsRequest): Promise<GetAllPlatformCredentialsResponse> {
+    const items = await this.platformCredentialsService.findAllForTenant(tenantId);
+    return {
+      status: true,
+      message: 'OK',
+      items: items.map((i) => ({ platform: i.platform, configJson: JSON.stringify(i.config), isDefault: i.isDefault })),
     };
   }
 

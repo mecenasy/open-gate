@@ -12,7 +12,7 @@ import settingsIcon from '@/assets/settings.svg';
 
 export function AuthNav() {
   const pathname = usePathname();
-  const { isAuthenticated, isLoading, isOwner, logout } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
   const t = useTranslations('nav');
 
   if (isLoading) {
@@ -28,32 +28,6 @@ export function AuthNav() {
         >
           {t('users')}
         </Link>
-        <Link
-          href="/prompts"
-          className="text-text text-sm font-medium hover:opacity-80 transition-opacity"
-        >
-          {t('prompts')}
-        </Link>
-        <Link
-          href="/commands"
-          className="text-text text-sm font-medium hover:opacity-80 transition-opacity"
-        >
-          {t('commands')}
-        </Link>
-        <Link
-          href="/feature-config"
-          className="text-text text-sm font-medium hover:opacity-80 transition-opacity"
-        >
-          {t('featureConfig')}
-        </Link>
-        {isOwner && (
-          <Link
-            href="/core-config"
-            className="text-text text-sm font-medium hover:opacity-80 transition-opacity"
-          >
-            {t('coreConfig')}
-          </Link>
-        )}
         <NavIconLink href="/settings" icon={settingsIcon} alt="Settings" active={pathname === '/settings'} />
         <NavIconButton onClick={logout} icon={logoutIcon} alt="Logout" />
       </>

@@ -29,8 +29,15 @@ export class LoginCommandsResolver {
   @Public()
   @Throttle({ auth: { limit: 5, ttl: 60000 } })
   @Mutation(() => StatusType)
-  async loginUser(@Args('input') input: LoginType, @SecurityContext() security: Security) {
-    return this.commandBus.execute<LoginCommand, StatusType>(new LoginCommand(input.email, input.password, security));
+  async loginUser(
+    @Args('input') input: LoginType,
+    @SecurityContext() security: Security,
+    @Context() ctx: express.Response,
+  ) {
+    console.log("🚀 ~ LoginCommandsResolver ~ loginUser ~ input:", ctx)
+    return this.commandBus.execute<LoginCommand, StatusType>(
+      new LoginCommand(input.email, input.password, security, ctx.req.session),
+    );
   }
 
   @Throttle({ auth: { limit: 5, ttl: 60000 } })

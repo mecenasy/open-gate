@@ -14,13 +14,11 @@ export class LoginService {
 
   async login(email: string, password: string): Promise<LoginResponse> {
     const user = await this.userService.findUserWithPassword(email);
-    console.log('🚀 ~ LoginService ~ login ~ user:', user);
     if (!user || !user.password) {
       return { success: false, message: 'Unknown user' };
     }
 
     const role = user.userRole?.userType;
-    console.log('🚀 ~ LoginService ~ login ~ role:', role);
     if (role !== UserType.Owner && role !== UserType.SuperUser) {
       return { success: false, message: 'Access denied' };
     }

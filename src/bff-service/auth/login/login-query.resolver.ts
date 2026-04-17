@@ -1,5 +1,6 @@
-import { Resolver, Query, Args } from '@nestjs/graphql';
+import { Resolver, Query, Args, Context } from '@nestjs/graphql';
 import { QueryBus } from '@nestjs/cqrs';
+import express from 'express';
 import { StatusAuthQuery } from './queries/impl/status-auth.query';
 import { LoginStatusType } from './dto/login-status.tape';
 import { VerifyTokenQuery } from './queries/impl/verify-token.query';
@@ -13,7 +14,6 @@ export class LoginQueriesResolver {
   @Public()
   @Query(() => LoginStatusType)
   async loginStatus(@CurrentUserId() userId: string) {
-    console.log("🚀 ~ LoginQueriesResolver ~ loginStatus ~ userId:", userId)
     return this.queryBus.execute<StatusAuthQuery, LoginStatusType>(new StatusAuthQuery(userId));
   }
 

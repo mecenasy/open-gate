@@ -9,6 +9,7 @@ import { RiskService } from 'src/bff-service/auth/risk/risk.service';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';
 import { LoginCache } from 'src/bff-service/auth/types/cache-data';
 import { SendVerifyCodeEvent } from 'src/bff-service/notify/common/dto/send-verify-code.event';
+import { saveSession } from 'src/bff-service/auth/helpers/save-session';
 
 @CommandHandler(LoginCommand)
 export class LoginHandler extends Handler<LoginCommand, StatusType, LoginProxyServiceClient> {
@@ -19,7 +20,7 @@ export class LoginHandler extends Handler<LoginCommand, StatusType, LoginProxySe
     super(LOGIN_PROXY_SERVICE_NAME);
   }
 
-  async execute({ email, password, security }: LoginCommand) {
+  async execute({ email, password, security, session }: LoginCommand) {
     const user = await lastValueFrom(
       this.gRpcService.login({
         email,
@@ -40,6 +41,8 @@ export class LoginHandler extends Handler<LoginCommand, StatusType, LoginProxySe
       const risk = await this.riskService.calculateRisk(user.userId ?? '', user.history, security);
 
       if (risk.score <= 40) {
+        session.user_id = user.userId;
+        await saveSession(session, this.logger);
         return { status: AuthStatus.login, score: risk.score };
       }
     }
@@ -48,12 +51,20 @@ export class LoginHandler extends Handler<LoginCommand, StatusType, LoginProxySe
       return { status: AuthStatus.tfa };
     }
 
+    if (!user.userId) {
+      this.logger.error(`Missing userId after successful login for: ${email}`);
+      return { status: AuthStatus.logout, message: 'Authentication error' };
+    }
+
     const code = this.otpService.generateOtp();
 
     await this.cache.saveInCache<LoginCache>({
       identifier: email,
-      data: { code, userId: user.userId ?? '' },
+      data: { code, userId: user.userId },
     });
+
+    session.mfa_pending = email;
+    await saveSession(session, this.logger);
 
     this.event.emit(new SendVerifyCodeEvent(user.phone ?? '', email, code));
 

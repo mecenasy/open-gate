@@ -6,15 +6,14 @@ import { StatusType } from '../../dto/status.type';
 import { LoginStatusType } from '../../dto/login-status.tape';
 import { Handler } from '@app/handler';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';
-import { TypeConfigService } from 'src/bff-service/common/configs/types.config.service';
-
 @QueryHandler(StatusAuthQuery)
 export class LoginStatusHandler extends Handler<StatusAuthQuery, StatusType, LoginProxyServiceClient> {
-  constructor(private readonly configService: TypeConfigService) {
+  constructor() {
     super(LOGIN_PROXY_SERVICE_NAME);
   }
 
   async execute({ userId }: StatusAuthQuery): Promise<LoginStatusType> {
+    this.logger.log(`[loginStatus] userId=${userId ?? 'undefined'}`);
     if (!userId) {
       return {
         status: AuthStatus.logout,

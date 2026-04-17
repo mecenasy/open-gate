@@ -4,6 +4,7 @@ import 'express-session';
 declare module 'express-session' {
   interface SessionData {
     user_id?: string;
+    mfa_pending?: string;
     isRegister?: boolean;
     currentChallenge?: PublicKeyCredentialCreationOptionsJSON['challenge'];
     csrfToken?: string;

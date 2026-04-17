@@ -22,6 +22,7 @@ export class VerifyCodeHandler extends Handler<VerifyCodeCommand, StatusType> {
     await this.cache.removeFromCache({ identifier: email });
 
     session.user_id = cache.userId;
+    delete session.mfa_pending;
 
     await saveSession(session, this.logger);
 

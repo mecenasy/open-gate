@@ -13,6 +13,7 @@ import { UpdateUserStatusCommand } from './commands/impl/update-user-status.comm
 import { UpdateUserRoleCommand } from './commands/impl/update-user-role.command';
 import { RemoveUserCommand } from './commands/impl/remove-user.command';
 import { RegisterCommand } from './commands/impl/register.command';
+import { ConfirmRegistrationCommand } from './commands/impl/confirm-registration.command';
 import { Public } from '@app/auth';
 import { CreateSimpleUserType } from './dto/create-simple-user.type.';
 import { CreateSimpleUserCommand } from './commands/impl/create-simple-user.command';
@@ -27,6 +28,14 @@ export class UserCommandResolver {
   async register(@Args('input') input: RegisterInput): Promise<SuccessResponseType> {
     await this.commandBus.execute<RegisterCommand, void>(new RegisterCommand(input));
     return { success: true };
+  }
+
+  @Public()
+  @Mutation(() => SuccessResponseType)
+  async confirmRegistration(@Args('token') token: string): Promise<SuccessResponseType> {
+    return this.commandBus.execute<ConfirmRegistrationCommand, SuccessResponseType>(
+      new ConfirmRegistrationCommand(token),
+    );
   }
 
   @Public()

@@ -119,6 +119,13 @@ export const envValidationSchema = Joi.object({
   POSTMAN_API_KEY: Joi.string().default('').description('Postman API key for collection sync'),
   POSTMAN_COLLECTION_ID: Joi.string().default('').description('Postman collection ID'),
 
+  // ============ Registration Token ============
+  REGISTRATION_TOKEN_TTL: Joi.number()
+    .integer()
+    .positive()
+    .default(600)
+    .description('Registration verification token TTL in seconds (default: 600 = 10 min)'),
+
   // ============ Logging & Debugging ============
   DEV_MODE: Joi.string()
     .valid('true', 'false')

@@ -34,13 +34,13 @@ export class AddUserHandler extends BaseCommandHandler<AddUserCommand, UserData>
     return this.run(
       'AddUser',
       async () => {
-        const { email, phone, password, name, surname, type, phoneOwner } = command.request;
+        const { email, phone, password, name, surname, type, phoneOwner, tenantId: requestTenantId } = command.request;
 
         const userType = await this.userRoleRepository.findOneOrFail({
           where: { userType: type ? protoToJsUserType(type) : UserType.User },
         });
 
-        const tenantId = this.tenantService.getContext()?.tenantId ?? null;
+        const tenantId = requestTenantId ?? this.tenantService.getContext()?.tenantId ?? null;
 
         const user = this.userRepository.create({
           email,

@@ -2,7 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import type Mail from 'nodemailer/lib/mailer';
 import { TenantService } from '@app/tenant';
-import { PlatformConfigService, SmtpCredentials } from '../../../platform-config/platform-config.service';
+import {
+  DEFAULT_PLATFORM_FALLBACK_ID,
+  PlatformConfigService,
+  SmtpCredentials,
+} from '../../../platform-config/platform-config.service';
 
 @Injectable()
 export class DynamicSmtpService {
@@ -36,10 +40,7 @@ export class DynamicSmtpService {
   }
 
   private async resolveConfig(): Promise<SmtpCredentials | null> {
-    const tenantId = this.tenantService.getContext()?.tenantId;
-    if (tenantId) {
-      return this.platformConfigService.getConfig(tenantId, 'smtp');
-    }
-    return this.platformConfigService.envFallback('smtp') as SmtpCredentials | null;
+    const tenantId = this.tenantService.getContext()?.tenantId ?? DEFAULT_PLATFORM_FALLBACK_ID;
+    return this.platformConfigService.getConfig(tenantId, 'smtp');
   }
 }

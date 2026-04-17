@@ -4,6 +4,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GateGrpcModule, config as gateGrpcConfig } from '@app/gate-grpc';
+import { config as dbGrpcConfig } from '@app/db-grpc';
 import { signalConfig } from './outgoing/platforms/signal/config/signal.config';
 import { MessageBridgeModule } from './incoming/message-bridge.module';
 import { OutgoingNotifyModule } from './outgoing/outgoing-notify.module';
@@ -16,7 +17,7 @@ import { PlatformConfigModule } from './platform-config/platform-config.module';
     LoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [gateGrpcConfig, signalConfig],
+      load: [gateGrpcConfig, signalConfig, dbGrpcConfig],
       validationSchema: envValidationSchema,
       validationOptions: {
         abortEarly: false,

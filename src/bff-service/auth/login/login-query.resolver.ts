@@ -13,6 +13,7 @@ export class LoginQueriesResolver {
   @Public()
   @Query(() => LoginStatusType)
   async loginStatus(@CurrentUserId() userId: string) {
+    console.log("🚀 ~ LoginQueriesResolver ~ loginStatus ~ userId:", userId)
     return this.queryBus.execute<StatusAuthQuery, LoginStatusType>(new StatusAuthQuery(userId));
   }
 

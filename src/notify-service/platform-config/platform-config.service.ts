@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger, OnModuleInit, Optional } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 import type { ClientGrpc } from '@nestjs/microservices';
@@ -46,6 +46,9 @@ export type PlatformCredentialMap = {
   whatsapp: WhatsAppCredentials;
   messenger: MessengerCredentials;
 };
+
+/** Sentinel UUID — global default platform credentials used as fallback for tenants without their own config. */
+export const DEFAULT_PLATFORM_FALLBACK_ID = '00000000-0000-0000-0000-000000000000';
 
 const CACHE_TTL_SECONDS = 30 * 60; // 30 minutes
 
@@ -116,7 +119,7 @@ export class PlatformConfigService implements OnModuleInit {
     try {
       const response = await lastValueFrom(this.tenantGrpcService.getTenantsWithPlatform({ platform }));
       if (!response.status) return [];
-      return response.entries
+      return (response.entries ?? [])
         .map((e) => {
           try {
             return { tenantId: e.tenantId, config: JSON.parse(e.configJson) as PlatformCredentialMap[P] };
@@ -126,7 +129,9 @@ export class PlatformConfigService implements OnModuleInit {
         })
         .filter((e): e is { tenantId: string; config: PlatformCredentialMap[P] } => e !== null);
     } catch (err) {
-      this.logger.warn(`getTenantsWithPlatform failed [${platform}]: ${String(err)}`);
+      this.logger.warn(
+        `getTenantsWithPlatform failed [${platform}]: ${err instanceof Error ? err.stack : String(err)}`,
+      );
       return [];
     }
   }

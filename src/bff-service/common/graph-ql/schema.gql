@@ -330,6 +330,7 @@ input GetFeatureConfigType {
 
 type Mutation {
   register(input: RegisterInput!): SuccessResponseType!
+  confirmRegistration(token: String!): SuccessResponseType!
   createUser(input: CreateUserType!): UserType!
   createSimpleUser(input: CreateSimpleUserType!): UserType!
   updateUser(input: UpdateUserType!): UserSummaryType!

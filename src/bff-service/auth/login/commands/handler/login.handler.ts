@@ -27,6 +27,7 @@ export class LoginHandler extends Handler<LoginCommand, StatusType, LoginProxySe
         fingerprintHash: security.fingerprint,
       }),
     );
+    console.log('🚀 ~ LoginHandler ~ execute ~ user:', user);
 
     if (!user.success) {
       if (user.userId && user.isAdaptive && user.history) {

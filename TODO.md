@@ -173,6 +173,26 @@ Posortowane według priorytetu.
 
 ---
 
+## Weryfikacja rejestracji Ownera
+
+- [ ] **Dedykowana notyfikacja email dla potwierdzenia rejestracji**
+  Aktualnie `SendRegistrationTokenEvent` wywołuje `sendToken` gRPC → `MailTokenPlatform`
+  (subject: "Reset your password", ogólny szablon linku).
+  Potrzebna nowa: `SendRegistrationConfirmationEvent` + dedykowany template email
+  z własnym subject i treścią (nie szablon reset-password).
+  Pliki do zmiany:
+  - [`src/bff-service/notify/common/dto/send-registration-token.event.ts`](src/bff-service/notify/common/dto/send-registration-token.event.ts)
+  - [`src/bff-service/notify/common/handlers/send-registration-token-event.handler.ts`](src/bff-service/notify/common/handlers/send-registration-token-event.handler.ts)
+  - `src/notify-service/outgoing/` — nowa platforma lub parametr szablonu w SmtpModule
+
+- [ ] **Usunięcie tenanta gdy Owner nie potwierdzi rejestracji w 10 min**
+  Aktualnie `RegistrationCleanupService` usuwa tylko rekord Usera z tabeli `users`.
+  Tenant (rekord w tabeli `tenants` + schemat `tenant_xxx` w bazie) pozostaje osierocony.
+  Należy wywołać usunięcie tenanta przez gRPC do db-service obok usunięcia usera.
+  Plik: [`src/db-service/user/cleanup/registration-cleanup.service.ts`](src/db-service/user/cleanup/registration-cleanup.service.ts)
+
+---
+
 ## TODO w kodzie (`// TODO` komentarze)
 
 Znalezione w kodzie źródłowym — do implementacji lub przeniesienia do konfiguracji.

@@ -8,6 +8,7 @@ export interface AppConfig {
   adminPassword: string;
   adminEmail: string;
   adminPhone: string;
+  registrationTokenTtl: number;
 }
 
 export const appConfig = registerAs(
@@ -20,5 +21,6 @@ export const appConfig = registerAs(
     adminPassword: process.env.ADMIN_PASSWORD || '',
     adminEmail: process.env.ADMIN_EMAIL || '',
     adminPhone: process.env.ADMIN_PHONE || '',
+    registrationTokenTtl: process.env.REGISTRATION_TOKEN_TTL ? parseInt(process.env.REGISTRATION_TOKEN_TTL) : 600,
   }),
 );

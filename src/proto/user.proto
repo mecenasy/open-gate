@@ -68,6 +68,7 @@ message AddUserRequest {
   optional string phoneOwner = 6; // Phone owner information
   optional UserType type = 7;    // User role (default: USER)
   optional string password = 8;  // Initial password (if provided)
+  optional string tenant_id = 9; // Tenant ID to assign to the user
 }
 
 // Retrieve user by ID

@@ -68,6 +68,7 @@ export const useRegister = (setError: (message: string) => void) => {
       reset();
       router.replace('/login');
     } catch (error) {
+      console.log('🚀 ~ onSubmit ~ error:', error);
       setError(t('registerWrong'));
     }
   };

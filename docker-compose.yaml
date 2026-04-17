@@ -31,6 +31,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      db-service:
+        condition: service_started
       # notify-service:
       #   condition: service_started
       #   required: false
@@ -188,7 +190,8 @@ services:
       SMTP_FROM: "${SMTP_FROM}"
     depends_on:
       signal-api:
-        condition: service_healthy
+        condition: service_started
+        required: false
     networks:
       - backend-net
     healthcheck:
@@ -275,7 +278,8 @@ services:
       - backend-net
     # Add a manual healthcheck if the image doesn't define one correctly
     healthcheck:
-      test: ["CMD", "curl", "-a", "http://localhost:8080/v1/about"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/v1/about || exit 1"]
+      interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s

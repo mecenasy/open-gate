@@ -3,7 +3,11 @@ import { Twilio } from 'twilio';
 import { Platform } from 'src/notify-service/types/platform';
 import { VerificationCodePlatform } from '../base/verification-code-platform';
 import { TenantService } from '@app/tenant';
-import { PlatformConfigService, SmsCredentials } from '../../../platform-config/platform-config.service';
+import {
+  DEFAULT_PLATFORM_FALLBACK_ID,
+  PlatformConfigService,
+  SmsCredentials,
+} from '../../../platform-config/platform-config.service';
 
 @Injectable()
 export class SmsVerificationCodePlatform extends VerificationCodePlatform {
@@ -18,12 +22,14 @@ export class SmsVerificationCodePlatform extends VerificationCodePlatform {
   }
 
   async send({ phoneNumber }: { phoneNumber?: string; email?: string }, code: number): Promise<void> {
+    console.log("🚀 ~ SmsVerificationCodePlatform ~ send ~ phoneNumber:", phoneNumber)
     if (!phoneNumber) {
       this.logger.warn('SMS platform: phoneNumber is missing, skipping.');
       return;
     }
 
     const config = await this.resolveConfig();
+    console.log('🚀 ~ SmsVerificationCodePlatform ~ send ~ config:', config);
     if (!config) {
       this.logger.warn(`No SMS config for tenant, skipping send to ${phoneNumber}`);
       return;
@@ -42,10 +48,7 @@ export class SmsVerificationCodePlatform extends VerificationCodePlatform {
   }
 
   private async resolveConfig(): Promise<SmsCredentials | null> {
-    const tenantId = this.tenantService.getContext()?.tenantId;
-    if (tenantId) {
-      return this.platformConfigService.getConfig(tenantId, 'sms');
-    }
-    return this.platformConfigService.envFallback('sms') as SmsCredentials | null;
+    const tenantId = this.tenantService.getContext()?.tenantId ?? DEFAULT_PLATFORM_FALLBACK_ID;
+    return this.platformConfigService.getConfig(tenantId, 'sms');
   }
 }

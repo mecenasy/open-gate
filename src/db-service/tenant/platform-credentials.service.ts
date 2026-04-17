@@ -3,6 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PlatformCredentials } from '@app/entities';
 
+/** Sentinel UUID — global default platform credentials used as fallback for tenants without their own config. */
+export const DEFAULT_PLATFORM_FALLBACK_ID = '00000000-0000-0000-0000-000000000000';
+
 @Injectable()
 export class PlatformCredentialsService {
   constructor(
@@ -10,8 +13,11 @@ export class PlatformCredentialsService {
     private readonly repo: Repository<PlatformCredentials>,
   ) {}
 
-  findByTenantAndPlatform(tenantId: string, platform: string): Promise<PlatformCredentials | null> {
-    return this.repo.findOne({ where: { tenantId, platform, isActive: true } });
+  async findByTenantAndPlatform(tenantId: string, platform: string): Promise<PlatformCredentials | null> {
+    const specific = await this.repo.findOne({ where: { tenantId, platform, isActive: true } });
+    if (specific) return specific;
+    if (tenantId === DEFAULT_PLATFORM_FALLBACK_ID) return null;
+    return this.repo.findOne({ where: { tenantId: DEFAULT_PLATFORM_FALLBACK_ID, platform, isActive: true } });
   }
 
   async findTenantsWithPlatform(platform: string): Promise<PlatformCredentials[]> {

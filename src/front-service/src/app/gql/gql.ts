@@ -41,7 +41,8 @@ type Documents = {
   '\n  mutation RemovePrompt($input: RemovePromptType!) {\n    removePrompt(input: $input) {\n      success\n    }\n  }\n': typeof types.RemovePromptDocument;
   '\n  mutation QrChallenge($nonce: String!) {\n    qrChallenge(nonce: $nonce) {\n      challenge\n      dataUrl\n    }\n  }\n': typeof types.QrChallengeDocument;
   '\n  mutation QrLogin($challenge: String!, $nonce: String!) {\n    qrLogin(challenge: $challenge, nonce: $nonce) {\n      status\n    }\n  }\n': typeof types.QrLoginDocument;
-  '\n  mutation Register($input: CreateUserType!) {\n    createUser(input: $input) {\n      id\n      email\n    }\n  }\n': typeof types.RegisterDocument;
+  '\n  mutation Register($input: RegisterInput!) {\n    register(input: $input) {\n      success\n    }\n  }\n': typeof types.RegisterDocument;
+  '\n  query TenantFeatures {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      maxUsersPerTenant\n    }\n  }\n': typeof types.TenantFeaturesDocument;
   '\n  query GetUsers($input: GetAllUsersType) {\n    users(input: $input) {\n      users {\n        id\n        name\n        surname\n        email\n        phone\n        status\n        type\n      }\n      total\n    }\n  }\n': typeof types.GetUsersDocument;
   '\n  mutation UpdateUser($input: UpdateUserType!) {\n    updateUser(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n': typeof types.UpdateUserDocument;
   '\n  mutation UpdateUserStatus($input: UpdateUserStatusType!) {\n    updateUserStatus(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n': typeof types.UpdateUserStatusDocument;
@@ -109,8 +110,10 @@ const documents: Documents = {
     types.QrChallengeDocument,
   '\n  mutation QrLogin($challenge: String!, $nonce: String!) {\n    qrLogin(challenge: $challenge, nonce: $nonce) {\n      status\n    }\n  }\n':
     types.QrLoginDocument,
-  '\n  mutation Register($input: CreateUserType!) {\n    createUser(input: $input) {\n      id\n      email\n    }\n  }\n':
+  '\n  mutation Register($input: RegisterInput!) {\n    register(input: $input) {\n      success\n    }\n  }\n':
     types.RegisterDocument,
+  '\n  query TenantFeatures {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      maxUsersPerTenant\n    }\n  }\n':
+    types.TenantFeaturesDocument,
   '\n  query GetUsers($input: GetAllUsersType) {\n    users(input: $input) {\n      users {\n        id\n        name\n        surname\n        email\n        phone\n        status\n        type\n      }\n      total\n    }\n  }\n':
     types.GetUsersDocument,
   '\n  mutation UpdateUser($input: UpdateUserType!) {\n    updateUser(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n':
@@ -319,8 +322,14 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: '\n  mutation Register($input: CreateUserType!) {\n    createUser(input: $input) {\n      id\n      email\n    }\n  }\n',
-): (typeof documents)['\n  mutation Register($input: CreateUserType!) {\n    createUser(input: $input) {\n      id\n      email\n    }\n  }\n'];
+  source: '\n  mutation Register($input: RegisterInput!) {\n    register(input: $input) {\n      success\n    }\n  }\n',
+): (typeof documents)['\n  mutation Register($input: RegisterInput!) {\n    register(input: $input) {\n      success\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  query TenantFeatures {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      maxUsersPerTenant\n    }\n  }\n',
+): (typeof documents)['\n  query TenantFeatures {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      maxUsersPerTenant\n    }\n  }\n'];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

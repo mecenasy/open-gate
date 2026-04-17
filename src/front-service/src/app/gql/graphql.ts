@@ -30,10 +30,11 @@ export type AcceptType = {
 };
 
 export type AddCommandType = {
-  actions: Scalars['JSON']['input'];
+  actions?: InputMaybe<Scalars['JSON']['input']>;
+  command: Scalars['String']['input'];
   description: Scalars['String']['input'];
   name: Scalars['String']['input'];
-  parameters: Scalars['JSON']['input'];
+  parameters?: InputMaybe<Scalars['JSON']['input']>;
   roleNames: Array<Scalars['String']['input']>;
 };
 
@@ -75,13 +76,13 @@ export type CommandResponseType = {
 
 export type CommandType = {
   __typename?: 'CommandType';
-  actions: Scalars['JSON']['output'];
+  actions?: Maybe<Scalars['JSON']['output']>;
   active: Scalars['Boolean']['output'];
   createdAt: Scalars['String']['output'];
   description: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
-  parameters: Scalars['JSON']['output'];
+  parameters?: Maybe<Scalars['JSON']['output']>;
   roleNames: Array<Scalars['String']['output']>;
   updatedAt: Scalars['String']['output'];
 };
@@ -130,6 +131,17 @@ export type CreateSimpleUserType = {
   type: UserRole | '%future added value';
 };
 
+export type CreateTenantInput = {
+  slug: Scalars['String']['input'];
+};
+
+export type CreateTenantResult = {
+  __typename?: 'CreateTenantResult';
+  id: Scalars['String']['output'];
+  schemaName: Scalars['String']['output'];
+  slug: Scalars['String']['output'];
+};
+
 export type CreateUserType = {
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
@@ -138,6 +150,11 @@ export type CreateUserType = {
   phoneOwner?: InputMaybe<Scalars['String']['input']>;
   surname: Scalars['String']['input'];
   type: Scalars['String']['input'];
+};
+
+export type CsrfTokenType = {
+  __typename?: 'CsrfTokenType';
+  csrfToken: Scalars['String']['output'];
 };
 
 export type ForgotPasswordType = {
@@ -217,6 +234,7 @@ export type Mutation = {
   addPrompt: PromptResponseType;
   changePassword: StatusType;
   createSimpleUser: UserType;
+  createTenant: CreateTenantResult;
   createUser: UserType;
   forgotPassword: StatusType;
   loginUser: StatusType;
@@ -228,6 +246,7 @@ export type Mutation = {
   qrLogin: StatusType;
   qrOption: Scalars['JSON']['output'];
   qrReject: StatusType;
+  register: SuccessResponseType;
   registerOptionPasskey: Scalars['JSON']['output'];
   registerOptionPasskeyVerify: StatusType;
   reject2fa: StatusType;
@@ -240,9 +259,13 @@ export type Mutation = {
   updateCommand: CommandResponseType;
   updateConfig: ConfigResponseType;
   updatePrompt: PromptResponseType;
+  updateTenantCustomization: MutationResult;
   updateUser: UserSummaryType;
   updateUserRole: UserSummaryType;
   updateUserStatus: UserSummaryType;
+  upsertPlatformCredentials: MutationResult;
+  upsertTenantCommandConfig: MutationResult;
+  upsertTenantPromptOverride: MutationResult;
   verify2fa: StatusType;
   verify2faCode: StatusType;
   verifyMfa: StatusType;
@@ -262,6 +285,10 @@ export type MutationChangePasswordArgs = {
 
 export type MutationCreateSimpleUserArgs = {
   input: CreateSimpleUserType;
+};
+
+export type MutationCreateTenantArgs = {
+  input: CreateTenantInput;
 };
 
 export type MutationCreateUserArgs = {
@@ -301,6 +328,10 @@ export type MutationQrOptionArgs = {
 
 export type MutationQrRejectArgs = {
   challenge: Scalars['String']['input'];
+};
+
+export type MutationRegisterArgs = {
+  input: RegisterInput;
 };
 
 export type MutationRegisterOptionPasskeyVerifyArgs = {
@@ -343,6 +374,10 @@ export type MutationUpdatePromptArgs = {
   input: UpdatePromptType;
 };
 
+export type MutationUpdateTenantCustomizationArgs = {
+  input: UpdateCustomizationInput;
+};
+
 export type MutationUpdateUserArgs = {
   input: UpdateUserType;
 };
@@ -355,6 +390,18 @@ export type MutationUpdateUserStatusArgs = {
   input: UpdateUserStatusType;
 };
 
+export type MutationUpsertPlatformCredentialsArgs = {
+  input: UpsertPlatformCredentialsInput;
+};
+
+export type MutationUpsertTenantCommandConfigArgs = {
+  input: UpsertTenantCommandConfigInput;
+};
+
+export type MutationUpsertTenantPromptOverrideArgs = {
+  input: UpsertTenantPromptOverrideInput;
+};
+
 export type MutationVerify2faArgs = {
   code: Scalars['String']['input'];
 };
@@ -365,6 +412,12 @@ export type MutationVerify2faCodeArgs = {
 
 export type MutationVerifyMfaArgs = {
   input: VerifyCodeType;
+};
+
+export type MutationResult = {
+  __typename?: 'MutationResult';
+  message: Scalars['String']['output'];
+  status: Scalars['Boolean']['output'];
 };
 
 export type PassKeyType = {
@@ -436,6 +489,7 @@ export type Query = {
   commands: CommandsListType;
   commandsByPermission: CommandsListType;
   coreConfigs: ConfigsListType;
+  csrfToken: CsrfTokenType;
   featureConfig: ConfigsListType;
   featureConfigs: ConfigsListType;
   getPasskeys: Array<PassKeyType>;
@@ -443,6 +497,10 @@ export type Query = {
   promptById: PromptResponseType;
   promptByKey: PromptResponseType;
   prompts: PromptsListType;
+  tenantCommandConfigs: Array<TenantCommandConfigType>;
+  tenantFeatures: TenantFeaturesType;
+  tenantPromptOverrides: Array<TenantPromptOverrideType>;
+  tenants: Array<TenantType>;
   user: UserSummaryType;
   users: UsersListType;
   verifyToken: VerifyTokenType;
@@ -480,6 +538,14 @@ export type QueryPromptsArgs = {
   input?: InputMaybe<GetAllPromptsType>;
 };
 
+export type QueryTenantCommandConfigsArgs = {
+  tenantId: Scalars['String']['input'];
+};
+
+export type QueryTenantPromptOverridesArgs = {
+  tenantId: Scalars['String']['input'];
+};
+
 export type QueryUserArgs = {
   input: GetUserType;
 };
@@ -490,6 +556,15 @@ export type QueryUsersArgs = {
 
 export type QueryVerifyTokenArgs = {
   token: Scalars['String']['input'];
+};
+
+export type RegisterInput = {
+  email: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  phone: Scalars['String']['input'];
+  surname: Scalars['String']['input'];
+  tenantSlug: Scalars['String']['input'];
 };
 
 export type RemoveCommandType = {
@@ -520,24 +595,68 @@ export type SuccessResponseType = {
   success: Scalars['Boolean']['output'];
 };
 
+export type TenantCommandConfigType = {
+  __typename?: 'TenantCommandConfigType';
+  active: Scalars['Boolean']['output'];
+  commandId: Scalars['String']['output'];
+  commandName: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  parametersOverrideJson?: Maybe<Scalars['String']['output']>;
+};
+
+export type TenantFeaturesType = {
+  __typename?: 'TenantFeaturesType';
+  enableAnalytics: Scalars['Boolean']['output'];
+  enableCommandScheduling: Scalars['Boolean']['output'];
+  enableGate: Scalars['Boolean']['output'];
+  enableMessenger: Scalars['Boolean']['output'];
+  enablePayment: Scalars['Boolean']['output'];
+  enableSignal: Scalars['Boolean']['output'];
+  enableWhatsApp: Scalars['Boolean']['output'];
+  maxUsersPerTenant: Scalars['Int']['output'];
+};
+
+export type TenantPromptOverrideType = {
+  __typename?: 'TenantPromptOverrideType';
+  commandId?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  prompt: Scalars['String']['output'];
+  tenantId: Scalars['String']['output'];
+  userType: Scalars['String']['output'];
+};
+
+export type TenantType = {
+  __typename?: 'TenantType';
+  id: Scalars['String']['output'];
+  isActive: Scalars['Boolean']['output'];
+  schemaName: Scalars['String']['output'];
+  slug: Scalars['String']['output'];
+};
+
 export type ToggleActiveStatusType = {
   active: Scalars['Boolean']['input'];
   id: Scalars['ID']['input'];
 };
 
 export type UpdateCommandType = {
-  actions: Scalars['JSON']['input'];
+  actions?: InputMaybe<Scalars['JSON']['input']>;
   active?: InputMaybe<Scalars['Boolean']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
-  parameters: Scalars['JSON']['input'];
+  parameters?: InputMaybe<Scalars['JSON']['input']>;
   roleNames?: Array<Scalars['String']['input']>;
 };
 
 export type UpdateConfigType = {
   key: Scalars['String']['input'];
   value: Scalars['String']['input'];
+};
+
+export type UpdateCustomizationInput = {
+  customizationJson: Scalars['String']['input'];
+  tenantId: Scalars['String']['input'];
 };
 
 export type UpdatePromptType = {
@@ -567,11 +686,33 @@ export type UpdateUserType = {
   surname?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpsertPlatformCredentialsInput = {
+  configJson: Scalars['String']['input'];
+  platform: Scalars['String']['input'];
+  tenantId: Scalars['String']['input'];
+};
+
+export type UpsertTenantCommandConfigInput = {
+  active: Scalars['Boolean']['input'];
+  commandId: Scalars['String']['input'];
+  parametersOverrideJson?: InputMaybe<Scalars['String']['input']>;
+  tenantId: Scalars['String']['input'];
+};
+
+export type UpsertTenantPromptOverrideInput = {
+  commandId?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  prompt: Scalars['String']['input'];
+  tenantId: Scalars['String']['input'];
+  userType: Scalars['String']['input'];
+};
+
 export enum UserRole {
   Admin = 'Admin',
   Member = 'Member',
   Owner = 'Owner',
   SuperUser = 'SuperUser',
+  Unrecognized = 'Unrecognized',
   User = 'User',
 }
 
@@ -764,8 +905,8 @@ export type GetCommandsQuery = {
       name: string;
       description: string;
       active: boolean;
-      actions: any;
-      parameters: any;
+      actions?: any | null;
+      parameters?: any | null;
       roleNames: Array<string>;
     }>;
   };
@@ -787,8 +928,8 @@ export type AddCommandMutation = {
       name: string;
       description: string;
       active: boolean;
-      actions: any;
-      parameters: any;
+      actions?: any | null;
+      parameters?: any | null;
       roleNames: Array<string>;
     } | null;
   };
@@ -977,12 +1118,29 @@ export type QrLoginMutationVariables = Exact<{
 export type QrLoginMutation = { __typename?: 'Mutation'; qrLogin: { __typename?: 'StatusType'; status: AuthStatus } };
 
 export type RegisterMutationVariables = Exact<{
-  input: CreateUserType;
+  input: RegisterInput;
 }>;
 
 export type RegisterMutation = {
   __typename?: 'Mutation';
-  createUser: { __typename?: 'UserType'; id: string; email: string };
+  register: { __typename?: 'SuccessResponseType'; success: boolean };
+};
+
+export type TenantFeaturesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type TenantFeaturesQuery = {
+  __typename?: 'Query';
+  tenantFeatures: {
+    __typename?: 'TenantFeaturesType';
+    enableSignal: boolean;
+    enableWhatsApp: boolean;
+    enableMessenger: boolean;
+    enableGate: boolean;
+    enablePayment: boolean;
+    enableCommandScheduling: boolean;
+    enableAnalytics: boolean;
+    maxUsersPerTenant: number;
+  };
 };
 
 export type GetUsersQueryVariables = Exact<{
@@ -2333,7 +2491,7 @@ export const RegisterDocument = {
         {
           kind: 'VariableDefinition',
           variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
-          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'CreateUserType' } } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'RegisterInput' } } },
         },
       ],
       selectionSet: {
@@ -2341,7 +2499,7 @@ export const RegisterDocument = {
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'createUser' },
+            name: { kind: 'Name', value: 'register' },
             arguments: [
               {
                 kind: 'Argument',
@@ -2351,10 +2509,7 @@ export const RegisterDocument = {
             ],
             selectionSet: {
               kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'email' } },
-              ],
+              selections: [{ kind: 'Field', name: { kind: 'Name', value: 'success' } }],
             },
           },
         ],
@@ -2362,6 +2517,38 @@ export const RegisterDocument = {
     },
   ],
 } as unknown as DocumentNode<RegisterMutation, RegisterMutationVariables>;
+export const TenantFeaturesDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'TenantFeatures' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'tenantFeatures' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'enableSignal' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'enableWhatsApp' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'enableMessenger' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'enableGate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'enablePayment' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'enableCommandScheduling' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'enableAnalytics' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'maxUsersPerTenant' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<TenantFeaturesQuery, TenantFeaturesQueryVariables>;
 export const GetUsersDocument = {
   kind: 'Document',
   definitions: [

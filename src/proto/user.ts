@@ -49,6 +49,7 @@ export interface AddUserRequest {
   phoneOwner?: string | undefined;
   type?: UserType | undefined;
   password?: string | undefined;
+  tenantId?: string | undefined;
 }
 
 export interface GetUserRequest {

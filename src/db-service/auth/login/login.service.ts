@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PasswordService } from 'src/db-service/user/password/password.service';
 import { UserType } from 'src/db-service/user/user-type';
+import { UserStatus } from 'src/db-service/user/status';
 import { UserService } from 'src/db-service/user/user.service';
 import { ChangePasswordResponse, LoginResponse, LoginStatusResponse, ResetPasswordResponse } from 'src/proto/login';
 
@@ -13,13 +14,19 @@ export class LoginService {
 
   async login(email: string, password: string): Promise<LoginResponse> {
     const user = await this.userService.findUserWithPassword(email);
+    console.log('🚀 ~ LoginService ~ login ~ user:', user);
     if (!user || !user.password) {
       return { success: false, message: 'Unknown user' };
     }
 
     const role = user.userRole?.userType;
+    console.log('🚀 ~ LoginService ~ login ~ role:', role);
     if (role !== UserType.Owner && role !== UserType.SuperUser) {
       return { success: false, message: 'Access denied' };
+    }
+
+    if (user.status === UserStatus.Pending) {
+      return { success: false, message: 'REGISTRATION_PENDING_CONFIRMATION' };
     }
 
     const isPasswordValid = this.passwordService.validatePassword(password, user.password);
@@ -101,6 +108,8 @@ export class LoginService {
         userId: '',
       };
     }
+
+    console.log('🚀 ~ LoginService ~ getUser2FaSecret ~ user:', user);
 
     return {
       secret: user.userSettings.twoFactorSecret,

@@ -67,8 +67,7 @@ export const useRegister = (setError: (message: string) => void) => {
       await registerMutation({ variables: { input: rest } });
       reset();
       router.replace('/login');
-    } catch (error) {
-      console.log('🚀 ~ onSubmit ~ error:', error);
+    } catch {
       setError(t('registerWrong'));
     }
   };

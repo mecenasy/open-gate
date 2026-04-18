@@ -1,7 +1,7 @@
 import createIntlMiddleware from 'next-intl/middleware';
 import { NextResponse, type NextRequest } from 'next/server';
 import { routing } from './i18n/routing';
-import { HOME_PATH, LOGIN_PATH, OWNER_ONLY_PATHS, PUBLIC_PATHS } from './constants/auth';
+import { GUEST_ONLY_PATHS, HOME_PATH, LOGIN_PATH, PUBLIC_PATHS } from './constants/auth';
 import { checkSession } from './lib/auth/check-session';
 
 const intlMiddleware = createIntlMiddleware(routing);
@@ -24,17 +24,23 @@ export default async function middleware(req: NextRequest) {
 
   const { locale, path } = stripLocale(req.nextUrl.pathname);
 
-  if (matchesAny(path, PUBLIC_PATHS)) return intlResponse;
+  const isPublic = matchesAny(path, PUBLIC_PATHS);
+  const isGuestOnly = matchesAny(path, GUEST_ONLY_PATHS);
+
+  if (isPublic && !isGuestOnly) return intlResponse;
 
   const cookieHeader = req.headers.get('cookie') ?? '';
   const session = await checkSession(cookieHeader);
 
-  if (!session.authenticated) {
-    return NextResponse.redirect(new URL(`/${locale}${LOGIN_PATH}`, req.url));
+  if (isGuestOnly) {
+    if (session.authenticated) {
+      return NextResponse.redirect(new URL(`/${locale}${HOME_PATH}`, req.url));
+    }
+    return intlResponse;
   }
 
-  if (matchesAny(path, OWNER_ONLY_PATHS) && !session.isOwner) {
-    return NextResponse.redirect(new URL(`/${locale}${HOME_PATH}`, req.url));
+  if (!session.authenticated) {
+    return NextResponse.redirect(new URL(`/${locale}${LOGIN_PATH}`, req.url));
   }
 
   return intlResponse;

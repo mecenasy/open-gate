@@ -5,7 +5,7 @@ import { SetContextLink } from '@apollo/client/link/context';
 import { ApolloClient, ApolloNextAppProvider, InMemoryCache } from '@apollo/client-integration-nextjs';
 import type { ReactNode } from 'react';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_HOST_URL}/graphql`;
+const API_URL = '/api/graphql';
 
 let cachedCsrfToken: string | null = null;
 

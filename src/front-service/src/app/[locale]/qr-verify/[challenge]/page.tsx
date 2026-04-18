@@ -56,8 +56,7 @@ export default function QrVerify(props: Props) {
 
         await qrConfirm({ variables: { challenge, data: regResponse } });
         router.replace("/thankyou");
-      } catch (error) {
-        console.log(error)
+      } catch {
         await qrReject({ variables: { challenge } });
         router.replace("/thankyou");
       }

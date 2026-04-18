@@ -12,7 +12,6 @@ export default function RegistrationPage() {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const { register, errors, onSubmit, loading } = useRegister(setServerError);
-  console.log("🚀 ~ RegistrationPage ~ errors:", errors)
 
   return (
     <Modal

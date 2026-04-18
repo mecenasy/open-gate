@@ -4,7 +4,7 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import Providers from '@/app/providers';
-import { Navbar } from '@/components/Navbar';
+import { Navbar } from '@/components/navbar/Navbar';
 import '@/app/globals.css';
 
 export const metadata: Metadata = {

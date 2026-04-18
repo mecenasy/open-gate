@@ -1,7 +1,7 @@
 import { Link } from '@/components/navigation/navigation';
-import { LangSwitcher } from './navbar/LangSwitcher';
-import { ThemeToggle } from './navbar/ThemeToggle';
-import { AuthNav } from './navbar/AuthNav';
+import { LangSwitcher } from './LangSwitcher';
+import { ThemeToggle } from './ThemeToggle';
+import { AuthNav } from './AuthNav';
 
 export function Navbar() {
   return (

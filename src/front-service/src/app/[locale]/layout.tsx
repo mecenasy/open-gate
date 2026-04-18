@@ -5,7 +5,6 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import Providers from '@/app/providers';
 import { Navbar } from '@/components/Navbar';
-import { AuthGuard } from '@/components/AuthGuard';
 import '@/app/globals.css';
 
 export const metadata: Metadata = {
@@ -13,13 +12,12 @@ export const metadata: Metadata = {
   description: 'Open Gate Frontend',
 };
 
-export default async function LocaleLayout({
-  children,
-  params,
-}: {
+interface LocaleLayoutProps {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
-}) {
+}
+
+export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
   const { locale } = await params;
 
   if (!routing.locales.includes(locale as 'pl' | 'en')) {
@@ -31,10 +29,8 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <Providers>
-        <AuthGuard>
-          <Navbar />
-          {children}
-        </AuthGuard>
+        <Navbar />
+        {children}
       </Providers>
     </NextIntlClientProvider>
   );

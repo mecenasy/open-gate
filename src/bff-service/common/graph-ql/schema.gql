@@ -245,10 +245,12 @@ type TenantPlatformCredentialType {
 
 type TenantCommandConfigType {
   id: String!
-  commandId: String!
   commandName: String!
   active: Boolean!
   parametersOverrideJson: String
+  userTypes: [String!]
+  actionsJson: String
+  descriptionI18nJson: String
 }
 
 type TenantPromptOverrideType {
@@ -279,7 +281,7 @@ type Query {
   tenantFeatures: TenantFeaturesType!
   tenantPlatformCredentials: [TenantPlatformCredentialType!]!
   tenants: [TenantType!]!
-  tenantCommandConfigs(tenantId: String!): [TenantCommandConfigType!]!
+  tenantCommandConfigs: [TenantCommandConfigType!]!
   tenantPromptOverrides(tenantId: String!): [TenantPromptOverrideType!]!
   csrfToken: CsrfTokenType!
 }
@@ -380,6 +382,7 @@ type Mutation {
   updateTenantCustomization(input: UpdateCustomizationInput!): MutationResult!
   upsertPlatformCredentials(input: UpsertPlatformCredentialsInput!): MutationResult!
   upsertTenantCommandConfig(input: UpsertTenantCommandConfigInput!): MutationResult!
+  deleteTenantCommandConfig(input: DeleteTenantCommandConfigInput!): MutationResult!
   upsertTenantPromptOverride(input: UpsertTenantPromptOverrideInput!): MutationResult!
 }
 
@@ -546,10 +549,16 @@ input UpsertPlatformCredentialsInput {
 }
 
 input UpsertTenantCommandConfigInput {
-  tenantId: String!
-  commandId: String!
+  commandName: String!
   active: Boolean!
   parametersOverrideJson: String
+  userTypes: [String!]
+  actionsJson: String
+  descriptionI18nJson: String
+}
+
+input DeleteTenantCommandConfigInput {
+  commandName: String!
 }
 
 input UpsertTenantPromptOverrideInput {

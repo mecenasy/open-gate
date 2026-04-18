@@ -2,6 +2,7 @@ export enum TenantResolutionSource {
   SESSION = 'session',
   SUBDOMAIN = 'subdomain',
   HEADER = 'header',
+  GUARD = 'guard',
 }
 
 export interface TenantContext {

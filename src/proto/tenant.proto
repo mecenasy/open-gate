@@ -14,6 +14,7 @@ service TenantService {
   rpc UpsertPlatformCredentials (UpsertPlatformCredentialsRequest) returns (UpsertPlatformCredentialsResponse);
   rpc GetTenantCommandConfigs (GetTenantCommandConfigsRequest) returns (GetTenantCommandConfigsResponse);
   rpc UpsertTenantCommandConfig (UpsertTenantCommandConfigRequest) returns (UpsertTenantCommandConfigResponse);
+  rpc DeleteTenantCommandConfig (DeleteTenantCommandConfigRequest) returns (DeleteTenantCommandConfigResponse);
   rpc GetPromptForContext (GetPromptForContextRequest) returns (GetPromptForContextResponse);
   rpc UpsertTenantPromptOverride (UpsertTenantPromptOverrideRequest) returns (UpsertTenantPromptOverrideResponse);
   rpc GetTenantPromptOverrides (GetTenantPromptOverridesRequest) returns (GetTenantPromptOverridesResponse);
@@ -135,10 +136,12 @@ message UpsertPlatformCredentialsResponse {
 
 message TenantCommandConfigEntry {
   string id = 1;
-  string command_id = 2;
-  string command_name = 3;
-  bool active = 4;
-  string parameters_override_json = 5;
+  string command_name = 2;
+  bool active = 3;
+  string parameters_override_json = 4;
+  repeated string user_types = 5;
+  string actions_json = 6;
+  string description_i18n_json = 7;
 }
 
 message GetTenantCommandConfigsRequest {
@@ -153,12 +156,25 @@ message GetTenantCommandConfigsResponse {
 
 message UpsertTenantCommandConfigRequest {
   string tenant_id = 1;
-  string command_id = 2;
+  string command_name = 2;
   bool active = 3;
   string parameters_override_json = 4;
+  repeated string user_types = 5;
+  string actions_json = 6;
+  string description_i18n_json = 7;
 }
 
 message UpsertTenantCommandConfigResponse {
+  bool status = 1;
+  string message = 2;
+}
+
+message DeleteTenantCommandConfigRequest {
+  string tenant_id = 1;
+  string command_name = 2;
+}
+
+message DeleteTenantCommandConfigResponse {
   bool status = 1;
   string message = 2;
 }

@@ -15,6 +15,7 @@ const SunIcon = () => (
 
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
+  console.log("🚀 ~ ThemeToggle ~ theme:", theme)
 
   return (
     <button

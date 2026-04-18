@@ -12,5 +12,6 @@ export function entityToProto(user: User): UserData {
     surname: user.surname,
     status: userStatusToProto(user.status),
     type: jsToProtoUserType(user.userRole.userType),
+    tenantId: user.tenantId || '',
   };
 }

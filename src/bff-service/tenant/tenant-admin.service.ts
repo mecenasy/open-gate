@@ -85,27 +85,40 @@ export class TenantAdminService implements OnModuleInit {
     const res = await lastValueFrom(this.tenantGrpcService.getTenantCommandConfigs({ tenantId }));
     return res.configs.map((c) => ({
       id: c.id,
-      commandId: c.commandId,
       commandName: c.commandName,
       active: c.active,
       parametersOverrideJson: c.parametersOverrideJson || undefined,
+      userTypes: c.userTypes ?? [],
+      actionsJson: c.actionsJson || undefined,
+      descriptionI18nJson: c.descriptionI18nJson || undefined,
     }));
   }
 
   async upsertTenantCommandConfig(
     tenantId: string,
-    commandId: string,
+    commandName: string,
     active: boolean,
     parametersOverrideJson?: string,
+    userTypes?: string[],
+    actionsJson?: string,
+    descriptionI18nJson?: string,
   ): Promise<MutationResult> {
     const res = await lastValueFrom(
       this.tenantGrpcService.upsertTenantCommandConfig({
         tenantId,
-        commandId,
+        commandName,
         active,
         parametersOverrideJson: parametersOverrideJson ?? '',
+        userTypes: userTypes ?? [],
+        actionsJson: actionsJson ?? '',
+        descriptionI18nJson: descriptionI18nJson ?? '',
       }),
     );
+    return { status: res.status, message: res.message };
+  }
+
+  async deleteTenantCommandConfig(tenantId: string, commandName: string): Promise<MutationResult> {
+    const res = await lastValueFrom(this.tenantGrpcService.deleteTenantCommandConfig({ tenantId, commandName }));
     return { status: res.status, message: res.message };
   }
 

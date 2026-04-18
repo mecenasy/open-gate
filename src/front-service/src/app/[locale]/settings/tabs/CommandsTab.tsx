@@ -1,14 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Button, Input, Modal, Table, Textarea, TagInput, MultiSelect, Toggle } from '@/components/ui';
+import { Button, Input, Modal, Select, Table, Textarea, TagInput, MultiSelect, Toggle } from '@/components/ui';
 import type { TableColumn, SelectOption } from '@/components/ui';
-import { useCommands } from '@/hooks/use-commands';
-import type { CommandSummary } from '@/hooks/use-commands';
+import { useTenantCommandConfigs } from '@/hooks/use-tenant-command-configs';
+import type { TenantCommandConfigSummary } from '@/hooks/use-tenant-command-configs';
 
-const ROLE_VALUES = {
+// ── constants ─────────────────────────────────────────────────────────────────
+
+const USER_TYPE_VALUES = {
   Owner: 'owner',
   Admin: 'admin',
   SuperUser: 'super_user',
@@ -24,6 +25,33 @@ const ROLE_BADGE: Record<string, { dot: string; pill: string }> = {
   user: { dot: 'bg-slate-500', pill: 'bg-slate-500/20 text-slate-400 border border-slate-400/50' },
 };
 
+const LANG_OPTIONS: SelectOption<string>[] = [
+  { value: 'en', label: 'English' },
+  { value: 'pl', label: 'Polski' },
+  { value: 'de', label: 'Deutsch' },
+  { value: 'fr', label: 'Français' },
+  { value: 'es', label: 'Español' },
+  { value: 'it', label: 'Italiano' },
+  { value: 'uk', label: 'Українська' },
+];
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+
+function parseJson<T>(json?: string | null, fallback: T = {} as T): T {
+  if (!json) return fallback;
+  try { return JSON.parse(json) as T; } catch { return fallback; }
+}
+
+function toKeysJson(keys: string[]): string | undefined {
+  return keys.length > 0 ? JSON.stringify(Object.fromEntries(keys.map((k) => [k, true]))) : undefined;
+}
+
+function getDescription(i18n: Record<string, string>, lang = 'en'): string {
+  return i18n[lang] ?? i18n['en'] ?? Object.values(i18n)[0] ?? '';
+}
+
+// ── small components ──────────────────────────────────────────────────────────
+
 function RoleBadge({ role }: { role: string }) {
   const cfg = ROLE_BADGE[role] ?? { dot: 'bg-slate-500', pill: 'bg-slate-500/20 text-slate-400 border border-slate-400/50' };
   return (
@@ -35,7 +63,7 @@ function RoleBadge({ role }: { role: string }) {
 }
 
 function KeyBadges({ record }: { record: Record<string, boolean> }) {
-  const keys = Object.keys(record || {});
+  const keys = Object.keys(record);
   if (keys.length === 0) return <span className="text-muted text-xs">—</span>;
   return (
     <div className="flex flex-wrap gap-1">
@@ -46,70 +74,162 @@ function KeyBadges({ record }: { record: Record<string, boolean> }) {
   );
 }
 
-type CommandForm = { name: string; description: string };
+// ── multilingual description editor ──────────────────────────────────────────
+
+type DescriptionEditorProps = {
+  value: Record<string, string>;
+  onChange: (v: Record<string, string>) => void;
+  label: string;
+  addLangLabel: string;
+  langLabel: string;
+};
+
+function DescriptionEditor({ value, onChange, label, addLangLabel, langLabel }: DescriptionEditorProps) {
+  const [newLang, setNewLang] = useState('en');
+  const usedLangs = Object.keys(value);
+  const availableLangs = LANG_OPTIONS.filter((o) => !usedLangs.includes(o.value));
+
+  const handleAdd = () => {
+    if (!newLang || value[newLang] !== undefined) return;
+    onChange({ ...value, [newLang]: '' });
+    const next = availableLangs.find((o) => o.value !== newLang);
+    if (next) setNewLang(next.value);
+  };
+
+  const handleChange = (lang: string, text: string) => {
+    onChange({ ...value, [lang]: text });
+  };
+
+  const handleRemove = (lang: string) => {
+    const next = { ...value };
+    delete next[lang];
+    onChange(next);
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="block text-xs font-medium text-muted">{label}</label>
+      {usedLangs.map((lang) => (
+        <div key={lang} className="flex items-start gap-2">
+          <span className="mt-2 text-xs font-mono uppercase text-muted w-8 shrink-0">{lang}</span>
+          <div className="flex-1">
+            <Textarea
+              value={value[lang]}
+              onChange={(e) => handleChange(lang, e.target.value)}
+              rows={2}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => handleRemove(lang)}
+            className="mt-2 text-xs text-rose-400 hover:text-rose-300 shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+      ))}
+      {availableLangs.length > 0 && (
+        <div className="flex items-center gap-2 mt-1">
+          <div className="w-40">
+            <Select<string> label={langLabel} value={newLang} options={availableLangs} onChange={setNewLang} />
+          </div>
+          <div className="pt-5">
+            <Button variant="blue" size="sm" onClick={handleAdd}>{addLangLabel}</Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── main component ────────────────────────────────────────────────────────────
 
 export function CommandsTab() {
   const t = useTranslations('commands');
 
   const {
-    commands, isLoading, selectedCommand, openModal, closeModal,
-    onUpdateCommand, onRemoveCommand, onToggleActive, isUpdatingCommand,
-    isAddModalOpen, openAddModal, closeAddModal, onCreateCommand, isCreatingCommand,
-  } = useCommands();
+    configs, isLoading, selectedConfig, openModal, closeModal,
+    onUpsert, onToggleActive, onDelete,
+    isUpserting, isAddModalOpen, openAddModal, closeAddModal,
+  } = useTenantCommandConfigs();
 
-  const [editActions, setEditActions] = useState<string[]>([]);
-  const [editParams, setEditParams] = useState<string[]>([]);
-  const [editRoles, setEditRoles] = useState<string[]>([]);
-  const [editActive, setEditActive] = useState(true);
+  // ── add state ──
+  const [addName, setAddName] = useState('');
   const [addActions, setAddActions] = useState<string[]>([]);
   const [addParams, setAddParams] = useState<string[]>([]);
-  const [addRoles, setAddRoles] = useState<string[]>([]);
-  const [addActive] = useState(true);
+  const [addUserTypes, setAddUserTypes] = useState<string[]>([]);
+  const [addActive, setAddActive] = useState(true);
+  const [addDescriptions, setAddDescriptions] = useState<Record<string, string>>({});
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CommandForm>();
-  const { register: registerAdd, handleSubmit: handleSubmitAdd, reset: resetAdd, formState: { errors: errorsAdd } } = useForm<CommandForm>();
+  // ── edit state ──
+  const [editActions, setEditActions] = useState<string[]>([]);
+  const [editParams, setEditParams] = useState<string[]>([]);
+  const [editUserTypes, setEditUserTypes] = useState<string[]>([]);
+  const [editActive, setEditActive] = useState(true);
+  const [editDescriptions, setEditDescriptions] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (selectedCommand) {
-      reset({ name: selectedCommand.name, description: selectedCommand.description });
-      setEditActions(Object.keys(selectedCommand.actions || {}));
-      setEditParams(Object.keys(selectedCommand.parameters || {}));
-      setEditRoles(selectedCommand.roleNames);
-      setEditActive(selectedCommand.active);
+    if (selectedConfig) {
+      setEditActions(Object.keys(parseJson<Record<string, boolean>>(selectedConfig.actionsJson)));
+      setEditParams(Object.keys(parseJson<Record<string, boolean>>(selectedConfig.parametersOverrideJson)));
+      setEditUserTypes(selectedConfig.userTypes ?? []);
+      setEditActive(selectedConfig.active);
+      setEditDescriptions(parseJson<Record<string, string>>(selectedConfig.descriptionI18nJson));
     }
-  }, [selectedCommand, reset]);
+  }, [selectedConfig]);
 
-  const ROLE_OPTIONS: SelectOption<string>[] = [
-    { value: ROLE_VALUES.Owner, label: t('roleOwner') },
-    { value: ROLE_VALUES.SuperUser, label: t('roleSuperUser') },
-    { value: ROLE_VALUES.Admin, label: t('roleAdmin') },
-    { value: ROLE_VALUES.Member, label: t('roleMember') },
-    { value: ROLE_VALUES.User, label: t('roleUser') },
+  const USER_TYPE_OPTIONS: SelectOption<string>[] = [
+    { value: USER_TYPE_VALUES.Owner, label: t('roleOwner') },
+    { value: USER_TYPE_VALUES.SuperUser, label: t('roleSuperUser') },
+    { value: USER_TYPE_VALUES.Admin, label: t('roleAdmin') },
+    { value: USER_TYPE_VALUES.Member, label: t('roleMember') },
+    { value: USER_TYPE_VALUES.User, label: t('roleUser') },
   ];
 
-  const toRecord = (keys: string[]): Record<string, boolean> =>
-    Object.fromEntries(keys.map((k) => [k, true]));
-
-  const onSubmitEdit = async (data: CommandForm) => {
-    await onUpdateCommand({ name: data.name, description: data.description, active: editActive, actions: toRecord(editActions), parameters: toRecord(editParams), roleNames: editRoles });
-    closeModal();
-  };
-
-  const onSubmitAdd = async (data: CommandForm) => {
-    await onCreateCommand({ name: data.name, description: data.description, actions: toRecord(addActions), parameters: toRecord(addParams), roleNames: addRoles });
-    resetAdd();
+  const resetAdd = () => {
+    setAddName('');
     setAddActions([]);
     setAddParams([]);
-    setAddRoles([]);
+    setAddUserTypes([]);
+    setAddActive(true);
+    setAddDescriptions({});
+  };
+
+  const onSubmitAdd = async () => {
+    if (!addName.trim()) return;
+    await onUpsert({
+      commandName: addName.trim(),
+      active: addActive,
+      userTypes: addUserTypes,
+      actionsJson: toKeysJson(addActions),
+      parametersOverrideJson: toKeysJson(addParams),
+      descriptionI18nJson: Object.keys(addDescriptions).length > 0 ? JSON.stringify(addDescriptions) : undefined,
+    });
+    resetAdd();
     closeAddModal();
   };
 
-  const columns: TableColumn<CommandSummary>[] = [
-    { key: 'name', header: t('colName') },
-    { key: 'actions', header: t('colActions'), render: (val) => <KeyBadges record={val as Record<string, boolean>} /> },
-    { key: 'parameters', header: t('colParameters'), render: (val) => <KeyBadges record={val as Record<string, boolean>} /> },
+  const onSubmitEdit = async () => {
+    if (!selectedConfig) return;
+    await onUpsert({
+      commandName: selectedConfig.commandName,
+      active: editActive,
+      userTypes: editUserTypes,
+      actionsJson: toKeysJson(editActions),
+      parametersOverrideJson: toKeysJson(editParams),
+      descriptionI18nJson: Object.keys(editDescriptions).length > 0 ? JSON.stringify(editDescriptions) : undefined,
+    });
+    closeModal();
+  };
+
+  const columns: TableColumn<TenantCommandConfigSummary>[] = [
+    { key: 'commandName', header: t('colName') },
     {
-      key: 'roleNames', header: t('colPermissions'),
+      key: 'actionsJson', header: t('colActions'),
+      render: (val) => <KeyBadges record={parseJson<Record<string, boolean>>(val as string)} />,
+    },
+    {
+      key: 'userTypes', header: t('colUserTypes'),
       render: (val) => (
         <div className="flex flex-wrap gap-1">
           {(val as string[]).length === 0
@@ -119,48 +239,74 @@ export function CommandsTab() {
       ),
     },
     {
+      key: 'descriptionI18nJson', header: t('colDescription'),
+      render: (val) => {
+        const desc = getDescription(parseJson<Record<string, string>>(val as string));
+        return desc ? (
+          <span className="text-xs text-muted line-clamp-1 max-w-50">{desc}</span>
+        ) : (
+          <span className="text-muted text-xs">—</span>
+        );
+      },
+    },
+    {
       key: 'active', header: t('colActive'),
       render: (val, row) => (
         <span onClick={(e) => e.stopPropagation()}>
-          <Toggle checked={val as boolean} onChange={(checked) => onToggleActive(row.id, checked)} />
+          <Toggle checked={val as boolean} onChange={(checked) => onToggleActive(row, checked)} />
         </span>
       ),
     },
     {
-      key: 'id', header: '', align: 'right',
+      key: 'commandName', header: '', align: 'right',
       render: (val) => (
         <span onClick={(e) => e.stopPropagation()}>
-          <Button variant="red" size="sm" onClick={() => onRemoveCommand(val as string)}>{t('delete')}</Button>
+          <Button variant="red" size="sm" onClick={() => onDelete(val as string)}>{t('delete')}</Button>
         </span>
       ),
     },
   ];
 
-  const renderModalFields = (
-    _mode: 'edit' | 'add',
-    reg: typeof register,
-    errs: typeof errors,
+  const sharedFormFields = (
+    name: string | undefined,
+    onNameChange: ((v: string) => void) | undefined,
     actions: string[], setActions: (v: string[]) => void,
     params: string[], setParams: (v: string[]) => void,
-    roles: string[], setRoles: (v: string[]) => void,
-    active: boolean, setActive?: (v: boolean) => void,
+    userTypes: string[], setUserTypes: (v: string[]) => void,
+    active: boolean, setActive: (v: boolean) => void,
+    descriptions: Record<string, string>, setDescriptions: (v: Record<string, string>) => void,
   ) => (
     <div className="flex flex-col gap-4">
       <div className="flex items-end gap-3">
         <div className="flex-1">
-          <Input label={t('fieldName')} error={errs.name?.message} {...reg('name', { required: t('required') })} />
+          {onNameChange !== undefined ? (
+            <Input label={t('fieldCommand')} value={name ?? ''} onChange={(e) => onNameChange(e.target.value)} />
+          ) : (
+            <div>
+              <label className="block text-xs font-medium text-muted mb-1.5">{t('fieldCommand')}</label>
+              <p className="text-sm font-medium text-text">{name}</p>
+            </div>
+          )}
         </div>
         <div className="flex-1">
-          <MultiSelect label={t('fieldPermissions')} value={roles} onChange={setRoles} options={ROLE_OPTIONS} />
+          <MultiSelect label={t('fieldPermissions')} value={userTypes} onChange={setUserTypes} options={USER_TYPE_OPTIONS} />
         </div>
         <div className="pb-1">
           <label className="block text-xs font-medium text-muted mb-1.5">{t('fieldActive')}</label>
           <Toggle checked={active} onChange={setActive} />
         </div>
       </div>
-      <TagInput label={t('fieldActions')} value={actions} onChange={setActions} />
-      <TagInput label={t('fieldParameters')} value={params} onChange={setParams} />
-      <Textarea label={t('fieldDescription')} error={errs.description?.message} {...reg('description')} />
+      <div className="grid grid-cols-2 gap-3">
+        <TagInput label={t('fieldActions')} value={actions} onChange={setActions} />
+        <TagInput label={t('fieldParameters')} value={params} onChange={setParams} />
+      </div>
+      <DescriptionEditor
+        value={descriptions}
+        onChange={setDescriptions}
+        label={t('fieldDescriptions')}
+        addLangLabel={t('addLanguage')}
+        langLabel={t('fieldLanguage')}
+      />
     </div>
   );
 
@@ -176,43 +322,63 @@ export function CommandsTab() {
           <div className="w-6 h-6 rounded-full border-2 border-border border-t-blue-500 animate-spin" />
         </div>
       ) : (
-        <Table<CommandSummary>
+        <Table<TenantCommandConfigSummary>
           columns={columns}
-          data={commands ?? []}
+          data={configs ?? []}
           keyExtractor={(row) => row.id}
           emptyMessage={t('empty')}
           onRowClick={openModal}
         />
       )}
 
-      <Modal isOpen={isAddModalOpen} onClose={closeAddModal} title={t('addModalTitle')} className="max-w-3xl! overflow-y-auto"
+      {/* Add modal */}
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={closeAddModal}
+        title={t('addModalTitle')}
+        className="max-w-3xl! overflow-y-auto"
         footer={
           <>
             <Button variant="blue" size="sm" onClick={closeAddModal}>{t('cancel')}</Button>
-            <Button variant="green" size="sm" form="add-command-form" type="submit" disabled={isCreatingCommand}>
-              {isCreatingCommand ? t('adding') : t('add')}
+            <Button variant="green" size="sm" onClick={onSubmitAdd} disabled={isUpserting || !addName.trim()}>
+              {isUpserting ? t('adding') : t('add')}
             </Button>
           </>
         }
       >
-        <form id="add-command-form" onSubmit={handleSubmitAdd(onSubmitAdd)}>
-          {renderModalFields('add', registerAdd, errorsAdd, addActions, setAddActions, addParams, setAddParams, addRoles, setAddRoles, addActive)}
-        </form>
+        {sharedFormFields(
+          addName, setAddName,
+          addActions, setAddActions,
+          addParams, setAddParams,
+          addUserTypes, setAddUserTypes,
+          addActive, setAddActive,
+          addDescriptions, setAddDescriptions,
+        )}
       </Modal>
 
-      <Modal isOpen={!!selectedCommand} onClose={closeModal} title={t('editModalTitle')} className="max-w-3xl! overflow-y-auto"
+      {/* Edit modal */}
+      <Modal
+        isOpen={!!selectedConfig}
+        onClose={closeModal}
+        title={t('editModalTitle')}
+        className="max-w-3xl! overflow-y-auto"
         footer={
           <>
             <Button variant="blue" size="sm" onClick={closeModal}>{t('cancel')}</Button>
-            <Button variant="green" size="sm" form="edit-command-form" type="submit" disabled={isUpdatingCommand}>
-              {isUpdatingCommand ? t('saving') : t('save')}
+            <Button variant="green" size="sm" onClick={onSubmitEdit} disabled={isUpserting}>
+              {isUpserting ? t('saving') : t('save')}
             </Button>
           </>
         }
       >
-        <form id="edit-command-form" onSubmit={handleSubmit(onSubmitEdit)}>
-          {renderModalFields('edit', register, errors, editActions, setEditActions, editParams, setEditParams, editRoles, setEditRoles, editActive, setEditActive)}
-        </form>
+        {sharedFormFields(
+          selectedConfig?.commandName, undefined,
+          editActions, setEditActions,
+          editParams, setEditParams,
+          editUserTypes, setEditUserTypes,
+          editActive, setEditActive,
+          editDescriptions, setEditDescriptions,
+        )}
       </Modal>
     </div>
   );

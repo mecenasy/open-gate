@@ -22,6 +22,11 @@ export class TenantInterceptor implements NestInterceptor {
       return next.handle();
     }
 
+    // Context already set by a guard (guards run before interceptors).
+    if (request.tenantContext) {
+      return this.runInContext(request.tenantContext, next);
+    }
+
     const syncContext = this.resolveTenantSync(request);
 
     if (syncContext) {

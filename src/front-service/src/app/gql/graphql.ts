@@ -157,6 +157,10 @@ export type CsrfTokenType = {
   csrfToken: Scalars['String']['output'];
 };
 
+export type DeleteTenantCommandConfigInput = {
+  commandName: Scalars['String']['input'];
+};
+
 export type ForgotPasswordType = {
   email: Scalars['String']['input'];
 };
@@ -237,6 +241,7 @@ export type Mutation = {
   createSimpleUser: UserType;
   createTenant: CreateTenantResult;
   createUser: UserType;
+  deleteTenantCommandConfig: MutationResult;
   forgotPassword: StatusType;
   loginUser: StatusType;
   logoutUser: StatusType;
@@ -300,6 +305,10 @@ export type MutationCreateTenantArgs = {
 
 export type MutationCreateUserArgs = {
   input: CreateUserType;
+};
+
+export type MutationDeleteTenantCommandConfigArgs = {
+  input: DeleteTenantCommandConfigInput;
 };
 
 export type MutationForgotPasswordArgs = {
@@ -554,10 +563,6 @@ export type QueryPromptsArgs = {
   input?: InputMaybe<GetAllPromptsType>;
 };
 
-export type QueryTenantCommandConfigsArgs = {
-  tenantId: Scalars['String']['input'];
-};
-
 export type QueryTenantPromptOverridesArgs = {
   tenantId: Scalars['String']['input'];
 };
@@ -613,11 +618,13 @@ export type SuccessResponseType = {
 
 export type TenantCommandConfigType = {
   __typename?: 'TenantCommandConfigType';
+  actionsJson?: Maybe<Scalars['String']['output']>;
   active: Scalars['Boolean']['output'];
-  commandId: Scalars['String']['output'];
   commandName: Scalars['String']['output'];
+  descriptionI18nJson?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
   parametersOverrideJson?: Maybe<Scalars['String']['output']>;
+  userTypes?: Maybe<Array<Scalars['String']['output']>>;
 };
 
 export type TenantFeaturesType = {
@@ -734,10 +741,12 @@ export type UpsertPlatformCredentialsInput = {
 };
 
 export type UpsertTenantCommandConfigInput = {
+  actionsJson?: InputMaybe<Scalars['String']['input']>;
   active: Scalars['Boolean']['input'];
-  commandId: Scalars['String']['input'];
+  commandName: Scalars['String']['input'];
+  descriptionI18nJson?: InputMaybe<Scalars['String']['input']>;
   parametersOverrideJson?: InputMaybe<Scalars['String']['input']>;
-  tenantId: Scalars['String']['input'];
+  userTypes?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type UpsertTenantPromptOverrideInput = {
@@ -1146,6 +1155,40 @@ export type RegisterMutationVariables = Exact<{
 export type RegisterMutation = {
   __typename?: 'Mutation';
   register: { __typename?: 'SuccessResponseType'; success: boolean };
+};
+
+export type GetTenantCommandConfigsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetTenantCommandConfigsQuery = {
+  __typename?: 'Query';
+  tenantCommandConfigs: Array<{
+    __typename?: 'TenantCommandConfigType';
+    id: string;
+    commandName: string;
+    active: boolean;
+    userTypes?: Array<string> | null;
+    actionsJson?: string | null;
+    parametersOverrideJson?: string | null;
+    descriptionI18nJson?: string | null;
+  }>;
+};
+
+export type UpsertTenantCommandConfigMutationMutationVariables = Exact<{
+  input: UpsertTenantCommandConfigInput;
+}>;
+
+export type UpsertTenantCommandConfigMutationMutation = {
+  __typename?: 'Mutation';
+  upsertTenantCommandConfig: { __typename?: 'MutationResult'; status: boolean; message: string };
+};
+
+export type DeleteTenantCommandConfigMutationVariables = Exact<{
+  input: DeleteTenantCommandConfigInput;
+}>;
+
+export type DeleteTenantCommandConfigMutation = {
+  __typename?: 'Mutation';
+  deleteTenantCommandConfig: { __typename?: 'MutationResult'; status: boolean; message: string };
 };
 
 export type TenantFeaturesSettingsQueryVariables = Exact<{ [key: string]: never }>;
@@ -2493,6 +2536,126 @@ export const RegisterDocument = {
     },
   ],
 } as unknown as DocumentNode<RegisterMutation, RegisterMutationVariables>;
+export const GetTenantCommandConfigsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetTenantCommandConfigs' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'tenantCommandConfigs' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'commandName' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'active' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'userTypes' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'actionsJson' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'parametersOverrideJson' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'descriptionI18nJson' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetTenantCommandConfigsQuery, GetTenantCommandConfigsQueryVariables>;
+export const UpsertTenantCommandConfigMutationDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpsertTenantCommandConfigMutation' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'UpsertTenantCommandConfigInput' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'upsertTenantCommandConfig' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpsertTenantCommandConfigMutationMutation,
+  UpsertTenantCommandConfigMutationMutationVariables
+>;
+export const DeleteTenantCommandConfigDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteTenantCommandConfig' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'DeleteTenantCommandConfigInput' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteTenantCommandConfig' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DeleteTenantCommandConfigMutation, DeleteTenantCommandConfigMutationVariables>;
 export const TenantFeaturesSettingsDocument = {
   kind: 'Document',
   definitions: [

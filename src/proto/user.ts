@@ -176,6 +176,8 @@ export interface UserData {
   status: Status;
   /** User role/type */
   type: UserType;
+  /** Tenant ID associated with the user */
+  tenantId: string;
 }
 
 export const USER_PACKAGE_NAME = 'user';

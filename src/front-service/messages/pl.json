@@ -164,7 +164,14 @@
     "roleAdmin": "Admin",
     "roleSuperUser": "SuperUser",
     "roleMember": "Member",
-    "roleUser": "User"
+    "roleUser": "User",
+    "fieldCommand": "Komenda",
+    "colUserTypes": "Typy użytkowników",
+    "colDescription": "Opis",
+    "fieldDescriptions": "Opisy",
+    "fieldLanguage": "Język",
+    "addLanguage": "+ Dodaj język",
+    "fieldParameters": "Parametry"
   },
   "coreConfig": {
     "title": "Konfiguracja rdzenia",

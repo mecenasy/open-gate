@@ -127,10 +127,12 @@ export interface UpsertPlatformCredentialsResponse {
 
 export interface TenantCommandConfigEntry {
   id: string;
-  commandId: string;
   commandName: string;
   active: boolean;
   parametersOverrideJson: string;
+  userTypes: string[];
+  actionsJson: string;
+  descriptionI18nJson: string;
 }
 
 export interface GetTenantCommandConfigsRequest {
@@ -145,12 +147,25 @@ export interface GetTenantCommandConfigsResponse {
 
 export interface UpsertTenantCommandConfigRequest {
   tenantId: string;
-  commandId: string;
+  commandName: string;
   active: boolean;
   parametersOverrideJson: string;
+  userTypes: string[];
+  actionsJson: string;
+  descriptionI18nJson: string;
 }
 
 export interface UpsertTenantCommandConfigResponse {
+  status: boolean;
+  message: string;
+}
+
+export interface DeleteTenantCommandConfigRequest {
+  tenantId: string;
+  commandName: string;
+}
+
+export interface DeleteTenantCommandConfigResponse {
   status: boolean;
   message: string;
 }
@@ -245,6 +260,11 @@ export interface TenantServiceClient {
     metadata?: Metadata,
   ): Observable<UpsertTenantCommandConfigResponse>;
 
+  deleteTenantCommandConfig(
+    request: DeleteTenantCommandConfigRequest,
+    metadata?: Metadata,
+  ): Observable<DeleteTenantCommandConfigResponse>;
+
   getPromptForContext(
     request: GetPromptForContextRequest,
     metadata?: Metadata,
@@ -335,6 +355,14 @@ export interface TenantServiceController {
     | Observable<UpsertTenantCommandConfigResponse>
     | UpsertTenantCommandConfigResponse;
 
+  deleteTenantCommandConfig(
+    request: DeleteTenantCommandConfigRequest,
+    metadata?: Metadata,
+  ):
+    | Promise<DeleteTenantCommandConfigResponse>
+    | Observable<DeleteTenantCommandConfigResponse>
+    | DeleteTenantCommandConfigResponse;
+
   getPromptForContext(
     request: GetPromptForContextRequest,
     metadata?: Metadata,
@@ -371,6 +399,7 @@ export function TenantServiceControllerMethods() {
       'upsertPlatformCredentials',
       'getTenantCommandConfigs',
       'upsertTenantCommandConfig',
+      'deleteTenantCommandConfig',
       'getPromptForContext',
       'upsertTenantPromptOverride',
       'getTenantPromptOverrides',

@@ -5,7 +5,6 @@ import { Tenant } from './entity/tenant.entity';
 import { CustomizationConfig } from './entity/customization-config.entity';
 import { PlatformCredentials, TenantCommandConfig, TenantPromptOverride } from '@app/entities';
 import { Prompt } from '../prompt/entity/prompt.entity';
-import { Command } from '../command/entity/command.entity';
 import { TenantDbService } from './tenant.service';
 import { PlatformCredentialsService } from './platform-credentials.service';
 import { TenantCommandConfigService } from './tenant-command-config.service';
@@ -24,7 +23,6 @@ import { DatabaseModule } from '@app/database';
       TenantCommandConfig,
       TenantPromptOverride,
       Prompt,
-      Command,
     ]),
     TenantModule,
     DatabaseModule,

@@ -1,4 +1,5 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { IsArray, IsString } from 'class-validator';
 
 @InputType()
 export class CreateTenantInput {
@@ -128,8 +129,26 @@ export class TenantCommandConfigType {
   id!: string;
 
   @Field()
-  commandId!: string;
+  commandName!: string;
 
+  @Field()
+  active!: boolean;
+
+  @Field({ nullable: true })
+  parametersOverrideJson?: string;
+
+  @Field(() => [String], { nullable: true })
+  userTypes?: string[];
+
+  @Field({ nullable: true })
+  actionsJson?: string;
+
+  @Field({ nullable: true })
+  descriptionI18nJson?: string;
+}
+
+@InputType()
+export class UpsertTenantCommandConfigInput {
   @Field()
   commandName!: string;
 
@@ -138,21 +157,23 @@ export class TenantCommandConfigType {
 
   @Field({ nullable: true })
   parametersOverrideJson?: string;
+
+  @Field(() => [String], { nullable: true })
+  @IsArray()
+  @IsString({ each: true })
+  userTypes?: string[];
+
+  @Field({ nullable: true })
+  actionsJson?: string;
+
+  @Field({ nullable: true })
+  descriptionI18nJson?: string;
 }
 
 @InputType()
-export class UpsertTenantCommandConfigInput {
+export class DeleteTenantCommandConfigInput {
   @Field()
-  tenantId!: string;
-
-  @Field()
-  commandId!: string;
-
-  @Field()
-  active!: boolean;
-
-  @Field({ nullable: true })
-  parametersOverrideJson?: string;
+  commandName!: string;
 }
 
 // ─── Tenant prompt overrides ──────────────────────────────────────────────────

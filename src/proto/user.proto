@@ -138,4 +138,5 @@ message UserData {
   string surname = 5;    // Last name
   Status status = 6;     // Account status
   UserType type = 7;     // User role/type
+  string tenant_id = 8;  // Tenant ID associated with the user
 }

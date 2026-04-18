@@ -164,7 +164,14 @@
     "roleAdmin": "Admin",
     "roleSuperUser": "SuperUser",
     "roleMember": "Member",
-    "roleUser": "User"
+    "roleUser": "User",
+    "fieldCommand": "Command",
+    "colUserTypes": "User Types",
+    "colDescription": "Description",
+    "fieldDescriptions": "Descriptions",
+    "fieldLanguage": "Language",
+    "addLanguage": "+ Add language",
+    "fieldParameters": "Parameters"
   },
   "coreConfig": {
     "title": "Core Configuration",

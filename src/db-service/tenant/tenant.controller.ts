@@ -23,6 +23,8 @@ import {
   GetTenantCommandConfigsResponse,
   UpsertTenantCommandConfigRequest,
   UpsertTenantCommandConfigResponse,
+  DeleteTenantCommandConfigRequest,
+  DeleteTenantCommandConfigResponse,
   GetPromptForContextRequest,
   GetPromptForContextResponse,
   UpsertTenantPromptOverrideRequest,
@@ -160,25 +162,50 @@ export class TenantController implements TenantServiceController {
       message: 'OK',
       configs: configs.map((c) => ({
         id: String(c.id),
-        commandId: String(c.commandId),
         commandName: String(c.commandName),
         active: Boolean(c.active),
         parametersOverrideJson: c.parametersOverride ? JSON.stringify(c.parametersOverride) : '',
+        userTypes: c.userTypes ?? [],
+        actionsJson: c.actions ? JSON.stringify(c.actions) : '',
+        descriptionI18nJson: c.descriptionI18n ? JSON.stringify(c.descriptionI18n) : '',
       })),
     };
   }
 
   async upsertTenantCommandConfig({
     tenantId,
-    commandId,
+    commandName,
     active,
     parametersOverrideJson,
+    userTypes,
+    actionsJson,
+    descriptionI18nJson,
   }: UpsertTenantCommandConfigRequest): Promise<UpsertTenantCommandConfigResponse> {
     const override = parametersOverrideJson
       ? (JSON.parse(String(parametersOverrideJson)) as Record<string, boolean>)
       : null;
-    await this.commandConfigService.upsert(String(tenantId), String(commandId), Boolean(active), override);
+    const actions = actionsJson ? (JSON.parse(String(actionsJson)) as Record<string, boolean>) : null;
+    const descriptionI18n = descriptionI18nJson
+      ? (JSON.parse(String(descriptionI18nJson)) as Record<string, string>)
+      : null;
+    await this.commandConfigService.upsert(
+      String(tenantId),
+      String(commandName),
+      Boolean(active),
+      override,
+      userTypes ?? [],
+      actions,
+      descriptionI18n,
+    );
     return { status: true, message: 'Command config upserted successfully' };
+  }
+
+  async deleteTenantCommandConfig({
+    tenantId,
+    commandName,
+  }: DeleteTenantCommandConfigRequest): Promise<DeleteTenantCommandConfigResponse> {
+    await this.commandConfigService.delete(String(tenantId), String(commandName));
+    return { status: true, message: 'Command config deleted successfully' };
   }
 
   async getPromptForContext({

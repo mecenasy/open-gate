@@ -1,5 +1,5 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { TenantService } from '@app/tenant';
 import { TenantCustomizationService } from '../common/customization/tenant-customization.service';
 import { OwnerGuard } from '../common/guards/owner.guard';
@@ -8,6 +8,7 @@ import { TenantFeaturesType } from './dto/tenant-features.type';
 import {
   CreateTenantInput,
   CreateTenantResult,
+  DeleteTenantCommandConfigInput,
   MutationResult,
   TenantCommandConfigType,
   TenantPlatformCredentialType,
@@ -99,19 +100,37 @@ export class TenantResolver {
 
   @UseGuards(OwnerGuard)
   @Query(() => [TenantCommandConfigType])
-  tenantCommandConfigs(@Args('tenantId') tenantId: string): Promise<TenantCommandConfigType[]> {
+  tenantCommandConfigs(): Promise<TenantCommandConfigType[]> {
+    const tenantId = this.resolveTenantId();
     return this.tenantAdminService.getTenantCommandConfigs(tenantId);
   }
 
   @UseGuards(OwnerGuard)
   @Mutation(() => MutationResult)
   upsertTenantCommandConfig(@Args('input') input: UpsertTenantCommandConfigInput): Promise<MutationResult> {
+    const tenantId = this.resolveTenantId();
     return this.tenantAdminService.upsertTenantCommandConfig(
-      input.tenantId,
-      input.commandId,
+      tenantId,
+      input.commandName,
       input.active,
       input.parametersOverrideJson,
+      input.userTypes,
+      input.actionsJson,
+      input.descriptionI18nJson,
     );
+  }
+
+  @UseGuards(OwnerGuard)
+  @Mutation(() => MutationResult)
+  deleteTenantCommandConfig(@Args('input') input: DeleteTenantCommandConfigInput): Promise<MutationResult> {
+    const tenantId = this.resolveTenantId();
+    return this.tenantAdminService.deleteTenantCommandConfig(tenantId, input.commandName);
+  }
+
+  private resolveTenantId(): string {
+    const tenantId = this.tenantService.getContext()?.tenantId;
+    if (!tenantId) throw new UnauthorizedException('Tenant context not available');
+    return tenantId;
   }
 
   // ── Prompt overrides per tenant ─────────────────────────────────────────────

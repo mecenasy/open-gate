@@ -41,6 +41,9 @@ type Documents = {
   '\n  mutation QrChallenge($nonce: String!) {\n    qrChallenge(nonce: $nonce) {\n      challenge\n      dataUrl\n    }\n  }\n': typeof types.QrChallengeDocument;
   '\n  mutation QrLogin($challenge: String!, $nonce: String!) {\n    qrLogin(challenge: $challenge, nonce: $nonce) {\n      status\n    }\n  }\n': typeof types.QrLoginDocument;
   '\n  mutation Register($input: RegisterInput!) {\n    register(input: $input) {\n      success\n    }\n  }\n': typeof types.RegisterDocument;
+  '\n  query GetTenantCommandConfigs {\n    tenantCommandConfigs {\n      id\n      commandName\n      active\n      userTypes\n      actionsJson\n      parametersOverrideJson\n      descriptionI18nJson\n    }\n  }\n': typeof types.GetTenantCommandConfigsDocument;
+  '\n  mutation UpsertTenantCommandConfigMutation($input: UpsertTenantCommandConfigInput!) {\n    upsertTenantCommandConfig(input: $input) {\n      status\n      message\n    }\n  }\n': typeof types.UpsertTenantCommandConfigMutationDocument;
+  '\n  mutation DeleteTenantCommandConfig($input: DeleteTenantCommandConfigInput!) {\n    deleteTenantCommandConfig(input: $input) {\n      status\n      message\n    }\n  }\n': typeof types.DeleteTenantCommandConfigDocument;
   '\n  query TenantFeaturesSettings {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      enableAudioRecognition\n      maxUsersPerTenant\n    }\n  }\n': typeof types.TenantFeaturesSettingsDocument;
   '\n  mutation UpdateTenantFeatures($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n': typeof types.UpdateTenantFeaturesDocument;
   '\n  query TenantFeatures {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      maxUsersPerTenant\n    }\n  }\n': typeof types.TenantFeaturesDocument;
@@ -111,6 +114,12 @@ const documents: Documents = {
     types.QrLoginDocument,
   '\n  mutation Register($input: RegisterInput!) {\n    register(input: $input) {\n      success\n    }\n  }\n':
     types.RegisterDocument,
+  '\n  query GetTenantCommandConfigs {\n    tenantCommandConfigs {\n      id\n      commandName\n      active\n      userTypes\n      actionsJson\n      parametersOverrideJson\n      descriptionI18nJson\n    }\n  }\n':
+    types.GetTenantCommandConfigsDocument,
+  '\n  mutation UpsertTenantCommandConfigMutation($input: UpsertTenantCommandConfigInput!) {\n    upsertTenantCommandConfig(input: $input) {\n      status\n      message\n    }\n  }\n':
+    types.UpsertTenantCommandConfigMutationDocument,
+  '\n  mutation DeleteTenantCommandConfig($input: DeleteTenantCommandConfigInput!) {\n    deleteTenantCommandConfig(input: $input) {\n      status\n      message\n    }\n  }\n':
+    types.DeleteTenantCommandConfigDocument,
   '\n  query TenantFeaturesSettings {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      enableAudioRecognition\n      maxUsersPerTenant\n    }\n  }\n':
     types.TenantFeaturesSettingsDocument,
   '\n  mutation UpdateTenantFeatures($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n':
@@ -321,6 +330,24 @@ export function graphql(
 export function graphql(
   source: '\n  mutation Register($input: RegisterInput!) {\n    register(input: $input) {\n      success\n    }\n  }\n',
 ): (typeof documents)['\n  mutation Register($input: RegisterInput!) {\n    register(input: $input) {\n      success\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  query GetTenantCommandConfigs {\n    tenantCommandConfigs {\n      id\n      commandName\n      active\n      userTypes\n      actionsJson\n      parametersOverrideJson\n      descriptionI18nJson\n    }\n  }\n',
+): (typeof documents)['\n  query GetTenantCommandConfigs {\n    tenantCommandConfigs {\n      id\n      commandName\n      active\n      userTypes\n      actionsJson\n      parametersOverrideJson\n      descriptionI18nJson\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  mutation UpsertTenantCommandConfigMutation($input: UpsertTenantCommandConfigInput!) {\n    upsertTenantCommandConfig(input: $input) {\n      status\n      message\n    }\n  }\n',
+): (typeof documents)['\n  mutation UpsertTenantCommandConfigMutation($input: UpsertTenantCommandConfigInput!) {\n    upsertTenantCommandConfig(input: $input) {\n      status\n      message\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  mutation DeleteTenantCommandConfig($input: DeleteTenantCommandConfigInput!) {\n    deleteTenantCommandConfig(input: $input) {\n      status\n      message\n    }\n  }\n',
+): (typeof documents)['\n  mutation DeleteTenantCommandConfig($input: DeleteTenantCommandConfigInput!) {\n    deleteTenantCommandConfig(input: $input) {\n      status\n      message\n    }\n  }\n'];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

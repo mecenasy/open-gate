@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client/react';
 import { io, Socket } from 'socket.io-client';
 import { useTranslations } from 'next-intl';
-import { graphql } from '@/app/gql';
 import { useRouter } from '@/components/navigation/navigation';
+import { graphql } from '@/app/gql';
 
 const CHALLENGE_MUTATION = graphql(`
   mutation QrChallenge($nonce: String!) {
@@ -26,6 +26,7 @@ const LOGIN_MUTATION = graphql(`
 
 export const useQrCodeLogin = (onClose: () => void) => {
   const [nonce] = useState(() => crypto.randomUUID());
+  const [serverError, setServerError] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const router = useRouter();
   const t = useTranslations('qrCode');
@@ -51,23 +52,23 @@ export const useQrCodeLogin = (onClose: () => void) => {
     });
 
     socketRef.current.on('challenge', async ({ status, type, ...rest }) => {
-      if (nonce === rest.nonce && type === 'QR-AUTH') {
+      if (rest.nonce === nonce && type === 'QR-AUTH') {
         switch (status) {
           case 'verified':
             await qrLogin({ variables: { challenge, nonce } });
             router.replace('/');
             break;
           case 'rejected':
-            alert(t('canceled'));
+            setServerError(t('canceled'));
             onClose();
             break;
           default:
-            alert(t('error'));
+            setServerError(t('error'));
             onClose();
             break;
         }
       } else {
-        alert(t('alert'));
+        setServerError(t('alert'));
       }
 
       socketRef.current?.close();
@@ -78,5 +79,5 @@ export const useQrCodeLogin = (onClose: () => void) => {
     };
   }, [challenge, qrLogin, t, router, nonce, onClose]);
 
-  return { dataUrl, isLoading: loading || !dataUrl };
+  return { dataUrl, isLoading: loading || !dataUrl, serverError };
 };

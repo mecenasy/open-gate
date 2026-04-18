@@ -1,26 +1,18 @@
+'use client';
+
+import { useState } from 'react';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { verificationSchema } from '../components/schemas/schemas';
-import { useRouter } from '../components/navigation/navigation';
 import { useTranslations } from 'next-intl';
 import { useMutation } from '@apollo/client/react';
+import { useRouter } from '@/components/navigation/navigation';
 import { graphql } from '@/app/gql';
 import { AuthStatus } from '@/app/gql/graphql';
+import { verificationSchema } from '@/components/schemas/schemas';
 
 type VerificationFormValues = z.infer<ReturnType<typeof verificationSchema>>;
 
-const getUrl = (type?: AuthStatus) => {
-  switch (type) {
-    case AuthStatus.Tfa:
-    case AuthStatus.Sms:
-    case AuthStatus.Email:
-      return '/api/auth/verify-otp';
-
-    default:
-      return '';
-  }
-};
 const VERIFY_MFA_MUTATION = graphql(`
   mutation VerifyMfa($input: VerifyCodeType!) {
     verifyMfa(input: $input) {
@@ -28,6 +20,7 @@ const VERIFY_MFA_MUTATION = graphql(`
     }
   }
 `);
+
 const VERIFY_2FA_MUTATION = graphql(`
   mutation Verify2faCode($input: Verify2faCodeType!) {
     verify2faCode(input: $input) {
@@ -36,17 +29,14 @@ const VERIFY_2FA_MUTATION = graphql(`
   }
 `);
 
-export const useVerify = (
-  login: string,
-  verifyType?: AuthStatus,
-  callBack?: (status: AuthStatus) => void,
-  token?: string,
-) => {
+export const useVerify = (email: string, verifyType?: AuthStatus) => {
   const router = useRouter();
   const t = useTranslations('login');
   const tSchemas = useTranslations('schemas');
   const [verifyMfa, verifyMfaMeta] = useMutation(VERIFY_MFA_MUTATION, { refetchQueries: ['Status'] });
   const [verify2fa, verify2faMeta] = useMutation(VERIFY_2FA_MUTATION, { refetchQueries: ['Status'] });
+  const [serverError, setServerError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -55,37 +45,31 @@ export const useVerify = (
     resolver: zodResolver(verificationSchema(tSchemas)),
   });
 
-  const verify = async (email: string, code: string, token: string = '') => {
-    switch (verifyType) {
-      case AuthStatus.Sms:
-      case AuthStatus.Email: {
-        const result = await verifyMfa({ variables: { input: { email, code: +code } } });
-        return result.data?.verifyMfa;
-      }
-      case AuthStatus.Tfa: {
-        const result = await verify2fa({ variables: { input: { email, code } } });
-        return result.data?.verify2faCode;
-      }
-      default:
-        return;
-    }
-  };
-
-  const onSubmit = async ({ code }: VerificationFormValues) => {
+  const onSubmit = handleSubmit(async ({ code }) => {
+    setServerError(null);
     try {
-      const result = await verify(login, code, token);
-      callBack?.(result?.status as AuthStatus);
+      switch (verifyType) {
+        case AuthStatus.Sms:
+        case AuthStatus.Email:
+          await verifyMfa({ variables: { input: { email, code: +code } } });
+          break;
+        case AuthStatus.Tfa:
+          await verify2fa({ variables: { input: { email, code } } });
+          break;
+        default:
+          return;
+      }
       router.replace('/');
-    } catch (error) {
-      console.error('Verification failed:', error);
-      alert(t('verifyWrong'));
+    } catch {
+      setServerError(t('verifyWrong'));
     }
-  };
+  });
 
   return {
     register,
-    onSubmit: handleSubmit(onSubmit),
     errors,
+    onSubmit,
+    serverError,
     isPending: verifyMfaMeta.loading || verify2faMeta.loading,
   };
 };

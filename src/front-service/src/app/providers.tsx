@@ -1,59 +1,19 @@
 'use client';
 
-import { ApolloProvider } from '@apollo/client/react';
-import { InMemoryCache, HttpLink, ApolloClient, from } from '@apollo/client';
-import { SetContextLink } from '@apollo/client/link/context';
+import { ThemeProvider } from 'next-themes';
+import type { ReactNode } from 'react';
+import { ApolloProvider } from '@/lib/apollo/client';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_HOST_URL}/graphql`;
-
-let cachedCsrfToken: string | null = null;
-
-async function fetchCsrfToken(): Promise<string> {
-  if (cachedCsrfToken) return cachedCsrfToken;
-
-  const response = await fetch(API_URL, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query: '{ csrfToken { csrfToken } }' }),
-  });
-
-  const json = (await response.json()) as { data?: { csrfToken?: { csrfToken?: string } } };
-  const token = json?.data?.csrfToken?.csrfToken;
-
-  if (!token) throw new Error('Failed to fetch CSRF token');
-
-  cachedCsrfToken = token;
-  return token;
+interface ProvidersProps {
+  children: ReactNode;
 }
 
-const csrfLink = new SetContextLink(async (prevContext, operation) => {
-  if (operation.operationType !== 'mutation') return prevContext;
-
-  const token = await fetchCsrfToken();
-  return {
-    ...prevContext,
-    headers: {
-      ...(prevContext.headers as Record<string, string> | undefined),
-      'X-CSRF-Token': token,
-    },
-  };
-});
-
-const httpLink = new HttpLink({
-  uri: API_URL,
-  credentials: 'include',
-});
-
-const client = new ApolloClient({
-  link: from([csrfLink, httpLink]),
-  cache: new InMemoryCache(),
-});
-
-export default function Provider({ children }: { children: React.ReactNode }) {
+export default function Providers({ children }: ProvidersProps) {
   return (
-    <ApolloProvider client={client}>
-      {children}
+    <ApolloProvider>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+        {children}
+      </ThemeProvider>
     </ApolloProvider>
   );
 }

@@ -193,7 +193,7 @@ export class TenantPromptOverrideType {
   userType!: string;
 
   @Field({ nullable: true })
-  description?: string;
+  descriptionI18nJson?: string;
 
   @Field()
   prompt!: string;
@@ -201,9 +201,6 @@ export class TenantPromptOverrideType {
 
 @InputType()
 export class UpsertTenantPromptOverrideInput {
-  @Field()
-  tenantId!: string;
-
   /** Empty string or omitted = general context (not command-specific) */
   @Field({ nullable: true })
   commandId?: string;
@@ -212,7 +209,7 @@ export class UpsertTenantPromptOverrideInput {
   userType!: string;
 
   @Field({ nullable: true })
-  description?: string;
+  descriptionI18nJson?: string;
 
   @Field()
   prompt!: string;

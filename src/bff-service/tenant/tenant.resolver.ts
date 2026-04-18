@@ -137,19 +137,21 @@ export class TenantResolver {
 
   @UseGuards(OwnerGuard)
   @Query(() => [TenantPromptOverrideType])
-  tenantPromptOverrides(@Args('tenantId') tenantId: string): Promise<TenantPromptOverrideType[]> {
+  tenantPromptOverrides(): Promise<TenantPromptOverrideType[]> {
+    const tenantId = this.resolveTenantId();
     return this.tenantAdminService.getTenantPromptOverrides(tenantId);
   }
 
   @UseGuards(OwnerGuard)
   @Mutation(() => MutationResult)
   upsertTenantPromptOverride(@Args('input') input: UpsertTenantPromptOverrideInput): Promise<MutationResult> {
+    const tenantId = this.resolveTenantId();
     return this.tenantAdminService.upsertTenantPromptOverride(
-      input.tenantId,
+      tenantId,
       input.userType,
       input.prompt,
       input.commandId,
-      input.description,
+      input.descriptionI18nJson,
     );
   }
 }

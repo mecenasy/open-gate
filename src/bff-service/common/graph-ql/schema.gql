@@ -258,7 +258,7 @@ type TenantPromptOverrideType {
   tenantId: String!
   commandId: String
   userType: String!
-  description: String
+  descriptionI18nJson: String
   prompt: String!
 }
 
@@ -282,7 +282,7 @@ type Query {
   tenantPlatformCredentials: [TenantPlatformCredentialType!]!
   tenants: [TenantType!]!
   tenantCommandConfigs: [TenantCommandConfigType!]!
-  tenantPromptOverrides(tenantId: String!): [TenantPromptOverrideType!]!
+  tenantPromptOverrides: [TenantPromptOverrideType!]!
   csrfToken: CsrfTokenType!
 }
 
@@ -562,9 +562,8 @@ input DeleteTenantCommandConfigInput {
 }
 
 input UpsertTenantPromptOverrideInput {
-  tenantId: String!
   commandId: String
   userType: String!
-  description: String
+  descriptionI18nJson: String
   prompt: String!
 }

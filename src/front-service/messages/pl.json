@@ -123,10 +123,12 @@
     "add": "Dodaj",
     "adding": "Dodawanie…",
     "fieldKey": "Key",
-    "fieldDescription": "Opis",
     "fieldCommandName": "Nazwa komendy",
     "fieldUserType": "Typ użytkownika",
     "fieldPrompt": "Prompt",
+    "fieldDescriptions": "Opisy",
+    "fieldLanguage": "Język",
+    "addLanguage": "+ Dodaj język",
     "required": "Wymagane",
     "loadingPrompt": "Ładowanie promptu…",
     "userTypeOwner": "Owner",
@@ -134,7 +136,8 @@
     "userTypeAdmin": "Admin",
     "userTypeMember": "Member",
     "userTypeUser": "User",
-    "userTypeUnrecognized": "Unrecognized"
+    "userTypeUnrecognized": "Unrecognized",
+    "commandGeneral": "— Ogólny (bez komendy) —"
   },
   "commands": {
     "title": "Komendy",

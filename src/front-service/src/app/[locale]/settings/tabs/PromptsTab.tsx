@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Button, Input, Modal, Select, Table, Textarea } from '@/components/ui';
+import { Button, Modal, Select, Table, Textarea } from '@/components/ui';
 import type { TableColumn, SelectOption } from '@/components/ui';
 import { PromptUserType } from '@/app/gql/graphql';
 import { usePrompts } from '@/hooks/use-prompts';
-import type { PromptSummary } from '@/hooks/use-prompts';
+import type { PromptSummary, PromptOverrideForm } from '@/hooks/use-prompts';
 
 const USER_TYPE_BADGE: Record<string, { dot: string; pill: string }> = {
   [PromptUserType.Owner]: { dot: 'bg-rose-700', pill: 'bg-rose-800/20 text-rose-500 border border-rose-800/30' },
@@ -27,6 +27,20 @@ const USER_TYPE_LABEL_KEY: Record<string, string> = {
   [PromptUserType.Unrecognized]: 'userTypeUnrecognized',
 };
 
+const LANG_OPTIONS: SelectOption<string>[] = [
+  { value: 'en', label: 'English' },
+  { value: 'pl', label: 'Polski' },
+  { value: 'de', label: 'Deutsch' },
+  { value: 'fr', label: 'Français' },
+  { value: 'es', label: 'Español' },
+  { value: 'it', label: 'Italiano' },
+  { value: 'uk', label: 'Українська' },
+];
+
+function getDescription(i18n: Record<string, string>, lang = 'en'): string {
+  return i18n[lang] ?? i18n['en'] ?? Object.values(i18n)[0] ?? '';
+}
+
 function UserTypeBadge({ value, label }: { value: string; label: string }) {
   const cfg = USER_TYPE_BADGE[value] ?? { dot: 'bg-slate-500', pill: 'bg-slate-500/20 text-slate-400 light:text-slate-600 border border-slate-400/50' };
   return (
@@ -37,29 +51,80 @@ function UserTypeBadge({ value, label }: { value: string; label: string }) {
   );
 }
 
-type PromptForm = {
-  key: string;
-  description: string;
-  commandName: string;
-  userType: PromptUserType;
-  prompt: string;
+type DescriptionEditorProps = {
+  value: Record<string, string>;
+  onChange: (v: Record<string, string>) => void;
+  label: string;
+  addLangLabel: string;
+  langLabel: string;
 };
+
+function DescriptionEditor({ value, onChange, label, addLangLabel, langLabel }: DescriptionEditorProps) {
+  const [newLang, setNewLang] = useState('en');
+  const usedLangs = Object.keys(value);
+  const availableLangs = LANG_OPTIONS.filter((o) => !usedLangs.includes(o.value));
+
+  const handleAdd = () => {
+    if (!newLang || value[newLang] !== undefined) return;
+    onChange({ ...value, [newLang]: '' });
+    const next = availableLangs.find((o) => o.value !== newLang);
+    if (next) setNewLang(next.value);
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="block text-xs font-medium text-muted">{label}</label>
+      {usedLangs.map((lang) => (
+        <div key={lang} className="flex items-start gap-2">
+          <span className="mt-2 text-xs font-mono uppercase text-muted w-8 shrink-0">{lang}</span>
+          <div className="flex-1">
+            <Textarea
+              value={value[lang]}
+              onChange={(e) => onChange({ ...value, [lang]: e.target.value })}
+              rows={2}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => { const next = { ...value }; delete next[lang]; onChange(next); }}
+            className="mt-2 text-xs text-rose-400 hover:text-rose-300 shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+      ))}
+      {availableLangs.length > 0 && (
+        <div className="flex items-center gap-2 mt-1">
+          <div className="w-40">
+            <Select<string> label={langLabel} value={newLang} options={availableLangs} onChange={setNewLang} />
+          </div>
+          <div className="pt-5">
+            <Button variant="blue" size="sm" onClick={handleAdd}>{addLangLabel}</Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function PromptsTab() {
   const t = useTranslations('prompts');
 
   const {
-    prompts, isLoading, selectedPrompt, openModal, closeModal,
-    onUpdatePrompt, onRemovePrompt, isUpdatingPrompt,
+    prompts, isLoading, commandOptions, selectedPrompt, openModal, closeModal,
+    onUpdatePrompt, isUpdatingPrompt,
     isAddModalOpen, openAddModal, closeAddModal, onCreatePrompt, isCreatingPrompt,
-    fullPromptLoading, fullPromptText,
   } = usePrompts();
 
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<PromptForm>();
-  const { register: registerAdd, handleSubmit: handleSubmitAdd, reset: resetAdd, watch: watchAdd, setValue: setValueAdd, formState: { errors: errorsAdd } } = useForm<PromptForm>({ defaultValues: { userType: PromptUserType.User } });
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<PromptOverrideForm>({ defaultValues: { descriptionI18n: {} } });
+  const { register: registerAdd, handleSubmit: handleSubmitAdd, reset: resetAdd, watch: watchAdd, setValue: setValueAdd, formState: { errors: errorsAdd } } = useForm<PromptOverrideForm>({ defaultValues: { userType: PromptUserType.User, descriptionI18n: {} } });
 
   const watchedUserType = watch('userType');
+  const watchedCommandId = watch('commandId');
+  const watchedDescriptionI18n = watch('descriptionI18n');
   const watchedAddUserType = watchAdd('userType');
+  const watchedAddCommandId = watchAdd('commandId');
+  const watchedAddDescriptionI18n = watchAdd('descriptionI18n');
 
   const USER_TYPE_OPTIONS: SelectOption<PromptUserType>[] = [
     { value: PromptUserType.Owner, label: t('userTypeOwner') },
@@ -69,34 +134,42 @@ export function PromptsTab() {
     { value: PromptUserType.User, label: t('userTypeUser') },
   ];
 
+  const COMMAND_OPTIONS: SelectOption<string>[] = [
+    { value: '', label: t('commandGeneral') },
+    ...commandOptions,
+  ];
+
   useEffect(() => {
     if (selectedPrompt) {
-      reset({ key: selectedPrompt.key, description: selectedPrompt.description, commandName: selectedPrompt.commandName, userType: selectedPrompt.userType as PromptUserType, prompt: selectedPrompt.prompt });
+      reset({
+        commandId: selectedPrompt.commandId ?? '',
+        descriptionI18n: selectedPrompt.descriptionI18n ?? {},
+        userType: selectedPrompt.userType as PromptUserType,
+        prompt: selectedPrompt.prompt,
+      });
     }
   }, [selectedPrompt, reset]);
 
-  useEffect(() => {
-    if (fullPromptText) setValue('prompt', fullPromptText);
-  }, [fullPromptText, setValue]);
-
-  const onSubmitAdd = async (data: PromptForm) => { await onCreatePrompt(data); resetAdd(); closeAddModal(); };
-  const onSubmit = async (data: PromptForm) => { await onUpdatePrompt(data); closeModal(); };
+  const onSubmitAdd = async (data: PromptOverrideForm) => { await onCreatePrompt(data); resetAdd({ descriptionI18n: {} }); closeAddModal(); };
+  const onSubmit = async (data: PromptOverrideForm) => { await onUpdatePrompt(data); closeModal(); };
 
   const columns: TableColumn<PromptSummary>[] = [
-    { key: 'key', header: t('colKey') },
-    { key: 'description', header: t('colDescription') },
-    { key: 'commandName', header: t('colCommandName') },
+    {
+      key: 'commandName', header: t('colCommandName'),
+      render: (val) => <span className="text-muted">{(val as string) ?? t('commandGeneral')}</span>,
+    },
+    {
+      key: 'descriptionI18n', header: t('colDescription'),
+      render: (val) => {
+        const desc = val ? getDescription(val as Record<string, string>) : '';
+        return desc
+          ? <span className="text-xs text-muted line-clamp-1 max-w-50">{desc}</span>
+          : <span className="text-muted text-xs">—</span>;
+      },
+    },
     {
       key: 'userType', header: t('colUserType'),
       render: (val) => <UserTypeBadge value={val as string} label={t(USER_TYPE_LABEL_KEY[val as string] as Parameters<typeof t>[0])} />,
-    },
-    {
-      key: 'id', header: '', align: 'right',
-      render: (val) => (
-        <span onClick={(e) => e.stopPropagation()}>
-          <Button variant="red" size="sm" onClick={() => onRemovePrompt(val as string)}>{t('delete')}</Button>
-        </span>
-      ),
     },
   ];
 
@@ -126,12 +199,27 @@ export function PromptsTab() {
         }
       >
         <form id="add-prompt-form" onSubmit={handleSubmitAdd(onSubmitAdd)} className="flex flex-col gap-4 flex-1 min-h-0">
-          <div className="grid grid-cols-3 gap-4 shrink-0">
-            <Input label={t('fieldKey')} error={errorsAdd.key?.message} {...registerAdd('key', { required: t('required') })} />
-            <Input label={t('fieldCommandName')} error={errorsAdd.commandName?.message} {...registerAdd('commandName', { required: t('required') })} />
-            <Select<PromptUserType> label={t('fieldUserType')} value={watchedAddUserType} options={USER_TYPE_OPTIONS} onChange={(v) => setValueAdd('userType', v)} />
+          <div className="grid grid-cols-2 gap-4 shrink-0">
+            <Select<string>
+              label={t('fieldCommandName')}
+              value={watchedAddCommandId ?? ''}
+              options={COMMAND_OPTIONS}
+              onChange={(v) => setValueAdd('commandId', v || undefined)}
+            />
+            <Select<PromptUserType>
+              label={t('fieldUserType')}
+              value={watchedAddUserType}
+              options={USER_TYPE_OPTIONS}
+              onChange={(v) => setValueAdd('userType', v)}
+            />
           </div>
-          <Input label={t('fieldDescription')} error={errorsAdd.description?.message} {...registerAdd('description', { required: t('required') })} />
+          <DescriptionEditor
+            value={watchedAddDescriptionI18n ?? {}}
+            onChange={(v) => setValueAdd('descriptionI18n', v)}
+            label={t('fieldDescriptions')}
+            addLangLabel={t('addLanguage')}
+            langLabel={t('fieldLanguage')}
+          />
           <Textarea grow label={t('fieldPrompt')} error={errorsAdd.prompt?.message} {...registerAdd('prompt', { required: t('required') })} />
         </form>
       </Modal>
@@ -140,27 +228,35 @@ export function PromptsTab() {
         footer={
           <>
             <Button variant="blue" size="sm" onClick={closeModal}>{t('cancel')}</Button>
-            <Button variant="green" size="sm" form="edit-prompt-form" type="submit" disabled={isUpdatingPrompt || fullPromptLoading}>
+            <Button variant="green" size="sm" form="edit-prompt-form" type="submit" disabled={isUpdatingPrompt}>
               {isUpdatingPrompt ? t('saving') : t('save')}
             </Button>
           </>
         }
       >
         <form id="edit-prompt-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 flex-1 min-h-0">
-          <div className="grid grid-cols-3 gap-4 shrink-0">
-            <Input label={t('fieldKey')} error={errors.key?.message} {...register('key', { required: t('required') })} />
-            <Input label={t('fieldCommandName')} error={errors.commandName?.message} {...register('commandName', { required: t('required') })} />
-            <Select<PromptUserType> label={t('fieldUserType')} value={watchedUserType} options={USER_TYPE_OPTIONS} onChange={(v) => setValue('userType', v)} />
+          <div className="grid grid-cols-2 gap-4 shrink-0">
+            <Select<string>
+              label={t('fieldCommandName')}
+              value={watchedCommandId ?? ''}
+              options={COMMAND_OPTIONS}
+              onChange={(v) => setValue('commandId', v || undefined)}
+            />
+            <Select<PromptUserType>
+              label={t('fieldUserType')}
+              value={watchedUserType}
+              options={USER_TYPE_OPTIONS}
+              onChange={(v) => setValue('userType', v)}
+            />
           </div>
-          <Input label={t('fieldDescription')} error={errors.description?.message} {...register('description', { required: t('required') })} />
-          {fullPromptLoading ? (
-            <div className="flex-1 flex items-center gap-2 text-sm text-muted">
-              <div className="w-4 h-4 rounded-full border-2 border-border border-t-blue-500 animate-spin" />
-              {t('loadingPrompt')}
-            </div>
-          ) : (
-            <Textarea grow label={t('fieldPrompt')} error={errors.prompt?.message} {...register('prompt', { required: t('required') })} />
-          )}
+          <DescriptionEditor
+            value={watchedDescriptionI18n ?? {}}
+            onChange={(v) => setValue('descriptionI18n', v)}
+            label={t('fieldDescriptions')}
+            addLangLabel={t('addLanguage')}
+            langLabel={t('fieldLanguage')}
+          />
+          <Textarea grow label={t('fieldPrompt')} error={errors.prompt?.message} {...register('prompt', { required: t('required') })} />
         </form>
       </Modal>
     </div>

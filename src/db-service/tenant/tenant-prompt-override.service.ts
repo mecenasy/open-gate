@@ -63,15 +63,17 @@ export class TenantPromptOverrideService {
     commandId: string | null,
     userType: UserType,
     prompt: string,
-    description: string | null,
+    descriptionI18n: Record<string, string> | null,
   ): Promise<void> {
     const existing = await this.overrideRepo.findOne({
       where: { tenantId, commandId: commandId ?? IsNull(), userType },
     });
     if (existing) {
-      await this.overrideRepo.update(existing.id, { prompt, description });
+      await this.overrideRepo.update(existing.id, { prompt, descriptionI18n });
     } else {
-      await this.overrideRepo.save(this.overrideRepo.create({ tenantId, commandId, userType, prompt, description }));
+      await this.overrideRepo.save(
+        this.overrideRepo.create({ tenantId, commandId, userType, prompt, descriptionI18n }),
+      );
     }
   }
 }

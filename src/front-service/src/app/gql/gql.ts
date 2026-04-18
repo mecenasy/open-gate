@@ -33,11 +33,10 @@ type Documents = {
   '\n  query CoreConfigs {\n    coreConfigs {\n      data {\n        key\n        value\n        description\n      }\n      status\n      message\n    }\n  }\n': typeof types.CoreConfigsDocument;
   '\n  mutation UpdateConfig($input: UpdateConfigType!) {\n    updateConfig(input: $input) {\n      status\n      message\n      data {\n        key\n        value\n      }\n    }\n  }\n': typeof types.UpdateConfigDocument;
   '\n  mutation Login($input: LoginType!) {\n    loginUser(input: $input) {\n      status\n    }\n  }\n': typeof types.LoginDocument;
-  '\n  query GetPrompts($input: GetAllPromptsType) {\n    prompts(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n      }\n      total\n    }\n  }\n': typeof types.GetPromptsDocument;
-  '\n  query GetPromptById($input: GetPromptByIdType!) {\n    promptById(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n': typeof types.GetPromptByIdDocument;
-  '\n  mutation AddPrompt($input: AddPromptType!) {\n    addPrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n': typeof types.AddPromptDocument;
-  '\n  mutation UpdatePrompt($input: UpdatePromptType!) {\n    updatePrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n': typeof types.UpdatePromptDocument;
-  '\n  mutation RemovePrompt($input: RemovePromptType!) {\n    removePrompt(input: $input) {\n      success\n    }\n  }\n': typeof types.RemovePromptDocument;
+  '\n  query GetTenantPromptOverrides {\n    tenantPromptOverrides {\n      id\n      commandId\n      userType\n      descriptionI18nJson\n      prompt\n    }\n  }\n': typeof types.GetTenantPromptOverridesDocument;
+  '\n  query GetTenantCommandConfigsForPrompts {\n    tenantCommandConfigs {\n      id\n      commandName\n    }\n  }\n': typeof types.GetTenantCommandConfigsForPromptsDocument;
+  '\n  query GetCommandsForPrompts {\n    commands(input: { limit: 500, page: 1 }) {\n      data {\n        id\n        name\n      }\n    }\n  }\n': typeof types.GetCommandsForPromptsDocument;
+  '\n  mutation UpsertTenantPromptOverride($input: UpsertTenantPromptOverrideInput!) {\n    upsertTenantPromptOverride(input: $input) {\n      status\n      message\n    }\n  }\n': typeof types.UpsertTenantPromptOverrideDocument;
   '\n  mutation QrChallenge($nonce: String!) {\n    qrChallenge(nonce: $nonce) {\n      challenge\n      dataUrl\n    }\n  }\n': typeof types.QrChallengeDocument;
   '\n  mutation QrLogin($challenge: String!, $nonce: String!) {\n    qrLogin(challenge: $challenge, nonce: $nonce) {\n      status\n    }\n  }\n': typeof types.QrLoginDocument;
   '\n  mutation Register($input: RegisterInput!) {\n    register(input: $input) {\n      success\n    }\n  }\n': typeof types.RegisterDocument;
@@ -98,16 +97,14 @@ const documents: Documents = {
     types.UpdateConfigDocument,
   '\n  mutation Login($input: LoginType!) {\n    loginUser(input: $input) {\n      status\n    }\n  }\n':
     types.LoginDocument,
-  '\n  query GetPrompts($input: GetAllPromptsType) {\n    prompts(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n      }\n      total\n    }\n  }\n':
-    types.GetPromptsDocument,
-  '\n  query GetPromptById($input: GetPromptByIdType!) {\n    promptById(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n':
-    types.GetPromptByIdDocument,
-  '\n  mutation AddPrompt($input: AddPromptType!) {\n    addPrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n':
-    types.AddPromptDocument,
-  '\n  mutation UpdatePrompt($input: UpdatePromptType!) {\n    updatePrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n':
-    types.UpdatePromptDocument,
-  '\n  mutation RemovePrompt($input: RemovePromptType!) {\n    removePrompt(input: $input) {\n      success\n    }\n  }\n':
-    types.RemovePromptDocument,
+  '\n  query GetTenantPromptOverrides {\n    tenantPromptOverrides {\n      id\n      commandId\n      userType\n      descriptionI18nJson\n      prompt\n    }\n  }\n':
+    types.GetTenantPromptOverridesDocument,
+  '\n  query GetTenantCommandConfigsForPrompts {\n    tenantCommandConfigs {\n      id\n      commandName\n    }\n  }\n':
+    types.GetTenantCommandConfigsForPromptsDocument,
+  '\n  query GetCommandsForPrompts {\n    commands(input: { limit: 500, page: 1 }) {\n      data {\n        id\n        name\n      }\n    }\n  }\n':
+    types.GetCommandsForPromptsDocument,
+  '\n  mutation UpsertTenantPromptOverride($input: UpsertTenantPromptOverrideInput!) {\n    upsertTenantPromptOverride(input: $input) {\n      status\n      message\n    }\n  }\n':
+    types.UpsertTenantPromptOverrideDocument,
   '\n  mutation QrChallenge($nonce: String!) {\n    qrChallenge(nonce: $nonce) {\n      challenge\n      dataUrl\n    }\n  }\n':
     types.QrChallengeDocument,
   '\n  mutation QrLogin($challenge: String!, $nonce: String!) {\n    qrLogin(challenge: $challenge, nonce: $nonce) {\n      status\n    }\n  }\n':
@@ -286,32 +283,26 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: '\n  query GetPrompts($input: GetAllPromptsType) {\n    prompts(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n      }\n      total\n    }\n  }\n',
-): (typeof documents)['\n  query GetPrompts($input: GetAllPromptsType) {\n    prompts(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n      }\n      total\n    }\n  }\n'];
+  source: '\n  query GetTenantPromptOverrides {\n    tenantPromptOverrides {\n      id\n      commandId\n      userType\n      descriptionI18nJson\n      prompt\n    }\n  }\n',
+): (typeof documents)['\n  query GetTenantPromptOverrides {\n    tenantPromptOverrides {\n      id\n      commandId\n      userType\n      descriptionI18nJson\n      prompt\n    }\n  }\n'];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: '\n  query GetPromptById($input: GetPromptByIdType!) {\n    promptById(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n',
-): (typeof documents)['\n  query GetPromptById($input: GetPromptByIdType!) {\n    promptById(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n'];
+  source: '\n  query GetTenantCommandConfigsForPrompts {\n    tenantCommandConfigs {\n      id\n      commandName\n    }\n  }\n',
+): (typeof documents)['\n  query GetTenantCommandConfigsForPrompts {\n    tenantCommandConfigs {\n      id\n      commandName\n    }\n  }\n'];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: '\n  mutation AddPrompt($input: AddPromptType!) {\n    addPrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n',
-): (typeof documents)['\n  mutation AddPrompt($input: AddPromptType!) {\n    addPrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n'];
+  source: '\n  query GetCommandsForPrompts {\n    commands(input: { limit: 500, page: 1 }) {\n      data {\n        id\n        name\n      }\n    }\n  }\n',
+): (typeof documents)['\n  query GetCommandsForPrompts {\n    commands(input: { limit: 500, page: 1 }) {\n      data {\n        id\n        name\n      }\n    }\n  }\n'];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: '\n  mutation UpdatePrompt($input: UpdatePromptType!) {\n    updatePrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n',
-): (typeof documents)['\n  mutation UpdatePrompt($input: UpdatePromptType!) {\n    updatePrompt(input: $input) {\n      status\n      message\n      data {\n        id\n        key\n        description\n        commandName\n        userType\n        prompt\n      }\n    }\n  }\n'];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(
-  source: '\n  mutation RemovePrompt($input: RemovePromptType!) {\n    removePrompt(input: $input) {\n      success\n    }\n  }\n',
-): (typeof documents)['\n  mutation RemovePrompt($input: RemovePromptType!) {\n    removePrompt(input: $input) {\n      success\n    }\n  }\n'];
+  source: '\n  mutation UpsertTenantPromptOverride($input: UpsertTenantPromptOverrideInput!) {\n    upsertTenantPromptOverride(input: $input) {\n      status\n      message\n    }\n  }\n',
+): (typeof documents)['\n  mutation UpsertTenantPromptOverride($input: UpsertTenantPromptOverrideInput!) {\n    upsertTenantPromptOverride(input: $input) {\n      status\n      message\n    }\n  }\n'];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

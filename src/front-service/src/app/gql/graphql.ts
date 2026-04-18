@@ -563,10 +563,6 @@ export type QueryPromptsArgs = {
   input?: InputMaybe<GetAllPromptsType>;
 };
 
-export type QueryTenantPromptOverridesArgs = {
-  tenantId: Scalars['String']['input'];
-};
-
 export type QueryUserArgs = {
   input: GetUserType;
 };
@@ -650,7 +646,7 @@ export type TenantPlatformCredentialType = {
 export type TenantPromptOverrideType = {
   __typename?: 'TenantPromptOverrideType';
   commandId?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
+  descriptionI18nJson?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
   prompt: Scalars['String']['output'];
   tenantId: Scalars['String']['output'];
@@ -751,9 +747,8 @@ export type UpsertTenantCommandConfigInput = {
 
 export type UpsertTenantPromptOverrideInput = {
   commandId?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
+  descriptionI18nJson?: InputMaybe<Scalars['String']['input']>;
   prompt: Scalars['String']['input'];
-  tenantId: Scalars['String']['input'];
   userType: Scalars['String']['input'];
 };
 
@@ -1035,101 +1030,41 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = { __typename?: 'Mutation'; loginUser: { __typename?: 'StatusType'; status: AuthStatus } };
 
-export type GetPromptsQueryVariables = Exact<{
-  input?: InputMaybe<GetAllPromptsType>;
-}>;
+export type GetTenantPromptOverridesQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetPromptsQuery = {
+export type GetTenantPromptOverridesQuery = {
   __typename?: 'Query';
-  prompts: {
-    __typename?: 'PromptsListType';
-    status: boolean;
-    message: string;
-    total: number;
-    data: Array<{
-      __typename?: 'PromptSimplyType';
-      id: string;
-      key: string;
-      description: string;
-      commandName: string;
-      userType: PromptUserType;
-    }>;
-  };
+  tenantPromptOverrides: Array<{
+    __typename?: 'TenantPromptOverrideType';
+    id: string;
+    commandId?: string | null;
+    userType: string;
+    descriptionI18nJson?: string | null;
+    prompt: string;
+  }>;
 };
 
-export type GetPromptByIdQueryVariables = Exact<{
-  input: GetPromptByIdType;
-}>;
+export type GetTenantCommandConfigsForPromptsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetPromptByIdQuery = {
+export type GetTenantCommandConfigsForPromptsQuery = {
   __typename?: 'Query';
-  promptById: {
-    __typename?: 'PromptResponseType';
-    status: boolean;
-    message: string;
-    data?: {
-      __typename?: 'PromptType';
-      id: string;
-      key: string;
-      description: string;
-      commandName: string;
-      userType: PromptUserType;
-      prompt: string;
-    } | null;
-  };
+  tenantCommandConfigs: Array<{ __typename?: 'TenantCommandConfigType'; id: string; commandName: string }>;
 };
 
-export type AddPromptMutationVariables = Exact<{
-  input: AddPromptType;
-}>;
+export type GetCommandsForPromptsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type AddPromptMutation = {
-  __typename?: 'Mutation';
-  addPrompt: {
-    __typename?: 'PromptResponseType';
-    status: boolean;
-    message: string;
-    data?: {
-      __typename?: 'PromptType';
-      id: string;
-      key: string;
-      description: string;
-      commandName: string;
-      userType: PromptUserType;
-      prompt: string;
-    } | null;
-  };
+export type GetCommandsForPromptsQuery = {
+  __typename?: 'Query';
+  commands: { __typename?: 'CommandsListType'; data: Array<{ __typename?: 'CommandType'; id: string; name: string }> };
 };
 
-export type UpdatePromptMutationVariables = Exact<{
-  input: UpdatePromptType;
+export type UpsertTenantPromptOverrideMutationVariables = Exact<{
+  input: UpsertTenantPromptOverrideInput;
 }>;
 
-export type UpdatePromptMutation = {
+export type UpsertTenantPromptOverrideMutation = {
   __typename?: 'Mutation';
-  updatePrompt: {
-    __typename?: 'PromptResponseType';
-    status: boolean;
-    message: string;
-    data?: {
-      __typename?: 'PromptType';
-      id: string;
-      key: string;
-      description: string;
-      commandName: string;
-      userType: PromptUserType;
-      prompt: string;
-    } | null;
-  };
-};
-
-export type RemovePromptMutationVariables = Exact<{
-  input: RemovePromptType;
-}>;
-
-export type RemovePromptMutation = {
-  __typename?: 'Mutation';
-  removePrompt: { __typename?: 'PromptSuccessType'; success: boolean };
+  upsertTenantPromptOverride: { __typename?: 'MutationResult'; status: boolean; message: string };
 };
 
 export type QrChallengeMutationVariables = Exact<{
@@ -2152,53 +2087,27 @@ export const LoginDocument = {
     },
   ],
 } as unknown as DocumentNode<LoginMutation, LoginMutationVariables>;
-export const GetPromptsDocument = {
+export const GetTenantPromptOverridesDocument = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'query',
-      name: { kind: 'Name', value: 'GetPrompts' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'GetAllPromptsType' } },
-        },
-      ],
+      name: { kind: 'Name', value: 'GetTenantPromptOverrides' },
       selectionSet: {
         kind: 'SelectionSet',
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'prompts' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'input' },
-                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
-              },
-            ],
+            name: { kind: 'Name', value: 'tenantPromptOverrides' },
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'data' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'key' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'description' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'commandName' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'userType' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'total' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'commandId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'userType' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'descriptionI18nJson' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'prompt' } },
               ],
             },
           },
@@ -2206,21 +2115,103 @@ export const GetPromptsDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<GetPromptsQuery, GetPromptsQueryVariables>;
-export const GetPromptByIdDocument = {
+} as unknown as DocumentNode<GetTenantPromptOverridesQuery, GetTenantPromptOverridesQueryVariables>;
+export const GetTenantCommandConfigsForPromptsDocument = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'query',
-      name: { kind: 'Name', value: 'GetPromptById' },
+      name: { kind: 'Name', value: 'GetTenantCommandConfigsForPrompts' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'tenantCommandConfigs' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'commandName' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetTenantCommandConfigsForPromptsQuery, GetTenantCommandConfigsForPromptsQueryVariables>;
+export const GetCommandsForPromptsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetCommandsForPrompts' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'commands' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: {
+                  kind: 'ObjectValue',
+                  fields: [
+                    {
+                      kind: 'ObjectField',
+                      name: { kind: 'Name', value: 'limit' },
+                      value: { kind: 'IntValue', value: '500' },
+                    },
+                    {
+                      kind: 'ObjectField',
+                      name: { kind: 'Name', value: 'page' },
+                      value: { kind: 'IntValue', value: '1' },
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetCommandsForPromptsQuery, GetCommandsForPromptsQueryVariables>;
+export const UpsertTenantPromptOverrideDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpsertTenantPromptOverride' },
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
           variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
           type: {
             kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'GetPromptByIdType' } },
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'UpsertTenantPromptOverrideInput' } },
           },
         },
       ],
@@ -2229,7 +2220,7 @@ export const GetPromptByIdDocument = {
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'promptById' },
+            name: { kind: 'Name', value: 'upsertTenantPromptOverride' },
             arguments: [
               {
                 kind: 'Argument',
@@ -2242,21 +2233,6 @@ export const GetPromptByIdDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'status' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'data' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'key' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'description' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'commandName' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'userType' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'prompt' } },
-                    ],
-                  },
-                },
               ],
             },
           },
@@ -2264,154 +2240,7 @@ export const GetPromptByIdDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<GetPromptByIdQuery, GetPromptByIdQueryVariables>;
-export const AddPromptDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'AddPrompt' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
-          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'AddPromptType' } } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'addPrompt' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'input' },
-                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'data' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'key' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'description' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'commandName' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'userType' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'prompt' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<AddPromptMutation, AddPromptMutationVariables>;
-export const UpdatePromptDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'UpdatePrompt' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
-          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'UpdatePromptType' } } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'updatePrompt' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'input' },
-                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'data' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'key' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'description' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'commandName' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'userType' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'prompt' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<UpdatePromptMutation, UpdatePromptMutationVariables>;
-export const RemovePromptDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'RemovePrompt' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
-          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'RemovePromptType' } } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'removePrompt' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'input' },
-                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [{ kind: 'Field', name: { kind: 'Name', value: 'success' } }],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<RemovePromptMutation, RemovePromptMutationVariables>;
+} as unknown as DocumentNode<UpsertTenantPromptOverrideMutation, UpsertTenantPromptOverrideMutationVariables>;
 export const QrChallengeDocument = {
   kind: 'Document',
   definitions: [

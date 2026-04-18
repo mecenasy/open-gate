@@ -196,7 +196,7 @@ message TenantPromptOverrideEntry {
   string tenant_id = 2;
   string command_id = 3;
   string user_type = 4;
-  string description = 5;
+  string description_i18n_json = 5;
   string prompt = 6;
 }
 
@@ -204,7 +204,7 @@ message UpsertTenantPromptOverrideRequest {
   string tenant_id = 1;
   string command_id = 2;
   string user_type = 3;
-  string description = 4;
+  string description_i18n_json = 4;
   string prompt = 5;
 }
 

@@ -30,8 +30,8 @@ export class TenantPromptOverride {
   })
   userType!: UserType;
 
-  @Column({ name: 'description', type: 'text', nullable: true })
-  description!: string | null;
+  @Column({ name: 'description_i18n', type: 'jsonb', nullable: true })
+  descriptionI18n!: Record<string, string> | null;
 
   @Column({ name: 'prompt', type: 'text', nullable: false })
   prompt!: string;

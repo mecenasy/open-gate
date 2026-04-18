@@ -124,12 +124,19 @@ export class TenantAdminService implements OnModuleInit {
 
   async getTenantPromptOverrides(tenantId: string): Promise<TenantPromptOverrideType[]> {
     const res = await lastValueFrom(this.tenantGrpcService.getTenantPromptOverrides({ tenantId }));
+    const userTypeMap: Record<string, string> = {
+      owner: 'OWNER',
+      admin: 'ADMIN',
+      super_user: 'SUPER_USER',
+      member: 'MEMBER',
+      user: 'USER',
+    };
     return res.overrides.map((o) => ({
       id: o.id,
       tenantId: o.tenantId,
       commandId: o.commandId || undefined,
-      userType: o.userType,
-      description: o.description || undefined,
+      userType: userTypeMap[o.userType] ?? o.userType.toUpperCase(),
+      descriptionI18nJson: o.descriptionI18nJson || undefined,
       prompt: o.prompt,
     }));
   }
@@ -139,15 +146,22 @@ export class TenantAdminService implements OnModuleInit {
     userType: string,
     prompt: string,
     commandId?: string,
-    description?: string,
+    descriptionI18nJson?: string,
   ): Promise<MutationResult> {
+    const userTypeMap: Record<string, string> = {
+      OWNER: 'owner',
+      ADMIN: 'admin',
+      SUPER_USER: 'super_user',
+      MEMBER: 'member',
+      USER: 'user',
+    };
     const res = await lastValueFrom(
       this.tenantGrpcService.upsertTenantPromptOverride({
         tenantId,
         commandId: commandId ?? '',
-        userType,
+        userType: userTypeMap[userType] ?? userType.toLowerCase(),
         prompt,
-        description: description ?? '',
+        descriptionI18nJson: descriptionI18nJson ?? '',
       }),
     );
     return { status: res.status, message: res.message };

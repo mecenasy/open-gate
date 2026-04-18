@@ -1,159 +1,143 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useLazyQuery } from '@apollo/client/react';
+import { useQuery, useMutation } from '@apollo/client/react';
 import { graphql } from '@/app/gql';
-import { AddPromptType, UpdatePromptType, PromptUserType } from '@/app/gql/graphql';
+import { PromptUserType } from '@/app/gql/graphql';
 
 export type PromptSummary = {
   id: string;
-  key: string;
-  description: string;
-  commandName: string;
-  prompt?: string;
-  userType: PromptUserType | '%future added value';
+  commandId?: string;
+  commandName?: string;
+  userType: string;
+  descriptionI18n?: Record<string, string>;
+  prompt: string;
 };
 
-const GET_PROMPTS_QUERY = graphql(`
-  query GetPrompts($input: GetAllPromptsType) {
-    prompts(input: $input) {
-      status
-      message
-      data {
-        id
-        key
-        description
-        commandName
-        userType
-      }
-      total
+export type CommandOption = {
+  value: string;
+  label: string;
+};
+
+const GET_TENANT_PROMPT_OVERRIDES_QUERY = graphql(`
+  query GetTenantPromptOverrides {
+    tenantPromptOverrides {
+      id
+      commandId
+      userType
+      descriptionI18nJson
+      prompt
     }
   }
 `);
 
-const GET_PROMPT_BY_USER_TYPE_QUERY = graphql(`
-  query GetPromptById($input: GetPromptByIdType!) {
-    promptById(input: $input) {
-      status
-      message
-      data {
-        id
-        key
-        description
-        commandName
-        userType
-        prompt
-      }
+const GET_TENANT_COMMAND_CONFIGS_FOR_PROMPTS_QUERY = graphql(`
+  query GetTenantCommandConfigsForPrompts {
+    tenantCommandConfigs {
+      id
+      commandName
     }
   }
 `);
 
-const ADD_PROMPT_MUTATION = graphql(`
-  mutation AddPrompt($input: AddPromptType!) {
-    addPrompt(input: $input) {
+const UPSERT_TENANT_PROMPT_OVERRIDE_MUTATION = graphql(`
+  mutation UpsertTenantPromptOverride($input: UpsertTenantPromptOverrideInput!) {
+    upsertTenantPromptOverride(input: $input) {
       status
       message
-      data {
-        id
-        key
-        description
-        commandName
-        userType
-        prompt
-      }
     }
   }
 `);
 
-const UPDATE_PROMPT_MUTATION = graphql(`
-  mutation UpdatePrompt($input: UpdatePromptType!) {
-    updatePrompt(input: $input) {
-      status
-      message
-      data {
-        id
-        key
-        description
-        commandName
-        userType
-        prompt
-      }
-    }
-  }
-`);
-
-const REMOVE_PROMPT_MUTATION = graphql(`
-  mutation RemovePrompt($input: RemovePromptType!) {
-    removePrompt(input: $input) {
-      success
-    }
-  }
-`);
+export type PromptOverrideForm = {
+  commandId?: string;
+  userType: PromptUserType;
+  descriptionI18n: Record<string, string>;
+  prompt: string;
+};
 
 export const usePrompts = () => {
   const [selectedPrompt, setSelectedPrompt] = useState<PromptSummary | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const { loading, data } = useQuery(GET_PROMPTS_QUERY, {
+  const { loading, data, refetch } = useQuery(GET_TENANT_PROMPT_OVERRIDES_QUERY, {
     fetchPolicy: 'cache-and-network',
-    variables: { input: { limit: 100, page: 1 } },
   });
 
-  const [fetchFullPrompt, { loading: fullPromptLoading, data: fullPromptData }] =
-    useLazyQuery(GET_PROMPT_BY_USER_TYPE_QUERY);
+  const { data: tenantConfigsData, loading: tenantConfigsLoading } = useQuery(
+    GET_TENANT_COMMAND_CONFIGS_FOR_PROMPTS_QUERY,
+    {
+      fetchPolicy: 'cache-and-network',
+    },
+  );
 
-  const [doAddPrompt, { loading: creatingPrompt }] = useMutation(ADD_PROMPT_MUTATION, {
-    refetchQueries: ['GetPrompts'],
+  const [doUpsert, { loading: upsertLoading }] = useMutation(UPSERT_TENANT_PROMPT_OVERRIDE_MUTATION, {
+    onCompleted: () => refetch(),
   });
 
-  const [doUpdatePrompt, { loading: updatingPrompt }] = useMutation(UPDATE_PROMPT_MUTATION, {
-    refetchQueries: ['GetPrompts'],
-  });
+  const commandOptions: CommandOption[] = (tenantConfigsData?.tenantCommandConfigs ?? []).map((c) => ({
+    value: c.id,
+    label: c.commandName,
+  }));
 
-  const [doRemovePrompt] = useMutation(REMOVE_PROMPT_MUTATION, {
-    refetchQueries: ['GetPrompts'],
-  });
+  const commandNameById = new Map(commandOptions.map((c) => [c.value, c.label]));
 
-  const prompts = data?.prompts.data;
+  const prompts: PromptSummary[] = (data?.tenantPromptOverrides ?? []).map((o) => ({
+    id: o.id,
+    commandId: o.commandId ?? undefined,
+    commandName: o.commandId ? (commandNameById.get(o.commandId) ?? o.commandId) : undefined,
+    userType: o.userType,
+    descriptionI18n: o.descriptionI18nJson ? (JSON.parse(o.descriptionI18nJson) as Record<string, string>) : undefined,
+    prompt: o.prompt,
+  }));
 
-  const openModal = (prompt: PromptSummary) => {
-    setSelectedPrompt(prompt);
-    fetchFullPrompt({ variables: { input: { id: prompt.id } } });
-  };
-
+  const openModal = (prompt: PromptSummary) => setSelectedPrompt(prompt);
   const closeModal = () => setSelectedPrompt(null);
 
   const openAddModal = () => setIsAddModalOpen(true);
   const closeAddModal = () => setIsAddModalOpen(false);
 
-  const onCreatePrompt = async (input: AddPromptType) => {
-    await doAddPrompt({ variables: { input } });
+  const onCreatePrompt = async (input: PromptOverrideForm) => {
+    await doUpsert({
+      variables: {
+        input: {
+          commandId: input.commandId || undefined,
+          userType: input.userType,
+          descriptionI18nJson:
+            Object.keys(input.descriptionI18n).length > 0 ? JSON.stringify(input.descriptionI18n) : undefined,
+          prompt: input.prompt,
+        },
+      },
+    });
   };
 
-  const onUpdatePrompt = async (input: Omit<UpdatePromptType, 'id'>) => {
-    if (!selectedPrompt) return;
-    await doUpdatePrompt({ variables: { input: { ...input, id: selectedPrompt.id } } });
-  };
-
-  const onRemovePrompt = (id: string) => {
-    doRemovePrompt({ variables: { input: { id } } });
+  const onUpdatePrompt = async (input: PromptOverrideForm) => {
+    await doUpsert({
+      variables: {
+        input: {
+          commandId: input.commandId || undefined,
+          userType: input.userType,
+          descriptionI18nJson:
+            Object.keys(input.descriptionI18n).length > 0 ? JSON.stringify(input.descriptionI18n) : undefined,
+          prompt: input.prompt,
+        },
+      },
+    });
   };
 
   return {
     prompts,
-    isLoading: loading,
+    isLoading: loading || tenantConfigsLoading,
+    commandOptions,
     selectedPrompt,
     openModal,
     closeModal,
     onUpdatePrompt,
-    onRemovePrompt,
-    isUpdatingPrompt: updatingPrompt,
+    isUpdatingPrompt: upsertLoading,
     isAddModalOpen,
     openAddModal,
     closeAddModal,
     onCreatePrompt,
-    isCreatingPrompt: creatingPrompt,
-    fullPromptLoading,
-    fullPromptText: fullPromptData?.promptById.data?.prompt,
+    isCreatingPrompt: upsertLoading,
   };
 };

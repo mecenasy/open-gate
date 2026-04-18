@@ -187,7 +187,7 @@ export interface TenantPromptOverrideEntry {
   tenantId: string;
   commandId: string;
   userType: string;
-  description: string;
+  descriptionI18nJson: string;
   prompt: string;
 }
 
@@ -195,7 +195,7 @@ export interface UpsertTenantPromptOverrideRequest {
   tenantId: string;
   commandId: string;
   userType: string;
-  description: string;
+  descriptionI18nJson: string;
   prompt: string;
 }
 

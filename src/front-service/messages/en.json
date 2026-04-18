@@ -123,10 +123,12 @@
     "add": "Add",
     "adding": "Adding…",
     "fieldKey": "Key",
-    "fieldDescription": "Description",
     "fieldCommandName": "Command name",
     "fieldUserType": "User type",
     "fieldPrompt": "Prompt",
+    "fieldDescriptions": "Descriptions",
+    "fieldLanguage": "Language",
+    "addLanguage": "+ Add language",
     "required": "Required",
     "loadingPrompt": "Loading prompt…",
     "userTypeOwner": "Owner",
@@ -134,7 +136,8 @@
     "userTypeAdmin": "Admin",
     "userTypeMember": "Member",
     "userTypeUser": "User",
-    "userTypeUnrecognized": "Unrecognized"
+    "userTypeUnrecognized": "Unrecognized",
+    "commandGeneral": "— General (no command) —"
   },
   "commands": {
     "title": "Commands",

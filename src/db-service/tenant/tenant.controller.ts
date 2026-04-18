@@ -232,14 +232,17 @@ export class TenantController implements TenantServiceController {
     commandId,
     userType,
     prompt,
-    description,
+    descriptionI18nJson,
   }: UpsertTenantPromptOverrideRequest): Promise<UpsertTenantPromptOverrideResponse> {
+    const descriptionI18n = descriptionI18nJson
+      ? (JSON.parse(String(descriptionI18nJson)) as Record<string, string>)
+      : null;
     await this.promptOverrideService.upsert(
       String(tenantId),
       commandId ? String(commandId) : null,
       String(userType) as UserType,
       String(prompt),
-      description ? String(description) : null,
+      descriptionI18n,
     );
     return { status: true, message: 'Prompt override upserted successfully' };
   }
@@ -256,7 +259,7 @@ export class TenantController implements TenantServiceController {
         tenantId: String(o.tenantId),
         commandId: o.commandId ? String(o.commandId) : '',
         userType: String(o.userType),
-        description: o.description ? String(o.description) : '',
+        descriptionI18nJson: o.descriptionI18n ? JSON.stringify(o.descriptionI18n) : '',
         prompt: String(o.prompt),
       })),
     };

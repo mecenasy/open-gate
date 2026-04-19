@@ -168,11 +168,11 @@
     "required": "Required",
     "loadingPrompt": "Loading prompt…",
     "userTypeOwner": "Owner",
-    "userTypeSuperUser": "SuperUser",
+    "userTypeSuperUser": "Super user",
     "userTypeAdmin": "Admin",
     "userTypeMember": "Member",
     "userTypeUser": "User",
-    "userTypeUnrecognized": "Unrecognized",
+    "userTypeUnrecognized": "Unknown",
     "commandGeneral": "— General (no command) —"
   },
   "commands": {
@@ -201,7 +201,7 @@
     "required": "Required",
     "roleOwner": "Owner",
     "roleAdmin": "Admin",
-    "roleSuperUser": "SuperUser",
+    "roleSuperUser": "Super user",
     "roleMember": "Member",
     "roleUser": "User",
     "fieldCommand": "Command",

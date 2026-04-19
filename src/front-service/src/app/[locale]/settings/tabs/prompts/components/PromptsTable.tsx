@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Table } from '@/components/ui';
 import type { TableColumn } from '@/components/ui';
+import { PromptUserType } from '@/app/gql/graphql';
 import { USER_TYPE_LABEL_KEYS } from '../constants';
 import { getDescription } from '../helpers';
 import type { PromptSummary } from '../interfaces';
@@ -38,7 +39,7 @@ export function PromptsTable({ prompts, onRowClick }: PromptsTableProps) {
       render: (val) => (
         <UserTypeBadge
           value={val as string}
-          label={t(USER_TYPE_LABEL_KEYS[val as string] as Parameters<typeof t>[0])}
+          label={t(USER_TYPE_LABEL_KEYS[val as PromptUserType] as Parameters<typeof t>[0])}
         />
       ),
     },

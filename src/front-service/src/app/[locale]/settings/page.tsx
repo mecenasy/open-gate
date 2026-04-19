@@ -9,7 +9,7 @@ import type { TabDef } from '@/components/ui';
 import { AuthTab } from './tabs/auth/AuthTab';
 import { FeatureSettingsTab } from './tabs/feature-settings/FeatureSettingsTab';
 import { FeatureTab } from './tabs/feature/FeatureTab';
-import { CommandsTab } from './tabs/CommandsTab';
+import { CommandsTab } from './tabs/commands/CommandsTab';
 import { PromptsTab } from './tabs/prompts/PromptsTab';
 
 const TABS = ['auth', 'feature', 'feature-settings', 'commands', 'prompts'] as const;

@@ -20,3 +20,5 @@ export { MultiSelect } from './MultiSelect';
 
 export { Tabs } from './Tabs';
 export type { TabDef } from './Tabs';
+
+export { TabPanels } from './TabPanels';

@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useRouter, usePathname } from '@/components/navigation/navigation';
-import { Tabs } from '@/components/ui';
+import { TabPanels, Tabs } from '@/components/ui';
 import type { TabDef } from '@/components/ui';
 import { AuthTab } from './tabs/auth/AuthTab';
 import { FeatureSettingsTab } from './tabs/feature-settings/FeatureSettingsTab';
@@ -44,11 +44,16 @@ function SettingsContent() {
     <div className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="text-xl font-bold text-text mb-8">{t('title')}</h1>
       <Tabs tabs={tabs} active={activeTab} onChange={handleTabChange} />
-      {activeTab === 'auth' && <AuthTab />}
-      {activeTab === 'feature' && <FeatureTab />}
-      {activeTab === 'feature-settings' && <FeatureSettingsTab />}
-      {activeTab === 'commands' && <CommandsTab />}
-      {activeTab === 'prompts' && <PromptsTab />}
+      <TabPanels
+        activeKey={activeTab}
+        panels={{
+          auth: <AuthTab />,
+          feature: <FeatureTab />,
+          'feature-settings': <FeatureSettingsTab />,
+          commands: <CommandsTab />,
+          prompts: <PromptsTab />,
+        }}
+      />
     </div>
   );
 }

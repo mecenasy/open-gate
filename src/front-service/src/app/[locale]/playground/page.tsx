@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Input, Toggle, Textarea, Table, Modal, Select } from '@/components/ui';
-import type { TableColumn, SelectOption } from '@/components/ui';
+import { Button, Input, Toggle, Textarea, Table, Modal, Select, Tabs, TabPanels } from '@/components/ui';
+import type { TableColumn, SelectOption, TabDef } from '@/components/ui';
 import { UserStatus, UserRole } from '@/app/gql/graphql';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -104,6 +104,8 @@ export default function PlaygroundPage() {
   const [submitted, setSubmitted] = useState<FormData | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<UserStatus>(UserStatus.Active);
   const [selectedRole, setSelectedRole] = useState<UserRole>(UserRole.User);
+  const [activeTab, setActiveTab] = useState<string>('overview');
+  const [activeTabMany, setActiveTabMany] = useState<string>('auth');
 
   const {
     register,
@@ -330,6 +332,74 @@ export default function PlaygroundPage() {
               />
             </Card>
           </div>
+        </Section>
+
+        {/* ── TABS ── */}
+        <Section title="Taby (z animacją react-spring)">
+          <Card span2>
+            <p className="text-xs text-slate-500 font-medium">Podstawowe — 3 taby, zawsze mieszczą się w szerokości</p>
+            <Tabs
+              tabs={[
+                { key: 'overview', label: 'Przegląd' },
+                { key: 'details', label: 'Szczegóły' },
+                { key: 'history', label: 'Historia' },
+              ] satisfies TabDef[]}
+              active={activeTab}
+              onChange={setActiveTab}
+            />
+            <TabPanels
+              activeKey={activeTab}
+              panels={{
+                overview: (
+                  <div className="rounded-lg border border-border bg-surface p-6">
+                    <h3 className="text-sm font-semibold text-text mb-2">Panel: Przegląd</h3>
+                    <p className="text-sm text-muted">Crossfade + translate-y przez useTransition z @react-spring/web.</p>
+                  </div>
+                ),
+                details: (
+                  <div className="rounded-lg border border-border bg-surface p-6">
+                    <h3 className="text-sm font-semibold text-text mb-2">Panel: Szczegóły</h3>
+                    <p className="text-sm text-muted">exitBeforeEnter=true — stary panel znika zanim nowy wejdzie (stabilny layout dla różnych wysokości).</p>
+                  </div>
+                ),
+                history: (
+                  <div className="rounded-lg border border-border bg-surface p-6">
+                    <h3 className="text-sm font-semibold text-text mb-2">Panel: Historia</h3>
+                    <p className="text-sm text-muted">Config: tension 280, friction 32 — krótka, sprężysta animacja.</p>
+                  </div>
+                ),
+              }}
+            />
+          </Card>
+
+          <Card span2>
+            <p className="text-xs text-slate-500 font-medium">Overflow — horizontal scroll + gradient fade na krawędziach</p>
+            <p className="text-xs text-slate-500">Zwężaj okno / kontener, żeby zobaczyć scroll i gradient. Kliknięcie zawijanego taba przewija go do widoku.</p>
+            <div className="max-w-md border border-border rounded-lg p-4 bg-bg">
+              <Tabs
+                tabs={[
+                  { key: 'auth', label: 'Uwierzytelnianie' },
+                  { key: 'feature', label: 'Funkcje' },
+                  { key: 'feature-settings', label: 'Ustawienia funkcji' },
+                  { key: 'commands', label: 'Komendy' },
+                  { key: 'prompts', label: 'Prompty' },
+                  { key: 'integrations', label: 'Integracje' },
+                  { key: 'billing', label: 'Rozliczenia' },
+                ] satisfies TabDef[]}
+                active={activeTabMany}
+                onChange={setActiveTabMany}
+              />
+              <TabPanels
+                activeKey={activeTabMany}
+                panels={Object.fromEntries(
+                  ['auth', 'feature', 'feature-settings', 'commands', 'prompts', 'integrations', 'billing'].map((k) => [
+                    k,
+                    <div key={k} className="text-sm text-muted p-4">Panel: {k}</div>,
+                  ]),
+                )}
+              />
+            </div>
+          </Card>
         </Section>
 
         {/* ── MODAL trigger ── */}

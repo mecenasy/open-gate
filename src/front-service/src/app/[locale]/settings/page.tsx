@@ -7,8 +7,8 @@ import { useRouter, usePathname } from '@/components/navigation/navigation';
 import { Tabs } from '@/components/ui';
 import type { TabDef } from '@/components/ui';
 import { AuthTab } from './tabs/AuthTab';
-import { FeatureSettingsTab } from './tabs/FeatureSettingsTab';
-import { FeatureTab } from './tabs/FeatureTab';
+import { FeatureSettingsTab } from './tabs/feature-settings/FeatureSettingsTab';
+import { FeatureTab } from './tabs/feature/FeatureTab';
 import { CommandsTab } from './tabs/CommandsTab';
 import { PromptsTab } from './tabs/PromptsTab';
 

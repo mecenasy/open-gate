@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter, usePathname } from '@/components/navigation/navigation';
 import { Tabs } from '@/components/ui';
 import type { TabDef } from '@/components/ui';
-import { AuthTab } from './tabs/AuthTab';
+import { AuthTab } from './tabs/auth/AuthTab';
 import { FeatureSettingsTab } from './tabs/feature-settings/FeatureSettingsTab';
 import { FeatureTab } from './tabs/feature/FeatureTab';
 import { CommandsTab } from './tabs/CommandsTab';

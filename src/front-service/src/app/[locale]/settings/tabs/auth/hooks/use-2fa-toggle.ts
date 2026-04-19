@@ -1,4 +1,6 @@
-import { use, useEffect, useState } from 'react';
+'use client';
+
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useMutation } from '@apollo/client/react';
 import { graphql } from '@/app/gql';
@@ -20,19 +22,21 @@ const REJECT_TFA_MUTATION = graphql(`
   }
 `);
 
-export const use2faToggle = (init: boolean, setQrCode: (code: string) => void) => {
-  const [isEnabled, setIsEnabled] = useState(init);
+export const use2faToggle = (init: boolean) => {
   const t = useTranslations('auth');
+  const [isEnabled, setIsEnabled] = useState(init);
+  const [qrCode, setQrCode] = useState('');
+  const [serverError, setServerError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsEnabled(init);
   }, [init]);
 
-  const [accept2fa, metaReject] = useMutation(ACCEPT_TFA_MUTATION);
-  const [reject2fa, metaAccept] = useMutation(REJECT_TFA_MUTATION);
+  const [accept2fa, metaAccept] = useMutation(ACCEPT_TFA_MUTATION);
+  const [reject2fa, metaReject] = useMutation(REJECT_TFA_MUTATION);
 
-  const handleToggleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
+  const toggle = async (checked: boolean) => {
+    setServerError(null);
     setIsEnabled(checked);
     try {
       if (checked) {
@@ -43,7 +47,7 @@ export const use2faToggle = (init: boolean, setQrCode: (code: string) => void) =
         setQrCode('');
       }
     } catch {
-      alert(t('tfaWrong'));
+      setServerError(t('tfaWrong'));
     }
   };
 
@@ -57,10 +61,15 @@ export const use2faToggle = (init: boolean, setQrCode: (code: string) => void) =
     setQrCode('');
   };
 
+  const closeQr = () => setQrCode('');
+
   return {
     isEnabled,
-    handleToggleChange,
+    qrCode,
+    serverError,
+    toggle,
     cancelSetup,
+    closeQr,
     isPending: metaAccept.loading || metaReject.loading,
   };
 };

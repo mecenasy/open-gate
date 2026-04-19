@@ -1,7 +1,11 @@
-import { useMutation } from '@apollo/client/react';
+'use client';
+
 import { useState } from 'react';
+import { useMutation } from '@apollo/client/react';
 import { startRegistration } from '@simplewebauthn/browser';
 import { graphql } from '@/app/gql';
+import { markCurrentDevice, unmarkCurrentDevice } from '../helpers';
+import { REMOVE_PASSKEY_MUTATION } from './queries';
 
 const REGISTER_OPTIONS_PASSKEY_MUTATION = graphql(`
   mutation RegisterOptionPasskey {
@@ -17,40 +21,30 @@ const VERIFY_REGISTRATION_MUTATION = graphql(`
   }
 `);
 
-export const REMOVE_PASSKEY_MUTATION = graphql(`
-  mutation RemovePasskey($id: String!) {
-    removePasskey(id: $id) {
-      status
-    }
-  }
-`);
-
-export const useWebAuthnToggle = (setShow: (show: boolean) => void) => {
+export const usePasskeyToggle = () => {
   const [credentialId, setCredentialId] = useState('');
 
+  const refetchQueries = ['GetPasskeys'];
   const [registerOption, metaOption] = useMutation(REGISTER_OPTIONS_PASSKEY_MUTATION);
-  const [verifyOption, metaVerify] = useMutation(VERIFY_REGISTRATION_MUTATION);
-  const [removePasskey, metaRemove] = useMutation(REMOVE_PASSKEY_MUTATION);
+  const [verifyOption, metaVerify] = useMutation(VERIFY_REGISTRATION_MUTATION, { refetchQueries });
+  const [removePasskey, metaRemove] = useMutation(REMOVE_PASSKEY_MUTATION, { refetchQueries });
 
-  const handleToggleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
+  const toggle = async (checked: boolean) => {
     if (checked) {
       try {
         const { data } = await registerOption();
         const options = data?.registerOptionPasskey;
 
         const regResponse = await startRegistration({ optionsJSON: options });
-        localStorage.setItem(`webauthn_${regResponse.id}`, 'true');
+        markCurrentDevice(regResponse.id);
 
-        setShow(!regResponse);
         setCredentialId(regResponse.id ?? '');
         await verifyOption({ variables: { input: regResponse } });
-      } catch (error) {
-        console.error('Błąd biometrii:', error);
+      } catch {
         setCredentialId('');
       }
     } else {
-      localStorage.removeItem(`webauthn_${credentialId}`);
+      unmarkCurrentDevice(credentialId);
       removePasskey({ variables: { id: credentialId } });
       setCredentialId('');
     }
@@ -58,7 +52,7 @@ export const useWebAuthnToggle = (setShow: (show: boolean) => void) => {
 
   return {
     isEnabled: Boolean(credentialId),
-    handleToggleChange,
+    toggle,
     isPending: metaOption.loading || metaVerify.loading || metaRemove.loading,
   };
 };

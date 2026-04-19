@@ -4,16 +4,37 @@ import { Accept2faCommand } from '../impl/accept-2fa.command';
 import { authenticator } from '@otplib/preset-default';
 import { AcceptType } from '../../dto/accept-2fa.type';
 import { LOGIN_PROXY_SERVICE_NAME, LoginProxyServiceClient } from 'src/proto/login';
-import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Inject, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { toDataURL } from 'qrcode';
 import { Handler } from '@app/handler';
+import { TenantService } from '@app/tenant';
+import { TENANT_SERVICE_NAME, TenantServiceClient } from 'src/proto/tenant';
 import { LoginStatusType } from 'src/bff-service/auth/login/dto/login-status.tape';
 import { AuthStatus } from 'src/bff-service/auth/types/login-status';
 
+const DEFAULT_ISSUER = 'Enklawa';
+
+const toPascalCase = (value: string): string =>
+  value
+    .split(/[^a-zA-Z0-9]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+
 @CommandHandler(Accept2faCommand)
 export class Accept2faHandler extends Handler<Accept2faCommand, AcceptType, LoginProxyServiceClient> {
+  private tenantGrpcService!: TenantServiceClient;
+
+  @Inject(TenantService)
+  private readonly tenantSvc!: TenantService;
+
   constructor() {
     super(LOGIN_PROXY_SERVICE_NAME);
+  }
+
+  override onModuleInit() {
+    super.onModuleInit();
+    this.tenantGrpcService = this.grpcClient.getService<TenantServiceClient>(TENANT_SERVICE_NAME);
   }
 
   async execute({ id }: Accept2faCommand): Promise<AcceptType> {
@@ -33,7 +54,7 @@ export class Accept2faHandler extends Handler<Accept2faCommand, AcceptType, Logi
       email = userStatus.email;
     }
 
-    const { uri, secret } = this.generateSecret(email as string);
+    const { uri, secret } = await this.generateSecret(email as string);
     const dataUrl = await this.generateQrCode(uri);
 
     await this.cache.saveInCache({
@@ -60,13 +81,27 @@ export class Accept2faHandler extends Handler<Accept2faCommand, AcceptType, Logi
     });
   }
 
-  private generateSecret(login: string) {
+  private async generateSecret(login: string) {
     const secret: string = authenticator.generateSecret();
-    const uri = authenticator.keyuri(login, 'authenticator', secret);
+    const issuer = await this.resolveIssuer();
+    const uri = authenticator.keyuri(login, issuer, secret);
 
     return {
       uri,
       secret,
     };
+  }
+
+  private async resolveIssuer(): Promise<string> {
+    const tenantId = this.tenantSvc.getContext()?.tenantId;
+    if (!tenantId) return DEFAULT_ISSUER;
+
+    try {
+      const response = await lastValueFrom(this.tenantGrpcService.getTenant({ tenantId }));
+      const slug = response?.slug;
+      return slug ? toPascalCase(slug) : DEFAULT_ISSUER;
+    } catch {
+      return DEFAULT_ISSUER;
+    }
   }
 }

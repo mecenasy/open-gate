@@ -36,11 +36,22 @@ export class SignalBridgeManager implements OnModuleInit, OnModuleDestroy {
       return;
     }
 
+    const fallback = this.platformConfigService.envFallback('signal') as SignalCredentials | null;
+    const fallbackApiUrl = fallback?.apiUrl || 'http://signal_bridge:8080';
+
+    let started = 0;
     for (const { tenantId, config } of tenants) {
-      this.openConnection(tenantId, config);
+      const apiUrl = config.apiUrl?.trim() || fallbackApiUrl;
+      const account = config.account?.trim();
+      if (!account) {
+        this.logger.warn(`Skipping Signal bridge [tenant=${tenantId}]: missing account.`);
+        continue;
+      }
+      this.openConnection(tenantId, { ...config, apiUrl, account });
+      started++;
     }
 
-    this.logger.log(`Signal bridge started for ${tenants.length} tenant(s).`);
+    this.logger.log(`Signal bridge started for ${started} tenant(s).`);
   }
 
   onModuleDestroy() {

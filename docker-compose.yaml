@@ -42,32 +42,38 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget -qO- http://localhost:${BFF_PORT:-3001}/health || exit 1",
+          "wget -qO- http://127.0.0.1:${BFF_PORT:-3001}/health || exit 1",
         ]
       interval: 15s
       timeout: 5s
       retries: 5
       start_period: 60s
 
-  # front-service:
-  #   container_name: front-service
-  #   build:
-  #     context: ./src/front-service
-  #     dockerfile: Dockerfile.dev
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ./src/front-service:/app
-  #     - /app/node_modules
-  #     - /app/.next
-  #   ports:
-  #     - "3001:3001"
-  #   environment:
-  #     WATCHPACK_POLLING: true
-  #     NEXT_PUBLIC_BFF_URL: "http://bff-service:3001"
-  #   depends_on:
-  #     - bff-service
-  #   networks:
-  #     - backend-net
+  front-service:
+    container_name: front-service
+    build:
+      context: ./src/front-service
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    mem_limit: 1024m
+    mem_reservation: 512m
+    cpus: "0.5"
+    volumes:
+      - ./src/front-service:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "127.0.0.1:4002:4002"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      API_INTERNAL_URL: "http://bff-service:${BFF_PORT:-3001}"
+      NEXT_PUBLIC_API_HOST_URL: "http://localhost:${BFF_PORT:-3001}"
+    depends_on:
+      bff-service:
+        condition: service_started
+    networks:
+      - backend-net
 
   # Serwis główny, odpowiedzialny za logikę biznesową, komunikację z bazą danych i innymi serwisami poprzez gRPC oraz udostępnianie API dla frontendu
   core-service:
@@ -113,7 +119,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget -qO- http://localhost:${GATE_PORT:-3002}/health || exit 1",
+          "wget -qO- http://127.0.0.1:${GATE_PORT:-3002}/health || exit 1",
         ]
       interval: 15s
       timeout: 5s
@@ -198,7 +204,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget -qO- http://localhost:${NOTIFY_PORT:-3003}/health || exit 1",
+          "wget -qO- http://127.0.0.1:${NOTIFY_PORT:-3003}/health || exit 1",
         ]
       interval: 15s
       timeout: 5s

@@ -26,8 +26,8 @@ export class TenantAdminService implements OnModuleInit {
     this.tenantGrpcService = this.grpcClient.getService<TenantServiceClient>(TENANT_SERVICE_NAME);
   }
 
-  async createTenant(slug: string): Promise<CreateTenantResult> {
-    const res = await lastValueFrom(this.tenantGrpcService.createTenant({ slug }));
+  async createTenant(slug: string, billingUserId: string): Promise<CreateTenantResult> {
+    const res = await lastValueFrom(this.tenantGrpcService.createTenant({ slug, billingUserId }));
     return { id: res.id, slug: res.slug, schemaName: res.schemaName };
   }
 
@@ -38,7 +38,96 @@ export class TenantAdminService implements OnModuleInit {
       slug: t.slug,
       schemaName: t.schemaName,
       isActive: t.isActive,
+      billingUserId: t.billingUserId || null,
     }));
+  }
+
+  async getMyTenants(userId: string): Promise<TenantType[]> {
+    const res = await lastValueFrom(this.tenantGrpcService.getMyTenants({ userId }));
+    return res.tenants.map((t) => ({
+      id: t.id,
+      slug: t.slug,
+      schemaName: t.schemaName,
+      isActive: t.isActive,
+      billingUserId: t.billingUserId || null,
+    }));
+  }
+
+  async getTenantsIStaffAt(userId: string) {
+    const res = await lastValueFrom(this.tenantGrpcService.getTenantsIStaffAt({ userId }));
+    return res.memberships.map((m) => ({
+      tenantId: m.tenantId,
+      tenantSlug: m.tenantSlug,
+      role: m.role,
+    }));
+  }
+
+  async getTenantStaff(tenantId: string) {
+    const res = await lastValueFrom(this.tenantGrpcService.getTenantStaff({ tenantId }));
+    return res.members.map((m) => ({ tenantId: m.tenantId, userId: m.userId, role: m.role }));
+  }
+
+  async isTenantStaff(tenantId: string, userId: string): Promise<{ isMember: boolean; role: string | null }> {
+    const res = await lastValueFrom(this.tenantGrpcService.getTenantStaffMembership({ tenantId, userId }));
+    return { isMember: res.isMember, role: res.role || null };
+  }
+
+  async addTenantStaff(tenantId: string, userId: string, role: string): Promise<MutationResult> {
+    const res = await lastValueFrom(this.tenantGrpcService.addTenantStaff({ tenantId, userId, role }));
+    return { status: res.status, message: res.message };
+  }
+
+  async removeTenantStaff(tenantId: string, userId: string): Promise<MutationResult> {
+    const res = await lastValueFrom(this.tenantGrpcService.removeTenantStaff({ tenantId, userId }));
+    return { status: res.status, message: res.message };
+  }
+
+  async changeTenantStaffRole(tenantId: string, userId: string, role: string): Promise<MutationResult> {
+    const res = await lastValueFrom(this.tenantGrpcService.changeTenantStaffRole({ tenantId, userId, role }));
+    return { status: res.status, message: res.message };
+  }
+
+  async addContact(input: {
+    tenantId: string;
+    email?: string;
+    phone?: string;
+    name: string;
+    surname?: string;
+    accessLevel: string;
+  }) {
+    const res = await lastValueFrom(
+      this.tenantGrpcService.addContact({
+        tenantId: input.tenantId,
+        email: input.email ?? '',
+        phone: input.phone ?? '',
+        name: input.name,
+        surname: input.surname ?? '',
+        accessLevel: input.accessLevel,
+      }),
+    );
+    return res;
+  }
+
+  async updateContact(contactId: string, input: { email?: string; phone?: string; name?: string; surname?: string }) {
+    return lastValueFrom(
+      this.tenantGrpcService.updateContact({
+        contactId,
+        email: input.email ?? '',
+        phone: input.phone ?? '',
+        name: input.name ?? '',
+        surname: input.surname ?? '',
+      }),
+    );
+  }
+
+  async getTenantContacts(tenantId: string) {
+    const res = await lastValueFrom(this.tenantGrpcService.getTenantContacts({ tenantId }));
+    return res.contacts;
+  }
+
+  async removeContactFromTenant(tenantId: string, contactId: string): Promise<MutationResult> {
+    const res = await lastValueFrom(this.tenantGrpcService.removeContactFromTenant({ tenantId, contactId }));
+    return { status: res.status, message: res.message };
   }
 
   async updateFeatures(

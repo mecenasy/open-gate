@@ -223,6 +223,28 @@ type TenantType {
   slug: String!
   schemaName: String!
   isActive: Boolean!
+  billingUserId: String
+}
+
+type TenantStaffMembershipType {
+  tenantId: String!
+  tenantSlug: String!
+  role: String!
+}
+
+type TenantStaffEntryType {
+  tenantId: String!
+  userId: String!
+  role: String!
+}
+
+type ContactType {
+  id: String!
+  email: String
+  phone: String
+  name: String!
+  surname: String
+  accessLevel: String
 }
 
 type CreateTenantResult {
@@ -307,6 +329,10 @@ type Query {
   tenantFeatures: TenantFeaturesType!
   tenantPlatformCredentials: [TenantPlatformCredentialType!]!
   tenants: [TenantType!]!
+  myTenants: [TenantType!]!
+  tenantsIStaffAt: [TenantStaffMembershipType!]!
+  tenantStaff(tenantId: String!): [TenantStaffEntryType!]!
+  tenantContacts(tenantId: String!): [ContactType!]!
   tenantCommandConfigs: [TenantCommandConfigType!]!
   tenantPromptOverrides: [TenantPromptOverrideType!]!
   subscriptionPlans: [SubscriptionPlanType!]!
@@ -412,8 +438,54 @@ type Mutation {
   upsertTenantCommandConfig(input: UpsertTenantCommandConfigInput!): MutationResult!
   deleteTenantCommandConfig(input: DeleteTenantCommandConfigInput!): MutationResult!
   upsertTenantPromptOverride(input: UpsertTenantPromptOverrideInput!): MutationResult!
+  switchTenant(tenantId: String!): Boolean!
+  addTenantStaff(input: AddTenantStaffInput!): MutationResult!
+  removeTenantStaff(input: RemoveTenantStaffInput!): MutationResult!
+  changeTenantStaffRole(input: ChangeTenantStaffRoleInput!): MutationResult!
+  addContact(input: AddContactInput!): ContactType!
+  updateContact(input: UpdateContactInput!): ContactType!
+  removeContactFromTenant(input: RemoveContactFromTenantInput!): MutationResult!
   selectSubscription(input: SelectSubscriptionInput!): UserSubscriptionType!
   cancelSubscription: Boolean!
+}
+
+input AddTenantStaffInput {
+  tenantId: String!
+  userId: String!
+  role: String!
+}
+
+input RemoveTenantStaffInput {
+  tenantId: String!
+  userId: String!
+}
+
+input ChangeTenantStaffRoleInput {
+  tenantId: String!
+  userId: String!
+  role: String!
+}
+
+input AddContactInput {
+  tenantId: String!
+  email: String
+  phone: String
+  name: String!
+  surname: String
+  accessLevel: String!
+}
+
+input UpdateContactInput {
+  contactId: String!
+  email: String
+  phone: String
+  name: String
+  surname: String
+}
+
+input RemoveContactFromTenantInput {
+  tenantId: String!
+  contactId: String!
 }
 
 input RegisterInput {

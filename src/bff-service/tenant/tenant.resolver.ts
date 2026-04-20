@@ -1,19 +1,34 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver, Context as GqlContext } from '@nestjs/graphql';
 import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { TenantService } from '@app/tenant';
+import { CurrentUserId } from '@app/auth';
+import type { Context } from '@app/auth';
+import { CacheService } from '@app/redis';
+import { TenantStaffRole } from '@app/entities';
 import { TenantCustomizationService } from '../common/customization/tenant-customization.service';
 import { OwnerGuard } from '../common/guards/owner.guard';
+import { AdminGuard } from '../common/guards/admin.guard';
+import { TenantStaffGuard } from '../common/guards/tenant-staff.guard';
 import { TenantAdminService } from './tenant-admin.service';
 import { TenantFeaturesType } from './dto/tenant-features.type';
 import {
+  AddContactInput,
+  AddTenantStaffInput,
+  ChangeTenantStaffRoleInput,
+  ContactType,
   CreateTenantInput,
   CreateTenantResult,
   DeleteTenantCommandConfigInput,
   MutationResult,
+  RemoveContactFromTenantInput,
+  RemoveTenantStaffInput,
   TenantCommandConfigType,
   TenantPlatformCredentialType,
   TenantPromptOverrideType,
+  TenantStaffEntryType,
+  TenantStaffMembershipType,
   TenantType,
+  UpdateContactInput,
   UpdateCustomizationInput,
   UpdateMyPlatformCredentialsInput,
   UpdateTenantFeaturesInput,
@@ -21,6 +36,7 @@ import {
   UpsertTenantCommandConfigInput,
   UpsertTenantPromptOverrideInput,
 } from './dto/tenant-admin.types';
+import { UserStatusType } from '../auth/login/dto/login-status.tape';
 
 @Resolver('Tenant')
 export class TenantResolver {
@@ -28,6 +44,7 @@ export class TenantResolver {
     private readonly tenantService: TenantService,
     private readonly customizationService: TenantCustomizationService,
     private readonly tenantAdminService: TenantAdminService,
+    private readonly cache: CacheService,
   ) {}
 
   // ── Public (auth-guarded only) ──────────────────────────────────────────────
@@ -62,16 +79,143 @@ export class TenantResolver {
 
   // ── Owner-only ──────────────────────────────────────────────────────────────
 
-  @UseGuards(OwnerGuard)
+  @UseGuards(AdminGuard)
   @Query(() => [TenantType])
   async tenants(): Promise<TenantType[]> {
     return this.tenantAdminService.getAllTenants();
   }
 
-  @UseGuards(OwnerGuard)
+  @Query(() => [TenantType])
+  async myTenants(@CurrentUserId() userId?: string): Promise<TenantType[]> {
+    if (!userId) throw new UnauthorizedException();
+    return this.tenantAdminService.getMyTenants(userId);
+  }
+
+  @Query(() => [TenantStaffMembershipType])
+  async tenantsIStaffAt(@CurrentUserId() userId?: string): Promise<TenantStaffMembershipType[]> {
+    if (!userId) throw new UnauthorizedException();
+    return this.tenantAdminService.getTenantsIStaffAt(userId);
+  }
+
   @Mutation(() => CreateTenantResult)
-  async createTenant(@Args('input') input: CreateTenantInput): Promise<CreateTenantResult> {
-    return this.tenantAdminService.createTenant(input.slug);
+  async createTenant(
+    @Args('input') input: CreateTenantInput,
+    @CurrentUserId() userId?: string,
+  ): Promise<CreateTenantResult> {
+    if (!userId) throw new UnauthorizedException();
+    return this.tenantAdminService.createTenant(input.slug, userId);
+  }
+
+  @Mutation(() => Boolean)
+  async switchTenant(
+    @Args('tenantId') tenantId: string,
+    @GqlContext() ctx: Context,
+    @CurrentUserId() userId?: string,
+  ): Promise<boolean> {
+    if (!userId) throw new UnauthorizedException();
+    const { isMember } = await this.tenantAdminService.isTenantStaff(tenantId, userId);
+    if (!isMember) throw new UnauthorizedException('Not a member of this tenant');
+
+    ctx.req.session.tenant_id = tenantId;
+
+    const userState = await this.cache.getFromCache<UserStatusType>({
+      identifier: userId,
+      prefix: 'user-state',
+    });
+    if (userState) {
+      await this.cache.saveInCache<UserStatusType>({
+        identifier: userId,
+        prefix: 'user-state',
+        EX: 3600,
+        data: { ...userState, tenantId },
+      });
+    }
+    return true;
+  }
+
+  @UseGuards(TenantStaffGuard(TenantStaffRole.Admin))
+  @Query(() => [TenantStaffEntryType])
+  async tenantStaff(@Args('tenantId') tenantId: string): Promise<TenantStaffEntryType[]> {
+    return this.tenantAdminService.getTenantStaff(tenantId);
+  }
+
+  @UseGuards(TenantStaffGuard(TenantStaffRole.Owner))
+  @Mutation(() => MutationResult)
+  async addTenantStaff(@Args('input') input: AddTenantStaffInput): Promise<MutationResult> {
+    return this.tenantAdminService.addTenantStaff(input.tenantId, input.userId, input.role);
+  }
+
+  @UseGuards(TenantStaffGuard(TenantStaffRole.Owner))
+  @Mutation(() => MutationResult)
+  async removeTenantStaff(@Args('input') input: RemoveTenantStaffInput): Promise<MutationResult> {
+    return this.tenantAdminService.removeTenantStaff(input.tenantId, input.userId);
+  }
+
+  @UseGuards(TenantStaffGuard(TenantStaffRole.Owner))
+  @Mutation(() => MutationResult)
+  async changeTenantStaffRole(@Args('input') input: ChangeTenantStaffRoleInput): Promise<MutationResult> {
+    return this.tenantAdminService.changeTenantStaffRole(input.tenantId, input.userId, input.role);
+  }
+
+  @UseGuards(TenantStaffGuard(TenantStaffRole.Support))
+  @Query(() => [ContactType])
+  async tenantContacts(@Args('tenantId') tenantId: string): Promise<ContactType[]> {
+    const contacts = await this.tenantAdminService.getTenantContacts(tenantId);
+    return contacts.map((c) => ({
+      id: c.id,
+      email: c.email || undefined,
+      phone: c.phone || undefined,
+      name: c.name,
+      surname: c.surname || undefined,
+      accessLevel: c.accessLevel || undefined,
+    }));
+  }
+
+  @UseGuards(TenantStaffGuard(TenantStaffRole.Support))
+  @Mutation(() => ContactType)
+  async addContact(@Args('input') input: AddContactInput): Promise<ContactType> {
+    const res = await this.tenantAdminService.addContact({
+      tenantId: input.tenantId,
+      email: input.email,
+      phone: input.phone,
+      name: input.name,
+      surname: input.surname,
+      accessLevel: input.accessLevel,
+    });
+    if (!res.contact) throw new Error(res.message);
+    return {
+      id: res.contact.id,
+      email: res.contact.email || undefined,
+      phone: res.contact.phone || undefined,
+      name: res.contact.name,
+      surname: res.contact.surname || undefined,
+      accessLevel: res.contact.accessLevel || undefined,
+    };
+  }
+
+  @UseGuards(TenantStaffGuard(TenantStaffRole.Support))
+  @Mutation(() => ContactType)
+  async updateContact(@Args('input') input: UpdateContactInput): Promise<ContactType> {
+    const res = await this.tenantAdminService.updateContact(input.contactId, {
+      email: input.email,
+      phone: input.phone,
+      name: input.name,
+      surname: input.surname,
+    });
+    if (!res.contact) throw new Error(res.message);
+    return {
+      id: res.contact.id,
+      email: res.contact.email || undefined,
+      phone: res.contact.phone || undefined,
+      name: res.contact.name,
+      surname: res.contact.surname || undefined,
+    };
+  }
+
+  @UseGuards(TenantStaffGuard(TenantStaffRole.Admin))
+  @Mutation(() => MutationResult)
+  async removeContactFromTenant(@Args('input') input: RemoveContactFromTenantInput): Promise<MutationResult> {
+    return this.tenantAdminService.removeContactFromTenant(input.tenantId, input.contactId);
   }
 
   @UseGuards(OwnerGuard)

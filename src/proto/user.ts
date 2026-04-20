@@ -79,11 +79,7 @@ export interface AddUserRequest {
     | UserType
     | undefined;
   /** Initial password (if provided) */
-  password?:
-    | string
-    | undefined;
-  /** Tenant ID to assign to the user */
-  tenantId?: string | undefined;
+  password?: string | undefined;
 }
 
 /** Retrieve user by ID */
@@ -194,8 +190,6 @@ export interface UserData {
   status: Status;
   /** User role/type */
   type: UserType;
-  /** Tenant ID associated with the user */
-  tenantId: string;
 }
 
 export const USER_PACKAGE_NAME = "user";

@@ -10,6 +10,8 @@ service TenantService {
   rpc GetAllPlatformCredentials (GetAllPlatformCredentialsRequest) returns (GetAllPlatformCredentialsResponse);
   rpc CreateTenant (CreateTenantRequest) returns (CreateTenantResponse);
   rpc GetAllTenants (GetAllTenantsRequest) returns (GetAllTenantsResponse);
+  rpc GetMyTenants (GetMyTenantsRequest) returns (GetMyTenantsResponse);
+  rpc GetTenantsIStaffAt (GetTenantsIStaffAtRequest) returns (GetTenantsIStaffAtResponse);
   rpc UpdateCustomization (UpdateCustomizationRequest) returns (UpdateCustomizationResponse);
   rpc UpsertPlatformCredentials (UpsertPlatformCredentialsRequest) returns (UpsertPlatformCredentialsResponse);
   rpc GetTenantCommandConfigs (GetTenantCommandConfigsRequest) returns (GetTenantCommandConfigsResponse);
@@ -18,6 +20,15 @@ service TenantService {
   rpc GetPromptForContext (GetPromptForContextRequest) returns (GetPromptForContextResponse);
   rpc UpsertTenantPromptOverride (UpsertTenantPromptOverrideRequest) returns (UpsertTenantPromptOverrideResponse);
   rpc GetTenantPromptOverrides (GetTenantPromptOverridesRequest) returns (GetTenantPromptOverridesResponse);
+  rpc AddTenantStaff (AddTenantStaffRequest) returns (TenantStaffMutationResponse);
+  rpc RemoveTenantStaff (RemoveTenantStaffRequest) returns (TenantStaffMutationResponse);
+  rpc ChangeTenantStaffRole (ChangeTenantStaffRoleRequest) returns (TenantStaffMutationResponse);
+  rpc GetTenantStaff (GetTenantStaffRequest) returns (GetTenantStaffResponse);
+  rpc GetTenantStaffMembership (GetTenantStaffMembershipRequest) returns (GetTenantStaffMembershipResponse);
+  rpc AddContact (AddContactRequest) returns (ContactEntryResponse);
+  rpc UpdateContact (UpdateContactRequest) returns (ContactEntryResponse);
+  rpc GetTenantContacts (GetTenantContactsRequest) returns (GetTenantContactsResponse);
+  rpc RemoveContactFromTenant (RemoveContactFromTenantRequest) returns (MutationResponse);
 }
 
 message GetCustomizationRequest {
@@ -88,6 +99,7 @@ message GetTenantsWithPlatformResponse {
 
 message CreateTenantRequest {
   string slug = 1;
+  string billing_user_id = 2;
 }
 
 message CreateTenantResponse {
@@ -103,6 +115,7 @@ message TenantEntry {
   string slug = 2;
   string schema_name = 3;
   bool is_active = 4;
+  string billing_user_id = 5;
 }
 
 message GetAllTenantsRequest {}
@@ -111,6 +124,130 @@ message GetAllTenantsResponse {
   bool status = 1;
   string message = 2;
   repeated TenantEntry tenants = 3;
+}
+
+message GetMyTenantsRequest {
+  string user_id = 1;
+}
+
+message GetMyTenantsResponse {
+  bool status = 1;
+  string message = 2;
+  repeated TenantEntry tenants = 3;
+}
+
+message TenantStaffEntry {
+  string tenant_id = 1;
+  string user_id = 2;
+  string role = 3;
+  string tenant_slug = 4;
+}
+
+message GetTenantsIStaffAtRequest {
+  string user_id = 1;
+}
+
+message GetTenantsIStaffAtResponse {
+  bool status = 1;
+  string message = 2;
+  repeated TenantStaffEntry memberships = 3;
+}
+
+message MutationResponse {
+  bool status = 1;
+  string message = 2;
+}
+
+message TenantStaffMutationResponse {
+  bool status = 1;
+  string message = 2;
+  TenantStaffEntry entry = 3;
+}
+
+message AddTenantStaffRequest {
+  string tenant_id = 1;
+  string user_id = 2;
+  string role = 3;
+}
+
+message RemoveTenantStaffRequest {
+  string tenant_id = 1;
+  string user_id = 2;
+}
+
+message ChangeTenantStaffRoleRequest {
+  string tenant_id = 1;
+  string user_id = 2;
+  string role = 3;
+}
+
+message GetTenantStaffRequest {
+  string tenant_id = 1;
+}
+
+message GetTenantStaffResponse {
+  bool status = 1;
+  string message = 2;
+  repeated TenantStaffEntry members = 3;
+}
+
+message GetTenantStaffMembershipRequest {
+  string tenant_id = 1;
+  string user_id = 2;
+}
+
+message GetTenantStaffMembershipResponse {
+  bool status = 1;
+  string message = 2;
+  bool is_member = 3;
+  string role = 4;
+}
+
+message ContactEntry {
+  string id = 1;
+  string email = 2;
+  string phone = 3;
+  string name = 4;
+  string surname = 5;
+  string access_level = 6;
+}
+
+message ContactEntryResponse {
+  bool status = 1;
+  string message = 2;
+  ContactEntry contact = 3;
+}
+
+message AddContactRequest {
+  string tenant_id = 1;
+  string email = 2;
+  string phone = 3;
+  string name = 4;
+  string surname = 5;
+  string access_level = 6;
+}
+
+message UpdateContactRequest {
+  string contact_id = 1;
+  string email = 2;
+  string phone = 3;
+  string name = 4;
+  string surname = 5;
+}
+
+message GetTenantContactsRequest {
+  string tenant_id = 1;
+}
+
+message GetTenantContactsResponse {
+  bool status = 1;
+  string message = 2;
+  repeated ContactEntry contacts = 3;
+}
+
+message RemoveContactFromTenantRequest {
+  string tenant_id = 1;
+  string contact_id = 2;
 }
 
 message UpdateCustomizationRequest {

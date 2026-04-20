@@ -4,9 +4,11 @@ import { TenantResolver } from './tenant.resolver';
 import { TenantAdminService } from './tenant-admin.service';
 import { TenantCustomizationModule } from '../common/customization/tenant-customization.module';
 import { OwnerGuard } from '../common/guards/owner.guard';
+import { AdminGuard } from '../common/guards/admin.guard';
 
 @Module({
   imports: [TenantModule, TenantCustomizationModule],
-  providers: [TenantResolver, TenantAdminService, OwnerGuard],
+  providers: [TenantResolver, TenantAdminService, OwnerGuard, AdminGuard],
+  exports: [TenantAdminService],
 })
 export class TenantBffModule {}

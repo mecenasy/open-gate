@@ -43,6 +43,135 @@ export class TenantType {
 
   @Field()
   isActive!: boolean;
+
+  @Field({ nullable: true })
+  billingUserId?: string | null;
+}
+
+@ObjectType()
+export class TenantStaffMembershipType {
+  @Field()
+  tenantId!: string;
+
+  @Field()
+  tenantSlug!: string;
+
+  @Field()
+  role!: string;
+}
+
+@ObjectType()
+export class TenantStaffEntryType {
+  @Field()
+  tenantId!: string;
+
+  @Field()
+  userId!: string;
+
+  @Field()
+  role!: string;
+}
+
+@InputType()
+export class AddTenantStaffInput {
+  @Field()
+  tenantId!: string;
+
+  @Field()
+  userId!: string;
+
+  @Field()
+  role!: string;
+}
+
+@InputType()
+export class RemoveTenantStaffInput {
+  @Field()
+  tenantId!: string;
+
+  @Field()
+  userId!: string;
+}
+
+@InputType()
+export class ChangeTenantStaffRoleInput {
+  @Field()
+  tenantId!: string;
+
+  @Field()
+  userId!: string;
+
+  @Field()
+  role!: string;
+}
+
+@ObjectType()
+export class ContactType {
+  @Field()
+  id!: string;
+
+  @Field({ nullable: true })
+  email?: string;
+
+  @Field({ nullable: true })
+  phone?: string;
+
+  @Field()
+  name!: string;
+
+  @Field({ nullable: true })
+  surname?: string;
+
+  @Field({ nullable: true })
+  accessLevel?: string;
+}
+
+@InputType()
+export class AddContactInput {
+  @Field()
+  tenantId!: string;
+
+  @Field({ nullable: true })
+  email?: string;
+
+  @Field({ nullable: true })
+  phone?: string;
+
+  @Field()
+  name!: string;
+
+  @Field({ nullable: true })
+  surname?: string;
+
+  @Field()
+  accessLevel!: string;
+}
+
+@InputType()
+export class UpdateContactInput {
+  @Field()
+  contactId!: string;
+
+  @Field({ nullable: true })
+  email?: string;
+
+  @Field({ nullable: true })
+  phone?: string;
+
+  @Field({ nullable: true })
+  name?: string;
+
+  @Field({ nullable: true })
+  surname?: string;
+}
+
+@InputType()
+export class RemoveContactFromTenantInput {
+  @Field()
+  tenantId!: string;
+
+  @Field()
+  contactId!: string;
 }
 
 @ObjectType()

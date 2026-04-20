@@ -7,6 +7,8 @@ export * from './enums/config-type.enum';
 export * from './enums/message-type.enum';
 export * from './enums/subscription-plan-code.enum';
 export * from './enums/subscription-status.enum';
+export * from './enums/tenant-staff-role.enum';
+export * from './enums/contact-access-level.enum';
 
 // User domain
 export * from './user/user.entity';
@@ -40,3 +42,8 @@ export * from './tenant/customization-config.entity';
 export * from './tenant/platform-credentials.entity';
 export * from './tenant/tenant-command-config.entity';
 export * from './tenant/tenant-prompt-override.entity';
+export * from './tenant/tenant-staff.entity';
+
+// Contact
+export * from './contact/contact.entity';
+export * from './contact/contact-membership.entity';

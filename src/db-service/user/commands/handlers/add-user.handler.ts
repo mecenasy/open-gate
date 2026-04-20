@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CustomLogger } from '@app/logger';
 import { BaseCommandHandler } from '@app/cqrs';
-import { TenantService } from '@app/tenant';
 import { AddUserCommand } from '../impl/add-user.command';
 import { User } from '../../entity/user.entity';
 import { UserRole } from '../../entity/user-role.entity';
@@ -24,7 +23,6 @@ export class AddUserHandler extends BaseCommandHandler<AddUserCommand, UserData>
     private readonly userRoleRepository: Repository<UserRole>,
     private readonly passwordService: PasswordService,
     private readonly userSettingsService: UserSettingsService,
-    private readonly tenantService: TenantService,
     logger: CustomLogger,
   ) {
     super(logger);
@@ -34,13 +32,11 @@ export class AddUserHandler extends BaseCommandHandler<AddUserCommand, UserData>
     return this.run(
       'AddUser',
       async () => {
-        const { email, phone, password, name, surname, type, phoneOwner, tenantId: requestTenantId } = command.request;
+        const { email, phone, password, name, surname, type, phoneOwner } = command.request;
 
         const userType = await this.userRoleRepository.findOneOrFail({
           where: { userType: type ? protoToJsUserType(type) : UserType.User },
         });
-
-        const tenantId = requestTenantId ?? this.tenantService.getContext()?.tenantId ?? null;
 
         const user = this.userRepository.create({
           email,
@@ -50,7 +46,6 @@ export class AddUserHandler extends BaseCommandHandler<AddUserCommand, UserData>
           status: UserStatus.Pending,
           userRole: userType,
           userSettings: this.userSettingsService.create(),
-          tenantId,
         });
 
         if (phoneOwner) {

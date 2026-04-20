@@ -29,6 +29,13 @@ export class Tenant {
   customizationId!: string | null;
 
   @Column({
+    name: 'billing_user_id',
+    type: 'uuid',
+    nullable: true,
+  })
+  billingUserId!: string | null;
+
+  @Column({
     name: 'is_active',
     type: 'boolean',
     default: true,

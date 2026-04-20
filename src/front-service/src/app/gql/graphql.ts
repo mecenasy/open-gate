@@ -38,12 +38,27 @@ export type AddCommandType = {
   roleNames: Array<Scalars['String']['input']>;
 };
 
+export type AddContactInput = {
+  accessLevel: Scalars['String']['input'];
+  email?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  phone?: InputMaybe<Scalars['String']['input']>;
+  surname?: InputMaybe<Scalars['String']['input']>;
+  tenantId: Scalars['String']['input'];
+};
+
 export type AddPromptType = {
   commandName: Scalars['String']['input'];
   description: Scalars['String']['input'];
   key: Scalars['String']['input'];
   prompt: Scalars['String']['input'];
   userType: PromptUserType | '%future added value';
+};
+
+export type AddTenantStaffInput = {
+  role: Scalars['String']['input'];
+  tenantId: Scalars['String']['input'];
+  userId: Scalars['String']['input'];
 };
 
 export enum AuthStatus {
@@ -65,6 +80,12 @@ export enum AuthStatus {
 export type ChangePasswordType = {
   newPassword: Scalars['String']['input'];
   oldPassword: Scalars['String']['input'];
+};
+
+export type ChangeTenantStaffRoleInput = {
+  role: Scalars['String']['input'];
+  tenantId: Scalars['String']['input'];
+  userId: Scalars['String']['input'];
 };
 
 export type CommandResponseType = {
@@ -119,6 +140,16 @@ export type ConfigsListType = {
   data: Array<ConfigType>;
   message: Scalars['String']['output'];
   status: Scalars['Boolean']['output'];
+};
+
+export type ContactType = {
+  __typename?: 'ContactType';
+  accessLevel?: Maybe<Scalars['String']['output']>;
+  email?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  phone?: Maybe<Scalars['String']['output']>;
+  surname?: Maybe<Scalars['String']['output']>;
 };
 
 export type CreateSimpleUserType = {
@@ -235,9 +266,12 @@ export type Mutation = {
   accept2fa: AcceptType;
   adaptiveLogin: AcceptAdaptiveLoginType;
   addCommand: CommandResponseType;
+  addContact: ContactType;
   addPrompt: PromptResponseType;
+  addTenantStaff: MutationResult;
   cancelSubscription: Scalars['Boolean']['output'];
   changePassword: StatusType;
+  changeTenantStaffRole: MutationResult;
   confirmRegistration: SuccessResponseType;
   createSimpleUser: UserType;
   createTenant: CreateTenantResult;
@@ -258,14 +292,18 @@ export type Mutation = {
   registerOptionPasskeyVerify: StatusType;
   reject2fa: StatusType;
   removeCommand: CommandResponseType;
+  removeContactFromTenant: MutationResult;
   removePasskey: RemovePasskeyType;
   removePrompt: PromptSuccessType;
+  removeTenantStaff: MutationResult;
   removeUser: SuccessResponseType;
   resetPassword: StatusType;
   selectSubscription: UserSubscriptionType;
+  switchTenant: Scalars['Boolean']['output'];
   toggleActiveStatus: CommandResponseType;
   updateCommand: CommandResponseType;
   updateConfig: ConfigResponseType;
+  updateContact: ContactType;
   updateMyPlatformCredentials: MutationResult;
   updatePrompt: PromptResponseType;
   updateTenantCustomization: MutationResult;
@@ -287,13 +325,28 @@ export type MutationAddCommandArgs = {
 };
 
 
+export type MutationAddContactArgs = {
+  input: AddContactInput;
+};
+
+
 export type MutationAddPromptArgs = {
   input: AddPromptType;
 };
 
 
+export type MutationAddTenantStaffArgs = {
+  input: AddTenantStaffInput;
+};
+
+
 export type MutationChangePasswordArgs = {
   input: ChangePasswordType;
+};
+
+
+export type MutationChangeTenantStaffRoleArgs = {
+  input: ChangeTenantStaffRoleInput;
 };
 
 
@@ -380,6 +433,11 @@ export type MutationRemoveCommandArgs = {
 };
 
 
+export type MutationRemoveContactFromTenantArgs = {
+  input: RemoveContactFromTenantInput;
+};
+
+
 export type MutationRemovePasskeyArgs = {
   id: Scalars['String']['input'];
 };
@@ -387,6 +445,11 @@ export type MutationRemovePasskeyArgs = {
 
 export type MutationRemovePromptArgs = {
   input: RemovePromptType;
+};
+
+
+export type MutationRemoveTenantStaffArgs = {
+  input: RemoveTenantStaffInput;
 };
 
 
@@ -405,6 +468,11 @@ export type MutationSelectSubscriptionArgs = {
 };
 
 
+export type MutationSwitchTenantArgs = {
+  tenantId: Scalars['String']['input'];
+};
+
+
 export type MutationToggleActiveStatusArgs = {
   input: ToggleActiveStatusType;
 };
@@ -417,6 +485,11 @@ export type MutationUpdateCommandArgs = {
 
 export type MutationUpdateConfigArgs = {
   input: UpdateConfigType;
+};
+
+
+export type MutationUpdateContactArgs = {
+  input: UpdateContactInput;
 };
 
 
@@ -565,15 +638,19 @@ export type Query = {
   getPasskeys: Array<PassKeyType>;
   loginStatus: LoginStatusType;
   mySubscription?: Maybe<UserSubscriptionType>;
+  myTenants: Array<TenantType>;
   promptById: PromptResponseType;
   promptByKey: PromptResponseType;
   prompts: PromptsListType;
   subscriptionPlans: Array<SubscriptionPlanType>;
   tenantCommandConfigs: Array<TenantCommandConfigType>;
+  tenantContacts: Array<ContactType>;
   tenantFeatures: TenantFeaturesType;
   tenantPlatformCredentials: Array<TenantPlatformCredentialType>;
   tenantPromptOverrides: Array<TenantPromptOverrideType>;
+  tenantStaff: Array<TenantStaffEntryType>;
   tenants: Array<TenantType>;
+  tenantsIStaffAt: Array<TenantStaffMembershipType>;
   user: UserSummaryType;
   users: UsersListType;
   verifyToken: VerifyTokenType;
@@ -620,6 +697,16 @@ export type QueryPromptsArgs = {
 };
 
 
+export type QueryTenantContactsArgs = {
+  tenantId: Scalars['String']['input'];
+};
+
+
+export type QueryTenantStaffArgs = {
+  tenantId: Scalars['String']['input'];
+};
+
+
 export type QueryUserArgs = {
   input: GetUserType;
 };
@@ -646,6 +733,11 @@ export type RemoveCommandType = {
   id: Scalars['ID']['input'];
 };
 
+export type RemoveContactFromTenantInput = {
+  contactId: Scalars['String']['input'];
+  tenantId: Scalars['String']['input'];
+};
+
 export type RemovePasskeyType = {
   __typename?: 'RemovePasskeyType';
   status: Scalars['Boolean']['output'];
@@ -653,6 +745,11 @@ export type RemovePasskeyType = {
 
 export type RemovePromptType = {
   id: Scalars['ID']['input'];
+};
+
+export type RemoveTenantStaffInput = {
+  tenantId: Scalars['String']['input'];
+  userId: Scalars['String']['input'];
 };
 
 export type ResetPasswordType = {
@@ -729,8 +826,23 @@ export type TenantPromptOverrideType = {
   userType: Scalars['String']['output'];
 };
 
+export type TenantStaffEntryType = {
+  __typename?: 'TenantStaffEntryType';
+  role: Scalars['String']['output'];
+  tenantId: Scalars['String']['output'];
+  userId: Scalars['String']['output'];
+};
+
+export type TenantStaffMembershipType = {
+  __typename?: 'TenantStaffMembershipType';
+  role: Scalars['String']['output'];
+  tenantId: Scalars['String']['output'];
+  tenantSlug: Scalars['String']['output'];
+};
+
 export type TenantType = {
   __typename?: 'TenantType';
+  billingUserId?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
   isActive: Scalars['Boolean']['output'];
   schemaName: Scalars['String']['output'];
@@ -755,6 +867,14 @@ export type UpdateCommandType = {
 export type UpdateConfigType = {
   key: Scalars['String']['input'];
   value: Scalars['String']['input'];
+};
+
+export type UpdateContactInput = {
+  contactId: Scalars['String']['input'];
+  email?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
+  surname?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateCustomizationInput = {

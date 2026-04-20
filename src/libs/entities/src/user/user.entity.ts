@@ -70,13 +70,6 @@ export class User {
   @IsString()
   ownerId!: string;
 
-  @Column({
-    name: 'tenant_id',
-    type: 'uuid',
-    nullable: true,
-  })
-  tenantId!: string | null;
-
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamptz',

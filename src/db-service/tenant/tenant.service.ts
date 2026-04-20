@@ -32,9 +32,22 @@ export class TenantDbService {
     return this.tenantRepo.find({ where: { isActive: true } });
   }
 
-  async create(slug: string): Promise<Tenant> {
+  findByBillingUserId(userId: string): Promise<Tenant[]> {
+    return this.tenantRepo.find({ where: { billingUserId: userId } });
+  }
+
+  countByBillingUserId(userId: string): Promise<number> {
+    return this.tenantRepo.count({ where: { billingUserId: userId } });
+  }
+
+  async create(slug: string, billingUserId?: string | null): Promise<Tenant> {
     const schemaName = `tenant_${slug.replace(/-/g, '_')}`;
-    const tenant = this.tenantRepo.create({ slug, schemaName, isActive: true });
+    const tenant = this.tenantRepo.create({
+      slug,
+      schemaName,
+      isActive: true,
+      billingUserId: billingUserId ?? null,
+    });
     const saved = await this.tenantRepo.save(tenant);
 
     const config = this.customizationRepo.create({

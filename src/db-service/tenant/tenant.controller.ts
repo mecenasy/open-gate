@@ -15,6 +15,10 @@ import {
   CreateTenantRequest,
   CreateTenantResponse,
   GetAllTenantsResponse,
+  GetMyTenantsRequest,
+  GetMyTenantsResponse,
+  GetTenantsIStaffAtRequest,
+  GetTenantsIStaffAtResponse,
   UpdateCustomizationRequest,
   UpdateCustomizationResponse,
   UpsertPlatformCredentialsRequest,
@@ -31,13 +35,47 @@ import {
   UpsertTenantPromptOverrideResponse,
   GetTenantPromptOverridesRequest,
   GetTenantPromptOverridesResponse,
+  AddTenantStaffRequest,
+  RemoveTenantStaffRequest,
+  ChangeTenantStaffRoleRequest,
+  TenantStaffMutationResponse,
+  GetTenantStaffRequest,
+  GetTenantStaffResponse,
+  GetTenantStaffMembershipRequest,
+  GetTenantStaffMembershipResponse,
+  AddContactRequest,
+  UpdateContactRequest,
+  ContactEntryResponse,
+  GetTenantContactsRequest,
+  GetTenantContactsResponse,
+  RemoveContactFromTenantRequest,
+  MutationResponse,
 } from 'src/proto/tenant';
 import { TenantDbService } from './tenant.service';
 import { PlatformCredentialsService } from './platform-credentials.service';
 import { TenantCommandConfigService } from './tenant-command-config.service';
 import { TenantPromptOverrideService } from './tenant-prompt-override.service';
+import { TenantStaffService } from './tenant-staff.service';
+import { ContactService } from '../contact/contact.service';
 import type { CommunityCustomization } from './entity/customization-config.entity';
-import { TenantPromptOverride, UserType } from '@app/entities';
+import { TenantPromptOverride, UserType, TenantStaffRole, ContactAccessLevel } from '@app/entities';
+
+function parseTenantStaffRole(value: string): TenantStaffRole {
+  const normalized = value?.toLowerCase();
+  if (
+    normalized === TenantStaffRole.Owner ||
+    normalized === TenantStaffRole.Admin ||
+    normalized === TenantStaffRole.Support
+  ) {
+    return normalized;
+  }
+  throw new Error(`Invalid tenant staff role: ${value}`);
+}
+
+function parseAccessLevel(value?: string | null): ContactAccessLevel {
+  if (value === ContactAccessLevel.Secondary) return ContactAccessLevel.Secondary;
+  return ContactAccessLevel.Primary;
+}
 
 @Controller()
 @TenantServiceControllerMethods()
@@ -47,6 +85,8 @@ export class TenantController implements TenantServiceController {
     private readonly platformCredentialsService: PlatformCredentialsService,
     private readonly commandConfigService: TenantCommandConfigService,
     private readonly promptOverrideService: TenantPromptOverrideService,
+    private readonly tenantStaffService: TenantStaffService,
+    private readonly contactService: ContactService,
   ) {}
 
   async getCustomization({ tenantId }: GetCustomizationRequest): Promise<GetCustomizationResponse> {
@@ -109,8 +149,11 @@ export class TenantController implements TenantServiceController {
     };
   }
 
-  async createTenant({ slug }: CreateTenantRequest): Promise<CreateTenantResponse> {
-    const tenant = await this.tenantDbService.create(String(slug));
+  async createTenant({ slug, billingUserId }: CreateTenantRequest): Promise<CreateTenantResponse> {
+    const tenant = await this.tenantDbService.create(String(slug), billingUserId || null);
+    if (billingUserId) {
+      await this.tenantStaffService.add(tenant.id, billingUserId, TenantStaffRole.Owner);
+    }
     return {
       status: true,
       message: 'Tenant created successfully',
@@ -130,8 +173,177 @@ export class TenantController implements TenantServiceController {
         slug: t.slug,
         schemaName: t.schemaName,
         isActive: t.isActive,
+        billingUserId: t.billingUserId ?? '',
       })),
     };
+  }
+
+  async getMyTenants({ userId }: GetMyTenantsRequest): Promise<GetMyTenantsResponse> {
+    const tenants = await this.tenantDbService.findByBillingUserId(String(userId));
+    return {
+      status: true,
+      message: 'OK',
+      tenants: tenants.map((t) => ({
+        id: t.id,
+        slug: t.slug,
+        schemaName: t.schemaName,
+        isActive: t.isActive,
+        billingUserId: t.billingUserId ?? '',
+      })),
+    };
+  }
+
+  async getTenantsIStaffAt({ userId }: GetTenantsIStaffAtRequest): Promise<GetTenantsIStaffAtResponse> {
+    const memberships = await this.tenantStaffService.listForUser(String(userId));
+    return {
+      status: true,
+      message: 'OK',
+      memberships: memberships.map((m) => ({
+        tenantId: m.tenantId,
+        userId: String(userId),
+        role: m.role,
+        tenantSlug: m.tenantSlug,
+      })),
+    };
+  }
+
+  async addTenantStaff({ tenantId, userId, role }: AddTenantStaffRequest): Promise<TenantStaffMutationResponse> {
+    const entry = await this.tenantStaffService.add(String(tenantId), String(userId), parseTenantStaffRole(role));
+    return {
+      status: true,
+      message: 'Staff added',
+      entry: { tenantId: entry.tenantId, userId: entry.userId, role: entry.role, tenantSlug: '' },
+    };
+  }
+
+  async removeTenantStaff({ tenantId, userId }: RemoveTenantStaffRequest): Promise<TenantStaffMutationResponse> {
+    const removed = await this.tenantStaffService.remove(String(tenantId), String(userId));
+    return {
+      status: removed,
+      message: removed ? 'Staff removed' : 'Membership not found',
+      entry: undefined,
+    };
+  }
+
+  async changeTenantStaffRole({
+    tenantId,
+    userId,
+    role,
+  }: ChangeTenantStaffRoleRequest): Promise<TenantStaffMutationResponse> {
+    const entry = await this.tenantStaffService.changeRole(
+      String(tenantId),
+      String(userId),
+      parseTenantStaffRole(role),
+    );
+    if (!entry) return { status: false, message: 'Membership not found', entry: undefined };
+    return {
+      status: true,
+      message: 'Role changed',
+      entry: { tenantId: entry.tenantId, userId: entry.userId, role: entry.role, tenantSlug: '' },
+    };
+  }
+
+  async getTenantStaff({ tenantId }: GetTenantStaffRequest): Promise<GetTenantStaffResponse> {
+    const members = await this.tenantStaffService.listForTenant(String(tenantId));
+    return {
+      status: true,
+      message: 'OK',
+      members: members.map((m) => ({
+        tenantId: m.tenantId,
+        userId: m.userId,
+        role: m.role,
+        tenantSlug: m.tenantSlug,
+      })),
+    };
+  }
+
+  async getTenantStaffMembership({
+    tenantId,
+    userId,
+  }: GetTenantStaffMembershipRequest): Promise<GetTenantStaffMembershipResponse> {
+    const membership = await this.tenantStaffService.findMembership(String(tenantId), String(userId));
+    return {
+      status: true,
+      message: 'OK',
+      isMember: !!membership,
+      role: membership?.role ?? '',
+    };
+  }
+
+  async addContact({
+    tenantId,
+    email,
+    phone,
+    name,
+    surname,
+    accessLevel,
+  }: AddContactRequest): Promise<ContactEntryResponse> {
+    const created = await this.contactService.createForTenant({
+      tenantId: String(tenantId),
+      email: email || null,
+      phone: phone || null,
+      name: String(name),
+      surname: surname || null,
+      accessLevel: parseAccessLevel(accessLevel),
+    });
+    return {
+      status: true,
+      message: 'Contact created',
+      contact: {
+        id: created.id,
+        email: created.email ?? '',
+        phone: created.phone ?? '',
+        name: created.name,
+        surname: created.surname ?? '',
+        accessLevel: created.accessLevel,
+      },
+    };
+  }
+
+  async updateContact({ contactId, email, phone, name, surname }: UpdateContactRequest): Promise<ContactEntryResponse> {
+    const updated = await this.contactService.update(String(contactId), {
+      email: email || null,
+      phone: phone || null,
+      name: name || undefined,
+      surname: surname || null,
+    });
+    if (!updated) return { status: false, message: 'Contact not found', contact: undefined };
+    return {
+      status: true,
+      message: 'Contact updated',
+      contact: {
+        id: updated.id,
+        email: updated.email ?? '',
+        phone: updated.phone ?? '',
+        name: updated.name,
+        surname: updated.surname ?? '',
+        accessLevel: '',
+      },
+    };
+  }
+
+  async getTenantContacts({ tenantId }: GetTenantContactsRequest): Promise<GetTenantContactsResponse> {
+    const contacts = await this.contactService.listForTenant(String(tenantId));
+    return {
+      status: true,
+      message: 'OK',
+      contacts: contacts.map((c) => ({
+        id: c.id,
+        email: c.email ?? '',
+        phone: c.phone ?? '',
+        name: c.name,
+        surname: c.surname ?? '',
+        accessLevel: c.accessLevel,
+      })),
+    };
+  }
+
+  async removeContactFromTenant({
+    tenantId,
+    contactId,
+  }: RemoveContactFromTenantRequest): Promise<MutationResponse> {
+    const removed = await this.contactService.removeFromTenant(String(tenantId), String(contactId));
+    return { status: removed, message: removed ? 'Contact removed from tenant' : 'Membership not found' };
   }
 
   async updateCustomization({

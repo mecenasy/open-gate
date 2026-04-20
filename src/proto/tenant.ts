@@ -79,6 +79,7 @@ export interface GetTenantsWithPlatformResponse {
 
 export interface CreateTenantRequest {
   slug: string;
+  billingUserId: string;
 }
 
 export interface CreateTenantResponse {
@@ -94,6 +95,7 @@ export interface TenantEntry {
   slug: string;
   schemaName: string;
   isActive: boolean;
+  billingUserId: string;
 }
 
 export interface GetAllTenantsRequest {
@@ -103,6 +105,130 @@ export interface GetAllTenantsResponse {
   status: boolean;
   message: string;
   tenants: TenantEntry[];
+}
+
+export interface GetMyTenantsRequest {
+  userId: string;
+}
+
+export interface GetMyTenantsResponse {
+  status: boolean;
+  message: string;
+  tenants: TenantEntry[];
+}
+
+export interface TenantStaffEntry {
+  tenantId: string;
+  userId: string;
+  role: string;
+  tenantSlug: string;
+}
+
+export interface GetTenantsIStaffAtRequest {
+  userId: string;
+}
+
+export interface GetTenantsIStaffAtResponse {
+  status: boolean;
+  message: string;
+  memberships: TenantStaffEntry[];
+}
+
+export interface MutationResponse {
+  status: boolean;
+  message: string;
+}
+
+export interface TenantStaffMutationResponse {
+  status: boolean;
+  message: string;
+  entry: TenantStaffEntry | undefined;
+}
+
+export interface AddTenantStaffRequest {
+  tenantId: string;
+  userId: string;
+  role: string;
+}
+
+export interface RemoveTenantStaffRequest {
+  tenantId: string;
+  userId: string;
+}
+
+export interface ChangeTenantStaffRoleRequest {
+  tenantId: string;
+  userId: string;
+  role: string;
+}
+
+export interface GetTenantStaffRequest {
+  tenantId: string;
+}
+
+export interface GetTenantStaffResponse {
+  status: boolean;
+  message: string;
+  members: TenantStaffEntry[];
+}
+
+export interface GetTenantStaffMembershipRequest {
+  tenantId: string;
+  userId: string;
+}
+
+export interface GetTenantStaffMembershipResponse {
+  status: boolean;
+  message: string;
+  isMember: boolean;
+  role: string;
+}
+
+export interface ContactEntry {
+  id: string;
+  email: string;
+  phone: string;
+  name: string;
+  surname: string;
+  accessLevel: string;
+}
+
+export interface ContactEntryResponse {
+  status: boolean;
+  message: string;
+  contact: ContactEntry | undefined;
+}
+
+export interface AddContactRequest {
+  tenantId: string;
+  email: string;
+  phone: string;
+  name: string;
+  surname: string;
+  accessLevel: string;
+}
+
+export interface UpdateContactRequest {
+  contactId: string;
+  email: string;
+  phone: string;
+  name: string;
+  surname: string;
+}
+
+export interface GetTenantContactsRequest {
+  tenantId: string;
+}
+
+export interface GetTenantContactsResponse {
+  status: boolean;
+  message: string;
+  contacts: ContactEntry[];
+}
+
+export interface RemoveContactFromTenantRequest {
+  tenantId: string;
+  contactId: string;
 }
 
 export interface UpdateCustomizationRequest {
@@ -241,6 +367,10 @@ export interface TenantServiceClient {
 
   getAllTenants(request: GetAllTenantsRequest, metadata?: Metadata): Observable<GetAllTenantsResponse>;
 
+  getMyTenants(request: GetMyTenantsRequest, metadata?: Metadata): Observable<GetMyTenantsResponse>;
+
+  getTenantsIStaffAt(request: GetTenantsIStaffAtRequest, metadata?: Metadata): Observable<GetTenantsIStaffAtResponse>;
+
   updateCustomization(
     request: UpdateCustomizationRequest,
     metadata?: Metadata,
@@ -280,6 +410,30 @@ export interface TenantServiceClient {
     request: GetTenantPromptOverridesRequest,
     metadata?: Metadata,
   ): Observable<GetTenantPromptOverridesResponse>;
+
+  addTenantStaff(request: AddTenantStaffRequest, metadata?: Metadata): Observable<TenantStaffMutationResponse>;
+
+  removeTenantStaff(request: RemoveTenantStaffRequest, metadata?: Metadata): Observable<TenantStaffMutationResponse>;
+
+  changeTenantStaffRole(
+    request: ChangeTenantStaffRoleRequest,
+    metadata?: Metadata,
+  ): Observable<TenantStaffMutationResponse>;
+
+  getTenantStaff(request: GetTenantStaffRequest, metadata?: Metadata): Observable<GetTenantStaffResponse>;
+
+  getTenantStaffMembership(
+    request: GetTenantStaffMembershipRequest,
+    metadata?: Metadata,
+  ): Observable<GetTenantStaffMembershipResponse>;
+
+  addContact(request: AddContactRequest, metadata?: Metadata): Observable<ContactEntryResponse>;
+
+  updateContact(request: UpdateContactRequest, metadata?: Metadata): Observable<ContactEntryResponse>;
+
+  getTenantContacts(request: GetTenantContactsRequest, metadata?: Metadata): Observable<GetTenantContactsResponse>;
+
+  removeContactFromTenant(request: RemoveContactFromTenantRequest, metadata?: Metadata): Observable<MutationResponse>;
 }
 
 export interface TenantServiceController {
@@ -326,6 +480,16 @@ export interface TenantServiceController {
     request: GetAllTenantsRequest,
     metadata?: Metadata,
   ): Promise<GetAllTenantsResponse> | Observable<GetAllTenantsResponse> | GetAllTenantsResponse;
+
+  getMyTenants(
+    request: GetMyTenantsRequest,
+    metadata?: Metadata,
+  ): Promise<GetMyTenantsResponse> | Observable<GetMyTenantsResponse> | GetMyTenantsResponse;
+
+  getTenantsIStaffAt(
+    request: GetTenantsIStaffAtRequest,
+    metadata?: Metadata,
+  ): Promise<GetTenantsIStaffAtResponse> | Observable<GetTenantsIStaffAtResponse> | GetTenantsIStaffAtResponse;
 
   updateCustomization(
     request: UpdateCustomizationRequest,
@@ -384,6 +548,54 @@ export interface TenantServiceController {
     | Promise<GetTenantPromptOverridesResponse>
     | Observable<GetTenantPromptOverridesResponse>
     | GetTenantPromptOverridesResponse;
+
+  addTenantStaff(
+    request: AddTenantStaffRequest,
+    metadata?: Metadata,
+  ): Promise<TenantStaffMutationResponse> | Observable<TenantStaffMutationResponse> | TenantStaffMutationResponse;
+
+  removeTenantStaff(
+    request: RemoveTenantStaffRequest,
+    metadata?: Metadata,
+  ): Promise<TenantStaffMutationResponse> | Observable<TenantStaffMutationResponse> | TenantStaffMutationResponse;
+
+  changeTenantStaffRole(
+    request: ChangeTenantStaffRoleRequest,
+    metadata?: Metadata,
+  ): Promise<TenantStaffMutationResponse> | Observable<TenantStaffMutationResponse> | TenantStaffMutationResponse;
+
+  getTenantStaff(
+    request: GetTenantStaffRequest,
+    metadata?: Metadata,
+  ): Promise<GetTenantStaffResponse> | Observable<GetTenantStaffResponse> | GetTenantStaffResponse;
+
+  getTenantStaffMembership(
+    request: GetTenantStaffMembershipRequest,
+    metadata?: Metadata,
+  ):
+    | Promise<GetTenantStaffMembershipResponse>
+    | Observable<GetTenantStaffMembershipResponse>
+    | GetTenantStaffMembershipResponse;
+
+  addContact(
+    request: AddContactRequest,
+    metadata?: Metadata,
+  ): Promise<ContactEntryResponse> | Observable<ContactEntryResponse> | ContactEntryResponse;
+
+  updateContact(
+    request: UpdateContactRequest,
+    metadata?: Metadata,
+  ): Promise<ContactEntryResponse> | Observable<ContactEntryResponse> | ContactEntryResponse;
+
+  getTenantContacts(
+    request: GetTenantContactsRequest,
+    metadata?: Metadata,
+  ): Promise<GetTenantContactsResponse> | Observable<GetTenantContactsResponse> | GetTenantContactsResponse;
+
+  removeContactFromTenant(
+    request: RemoveContactFromTenantRequest,
+    metadata?: Metadata,
+  ): Promise<MutationResponse> | Observable<MutationResponse> | MutationResponse;
 }
 
 export function TenantServiceControllerMethods() {
@@ -396,6 +608,8 @@ export function TenantServiceControllerMethods() {
       "getAllPlatformCredentials",
       "createTenant",
       "getAllTenants",
+      "getMyTenants",
+      "getTenantsIStaffAt",
       "updateCustomization",
       "upsertPlatformCredentials",
       "getTenantCommandConfigs",
@@ -404,6 +618,15 @@ export function TenantServiceControllerMethods() {
       "getPromptForContext",
       "upsertTenantPromptOverride",
       "getTenantPromptOverrides",
+      "addTenantStaff",
+      "removeTenantStaff",
+      "changeTenantStaffRole",
+      "getTenantStaff",
+      "getTenantStaffMembership",
+      "addContact",
+      "updateContact",
+      "getTenantContacts",
+      "removeContactFromTenant",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

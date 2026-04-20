@@ -17,6 +17,7 @@ const STATUS_QUERY = graphql(`
         is2faEnabled
         isAdaptiveLoginEnabled
         admin
+        tenantId
       }
     }
   }
@@ -40,6 +41,7 @@ export const useAuth = () => {
   const status = data?.loginStatus.status;
   const user = data?.loginStatus.user;
   const phoneId = data?.loginStatus.phoneId;
+  const activeTenantId = user?.tenantId ?? null;
 
   const [logoutUser] = useMutation(LOGOUT_MUTATION, {
     refetchQueries: ['Status'],
@@ -57,6 +59,7 @@ export const useAuth = () => {
     isOwner: user?.owner === true,
     user: user,
     phoneId,
+    activeTenantId,
     logout,
     refetch,
   };

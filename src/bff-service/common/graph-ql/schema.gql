@@ -82,6 +82,7 @@ type UserStatusType {
   email: String!
   is2faEnabled: Boolean!
   isAdaptiveLoginEnabled: Boolean!
+  tenantId: String
 }
 
 type LoginStatusType {

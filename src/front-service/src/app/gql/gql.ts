@@ -15,6 +15,9 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 type Documents = {
     "\n  mutation ConfirmRegistration($token: String!) {\n    confirmRegistration(token: $token) {\n      success\n    }\n  }\n": typeof types.ConfirmRegistrationDocument,
+    "\n  query GetHomeData {\n    mySubscription {\n      id\n      status\n      plan {\n        id\n        code\n        name\n        maxTenants\n        maxPlatformsPerTenant\n        maxContactsPerTenant\n        maxStaffPerTenant\n        maxCustomCommandsPerTenant\n        priceCents\n        currency\n      }\n    }\n    subscriptionPlans {\n      id\n      code\n      name\n      maxTenants\n      maxPlatformsPerTenant\n      maxContactsPerTenant\n      maxStaffPerTenant\n      maxCustomCommandsPerTenant\n      priceCents\n      currency\n      isActive\n    }\n    myTenants {\n      id\n      slug\n      billingUserId\n      isActive\n    }\n    tenantsIStaffAt {\n      tenantId\n      tenantSlug\n      role\n    }\n  }\n": typeof types.GetHomeDataDocument,
+    "\n  mutation SelectSubscription($input: SelectSubscriptionInput!) {\n    selectSubscription(input: $input) {\n      id\n      status\n      plan {\n        id\n        code\n        name\n      }\n    }\n  }\n": typeof types.SelectSubscriptionDocument,
+    "\n  mutation SwitchActiveTenant($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n": typeof types.SwitchActiveTenantDocument,
     "\n  mutation Login($input: LoginType!) {\n    loginUser(input: $input) {\n      status\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation QrChallenge($nonce: String!) {\n    qrChallenge(nonce: $nonce) {\n      challenge\n      dataUrl\n    }\n  }\n": typeof types.QrChallengeDocument,
     "\n  mutation QrLogin($challenge: String!, $nonce: String!) {\n    qrLogin(challenge: $challenge, nonce: $nonce) {\n      status\n    }\n  }\n": typeof types.QrLoginDocument,
@@ -55,7 +58,7 @@ type Documents = {
     "\n  mutation UpdateUserStatus($input: UpdateUserStatusType!) {\n    updateUserStatus(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n": typeof types.UpdateUserStatusDocument,
     "\n  mutation UpdateUserRole($input: UpdateUserRoleType!) {\n    updateUserRole(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n": typeof types.UpdateUserRoleDocument,
     "\n  mutation RemoveUser($input: GetUserType!) {\n    removeUser(input: $input) {\n      success\n    }\n  }\n": typeof types.RemoveUserDocument,
-    "\n  query Status {\n    loginStatus {\n      status\n      phoneId\n      user {\n        id\n        email\n        owner\n        is2faEnabled\n        isAdaptiveLoginEnabled\n        admin\n      }\n    }\n  }\n": typeof types.StatusDocument,
+    "\n  query Status {\n    loginStatus {\n      status\n      phoneId\n      user {\n        id\n        email\n        owner\n        is2faEnabled\n        isAdaptiveLoginEnabled\n        admin\n        tenantId\n      }\n    }\n  }\n": typeof types.StatusDocument,
     "\n  mutation Logout {\n    logoutUser {\n      status\n    }\n  }\n": typeof types.LogoutDocument,
     "\n  query CoreConfigs {\n    coreConfigs {\n      data {\n        key\n        value\n        description\n      }\n      status\n      message\n    }\n  }\n": typeof types.CoreConfigsDocument,
     "\n  mutation UpdateConfig($input: UpdateConfigType!) {\n    updateConfig(input: $input) {\n      status\n      message\n      data {\n        key\n        value\n      }\n    }\n  }\n": typeof types.UpdateConfigDocument,
@@ -63,6 +66,9 @@ type Documents = {
 };
 const documents: Documents = {
     "\n  mutation ConfirmRegistration($token: String!) {\n    confirmRegistration(token: $token) {\n      success\n    }\n  }\n": types.ConfirmRegistrationDocument,
+    "\n  query GetHomeData {\n    mySubscription {\n      id\n      status\n      plan {\n        id\n        code\n        name\n        maxTenants\n        maxPlatformsPerTenant\n        maxContactsPerTenant\n        maxStaffPerTenant\n        maxCustomCommandsPerTenant\n        priceCents\n        currency\n      }\n    }\n    subscriptionPlans {\n      id\n      code\n      name\n      maxTenants\n      maxPlatformsPerTenant\n      maxContactsPerTenant\n      maxStaffPerTenant\n      maxCustomCommandsPerTenant\n      priceCents\n      currency\n      isActive\n    }\n    myTenants {\n      id\n      slug\n      billingUserId\n      isActive\n    }\n    tenantsIStaffAt {\n      tenantId\n      tenantSlug\n      role\n    }\n  }\n": types.GetHomeDataDocument,
+    "\n  mutation SelectSubscription($input: SelectSubscriptionInput!) {\n    selectSubscription(input: $input) {\n      id\n      status\n      plan {\n        id\n        code\n        name\n      }\n    }\n  }\n": types.SelectSubscriptionDocument,
+    "\n  mutation SwitchActiveTenant($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n": types.SwitchActiveTenantDocument,
     "\n  mutation Login($input: LoginType!) {\n    loginUser(input: $input) {\n      status\n    }\n  }\n": types.LoginDocument,
     "\n  mutation QrChallenge($nonce: String!) {\n    qrChallenge(nonce: $nonce) {\n      challenge\n      dataUrl\n    }\n  }\n": types.QrChallengeDocument,
     "\n  mutation QrLogin($challenge: String!, $nonce: String!) {\n    qrLogin(challenge: $challenge, nonce: $nonce) {\n      status\n    }\n  }\n": types.QrLoginDocument,
@@ -103,7 +109,7 @@ const documents: Documents = {
     "\n  mutation UpdateUserStatus($input: UpdateUserStatusType!) {\n    updateUserStatus(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n": types.UpdateUserStatusDocument,
     "\n  mutation UpdateUserRole($input: UpdateUserRoleType!) {\n    updateUserRole(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n": types.UpdateUserRoleDocument,
     "\n  mutation RemoveUser($input: GetUserType!) {\n    removeUser(input: $input) {\n      success\n    }\n  }\n": types.RemoveUserDocument,
-    "\n  query Status {\n    loginStatus {\n      status\n      phoneId\n      user {\n        id\n        email\n        owner\n        is2faEnabled\n        isAdaptiveLoginEnabled\n        admin\n      }\n    }\n  }\n": types.StatusDocument,
+    "\n  query Status {\n    loginStatus {\n      status\n      phoneId\n      user {\n        id\n        email\n        owner\n        is2faEnabled\n        isAdaptiveLoginEnabled\n        admin\n        tenantId\n      }\n    }\n  }\n": types.StatusDocument,
     "\n  mutation Logout {\n    logoutUser {\n      status\n    }\n  }\n": types.LogoutDocument,
     "\n  query CoreConfigs {\n    coreConfigs {\n      data {\n        key\n        value\n        description\n      }\n      status\n      message\n    }\n  }\n": types.CoreConfigsDocument,
     "\n  mutation UpdateConfig($input: UpdateConfigType!) {\n    updateConfig(input: $input) {\n      status\n      message\n      data {\n        key\n        value\n      }\n    }\n  }\n": types.UpdateConfigDocument,
@@ -128,6 +134,18 @@ export function graphql(source: string): unknown;
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation ConfirmRegistration($token: String!) {\n    confirmRegistration(token: $token) {\n      success\n    }\n  }\n"): (typeof documents)["\n  mutation ConfirmRegistration($token: String!) {\n    confirmRegistration(token: $token) {\n      success\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetHomeData {\n    mySubscription {\n      id\n      status\n      plan {\n        id\n        code\n        name\n        maxTenants\n        maxPlatformsPerTenant\n        maxContactsPerTenant\n        maxStaffPerTenant\n        maxCustomCommandsPerTenant\n        priceCents\n        currency\n      }\n    }\n    subscriptionPlans {\n      id\n      code\n      name\n      maxTenants\n      maxPlatformsPerTenant\n      maxContactsPerTenant\n      maxStaffPerTenant\n      maxCustomCommandsPerTenant\n      priceCents\n      currency\n      isActive\n    }\n    myTenants {\n      id\n      slug\n      billingUserId\n      isActive\n    }\n    tenantsIStaffAt {\n      tenantId\n      tenantSlug\n      role\n    }\n  }\n"): (typeof documents)["\n  query GetHomeData {\n    mySubscription {\n      id\n      status\n      plan {\n        id\n        code\n        name\n        maxTenants\n        maxPlatformsPerTenant\n        maxContactsPerTenant\n        maxStaffPerTenant\n        maxCustomCommandsPerTenant\n        priceCents\n        currency\n      }\n    }\n    subscriptionPlans {\n      id\n      code\n      name\n      maxTenants\n      maxPlatformsPerTenant\n      maxContactsPerTenant\n      maxStaffPerTenant\n      maxCustomCommandsPerTenant\n      priceCents\n      currency\n      isActive\n    }\n    myTenants {\n      id\n      slug\n      billingUserId\n      isActive\n    }\n    tenantsIStaffAt {\n      tenantId\n      tenantSlug\n      role\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SelectSubscription($input: SelectSubscriptionInput!) {\n    selectSubscription(input: $input) {\n      id\n      status\n      plan {\n        id\n        code\n        name\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation SelectSubscription($input: SelectSubscriptionInput!) {\n    selectSubscription(input: $input) {\n      id\n      status\n      plan {\n        id\n        code\n        name\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SwitchActiveTenant($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n"): (typeof documents)["\n  mutation SwitchActiveTenant($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -291,7 +309,7 @@ export function graphql(source: "\n  mutation RemoveUser($input: GetUserType!) {
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Status {\n    loginStatus {\n      status\n      phoneId\n      user {\n        id\n        email\n        owner\n        is2faEnabled\n        isAdaptiveLoginEnabled\n        admin\n      }\n    }\n  }\n"): (typeof documents)["\n  query Status {\n    loginStatus {\n      status\n      phoneId\n      user {\n        id\n        email\n        owner\n        is2faEnabled\n        isAdaptiveLoginEnabled\n        admin\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  query Status {\n    loginStatus {\n      status\n      phoneId\n      user {\n        id\n        email\n        owner\n        is2faEnabled\n        isAdaptiveLoginEnabled\n        admin\n        tenantId\n      }\n    }\n  }\n"): (typeof documents)["\n  query Status {\n    loginStatus {\n      status\n      phoneId\n      user {\n        id\n        email\n        owner\n        is2faEnabled\n        isAdaptiveLoginEnabled\n        admin\n        tenantId\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

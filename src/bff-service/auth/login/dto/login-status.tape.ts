@@ -21,6 +21,7 @@ export class UserStatusType {
   @Field()
   isAdaptiveLoginEnabled!: boolean;
 
+  @Field({ nullable: true })
   tenantId?: string;
 }
 

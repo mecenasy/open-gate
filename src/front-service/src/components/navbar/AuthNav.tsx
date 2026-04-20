@@ -9,10 +9,11 @@ import loginIcon from '@/assets/login.svg';
 import registrationIcon from '@/assets/registration.svg';
 import logoutIcon from '@/assets/logout.svg';
 import settingsIcon from '@/assets/settings.svg';
+import { TenantSwitcher } from './TenantSwitcher';
 
 export function AuthNav() {
   const pathname = usePathname();
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { isAuthenticated, isLoading, logout, activeTenantId } = useAuth();
   const t = useTranslations('nav');
 
   if (isLoading) {
@@ -22,6 +23,7 @@ export function AuthNav() {
   if (isAuthenticated) {
     return (
       <>
+        <TenantSwitcher activeTenantId={activeTenantId} />
         <Link
           href="/users"
           className="text-text text-sm font-medium hover:opacity-80 transition-opacity"

@@ -6,19 +6,19 @@ import { useRegister } from '../hooks/use-register';
 
 export function RegistrationForm() {
   const t = useTranslations('register');
-  const { register, errors, onSubmit, loading, serverError } = useRegister();
+  const { register, errors, onSubmit, loading, serverError, submittedEmail } = useRegister();
+
+  if (submittedEmail) {
+    return (
+      <div className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold text-text">{t('checkEmailTitle')}</h2>
+        <p className="text-sm text-muted">{t('checkEmailDesc', { email: submittedEmail })}</p>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4">
-      <Input
-        id="tenantSlug"
-        label={t('tenantSlug')}
-        placeholder={t('tenantSlugPlaceholder')}
-        hint={t('tenantSlugHint')}
-        error={errors.tenantSlug?.message}
-        {...register('tenantSlug')}
-      />
-
       <div className="grid grid-cols-2 gap-4">
         <Input
           id="name"

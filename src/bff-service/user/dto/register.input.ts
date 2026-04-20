@@ -29,10 +29,4 @@ export class RegisterInput {
   @Matches(/[0-9]/, { message: 'Password must contain at least 1 number' })
   @Matches(/[^A-Za-z0-9]/, { message: 'Password must contain at least 1 special character' })
   password!: string;
-
-  @Field()
-  @IsString()
-  @Matches(/^[a-z0-9-]+$/, { message: 'Slug may only contain lowercase letters, numbers and hyphens' })
-  @IsNotEmpty()
-  tenantSlug!: string;
 }

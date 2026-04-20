@@ -59,13 +59,22 @@
     "passwordPlaceholder": "••••••••",
     "passwordHint": "Min. 8 znaków, wielka i mała litera, cyfra, znak specjalny",
     "confirmPassword": "Powtórz hasło",
-    "tenantSlug": "Nazwa firmy (subdomena)",
-    "tenantSlugPlaceholder": "moja-firma",
-    "tenantSlugHint": "Tylko małe litery, cyfry i myślniki. Będzie Twoim adresem: moja-firma.app.com",
     "submit": "Zarejestruj się",
     "submitting": "Rejestracja…",
     "cancel": "Anuluj",
-    "registerWrong": "Rejestracja nie powiodła się. Sprawdź dane i spróbuj ponownie."
+    "registerWrong": "Rejestracja nie powiodła się. Sprawdź dane i spróbuj ponownie.",
+    "checkEmailTitle": "Sprawdź swoją skrzynkę",
+    "checkEmailDesc": "Wysłaliśmy link potwierdzający na adres {email}. Kliknij link, żeby aktywować konto."
+  },
+  "confirmRegistration": {
+    "verifyingTitle": "Potwierdzanie rejestracji…",
+    "verifyingDesc": "Chwila cierpliwości, weryfikujemy Twój link.",
+    "successTitle": "Konto aktywowane",
+    "successDesc": "Twoje konto zostało potwierdzone. Możesz się teraz zalogować.",
+    "goToLogin": "Przejdź do logowania",
+    "errorTitle": "Link nieprawidłowy lub wygasł",
+    "errorDesc": "Nie udało się potwierdzić rejestracji. Zarejestruj się ponownie.",
+    "tryAgain": "Zarejestruj się ponownie"
   },
   "auth": {
     "tfaWrong": "Błąd podczas zmiany ustawień 2FA"

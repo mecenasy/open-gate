@@ -59,13 +59,22 @@
     "passwordPlaceholder": "••••••••",
     "passwordHint": "Min. 8 chars, uppercase, lowercase, digit, special character",
     "confirmPassword": "Confirm password",
-    "tenantSlug": "Company name (subdomain)",
-    "tenantSlugPlaceholder": "my-company",
-    "tenantSlugHint": "Lowercase letters, numbers and hyphens only. This will be your address: my-company.app.com",
     "submit": "Create account",
     "submitting": "Creating account…",
     "cancel": "Cancel",
-    "registerWrong": "Registration failed. Please check your details and try again."
+    "registerWrong": "Registration failed. Please check your details and try again.",
+    "checkEmailTitle": "Check your inbox",
+    "checkEmailDesc": "We've sent a confirmation link to {email}. Click it to activate your account."
+  },
+  "confirmRegistration": {
+    "verifyingTitle": "Confirming your registration…",
+    "verifyingDesc": "One moment, we're verifying your link.",
+    "successTitle": "Account activated",
+    "successDesc": "Your account has been confirmed. You can now sign in.",
+    "goToLogin": "Go to login",
+    "errorTitle": "Invalid or expired link",
+    "errorDesc": "We couldn't confirm your registration. Please sign up again.",
+    "tryAgain": "Sign up again"
   },
   "auth": {
     "tfaWrong": "Failed to change 2FA settings"

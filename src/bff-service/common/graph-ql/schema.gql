@@ -392,7 +392,6 @@ input RegisterInput {
   name: String!
   surname: String!
   password: String!
-  tenantSlug: String!
 }
 
 input CreateUserType {

@@ -5,11 +5,11 @@
 // source: src/proto/user.proto
 
 /* eslint-disable */
-import type { Metadata } from '@grpc/grpc-js';
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import type { Metadata } from "@grpc/grpc-js";
+import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { Observable } from "rxjs";
 
-export const protobufPackage = 'user';
+export const protobufPackage = "user";
 
 /** User account status */
 export enum Status {
@@ -67,13 +67,21 @@ export interface AddUserRequest {
   /** Last name */
   surname: string;
   /** Account status (default: PENDING) */
-  status?: Status | undefined;
+  status?:
+    | Status
+    | undefined;
   /** Phone owner information */
-  phoneOwner?: string | undefined;
+  phoneOwner?:
+    | string
+    | undefined;
   /** User role (default: USER) */
-  type?: UserType | undefined;
+  type?:
+    | UserType
+    | undefined;
   /** Initial password (if provided) */
-  password?: string | undefined;
+  password?:
+    | string
+    | undefined;
   /** Tenant ID to assign to the user */
   tenantId?: string | undefined;
 }
@@ -95,15 +103,25 @@ export interface UpdateUserRequest {
   /** User ID to update */
   id: string;
   /** New email */
-  email?: string | undefined;
+  email?:
+    | string
+    | undefined;
   /** New phone */
-  phone?: string | undefined;
+  phone?:
+    | string
+    | undefined;
   /** New first name */
-  name?: string | undefined;
+  name?:
+    | string
+    | undefined;
   /** New last name */
-  surname?: string | undefined;
+  surname?:
+    | string
+    | undefined;
   /** New status */
-  status?: Status | undefined;
+  status?:
+    | Status
+    | undefined;
   /** New role */
   type?: UserType | undefined;
 }
@@ -180,7 +198,7 @@ export interface UserData {
   tenantId: string;
 }
 
-export const USER_PACKAGE_NAME = 'user';
+export const USER_PACKAGE_NAME = "user";
 
 /**
  * UserProxyService manages user data and operations
@@ -309,27 +327,27 @@ export interface UserProxyServiceController {
 export function UserProxyServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      'addUser',
-      'getUser',
-      'getUserByEmail',
-      'getUserByPhone',
-      'updateUser',
-      'updateUserStatus',
-      'updateUserRole',
-      'removeUser',
-      'getAllUsers',
-      'checkExist',
+      "addUser",
+      "getUser",
+      "getUserByEmail",
+      "getUserByPhone",
+      "updateUser",
+      "updateUserStatus",
+      "updateUserRole",
+      "removeUser",
+      "getAllUsers",
+      "checkExist",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('UserProxyService', method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod("UserProxyService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('UserProxyService', method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod("UserProxyService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const USER_PROXY_SERVICE_NAME = 'UserProxyService';
+export const USER_PROXY_SERVICE_NAME = "UserProxyService";

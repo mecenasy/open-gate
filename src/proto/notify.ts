@@ -5,11 +5,11 @@
 // source: src/proto/notify.proto
 
 /* eslint-disable */
-import type { Metadata } from '@grpc/grpc-js';
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import type { Metadata } from "@grpc/grpc-js";
+import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { Observable } from "rxjs";
 
-export const protobufPackage = 'notify';
+export const protobufPackage = "notify";
 
 export enum Platform {
   Signal = 0,
@@ -26,6 +26,12 @@ export enum Type {
   Audio = 3,
   Poll = 4,
   MessageReaction = 5,
+  UNRECOGNIZED = -1,
+}
+
+export enum TokenType {
+  RESET_PASSWORD = 0,
+  CONFIRM_REGISTRATION = 1,
   UNRECOGNIZED = -1,
 }
 
@@ -90,6 +96,7 @@ export interface SendTokenRequest {
   platforms: Platform[];
   email: string;
   url: string;
+  type: TokenType;
 }
 
 export interface NotifyAck {
@@ -97,7 +104,7 @@ export interface NotifyAck {
   message: string;
 }
 
-export const NOTIFY_PACKAGE_NAME = 'notify';
+export const NOTIFY_PACKAGE_NAME = "notify";
 
 /** Hosted by core-service (port 50053) — receives incoming Signal messages from notify-service */
 
@@ -116,20 +123,20 @@ export interface IncomingNotifyServiceController {
 
 export function IncomingNotifyServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['receiveMessage'];
+    const grpcMethods: string[] = ["receiveMessage"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('IncomingNotifyService', method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod("IncomingNotifyService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('IncomingNotifyService', method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod("IncomingNotifyService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const INCOMING_NOTIFY_SERVICE_NAME = 'IncomingNotifyService';
+export const INCOMING_NOTIFY_SERVICE_NAME = "IncomingNotifyService";
 
 /** Hosted by notify-service (port 50052) — receives outbound send requests from core-service */
 
@@ -159,17 +166,17 @@ export interface OutgoingNotifyServiceController {
 
 export function OutgoingNotifyServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['sendMessage', 'sendVerificationCode', 'sendToken'];
+    const grpcMethods: string[] = ["sendMessage", "sendVerificationCode", "sendToken"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('OutgoingNotifyService', method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod("OutgoingNotifyService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('OutgoingNotifyService', method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod("OutgoingNotifyService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const OUTGOING_NOTIFY_SERVICE_NAME = 'OutgoingNotifyService';
+export const OUTGOING_NOTIFY_SERVICE_NAME = "OutgoingNotifyService";

@@ -35,12 +35,13 @@ export class OutgoingNotifyController implements OutgoingNotifyServiceController
     return { success: true, message: 'Verification code sent' };
   }
 
-  async sendToken({ platforms, email, url }: SendTokenRequest): Promise<NotifyAck> {
+  async sendToken({ platforms, email, url, type }: SendTokenRequest): Promise<NotifyAck> {
     await this.commandBus.execute(
       new SendTokenCommand(
         platforms.map((p) => PlatformTransformer.fromGrpc(p)),
         email,
         url,
+        type,
       ),
     );
     return { success: true, message: 'Token sent' };

@@ -2,7 +2,7 @@ import { Inject, Logger } from '@nestjs/common';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { firstValueFrom } from 'rxjs';
 import { NotifyGrpcKey, type ClientGrpc } from '@app/notify-grpc';
-import { OutgoingNotifyServiceClient, OUTGOING_NOTIFY_SERVICE_NAME, Platform } from 'src/proto/notify';
+import { OutgoingNotifyServiceClient, OUTGOING_NOTIFY_SERVICE_NAME, Platform, TokenType } from 'src/proto/notify';
 import { SendResetTokenEvent } from '../dto/send-reset-token.event';
 import { TypeConfigService } from 'src/bff-service/common/configs/types.config.service';
 import { AppConfig } from 'src/bff-service/common/configs/app.configs';
@@ -29,6 +29,7 @@ export class SendResetTokenEventHandler implements IEventHandler<SendResetTokenE
           platforms: [Platform.Email],
           email,
           url,
+          type: TokenType.RESET_PASSWORD,
         }),
       );
     } catch (error) {

@@ -5,12 +5,12 @@
 // source: src/proto/config.proto
 
 /* eslint-disable */
-import type { Metadata } from '@grpc/grpc-js';
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
-import { Empty } from '../../google/protobuf/empty';
+import type { Metadata } from "@grpc/grpc-js";
+import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { Observable } from "rxjs";
+import { Empty } from "../../google/protobuf/empty";
 
-export const protobufPackage = 'config';
+export const protobufPackage = "config";
 
 /** Configuration entity */
 export interface Config {
@@ -45,7 +45,7 @@ export interface ConfigResponse {
   data: Config | undefined;
 }
 
-export const CONFIG_PACKAGE_NAME = 'config';
+export const CONFIG_PACKAGE_NAME = "config";
 
 export interface ConfigServiceClient {
   getCoreAll(request: Empty, metadata?: Metadata): Observable<GetAllResponse>;
@@ -81,17 +81,17 @@ export interface ConfigServiceController {
 
 export function ConfigServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['getCoreAll', 'getFeatures', 'getFeatureConfig', 'updateConfig'];
+    const grpcMethods: string[] = ["getCoreAll", "getFeatures", "getFeatureConfig", "updateConfig"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('ConfigService', method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod("ConfigService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('ConfigService', method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod("ConfigService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const CONFIG_SERVICE_NAME = 'ConfigService';
+export const CONFIG_SERVICE_NAME = "ConfigService";

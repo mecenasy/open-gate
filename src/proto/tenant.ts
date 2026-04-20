@@ -5,11 +5,11 @@
 // source: src/proto/tenant.proto
 
 /* eslint-disable */
-import type { Metadata } from '@grpc/grpc-js';
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import type { Metadata } from "@grpc/grpc-js";
+import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { Observable } from "rxjs";
 
-export const protobufPackage = 'tenant';
+export const protobufPackage = "tenant";
 
 export interface GetCustomizationRequest {
   tenantId: string;
@@ -96,7 +96,8 @@ export interface TenantEntry {
   isActive: boolean;
 }
 
-export interface GetAllTenantsRequest {}
+export interface GetAllTenantsRequest {
+}
 
 export interface GetAllTenantsResponse {
   status: boolean;
@@ -214,7 +215,7 @@ export interface GetTenantPromptOverridesResponse {
   overrides: TenantPromptOverrideEntry[];
 }
 
-export const TENANT_PACKAGE_NAME = 'tenant';
+export const TENANT_PACKAGE_NAME = "tenant";
 
 export interface TenantServiceClient {
   getCustomization(request: GetCustomizationRequest, metadata?: Metadata): Observable<GetCustomizationResponse>;
@@ -388,32 +389,32 @@ export interface TenantServiceController {
 export function TenantServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      'getCustomization',
-      'getTenant',
-      'getPlatformCredentials',
-      'getTenantsWithPlatform',
-      'getAllPlatformCredentials',
-      'createTenant',
-      'getAllTenants',
-      'updateCustomization',
-      'upsertPlatformCredentials',
-      'getTenantCommandConfigs',
-      'upsertTenantCommandConfig',
-      'deleteTenantCommandConfig',
-      'getPromptForContext',
-      'upsertTenantPromptOverride',
-      'getTenantPromptOverrides',
+      "getCustomization",
+      "getTenant",
+      "getPlatformCredentials",
+      "getTenantsWithPlatform",
+      "getAllPlatformCredentials",
+      "createTenant",
+      "getAllTenants",
+      "updateCustomization",
+      "upsertPlatformCredentials",
+      "getTenantCommandConfigs",
+      "upsertTenantCommandConfig",
+      "deleteTenantCommandConfig",
+      "getPromptForContext",
+      "upsertTenantPromptOverride",
+      "getTenantPromptOverrides",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('TenantService', method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod("TenantService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('TenantService', method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod("TenantService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const TENANT_SERVICE_NAME = 'TenantService';
+export const TENANT_SERVICE_NAME = "TenantService";

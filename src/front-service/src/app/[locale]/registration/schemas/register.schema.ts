@@ -20,10 +20,6 @@ export const createRegisterSchema = (t: (key: string) => string) => {
         .regex(/^\+?[0-9\s\-]+$/, t('phoneInvalid')),
       password,
       confirmPassword: z.string(),
-      tenantSlug: z
-        .string()
-        .min(3, t('slugMin'))
-        .regex(/^[a-z0-9-]+$/, t('slugInvalid')),
     })
     .refine((d) => d.password === d.confirmPassword, {
       message: t('passwordsMismatch'),

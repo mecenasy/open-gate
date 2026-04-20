@@ -97,10 +97,16 @@ message SendVerificationCodeRequest {
   optional string email = 4;
 }
 
+enum TokenType {
+  RESET_PASSWORD = 0;
+  CONFIRM_REGISTRATION = 1;
+}
+
 message SendTokenRequest {
   repeated Platform platforms = 1;
   string email = 2;
   string url = 3;
+  TokenType type = 4;
 }
 
 message NotifyAck {

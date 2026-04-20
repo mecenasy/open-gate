@@ -10,11 +10,11 @@ export class SendTokenHandler implements ICommandHandler<SendTokenCommand> {
     private readonly strategies: TokenPlatform[],
   ) {}
 
-  async execute({ platforms, email, url }: SendTokenCommand): Promise<void> {
+  async execute({ platforms, email, url, type }: SendTokenCommand): Promise<void> {
     for (const platform of platforms) {
       const strategy = this.strategies.find((s) => s.platform === platform);
       if (strategy) {
-        await strategy.send(email, url);
+        await strategy.send(email, url, type);
       }
     }
   }

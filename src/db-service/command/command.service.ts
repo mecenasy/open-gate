@@ -24,6 +24,8 @@ export class CommandService {
         active: true,
         actions: commandData.actions,
         parameters: commandData.parameters,
+        isSystem: true,
+        tenantId: null,
         userRoles: [],
       });
 

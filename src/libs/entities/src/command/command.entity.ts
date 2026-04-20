@@ -64,6 +64,22 @@ export class Command {
   @IsJSON()
   parameters: Record<string, boolean>;
 
+  @Column({
+    name: 'is_system',
+    type: 'boolean',
+    default: false,
+    nullable: false,
+  })
+  @IsBoolean()
+  isSystem: boolean;
+
+  @Column({
+    name: 'tenant_id',
+    type: 'uuid',
+    nullable: true,
+  })
+  tenantId: string | null;
+
   @ManyToMany(() => UserRole, (role) => role.commands, { cascade: true })
   @JoinTable({
     name: 'command_permissions',

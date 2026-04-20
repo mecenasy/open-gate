@@ -13,7 +13,6 @@ const TENANT_FEATURES_QUERY = graphql(`
       enablePayment
       enableCommandScheduling
       enableAnalytics
-      maxUsersPerTenant
     }
   }
 `);
@@ -26,7 +25,6 @@ export interface TenantFeatures {
   enablePayment: boolean;
   enableCommandScheduling: boolean;
   enableAnalytics: boolean;
-  maxUsersPerTenant: number;
 }
 
 const DEFAULT_FEATURES: TenantFeatures = {
@@ -37,7 +35,6 @@ const DEFAULT_FEATURES: TenantFeatures = {
   enablePayment: false,
   enableCommandScheduling: true,
   enableAnalytics: false,
-  maxUsersPerTenant: 1000,
 };
 
 export const useTenant = () => {

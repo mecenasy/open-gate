@@ -1,4 +1,4 @@
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsArray, IsString } from 'class-validator';
 
 @InputType()
@@ -116,9 +116,6 @@ export class UpdateTenantFeaturesInput {
 
   @Field({ nullable: true })
   enableAudioRecognition?: boolean;
-
-  @Field(() => Int, { nullable: true })
-  maxUsersPerTenant?: number;
 }
 
 // ─── Tenant command config ────────────────────────────────────────────────────

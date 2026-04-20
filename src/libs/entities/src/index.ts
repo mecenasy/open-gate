@@ -5,6 +5,8 @@ export * from './enums/risk-reason.enum';
 export * from './enums/risk-tolerance.enum';
 export * from './enums/config-type.enum';
 export * from './enums/message-type.enum';
+export * from './enums/subscription-plan-code.enum';
+export * from './enums/subscription-status.enum';
 
 // User domain
 export * from './user/user.entity';
@@ -27,6 +29,10 @@ export * from './prompt/prompt.entity';
 
 // Config
 export * from './config/config.entity';
+
+// Subscription
+export * from './subscription/subscription-plan.entity';
+export * from './subscription/user-subscription.entity';
 
 // Tenant
 export * from './tenant/tenant.entity';

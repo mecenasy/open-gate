@@ -39,7 +39,7 @@ type Documents = {
     "\n  mutation DeleteTenantCommandConfig($input: DeleteTenantCommandConfigInput!) {\n    deleteTenantCommandConfig(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.DeleteTenantCommandConfigDocument,
     "\n  query TenantPlatformCredentials {\n    tenantPlatformCredentials {\n      platform\n      configJson\n      isDefault\n    }\n  }\n": typeof types.TenantPlatformCredentialsDocument,
     "\n  mutation UpdateMyPlatformCredentials($input: UpdateMyPlatformCredentialsInput!) {\n    updateMyPlatformCredentials(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpdateMyPlatformCredentialsDocument,
-    "\n  query TenantFeaturesSettings {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      enableAudioRecognition\n      maxUsersPerTenant\n    }\n  }\n": typeof types.TenantFeaturesSettingsDocument,
+    "\n  query TenantFeaturesSettings {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      enableAudioRecognition\n    }\n  }\n": typeof types.TenantFeaturesSettingsDocument,
     "\n  mutation UpdateTenantFeatures($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpdateTenantFeaturesDocument,
     "\n  query GetTenantPromptOverrides {\n    tenantPromptOverrides {\n      id\n      commandId\n      userType\n      descriptionI18nJson\n      prompt\n    }\n  }\n": typeof types.GetTenantPromptOverridesDocument,
     "\n  query GetTenantCommandConfigsForPrompts {\n    tenantCommandConfigs {\n      id\n      commandName\n    }\n  }\n": typeof types.GetTenantCommandConfigsForPromptsDocument,
@@ -54,7 +54,7 @@ type Documents = {
     "\n  mutation Logout {\n    logoutUser {\n      status\n    }\n  }\n": typeof types.LogoutDocument,
     "\n  query CoreConfigs {\n    coreConfigs {\n      data {\n        key\n        value\n        description\n      }\n      status\n      message\n    }\n  }\n": typeof types.CoreConfigsDocument,
     "\n  mutation UpdateConfig($input: UpdateConfigType!) {\n    updateConfig(input: $input) {\n      status\n      message\n      data {\n        key\n        value\n      }\n    }\n  }\n": typeof types.UpdateConfigDocument,
-    "\n  query TenantFeatures {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      maxUsersPerTenant\n    }\n  }\n": typeof types.TenantFeaturesDocument,
+    "\n  query TenantFeatures {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n    }\n  }\n": typeof types.TenantFeaturesDocument,
 };
 const documents: Documents = {
     "\n  mutation ConfirmRegistration($token: String!) {\n    confirmRegistration(token: $token) {\n      success\n    }\n  }\n": types.ConfirmRegistrationDocument,
@@ -82,7 +82,7 @@ const documents: Documents = {
     "\n  mutation DeleteTenantCommandConfig($input: DeleteTenantCommandConfigInput!) {\n    deleteTenantCommandConfig(input: $input) {\n      status\n      message\n    }\n  }\n": types.DeleteTenantCommandConfigDocument,
     "\n  query TenantPlatformCredentials {\n    tenantPlatformCredentials {\n      platform\n      configJson\n      isDefault\n    }\n  }\n": types.TenantPlatformCredentialsDocument,
     "\n  mutation UpdateMyPlatformCredentials($input: UpdateMyPlatformCredentialsInput!) {\n    updateMyPlatformCredentials(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpdateMyPlatformCredentialsDocument,
-    "\n  query TenantFeaturesSettings {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      enableAudioRecognition\n      maxUsersPerTenant\n    }\n  }\n": types.TenantFeaturesSettingsDocument,
+    "\n  query TenantFeaturesSettings {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      enableAudioRecognition\n    }\n  }\n": types.TenantFeaturesSettingsDocument,
     "\n  mutation UpdateTenantFeatures($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpdateTenantFeaturesDocument,
     "\n  query GetTenantPromptOverrides {\n    tenantPromptOverrides {\n      id\n      commandId\n      userType\n      descriptionI18nJson\n      prompt\n    }\n  }\n": types.GetTenantPromptOverridesDocument,
     "\n  query GetTenantCommandConfigsForPrompts {\n    tenantCommandConfigs {\n      id\n      commandName\n    }\n  }\n": types.GetTenantCommandConfigsForPromptsDocument,
@@ -97,7 +97,7 @@ const documents: Documents = {
     "\n  mutation Logout {\n    logoutUser {\n      status\n    }\n  }\n": types.LogoutDocument,
     "\n  query CoreConfigs {\n    coreConfigs {\n      data {\n        key\n        value\n        description\n      }\n      status\n      message\n    }\n  }\n": types.CoreConfigsDocument,
     "\n  mutation UpdateConfig($input: UpdateConfigType!) {\n    updateConfig(input: $input) {\n      status\n      message\n      data {\n        key\n        value\n      }\n    }\n  }\n": types.UpdateConfigDocument,
-    "\n  query TenantFeatures {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      maxUsersPerTenant\n    }\n  }\n": types.TenantFeaturesDocument,
+    "\n  query TenantFeatures {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n    }\n  }\n": types.TenantFeaturesDocument,
 };
 
 /**
@@ -217,7 +217,7 @@ export function graphql(source: "\n  mutation UpdateMyPlatformCredentials($input
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query TenantFeaturesSettings {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      enableAudioRecognition\n      maxUsersPerTenant\n    }\n  }\n"): (typeof documents)["\n  query TenantFeaturesSettings {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      enableAudioRecognition\n      maxUsersPerTenant\n    }\n  }\n"];
+export function graphql(source: "\n  query TenantFeaturesSettings {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      enableAudioRecognition\n    }\n  }\n"): (typeof documents)["\n  query TenantFeaturesSettings {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      enableAudioRecognition\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -277,7 +277,7 @@ export function graphql(source: "\n  mutation UpdateConfig($input: UpdateConfigT
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query TenantFeatures {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      maxUsersPerTenant\n    }\n  }\n"): (typeof documents)["\n  query TenantFeatures {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      maxUsersPerTenant\n    }\n  }\n"];
+export function graphql(source: "\n  query TenantFeatures {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n    }\n  }\n"): (typeof documents)["\n  query TenantFeatures {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

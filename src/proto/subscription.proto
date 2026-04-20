@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package subscription;
+
+service SubscriptionService {
+  rpc GetAllPlans (GetAllPlansRequest) returns (GetAllPlansResponse);
+  rpc GetPlanById (GetPlanByIdRequest) returns (GetPlanByIdResponse);
+  rpc GetUserSubscription (GetUserSubscriptionRequest) returns (GetUserSubscriptionResponse);
+  rpc SelectSubscription (SelectSubscriptionRequest) returns (SelectSubscriptionResponse);
+  rpc CancelSubscription (CancelSubscriptionRequest) returns (CancelSubscriptionResponse);
+}
+
+message PlanEntry {
+  string id = 1;
+  string code = 2;
+  string name = 3;
+  int32 max_tenants = 4;
+  int32 max_platforms_per_tenant = 5;
+  int32 max_contacts_per_tenant = 6;
+  int32 max_staff_per_tenant = 7;
+  int32 max_custom_commands_per_tenant = 8;
+  int32 price_cents = 9;
+  string currency = 10;
+  bool is_active = 11;
+}
+
+message GetAllPlansRequest {}
+
+message GetAllPlansResponse {
+  bool status = 1;
+  string message = 2;
+  repeated PlanEntry plans = 3;
+}
+
+message GetPlanByIdRequest {
+  string plan_id = 1;
+}
+
+message GetPlanByIdResponse {
+  bool status = 1;
+  string message = 2;
+  PlanEntry plan = 3;
+}
+
+message UserSubscriptionEntry {
+  string id = 1;
+  string user_id = 2;
+  string plan_id = 3;
+  string status = 4;
+  string started_at = 5;
+  string expires_at = 6;
+  PlanEntry plan = 7;
+}
+
+message GetUserSubscriptionRequest {
+  string user_id = 1;
+}
+
+message GetUserSubscriptionResponse {
+  bool status = 1;
+  string message = 2;
+  UserSubscriptionEntry subscription = 3;
+}
+
+message SelectSubscriptionRequest {
+  string user_id = 1;
+  string plan_id = 2;
+}
+
+message SelectSubscriptionResponse {
+  bool status = 1;
+  string message = 2;
+  UserSubscriptionEntry subscription = 3;
+}
+
+message CancelSubscriptionRequest {
+  string user_id = 1;
+}
+
+message CancelSubscriptionResponse {
+  bool status = 1;
+  string message = 2;
+}

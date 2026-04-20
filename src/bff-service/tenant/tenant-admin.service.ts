@@ -58,7 +58,6 @@ export class TenantAdminService implements OnModuleInit {
         ...(input.enableCommandScheduling !== undefined && { enableCommandScheduling: input.enableCommandScheduling }),
         ...(input.enableAnalytics !== undefined && { enableAnalytics: input.enableAnalytics }),
         ...(input.enableAudioRecognition !== undefined && { enableAudioRecognition: input.enableAudioRecognition }),
-        ...(input.maxUsersPerTenant !== undefined && { maxUsersPerTenant: input.maxUsersPerTenant }),
       },
     };
     return this.updateCustomization(tenantId, JSON.stringify(updated));

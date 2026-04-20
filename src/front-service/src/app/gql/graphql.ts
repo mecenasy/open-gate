@@ -236,6 +236,7 @@ export type Mutation = {
   adaptiveLogin: AcceptAdaptiveLoginType;
   addCommand: CommandResponseType;
   addPrompt: PromptResponseType;
+  cancelSubscription: Scalars['Boolean']['output'];
   changePassword: StatusType;
   confirmRegistration: SuccessResponseType;
   createSimpleUser: UserType;
@@ -261,6 +262,7 @@ export type Mutation = {
   removePrompt: PromptSuccessType;
   removeUser: SuccessResponseType;
   resetPassword: StatusType;
+  selectSubscription: UserSubscriptionType;
   toggleActiveStatus: CommandResponseType;
   updateCommand: CommandResponseType;
   updateConfig: ConfigResponseType;
@@ -395,6 +397,11 @@ export type MutationRemoveUserArgs = {
 
 export type MutationResetPasswordArgs = {
   input: ResetPasswordType;
+};
+
+
+export type MutationSelectSubscriptionArgs = {
+  input: SelectSubscriptionInput;
 };
 
 
@@ -557,9 +564,11 @@ export type Query = {
   featureConfigs: ConfigsListType;
   getPasskeys: Array<PassKeyType>;
   loginStatus: LoginStatusType;
+  mySubscription?: Maybe<UserSubscriptionType>;
   promptById: PromptResponseType;
   promptByKey: PromptResponseType;
   prompts: PromptsListType;
+  subscriptionPlans: Array<SubscriptionPlanType>;
   tenantCommandConfigs: Array<TenantCommandConfigType>;
   tenantFeatures: TenantFeaturesType;
   tenantPlatformCredentials: Array<TenantPlatformCredentialType>;
@@ -651,9 +660,28 @@ export type ResetPasswordType = {
   token: Scalars['String']['input'];
 };
 
+export type SelectSubscriptionInput = {
+  planId: Scalars['String']['input'];
+};
+
 export type StatusType = {
   __typename?: 'StatusType';
   status: AuthStatus | '%future added value';
+};
+
+export type SubscriptionPlanType = {
+  __typename?: 'SubscriptionPlanType';
+  code: Scalars['String']['output'];
+  currency: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  isActive: Scalars['Boolean']['output'];
+  maxContactsPerTenant: Scalars['Int']['output'];
+  maxCustomCommandsPerTenant: Scalars['Int']['output'];
+  maxPlatformsPerTenant: Scalars['Int']['output'];
+  maxStaffPerTenant: Scalars['Int']['output'];
+  maxTenants: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  priceCents: Scalars['Int']['output'];
 };
 
 export type SuccessResponseType = {
@@ -682,7 +710,6 @@ export type TenantFeaturesType = {
   enablePayment: Scalars['Boolean']['output'];
   enableSignal: Scalars['Boolean']['output'];
   enableWhatsApp: Scalars['Boolean']['output'];
-  maxUsersPerTenant: Scalars['Int']['output'];
 };
 
 export type TenantPlatformCredentialType = {
@@ -758,7 +785,6 @@ export type UpdateTenantFeaturesInput = {
   enablePayment?: InputMaybe<Scalars['Boolean']['input']>;
   enableSignal?: InputMaybe<Scalars['Boolean']['input']>;
   enableWhatsApp?: InputMaybe<Scalars['Boolean']['input']>;
-  maxUsersPerTenant?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type UpdateUserRoleType = {
@@ -825,6 +851,16 @@ export type UserStatusType = {
   is2faEnabled: Scalars['Boolean']['output'];
   isAdaptiveLoginEnabled: Scalars['Boolean']['output'];
   owner: Scalars['Boolean']['output'];
+};
+
+export type UserSubscriptionType = {
+  __typename?: 'UserSubscriptionType';
+  expiresAt?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  plan: SubscriptionPlanType;
+  planId: Scalars['String']['output'];
+  startedAt: Scalars['String']['output'];
+  status: Scalars['String']['output'];
 };
 
 export type UserSummaryType = {
@@ -1030,7 +1066,7 @@ export type UpdateMyPlatformCredentialsMutation = { __typename?: 'Mutation', upd
 export type TenantFeaturesSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type TenantFeaturesSettingsQuery = { __typename?: 'Query', tenantFeatures: { __typename?: 'TenantFeaturesType', enableSignal: boolean, enableWhatsApp: boolean, enableMessenger: boolean, enableGate: boolean, enablePayment: boolean, enableCommandScheduling: boolean, enableAnalytics: boolean, enableAudioRecognition: boolean, maxUsersPerTenant: number } };
+export type TenantFeaturesSettingsQuery = { __typename?: 'Query', tenantFeatures: { __typename?: 'TenantFeaturesType', enableSignal: boolean, enableWhatsApp: boolean, enableMessenger: boolean, enableGate: boolean, enablePayment: boolean, enableCommandScheduling: boolean, enableAnalytics: boolean, enableAudioRecognition: boolean } };
 
 export type UpdateTenantFeaturesMutationVariables = Exact<{
   input: UpdateTenantFeaturesInput;
@@ -1123,7 +1159,7 @@ export type UpdateConfigMutation = { __typename?: 'Mutation', updateConfig: { __
 export type TenantFeaturesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type TenantFeaturesQuery = { __typename?: 'Query', tenantFeatures: { __typename?: 'TenantFeaturesType', enableSignal: boolean, enableWhatsApp: boolean, enableMessenger: boolean, enableGate: boolean, enablePayment: boolean, enableCommandScheduling: boolean, enableAnalytics: boolean, maxUsersPerTenant: number } };
+export type TenantFeaturesQuery = { __typename?: 'Query', tenantFeatures: { __typename?: 'TenantFeaturesType', enableSignal: boolean, enableWhatsApp: boolean, enableMessenger: boolean, enableGate: boolean, enablePayment: boolean, enableCommandScheduling: boolean, enableAnalytics: boolean } };
 
 
 export const ConfirmRegistrationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ConfirmRegistration"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"token"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"confirmRegistration"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"token"},"value":{"kind":"Variable","name":{"kind":"Name","value":"token"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<ConfirmRegistrationMutation, ConfirmRegistrationMutationVariables>;
@@ -1151,7 +1187,7 @@ export const UpsertTenantCommandConfigMutationDocument = {"kind":"Document","def
 export const DeleteTenantCommandConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteTenantCommandConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteTenantCommandConfigInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteTenantCommandConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<DeleteTenantCommandConfigMutation, DeleteTenantCommandConfigMutationVariables>;
 export const TenantPlatformCredentialsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantPlatformCredentials"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantPlatformCredentials"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"platform"}},{"kind":"Field","name":{"kind":"Name","value":"configJson"}},{"kind":"Field","name":{"kind":"Name","value":"isDefault"}}]}}]}}]} as unknown as DocumentNode<TenantPlatformCredentialsQuery, TenantPlatformCredentialsQueryVariables>;
 export const UpdateMyPlatformCredentialsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateMyPlatformCredentials"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateMyPlatformCredentialsInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMyPlatformCredentials"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<UpdateMyPlatformCredentialsMutation, UpdateMyPlatformCredentialsMutationVariables>;
-export const TenantFeaturesSettingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantFeaturesSettings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantFeatures"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enableSignal"}},{"kind":"Field","name":{"kind":"Name","value":"enableWhatsApp"}},{"kind":"Field","name":{"kind":"Name","value":"enableMessenger"}},{"kind":"Field","name":{"kind":"Name","value":"enableGate"}},{"kind":"Field","name":{"kind":"Name","value":"enablePayment"}},{"kind":"Field","name":{"kind":"Name","value":"enableCommandScheduling"}},{"kind":"Field","name":{"kind":"Name","value":"enableAnalytics"}},{"kind":"Field","name":{"kind":"Name","value":"enableAudioRecognition"}},{"kind":"Field","name":{"kind":"Name","value":"maxUsersPerTenant"}}]}}]}}]} as unknown as DocumentNode<TenantFeaturesSettingsQuery, TenantFeaturesSettingsQueryVariables>;
+export const TenantFeaturesSettingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantFeaturesSettings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantFeatures"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enableSignal"}},{"kind":"Field","name":{"kind":"Name","value":"enableWhatsApp"}},{"kind":"Field","name":{"kind":"Name","value":"enableMessenger"}},{"kind":"Field","name":{"kind":"Name","value":"enableGate"}},{"kind":"Field","name":{"kind":"Name","value":"enablePayment"}},{"kind":"Field","name":{"kind":"Name","value":"enableCommandScheduling"}},{"kind":"Field","name":{"kind":"Name","value":"enableAnalytics"}},{"kind":"Field","name":{"kind":"Name","value":"enableAudioRecognition"}}]}}]}}]} as unknown as DocumentNode<TenantFeaturesSettingsQuery, TenantFeaturesSettingsQueryVariables>;
 export const UpdateTenantFeaturesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateTenantFeatures"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateTenantFeaturesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateTenantFeatures"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<UpdateTenantFeaturesMutation, UpdateTenantFeaturesMutationVariables>;
 export const GetTenantPromptOverridesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTenantPromptOverrides"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantPromptOverrides"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"commandId"}},{"kind":"Field","name":{"kind":"Name","value":"userType"}},{"kind":"Field","name":{"kind":"Name","value":"descriptionI18nJson"}},{"kind":"Field","name":{"kind":"Name","value":"prompt"}}]}}]}}]} as unknown as DocumentNode<GetTenantPromptOverridesQuery, GetTenantPromptOverridesQueryVariables>;
 export const GetTenantCommandConfigsForPromptsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTenantCommandConfigsForPrompts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantCommandConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"commandName"}}]}}]}}]} as unknown as DocumentNode<GetTenantCommandConfigsForPromptsQuery, GetTenantCommandConfigsForPromptsQueryVariables>;
@@ -1166,4 +1202,4 @@ export const StatusDocument = {"kind":"Document","definitions":[{"kind":"Operati
 export const LogoutDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Logout"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"logoutUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]} as unknown as DocumentNode<LogoutMutation, LogoutMutationVariables>;
 export const CoreConfigsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CoreConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"coreConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<CoreConfigsQuery, CoreConfigsQueryVariables>;
 export const UpdateConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateConfigType"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateConfigMutation, UpdateConfigMutationVariables>;
-export const TenantFeaturesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantFeatures"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantFeatures"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enableSignal"}},{"kind":"Field","name":{"kind":"Name","value":"enableWhatsApp"}},{"kind":"Field","name":{"kind":"Name","value":"enableMessenger"}},{"kind":"Field","name":{"kind":"Name","value":"enableGate"}},{"kind":"Field","name":{"kind":"Name","value":"enablePayment"}},{"kind":"Field","name":{"kind":"Name","value":"enableCommandScheduling"}},{"kind":"Field","name":{"kind":"Name","value":"enableAnalytics"}},{"kind":"Field","name":{"kind":"Name","value":"maxUsersPerTenant"}}]}}]}}]} as unknown as DocumentNode<TenantFeaturesQuery, TenantFeaturesQueryVariables>;
+export const TenantFeaturesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantFeatures"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantFeatures"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enableSignal"}},{"kind":"Field","name":{"kind":"Name","value":"enableWhatsApp"}},{"kind":"Field","name":{"kind":"Name","value":"enableMessenger"}},{"kind":"Field","name":{"kind":"Name","value":"enableGate"}},{"kind":"Field","name":{"kind":"Name","value":"enablePayment"}},{"kind":"Field","name":{"kind":"Name","value":"enableCommandScheduling"}},{"kind":"Field","name":{"kind":"Name","value":"enableAnalytics"}}]}}]}}]} as unknown as DocumentNode<TenantFeaturesQuery, TenantFeaturesQueryVariables>;

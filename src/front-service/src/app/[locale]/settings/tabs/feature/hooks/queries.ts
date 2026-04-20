@@ -11,7 +11,6 @@ export const TENANT_FEATURES_QUERY = graphql(`
       enableCommandScheduling
       enableAnalytics
       enableAudioRecognition
-      maxUsersPerTenant
     }
   }
 `);

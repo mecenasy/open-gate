@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { CommandModule } from './command/command.module';
 import { MessagesModule } from './messages/messages.module';
 import { TenantDbModule } from './tenant/tenant.module';
+import { SubscriptionModule } from './subscription/subscription.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { TenantDbModule } from './tenant/tenant.module';
     CommandModule,
     MessagesModule,
     TenantDbModule,
+    SubscriptionModule,
   ],
 })
 export class AppModule {}

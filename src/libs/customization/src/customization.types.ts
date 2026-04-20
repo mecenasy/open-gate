@@ -17,7 +17,6 @@ export interface CommunityCustomizationFeatures {
   enableCommandScheduling: boolean;
   enableAnalytics: boolean;
   enableAudioRecognition: boolean;
-  maxUsersPerTenant: number;
 }
 
 export interface CommunityCustomizationMessaging {
@@ -67,7 +66,6 @@ export const DEFAULT_CUSTOMIZATION: CommunityCustomization = {
     enableCommandScheduling: true,
     enableAnalytics: true,
     enableAudioRecognition: false,
-    maxUsersPerTenant: 1000,
   },
   messaging: {
     defaultSmsProvider: 'twilio',

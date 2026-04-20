@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class TenantFeaturesType {
@@ -25,7 +25,4 @@ export class TenantFeaturesType {
 
   @Field()
   enableAudioRecognition!: boolean;
-
-  @Field(() => Int)
-  maxUsersPerTenant!: number;
 }

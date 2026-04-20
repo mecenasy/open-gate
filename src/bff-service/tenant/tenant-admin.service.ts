@@ -31,6 +31,11 @@ export class TenantAdminService implements OnModuleInit {
     return { id: res.id, slug: res.slug, schemaName: res.schemaName };
   }
 
+  async isTenantSlugAvailable(slug: string): Promise<boolean> {
+    const res = await lastValueFrom(this.tenantGrpcService.checkTenantSlug({ slug }));
+    return res.isAvailable;
+  }
+
   async getAllTenants(): Promise<TenantType[]> {
     const res = await lastValueFrom(this.tenantGrpcService.getAllTenants({}));
     return res.tenants.map((t) => ({

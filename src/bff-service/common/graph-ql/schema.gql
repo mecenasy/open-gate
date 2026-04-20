@@ -330,6 +330,7 @@ type Query {
   tenantPlatformCredentials: [TenantPlatformCredentialType!]!
   tenants: [TenantType!]!
   myTenants: [TenantType!]!
+  tenantSlugAvailable(slug: String!): Boolean!
   tenantsIStaffAt: [TenantStaffMembershipType!]!
   tenantStaff(tenantId: String!): [TenantStaffEntryType!]!
   tenantContacts(tenantId: String!): [ContactType!]!

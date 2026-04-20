@@ -91,6 +91,11 @@ export class TenantResolver {
     return this.tenantAdminService.getMyTenants(userId);
   }
 
+  @Query(() => Boolean)
+  async tenantSlugAvailable(@Args('slug') slug: string): Promise<boolean> {
+    return this.tenantAdminService.isTenantSlugAvailable(slug);
+  }
+
   @Query(() => [TenantStaffMembershipType])
   async tenantsIStaffAt(@CurrentUserId() userId?: string): Promise<TenantStaffMembershipType[]> {
     if (!userId) throw new UnauthorizedException();

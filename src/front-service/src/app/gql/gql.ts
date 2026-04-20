@@ -44,6 +44,11 @@ type Documents = {
     "\n  query GetTenantPromptOverrides {\n    tenantPromptOverrides {\n      id\n      commandId\n      userType\n      descriptionI18nJson\n      prompt\n    }\n  }\n": typeof types.GetTenantPromptOverridesDocument,
     "\n  query GetTenantCommandConfigsForPrompts {\n    tenantCommandConfigs {\n      id\n      commandName\n    }\n  }\n": typeof types.GetTenantCommandConfigsForPromptsDocument,
     "\n  mutation UpsertTenantPromptOverride($input: UpsertTenantPromptOverrideInput!) {\n    upsertTenantPromptOverride(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpsertTenantPromptOverrideDocument,
+    "\n  query TenantSlugAvailable($slug: String!) {\n    tenantSlugAvailable(slug: $slug)\n  }\n": typeof types.TenantSlugAvailableDocument,
+    "\n  mutation CreateTenantWizard($input: CreateTenantInput!) {\n    createTenant(input: $input) {\n      id\n      slug\n      schemaName\n    }\n  }\n": typeof types.CreateTenantWizardDocument,
+    "\n  mutation SwitchTenantWizard($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n": typeof types.SwitchTenantWizardDocument,
+    "\n  mutation UpdateTenantFeaturesWizard($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpdateTenantFeaturesWizardDocument,
+    "\n  mutation AddContactWizard($input: AddContactInput!) {\n    addContact(input: $input) {\n      id\n    }\n  }\n": typeof types.AddContactWizardDocument,
     "\n  query GetUsers($input: GetAllUsersType) {\n    users(input: $input) {\n      users {\n        id\n        name\n        surname\n        email\n        phone\n        status\n        type\n      }\n      total\n    }\n  }\n": typeof types.GetUsersDocument,
     "\n  mutation CreateSimpleUser($input: CreateSimpleUserType!) {\n    createSimpleUser(input: $input) {\n      id\n      email\n    }\n  }\n": typeof types.CreateSimpleUserDocument,
     "\n  mutation UpdateUser($input: UpdateUserType!) {\n    updateUser(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n": typeof types.UpdateUserDocument,
@@ -87,6 +92,11 @@ const documents: Documents = {
     "\n  query GetTenantPromptOverrides {\n    tenantPromptOverrides {\n      id\n      commandId\n      userType\n      descriptionI18nJson\n      prompt\n    }\n  }\n": types.GetTenantPromptOverridesDocument,
     "\n  query GetTenantCommandConfigsForPrompts {\n    tenantCommandConfigs {\n      id\n      commandName\n    }\n  }\n": types.GetTenantCommandConfigsForPromptsDocument,
     "\n  mutation UpsertTenantPromptOverride($input: UpsertTenantPromptOverrideInput!) {\n    upsertTenantPromptOverride(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpsertTenantPromptOverrideDocument,
+    "\n  query TenantSlugAvailable($slug: String!) {\n    tenantSlugAvailable(slug: $slug)\n  }\n": types.TenantSlugAvailableDocument,
+    "\n  mutation CreateTenantWizard($input: CreateTenantInput!) {\n    createTenant(input: $input) {\n      id\n      slug\n      schemaName\n    }\n  }\n": types.CreateTenantWizardDocument,
+    "\n  mutation SwitchTenantWizard($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n": types.SwitchTenantWizardDocument,
+    "\n  mutation UpdateTenantFeaturesWizard($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpdateTenantFeaturesWizardDocument,
+    "\n  mutation AddContactWizard($input: AddContactInput!) {\n    addContact(input: $input) {\n      id\n    }\n  }\n": types.AddContactWizardDocument,
     "\n  query GetUsers($input: GetAllUsersType) {\n    users(input: $input) {\n      users {\n        id\n        name\n        surname\n        email\n        phone\n        status\n        type\n      }\n      total\n    }\n  }\n": types.GetUsersDocument,
     "\n  mutation CreateSimpleUser($input: CreateSimpleUserType!) {\n    createSimpleUser(input: $input) {\n      id\n      email\n    }\n  }\n": types.CreateSimpleUserDocument,
     "\n  mutation UpdateUser($input: UpdateUserType!) {\n    updateUser(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n": types.UpdateUserDocument,
@@ -234,6 +244,26 @@ export function graphql(source: "\n  query GetTenantCommandConfigsForPrompts {\n
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation UpsertTenantPromptOverride($input: UpsertTenantPromptOverrideInput!) {\n    upsertTenantPromptOverride(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation UpsertTenantPromptOverride($input: UpsertTenantPromptOverrideInput!) {\n    upsertTenantPromptOverride(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query TenantSlugAvailable($slug: String!) {\n    tenantSlugAvailable(slug: $slug)\n  }\n"): (typeof documents)["\n  query TenantSlugAvailable($slug: String!) {\n    tenantSlugAvailable(slug: $slug)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateTenantWizard($input: CreateTenantInput!) {\n    createTenant(input: $input) {\n      id\n      slug\n      schemaName\n    }\n  }\n"): (typeof documents)["\n  mutation CreateTenantWizard($input: CreateTenantInput!) {\n    createTenant(input: $input) {\n      id\n      slug\n      schemaName\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SwitchTenantWizard($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n"): (typeof documents)["\n  mutation SwitchTenantWizard($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateTenantFeaturesWizard($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateTenantFeaturesWizard($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation AddContactWizard($input: AddContactInput!) {\n    addContact(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation AddContactWizard($input: AddContactInput!) {\n    addContact(input: $input) {\n      id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

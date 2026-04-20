@@ -14,6 +14,8 @@ import {
   GetAllPlatformCredentialsResponse,
   CreateTenantRequest,
   CreateTenantResponse,
+  CheckTenantSlugRequest,
+  CheckTenantSlugResponse,
   GetAllTenantsResponse,
   GetMyTenantsRequest,
   GetMyTenantsResponse,
@@ -161,6 +163,15 @@ export class TenantController implements TenantServiceController {
       slug: tenant.slug,
       schemaName: tenant.schemaName,
     };
+  }
+
+  async checkTenantSlug({ slug }: CheckTenantSlugRequest): Promise<CheckTenantSlugResponse> {
+    const normalized = String(slug || '').trim().toLowerCase();
+    if (!normalized) {
+      return { status: false, message: 'Slug is required', isAvailable: false };
+    }
+    const existing = await this.tenantDbService.findBySlug(normalized);
+    return { status: true, message: 'OK', isAvailable: !existing };
   }
 
   async getAllTenants(): Promise<GetAllTenantsResponse> {

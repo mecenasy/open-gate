@@ -1,44 +1,22 @@
-jest.mock('bcrypt', () => ({
-  hash: jest.fn().mockResolvedValue('$2b$10$hashedtoken'),
-}));
-
-import * as bcrypt from 'bcrypt';
 import { CsrfService } from './csrf.service';
 
 describe('CsrfService', () => {
   let service: CsrfService;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     service = new CsrfService();
   });
 
   describe('generateToken', () => {
-    it('should return a bcrypt-hashed string', async () => {
-      const token = await service.generateToken();
+    it('should return a 64-char hex string', () => {
+      const token = service.generateToken();
 
-      expect(token).toBe('$2b$10$hashedtoken');
-      expect(bcrypt.hash).toHaveBeenCalledTimes(1);
+      expect(token).toMatch(/^[0-9a-f]{64}$/);
     });
 
-    it('should hash with salt rounds 10', async () => {
-      await service.generateToken();
-
-      expect(bcrypt.hash).toHaveBeenCalledWith(expect.any(String), 10);
-    });
-
-    it('should pass a 64-char hex random string to bcrypt', async () => {
-      await service.generateToken();
-
-      const [rawToken] = (bcrypt.hash as jest.Mock).mock.calls[0] as [string, number];
-      expect(rawToken).toMatch(/^[0-9a-f]{64}$/);
-    });
-
-    it('should generate different raw values on each call', async () => {
-      (bcrypt.hash as jest.Mock).mockImplementation((v: string) => Promise.resolve(v));
-
-      const t1 = await service.generateToken();
-      const t2 = await service.generateToken();
+    it('should generate different values on each call', () => {
+      const t1 = service.generateToken();
+      const t2 = service.generateToken();
 
       expect(t1).not.toBe(t2);
     });

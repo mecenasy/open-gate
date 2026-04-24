@@ -44,7 +44,7 @@ export class TenantType {
   @Field()
   isActive!: boolean;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   billingUserId?: string | null;
 }
 

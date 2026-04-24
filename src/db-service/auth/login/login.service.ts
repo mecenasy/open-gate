@@ -14,6 +14,7 @@ export class LoginService {
 
   async login(email: string, password: string): Promise<LoginResponse> {
     const user = await this.userService.findUserWithPassword(email);
+    console.log("🚀 ~ LoginService ~ login ~ user:", user)
     if (!user || !user.password) {
       return { success: false, message: 'Unknown user' };
     }

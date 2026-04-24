@@ -30,7 +30,7 @@ export class RegisterHandler extends Handler<RegisterCommand, void, UserProxySer
         name,
         surname,
         password,
-        type: UserType.USER,
+        type: UserType.OWNER,
       }),
     );
 

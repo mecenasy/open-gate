@@ -10,8 +10,8 @@ export class CsrfController {
   @Get('token')
   @Public()
   @ExcludeCsrf()
-  async getCsrfToken(@Res() res: Response, @Session() session: Record<string, any>) {
-    const token = await this.csrfService.generateToken();
+  getCsrfToken(@Res() res: Response, @Session() session: Record<string, any>) {
+    const token = this.csrfService.generateToken();
     session.csrfToken = token;
 
     return res.json({ csrfToken: token });

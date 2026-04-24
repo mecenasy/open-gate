@@ -12,7 +12,7 @@ import { UserStatus } from '../../status';
 import { UserType } from '../../user-type';
 import { protoToJsUserType } from 'src/utils/user-type-converter';
 import { entityToProto } from '../../utils/entity-to-proto';
-import { UserData } from 'src/proto/user';
+import { UserData, UserType as ProtoUserType } from 'src/proto/user';
 
 @CommandHandler(AddUserCommand)
 export class AddUserHandler extends BaseCommandHandler<AddUserCommand, UserData> {
@@ -33,9 +33,10 @@ export class AddUserHandler extends BaseCommandHandler<AddUserCommand, UserData>
       'AddUser',
       async () => {
         const { email, phone, password, name, surname, type, phoneOwner } = command.request;
+        console.log("🚀 ~ AddUserHandler ~ execute ~ type:", type)
 
         const userType = await this.userRoleRepository.findOneOrFail({
-          where: { userType: type ? protoToJsUserType(type) : UserType.User },
+          where: { userType: protoToJsUserType(type ?? ProtoUserType.USER) },
         });
 
         const user = this.userRepository.create({

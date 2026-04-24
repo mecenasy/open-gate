@@ -10,6 +10,8 @@ interface GraphQLOperation {
   variables?: Record<string, unknown>;
 }
 
+const MUTATING_OPERATION_RE = /^\s*(?:#.*\n\s*)*(mutation|subscription)\b/i;
+
 @Injectable()
 export class CsrfGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
@@ -28,7 +30,7 @@ export class CsrfGuard implements CanActivate {
       request = ctx.getContext<Context>().req;
       session = request.session as SessionData;
 
-      if (this.isGraphQLQuery(request)) {
+      if (this.isReadOnlyGraphQLOperation(request)) {
         return true;
       }
     }
@@ -43,27 +45,12 @@ export class CsrfGuard implements CanActivate {
     return token === sessionToken;
   }
 
-  private isGraphQLQuery(request: Request): boolean {
-    if (request.body && typeof request.body === 'object') {
-      const body = request.body as GraphQLOperation | GraphQLOperation[];
+  private isReadOnlyGraphQLOperation(request: Request): boolean {
+    if (!request.body || typeof request.body !== 'object') return false;
 
-      if ('query' in body && typeof body.query === 'string') {
-        const query = body.query.trim().toLowerCase();
-        return query.startsWith('query') && !query.includes('mutation') && !query.includes('subscription');
-      }
+    const body = request.body as GraphQLOperation | GraphQLOperation[];
+    const ops = Array.isArray(body) ? body : [body];
 
-      if (Array.isArray(body)) {
-        return body.every(
-          (op) =>
-            op.query &&
-            typeof op.query === 'string' &&
-            op.query.trim().toLowerCase().startsWith('query') &&
-            !op.query.includes('mutation') &&
-            !op.query.includes('subscription'),
-        );
-      }
-    }
-
-    return false;
+    return ops.every((op) => typeof op.query === 'string' && !MUTATING_OPERATION_RE.test(op.query));
   }
 }

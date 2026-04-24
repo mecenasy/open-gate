@@ -49,7 +49,7 @@ export class TenantAdminService implements OnModuleInit {
 
   async getMyTenants(userId: string): Promise<TenantType[]> {
     const res = await lastValueFrom(this.tenantGrpcService.getMyTenants({ userId }));
-    return res.tenants.map((t) => ({
+    return (res.tenants ?? []).map((t) => ({
       id: t.id,
       slug: t.slug,
       schemaName: t.schemaName,
@@ -60,7 +60,7 @@ export class TenantAdminService implements OnModuleInit {
 
   async getTenantsIStaffAt(userId: string) {
     const res = await lastValueFrom(this.tenantGrpcService.getTenantsIStaffAt({ userId }));
-    return res.memberships.map((m) => ({
+    return (res.memberships ?? []).map((m) => ({
       tenantId: m.tenantId,
       tenantSlug: m.tenantSlug,
       role: m.role,

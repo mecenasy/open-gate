@@ -15,7 +15,6 @@ export class LoginHandler extends BaseQueryHandler<LoginQuery, LoginResponse> {
   }
 
   execute(query: LoginQuery): Promise<LoginResponse> {
-    console.log('🚀 ~ LoginHandler ~ execute ~ query:', query);
     return this.run('Login', () => this.loginService.login(query.email, query.password));
   }
 }

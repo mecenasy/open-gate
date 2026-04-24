@@ -7,7 +7,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only --exit-child src/bff-service/main.ts
+    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only
+      --exit-child src/bff-service/main.ts
     restart: unless-stopped
     mem_limit: 512m
     mem_reservation: 256m
@@ -49,31 +50,31 @@ services:
       retries: 5
       start_period: 60s
 
-  front-service:
-    container_name: front-service
-    build:
-      context: ./src/front-service
-      dockerfile: Dockerfile.dev
-    restart: unless-stopped
-    mem_limit: 1024m
-    mem_reservation: 512m
-    cpus: "0.5"
-    volumes:
-      - ./src/front-service:/app
-      - /app/node_modules
-      - /app/.next
-    ports:
-      - "127.0.0.1:4002:4002"
-    environment:
-      CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
-      API_INTERNAL_URL: "http://bff-service:${BFF_PORT:-3001}"
-      NEXT_PUBLIC_API_HOST_URL: "http://localhost:${BFF_PORT:-3001}"
-    depends_on:
-      bff-service:
-        condition: service_started
-    networks:
-      - backend-net
+  # front-service:
+  #   container_name: front-service
+  #   build:
+  #     context: ./src/front-service
+  #     dockerfile: Dockerfile.dev
+  #   restart: unless-stopped
+  #   mem_limit: 1024m
+  #   mem_reservation: 512m
+  #   cpus: "0.5"
+  #   volumes:
+  #     - ./src/front-service:/app
+  #     - /app/node_modules
+  #     - /app/.next
+  #   ports:
+  #     - "127.0.0.1:4002:4002"
+  #   environment:
+  #     CHOKIDAR_USEPOLLING: "true"
+  #     WATCHPACK_POLLING: "true"
+  #     API_INTERNAL_URL: "http://bff-service:${BFF_PORT:-3001}"
+  #     NEXT_PUBLIC_API_HOST_URL: "http://localhost:${BFF_PORT:-3001}"
+  #   depends_on:
+  #     bff-service:
+  #       condition: service_started
+  #   networks:
+  #     - backend-net
 
   # Serwis główny, odpowiedzialny za logikę biznesową, komunikację z bazą danych i innymi serwisami poprzez gRPC oraz udostępnianie API dla frontendu
   core-service:
@@ -89,7 +90,8 @@ services:
     cpus: "0.5"
 
     # Komenda wymuszająca start konkretnego pliku i obserwowanie zmian
-    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/core-service/main.ts
+    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only
+      src/core-service/main.ts
     volumes:
       - .:/app
       - /app/node_modules
@@ -125,7 +127,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
-
     # Database service - serwis odpowiedzialny za komunikację z bazą danych i udostępnianie danych innym serwisom poprzez gRPC
   db-service:
     # profiles:
@@ -141,7 +142,8 @@ services:
     cpus: "0.25"
     ports:
       - "${GRPC_PORT}:50051"
-    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/db-service/main.ts
+    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only
+      src/db-service/main.ts
     # Startuje drugi punkt wejścia w tym samym projekcie
     volumes:
       - .:/app
@@ -167,7 +169,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/notify-service/main.ts
+    command: npx ts-node-dev -r tsconfig-paths/register --respawn --transpile-only
+      src/notify-service/main.ts
     restart: unless-stopped
     mem_limit: 256m
     mem_reservation: 128m
@@ -210,7 +213,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
-
       # Database
 
   postgres:
@@ -236,7 +238,7 @@ services:
     networks:
       - backend-net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_DB}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_DB}" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -261,7 +263,7 @@ services:
     networks:
       - backend-net
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -284,12 +286,11 @@ services:
       - backend-net
     # Add a manual healthcheck if the image doesn't define one correctly
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/v1/about || exit 1"]
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/v1/about || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
-
   # languagetool:
   #   image: erikvl82/languagetool:latest
   #   container_name: local_languagetool

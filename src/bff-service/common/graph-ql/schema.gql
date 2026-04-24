@@ -307,10 +307,6 @@ type UserSubscriptionType {
   plan: SubscriptionPlanType!
 }
 
-input SelectSubscriptionInput {
-  planId: String!
-}
-
 type Query {
   users(input: GetAllUsersType): UsersListType!
   user(input: GetUserType!): UserSummaryType!
@@ -434,12 +430,6 @@ type Mutation {
   updateConfig(input: UpdateConfigType!): ConfigResponseType!
   updateMyPlatformCredentials(input: UpdateMyPlatformCredentialsInput!): MutationResult!
   createTenant(input: CreateTenantInput!): CreateTenantResult!
-  updateTenantFeatures(input: UpdateTenantFeaturesInput!): MutationResult!
-  updateTenantCustomization(input: UpdateCustomizationInput!): MutationResult!
-  upsertPlatformCredentials(input: UpsertPlatformCredentialsInput!): MutationResult!
-  upsertTenantCommandConfig(input: UpsertTenantCommandConfigInput!): MutationResult!
-  deleteTenantCommandConfig(input: DeleteTenantCommandConfigInput!): MutationResult!
-  upsertTenantPromptOverride(input: UpsertTenantPromptOverrideInput!): MutationResult!
   switchTenant(tenantId: String!): Boolean!
   addTenantStaff(input: AddTenantStaffInput!): MutationResult!
   removeTenantStaff(input: RemoveTenantStaffInput!): MutationResult!
@@ -447,47 +437,14 @@ type Mutation {
   addContact(input: AddContactInput!): ContactType!
   updateContact(input: UpdateContactInput!): ContactType!
   removeContactFromTenant(input: RemoveContactFromTenantInput!): MutationResult!
+  updateTenantFeatures(input: UpdateTenantFeaturesInput!): MutationResult!
+  updateTenantCustomization(input: UpdateCustomizationInput!): MutationResult!
+  upsertPlatformCredentials(input: UpsertPlatformCredentialsInput!): MutationResult!
+  upsertTenantCommandConfig(input: UpsertTenantCommandConfigInput!): MutationResult!
+  deleteTenantCommandConfig(input: DeleteTenantCommandConfigInput!): MutationResult!
+  upsertTenantPromptOverride(input: UpsertTenantPromptOverrideInput!): MutationResult!
   selectSubscription(input: SelectSubscriptionInput!): UserSubscriptionType!
   cancelSubscription: Boolean!
-}
-
-input AddTenantStaffInput {
-  tenantId: String!
-  userId: String!
-  role: String!
-}
-
-input RemoveTenantStaffInput {
-  tenantId: String!
-  userId: String!
-}
-
-input ChangeTenantStaffRoleInput {
-  tenantId: String!
-  userId: String!
-  role: String!
-}
-
-input AddContactInput {
-  tenantId: String!
-  email: String
-  phone: String
-  name: String!
-  surname: String
-  accessLevel: String!
-}
-
-input UpdateContactInput {
-  contactId: String!
-  email: String
-  phone: String
-  name: String
-  surname: String
-}
-
-input RemoveContactFromTenantInput {
-  tenantId: String!
-  contactId: String!
 }
 
 input RegisterInput {
@@ -628,6 +585,45 @@ input CreateTenantInput {
   slug: String!
 }
 
+input AddTenantStaffInput {
+  tenantId: String!
+  userId: String!
+  role: String!
+}
+
+input RemoveTenantStaffInput {
+  tenantId: String!
+  userId: String!
+}
+
+input ChangeTenantStaffRoleInput {
+  tenantId: String!
+  userId: String!
+  role: String!
+}
+
+input AddContactInput {
+  tenantId: String!
+  email: String
+  phone: String
+  name: String!
+  surname: String
+  accessLevel: String!
+}
+
+input UpdateContactInput {
+  contactId: String!
+  email: String
+  phone: String
+  name: String
+  surname: String
+}
+
+input RemoveContactFromTenantInput {
+  tenantId: String!
+  contactId: String!
+}
+
 input UpdateTenantFeaturesInput {
   enableSignal: Boolean
   enableWhatsApp: Boolean
@@ -668,4 +664,8 @@ input UpsertTenantPromptOverrideInput {
   userType: String!
   descriptionI18nJson: String
   prompt: String!
+}
+
+input SelectSubscriptionInput {
+  planId: String!
 }

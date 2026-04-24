@@ -17,6 +17,7 @@ export class ConfirmRegistrationHandler extends Handler<
   }
 
   async execute({ token }: ConfirmRegistrationCommand): Promise<SuccessResponseType> {
+    console.log("🚀 ~ ConfirmRegistrationHandler ~ execute ~ token:", token)
     const data = await this.cache.getFromCache<{ userId: string; email: string }>({
       identifier: token,
       prefix: 'verify-registration',

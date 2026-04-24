@@ -8,6 +8,17 @@ import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from
 import { Request, Response } from 'express';
 import { CustomLogger } from './custom-logger.service';
 
+interface GraphQLErrorExtensions {
+  code: string;
+  statusCode: number;
+  timestamp: string;
+}
+
+interface GraphQLErrorBody {
+  message: string;
+  extensions: GraphQLErrorExtensions;
+}
+
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   private readonly logger: CustomLogger;
@@ -23,16 +34,47 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const errorResponse = this.buildErrorResponse(exception, status, request);
-
-    // Log the full error internally
     this.logError(exception, request, status);
 
-    // Only send response if it's HTTP context (has status method)
-    if (response && typeof response.status === 'function') {
-      response.status(status).json(errorResponse);
+    // GraphQL requests must respond with HTTP 200 and an `errors` array
+    // so Apollo Client treats them as GraphQL errors (allowing e.g. retry
+    // links to react), not as a transport-level failure.
+    if (host.getType<string>() === 'graphql' && response && typeof response.status === 'function') {
+      response.status(HttpStatus.OK).json({ errors: [this.buildGraphQLError(exception, status)] });
+      return;
     }
-    // For GraphQL and other contexts, let exception propagate
+
+    if (response && typeof response.status === 'function') {
+      const errorResponse = this.buildErrorResponse(exception, status, request);
+      response.status(status).json(errorResponse);
+      return;
+    }
+
+    // For microservice and other contexts, let exception propagate
+    throw exception;
+  }
+
+  private buildGraphQLError(exception: unknown, status: number): GraphQLErrorBody {
+    let message = 'Internal server error';
+    let code = 'INTERNAL_SERVER_ERROR';
+
+    if (exception instanceof HttpException) {
+      const resp = exception.getResponse();
+      if (typeof resp === 'object' && resp !== null) {
+        message = ((resp as Record<string, unknown>).message as string) || exception.message;
+      } else {
+        message = String(resp);
+      }
+      code = exception.constructor.name;
+    } else if (exception instanceof Error) {
+      message = exception.message;
+      code = exception.name || 'UNKNOWN_ERROR';
+    }
+
+    return {
+      message,
+      extensions: { code, statusCode: status, timestamp: new Date().toISOString() },
+    };
   }
 
   private buildErrorResponse(exception: unknown, status: number, request: Request): Record<string, unknown> {

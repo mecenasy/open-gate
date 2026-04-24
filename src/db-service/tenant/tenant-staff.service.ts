@@ -43,7 +43,7 @@ export class TenantStaffService {
       .createQueryBuilder('s')
       .innerJoin(Tenant, 't', 't.id = s.tenant_id')
       .where('s.user_id = :userId', { userId })
-      .select(['s.tenant_id AS tenantId', 's.role AS role', 't.slug AS tenantSlug'])
+      .select(['s.tenant_id AS "tenantId"', 's.role AS "role"', 't.slug AS "tenantSlug"'])
       .getRawMany<{ tenantId: string; role: TenantStaffRole; tenantSlug: string }>();
     return rows;
   }

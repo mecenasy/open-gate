@@ -571,6 +571,15 @@ export type PassKeyType = {
   id: Scalars['String']['output'];
 };
 
+export type PlanChangePreviewType = {
+  __typename?: 'PlanChangePreviewType';
+  currentPlan?: Maybe<SubscriptionPlanType>;
+  deltaPriceCents: Scalars['Int']['output'];
+  kind: Scalars['String']['output'];
+  newPlan: SubscriptionPlanType;
+  violations: Array<QuotaViolationType>;
+};
+
 export type PromptResponseType = {
   __typename?: 'PromptResponseType';
   data?: Maybe<PromptType>;
@@ -639,9 +648,12 @@ export type Query = {
   loginStatus: LoginStatusType;
   mySubscription?: Maybe<UserSubscriptionType>;
   myTenants: Array<TenantType>;
+  myUsage: UsageReportType;
+  previewPlanChange: PlanChangePreviewType;
   promptById: PromptResponseType;
   promptByKey: PromptResponseType;
   prompts: PromptsListType;
+  subscriptionHistory: Array<SubscriptionChangeType>;
   subscriptionPlans: Array<SubscriptionPlanType>;
   tenantCommandConfigs: Array<TenantCommandConfigType>;
   tenantContacts: Array<ContactType>;
@@ -680,6 +692,11 @@ export type QueryCommandsByPermissionArgs = {
 
 export type QueryFeatureConfigArgs = {
   input: GetFeatureConfigType;
+};
+
+
+export type QueryPreviewPlanChangeArgs = {
+  newPlanId: Scalars['String']['input'];
 };
 
 
@@ -727,6 +744,14 @@ export type QueryVerifyTokenArgs = {
   token: Scalars['String']['input'];
 };
 
+export type QuotaViolationType = {
+  __typename?: 'QuotaViolationType';
+  current: Scalars['Int']['output'];
+  kind: Scalars['String']['output'];
+  max: Scalars['Int']['output'];
+  tenantId?: Maybe<Scalars['String']['output']>;
+};
+
 export type RegisterInput = {
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
@@ -770,6 +795,15 @@ export type SelectSubscriptionInput = {
 export type StatusType = {
   __typename?: 'StatusType';
   status: AuthStatus | '%future added value';
+};
+
+export type SubscriptionChangeType = {
+  __typename?: 'SubscriptionChangeType';
+  id: Scalars['String']['output'];
+  initiatedAt: Scalars['String']['output'];
+  kind: Scalars['String']['output'];
+  newPlanId?: Maybe<Scalars['String']['output']>;
+  oldPlanId?: Maybe<Scalars['String']['output']>;
 };
 
 export type SubscriptionPlanType = {
@@ -853,6 +887,15 @@ export type TenantType = {
   isActive: Scalars['Boolean']['output'];
   schemaName: Scalars['String']['output'];
   slug: Scalars['String']['output'];
+};
+
+export type TenantUsageEntryType = {
+  __typename?: 'TenantUsageEntryType';
+  contacts: Scalars['Int']['output'];
+  customCommands: Scalars['Int']['output'];
+  platforms: Scalars['Int']['output'];
+  staff: Scalars['Int']['output'];
+  tenantId: Scalars['String']['output'];
 };
 
 export type ToggleActiveStatusType = {
@@ -951,6 +994,13 @@ export type UpsertTenantPromptOverrideInput = {
   descriptionI18nJson?: InputMaybe<Scalars['String']['input']>;
   prompt: Scalars['String']['input'];
   userType: Scalars['String']['input'];
+};
+
+export type UsageReportType = {
+  __typename?: 'UsageReportType';
+  billingUserId: Scalars['String']['output'];
+  perTenant: Array<TenantUsageEntryType>;
+  tenants: Scalars['Int']['output'];
 };
 
 export enum UserRole {
@@ -1178,6 +1228,30 @@ export type VerifyRegistrationMutationVariables = Exact<{
 
 export type VerifyRegistrationMutation = { __typename?: 'Mutation', registerOptionPasskeyVerify: { __typename?: 'StatusType', status: AuthStatus } };
 
+export type GetBillingDataQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetBillingDataQuery = { __typename?: 'Query', mySubscription?: { __typename?: 'UserSubscriptionType', id: string, status: string, startedAt: string, plan: { __typename?: 'SubscriptionPlanType', id: string, code: string, name: string, maxTenants: number, maxPlatformsPerTenant: number, maxContactsPerTenant: number, maxStaffPerTenant: number, maxCustomCommandsPerTenant: number, priceCents: number, currency: string } } | null, subscriptionPlans: Array<{ __typename?: 'SubscriptionPlanType', id: string, code: string, name: string, maxTenants: number, maxPlatformsPerTenant: number, maxContactsPerTenant: number, maxStaffPerTenant: number, maxCustomCommandsPerTenant: number, priceCents: number, currency: string, isActive: boolean }>, myUsage: { __typename?: 'UsageReportType', billingUserId: string, tenants: number, perTenant: Array<{ __typename?: 'TenantUsageEntryType', tenantId: string, staff: number, platforms: number, contacts: number, customCommands: number }> }, subscriptionHistory: Array<{ __typename?: 'SubscriptionChangeType', id: string, oldPlanId?: string | null, newPlanId?: string | null, kind: string, initiatedAt: string }> };
+
+export type PreviewPlanChangeQueryVariables = Exact<{
+  newPlanId: Scalars['String']['input'];
+}>;
+
+
+export type PreviewPlanChangeQuery = { __typename?: 'Query', previewPlanChange: { __typename?: 'PlanChangePreviewType', kind: string, deltaPriceCents: number, newPlan: { __typename?: 'SubscriptionPlanType', id: string, code: string, name: string, maxTenants: number, maxPlatformsPerTenant: number, maxContactsPerTenant: number, maxStaffPerTenant: number, maxCustomCommandsPerTenant: number, priceCents: number, currency: string }, currentPlan?: { __typename?: 'SubscriptionPlanType', id: string, code: string, name: string, maxTenants: number, maxPlatformsPerTenant: number, maxContactsPerTenant: number, maxStaffPerTenant: number, maxCustomCommandsPerTenant: number, priceCents: number, currency: string } | null, violations: Array<{ __typename?: 'QuotaViolationType', kind: string, tenantId?: string | null, current: number, max: number }> } };
+
+export type ChangePlanMutationVariables = Exact<{
+  input: SelectSubscriptionInput;
+}>;
+
+
+export type ChangePlanMutation = { __typename?: 'Mutation', selectSubscription: { __typename?: 'UserSubscriptionType', id: string, status: string, plan: { __typename?: 'SubscriptionPlanType', id: string, code: string, name: string } } };
+
+export type CancelSubscriptionMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CancelSubscriptionMutation = { __typename?: 'Mutation', cancelSubscription: boolean };
+
 export type GetTenantCommandConfigsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1366,6 +1440,10 @@ export const Verify2faDocument = {"kind":"Document","definitions":[{"kind":"Oper
 export const AcceptAdaptiveLoginDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AcceptAdaptiveLogin"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"adaptiveLogin"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"active"}}]}}]}}]} as unknown as DocumentNode<AcceptAdaptiveLoginMutation, AcceptAdaptiveLoginMutationVariables>;
 export const RegisterOptionPasskeyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RegisterOptionPasskey"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"registerOptionPasskey"}}]}}]} as unknown as DocumentNode<RegisterOptionPasskeyMutation, RegisterOptionPasskeyMutationVariables>;
 export const VerifyRegistrationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"VerifyRegistration"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"JSON"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"registerOptionPasskeyVerify"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]} as unknown as DocumentNode<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>;
+export const GetBillingDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetBillingData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mySubscription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startedAt"}},{"kind":"Field","name":{"kind":"Name","value":"plan"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"maxTenants"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlatformsPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"maxContactsPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"maxStaffPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"maxCustomCommandsPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"priceCents"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"subscriptionPlans"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"maxTenants"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlatformsPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"maxContactsPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"maxStaffPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"maxCustomCommandsPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"priceCents"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}}]}},{"kind":"Field","name":{"kind":"Name","value":"myUsage"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"billingUserId"}},{"kind":"Field","name":{"kind":"Name","value":"tenants"}},{"kind":"Field","name":{"kind":"Name","value":"perTenant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantId"}},{"kind":"Field","name":{"kind":"Name","value":"staff"}},{"kind":"Field","name":{"kind":"Name","value":"platforms"}},{"kind":"Field","name":{"kind":"Name","value":"contacts"}},{"kind":"Field","name":{"kind":"Name","value":"customCommands"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"subscriptionHistory"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"oldPlanId"}},{"kind":"Field","name":{"kind":"Name","value":"newPlanId"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"initiatedAt"}}]}}]}}]} as unknown as DocumentNode<GetBillingDataQuery, GetBillingDataQueryVariables>;
+export const PreviewPlanChangeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PreviewPlanChange"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"newPlanId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"previewPlanChange"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"newPlanId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"newPlanId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"deltaPriceCents"}},{"kind":"Field","name":{"kind":"Name","value":"newPlan"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"maxTenants"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlatformsPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"maxContactsPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"maxStaffPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"maxCustomCommandsPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"priceCents"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}}]}},{"kind":"Field","name":{"kind":"Name","value":"currentPlan"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"maxTenants"}},{"kind":"Field","name":{"kind":"Name","value":"maxPlatformsPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"maxContactsPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"maxStaffPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"maxCustomCommandsPerTenant"}},{"kind":"Field","name":{"kind":"Name","value":"priceCents"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}}]}},{"kind":"Field","name":{"kind":"Name","value":"violations"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"tenantId"}},{"kind":"Field","name":{"kind":"Name","value":"current"}},{"kind":"Field","name":{"kind":"Name","value":"max"}}]}}]}}]}}]} as unknown as DocumentNode<PreviewPlanChangeQuery, PreviewPlanChangeQueryVariables>;
+export const ChangePlanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangePlan"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SelectSubscriptionInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"selectSubscription"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"plan"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<ChangePlanMutation, ChangePlanMutationVariables>;
+export const CancelSubscriptionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CancelSubscription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cancelSubscription"}}]}}]} as unknown as DocumentNode<CancelSubscriptionMutation, CancelSubscriptionMutationVariables>;
 export const GetTenantCommandConfigsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTenantCommandConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantCommandConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"commandName"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"userTypes"}},{"kind":"Field","name":{"kind":"Name","value":"actionsJson"}},{"kind":"Field","name":{"kind":"Name","value":"parametersOverrideJson"}},{"kind":"Field","name":{"kind":"Name","value":"descriptionI18nJson"}}]}}]}}]} as unknown as DocumentNode<GetTenantCommandConfigsQuery, GetTenantCommandConfigsQueryVariables>;
 export const UpsertTenantCommandConfigMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpsertTenantCommandConfigMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpsertTenantCommandConfigInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"upsertTenantCommandConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<UpsertTenantCommandConfigMutationMutation, UpsertTenantCommandConfigMutationMutationVariables>;
 export const DeleteTenantCommandConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteTenantCommandConfig"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteTenantCommandConfigInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteTenantCommandConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<DeleteTenantCommandConfigMutation, DeleteTenantCommandConfigMutationVariables>;

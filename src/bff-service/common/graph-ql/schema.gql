@@ -284,6 +284,20 @@ type TenantPromptOverrideType {
   prompt: String!
 }
 
+type TenantUsageEntryType {
+  tenantId: String!
+  staff: Int!
+  platforms: Int!
+  contacts: Int!
+  customCommands: Int!
+}
+
+type UsageReportType {
+  billingUserId: String!
+  tenants: Int!
+  perTenant: [TenantUsageEntryType!]!
+}
+
 type SubscriptionPlanType {
   id: String!
   code: String!
@@ -305,6 +319,29 @@ type UserSubscriptionType {
   startedAt: String!
   expiresAt: String
   plan: SubscriptionPlanType!
+}
+
+type QuotaViolationType {
+  kind: String!
+  tenantId: String
+  current: Int!
+  max: Int!
+}
+
+type PlanChangePreviewType {
+  newPlan: SubscriptionPlanType!
+  currentPlan: SubscriptionPlanType
+  kind: String!
+  violations: [QuotaViolationType!]!
+  deltaPriceCents: Int!
+}
+
+type SubscriptionChangeType {
+  id: String!
+  oldPlanId: String
+  newPlanId: String
+  kind: String!
+  initiatedAt: String!
 }
 
 type Query {
@@ -333,8 +370,11 @@ type Query {
   tenantContacts(tenantId: String!): [ContactType!]!
   tenantCommandConfigs: [TenantCommandConfigType!]!
   tenantPromptOverrides: [TenantPromptOverrideType!]!
+  myUsage: UsageReportType!
   subscriptionPlans: [SubscriptionPlanType!]!
   mySubscription: UserSubscriptionType
+  previewPlanChange(newPlanId: String!): PlanChangePreviewType!
+  subscriptionHistory: [SubscriptionChangeType!]!
   csrfToken: CsrfTokenType!
 }
 

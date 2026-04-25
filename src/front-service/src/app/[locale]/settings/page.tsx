@@ -11,8 +11,9 @@ import { FeatureSettingsTab } from './tabs/feature-settings/FeatureSettingsTab';
 import { FeatureTab } from './tabs/feature/FeatureTab';
 import { CommandsTab } from './tabs/commands/CommandsTab';
 import { PromptsTab } from './tabs/prompts/PromptsTab';
+import { BillingTab } from './tabs/billing/BillingTab';
 
-const TABS = ['auth', 'feature', 'feature-settings', 'commands', 'prompts'] as const;
+const TABS = ['auth', 'feature', 'feature-settings', 'commands', 'prompts', 'billing'] as const;
 type TabKey = (typeof TABS)[number];
 
 function isValidTab(value: string | null): value is TabKey {
@@ -34,6 +35,7 @@ function SettingsContent() {
     { key: 'feature-settings', label: t('tabFeatureSettings') },
     { key: 'commands', label: t('tabCommands') },
     { key: 'prompts', label: t('tabPrompts') },
+    { key: 'billing', label: t('tabBilling') },
   ];
 
   const handleTabChange = (key: string) => {
@@ -52,6 +54,7 @@ function SettingsContent() {
           'feature-settings': <FeatureSettingsTab />,
           commands: <CommandsTab />,
           prompts: <PromptsTab />,
+          billing: <BillingTab />,
         }}
       />
     </div>

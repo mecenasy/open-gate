@@ -89,7 +89,7 @@ Wykluczone jako niezwiązane: `command.service.ts:89 actionFilter`, `gate.servic
 
 ---
 
-### Commit 3 — frontend: UI zmiany planu + usage
+### Commit 3 — frontend: UI zmiany planu + usage  ✅ ZREALIZOWANE
 
 1. Dodać button "Zmień plan" do [SubscriptionBanner](src/front-service/src/app/[locale]/home/components/SubscriptionBanner.tsx) → link do `/settings/billing`.
 2. Nowa feature `src/front-service/src/app/[locale]/settings/tabs/billing/`:

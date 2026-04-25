@@ -201,16 +201,6 @@ type UsageReportType {
   perTenant: [TenantUsageEntryType!]!
 }
 
-type TenantAuditLogEntryType {
-  id: String!
-  tenantId: String
-  userId: String!
-  action: String!
-  payload: JSON
-  correlationId: String
-  createdAt: String!
-}
-
 type SubscriptionPlanType {
   id: String!
   code: String!
@@ -378,6 +368,16 @@ type TenantCustomizationFullType {
   compliance: TenantComplianceType!
 }
 
+type TenantAuditLogEntryType {
+  id: String!
+  tenantId: String
+  userId: String!
+  action: String!
+  payload: JSON
+  correlationId: String
+  createdAt: String!
+}
+
 type ConfigType {
   id: ID!
   key: String!
@@ -413,7 +413,6 @@ type Query {
   commandsByPermission(input: GetAllByPermissionType!): CommandsListType!
   commandByPermission(input: GetByPermissionType!): CommandResponseType!
   myUsage: UsageReportType!
-  tenantAuditLog(tenantId: String!): [TenantAuditLogEntryType!]!
   subscriptionPlans: [SubscriptionPlanType!]!
   mySubscription: UserSubscriptionType
   previewPlanChange(newPlanId: String!): PlanChangePreviewType!
@@ -429,6 +428,7 @@ type Query {
   tenantCommandConfigs: [TenantCommandConfigType!]!
   tenantPromptOverrides: [TenantPromptOverrideType!]!
   tenantCustomization(tenantId: String!): TenantCustomizationFullType!
+  tenantAuditLog(tenantId: String!): [TenantAuditLogEntryType!]!
   coreConfigs: ConfigsListType!
   featureConfigs: ConfigsListType!
   featureConfig(input: GetFeatureConfigType!): ConfigsListType!

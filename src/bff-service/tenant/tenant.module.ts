@@ -8,10 +8,11 @@ import { OwnerGuard } from '../common/guards/owner.guard';
 import { AdminGuard } from '../common/guards/admin.guard';
 import { QuotasBffModule } from '../quotas/quotas.module';
 import { AuditBffModule } from '../audit/audit.module';
+import { AuditResolver } from '../audit/audit.resolver';
 
 @Module({
   imports: [TenantModule, TenantCustomizationModule, QuotasBffModule, AuditBffModule],
-  providers: [TenantResolver, TenantSettingsResolver, TenantAdminService, OwnerGuard, AdminGuard],
+  providers: [TenantResolver, TenantSettingsResolver, TenantAdminService, OwnerGuard, AdminGuard, AuditResolver],
   exports: [TenantAdminService],
 })
 export class TenantBffModule {}

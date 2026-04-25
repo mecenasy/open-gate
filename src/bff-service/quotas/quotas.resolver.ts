@@ -4,7 +4,7 @@ import { CurrentUserId } from '@app/auth';
 import { QuotasClientService } from './quotas.client.service';
 import { UsageReportType } from './dto/quotas.types';
 
-@Resolver('Quotas')
+@Resolver()
 export class QuotasResolver {
   constructor(private readonly quotas: QuotasClientService) {}
 

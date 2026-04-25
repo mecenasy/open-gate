@@ -14,7 +14,7 @@ import {
 } from './dto/subscription.types';
 import { QuotasClientService } from '../quotas/quotas.client.service';
 
-@Resolver('Subscription')
+@Resolver()
 export class SubscriptionResolver {
   constructor(
     private readonly subscriptions: SubscriptionClientService,

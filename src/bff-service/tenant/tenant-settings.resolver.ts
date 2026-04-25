@@ -1,6 +1,9 @@
 import { BadRequestException, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { TenantStaffRole } from '@app/entities';
+import { AuditAction } from '@app/audit';
+import { CurrentUserId } from '@app/auth';
+import { AuditClientService } from '../audit/audit.client.service';
 import {
   validateMessagingChannels,
   type CommunityCustomization,
@@ -56,6 +59,7 @@ export class TenantSettingsResolver {
   constructor(
     private readonly customization: TenantCustomizationService,
     private readonly admin: TenantAdminService,
+    private readonly audit: AuditClientService,
   ) {}
 
   @UseGuards(TenantStaffGuard(TenantStaffRole.Support))
@@ -186,13 +190,16 @@ export class TenantSettingsResolver {
 
   @UseGuards(TenantStaffGuard(TenantStaffRole.Owner))
   @Mutation(() => MutationResult)
-  async updateTenantCompliance(@Args('input') input: ComplianceInput): Promise<MutationResult> {
+  async updateTenantCompliance(
+    @Args('input') input: ComplianceInput,
+    @CurrentUserId() actor?: string,
+  ): Promise<MutationResult> {
     if (input.dataResidency !== undefined && !RESIDENCY.has(input.dataResidency)) {
       throw new BadRequestException(`dataResidency must be one of: ${[...RESIDENCY].join(', ')}`);
     }
     ensureUrl(input.webhookUrl, 'webhookUrl');
 
-    return this.patchSection(input.tenantId, (current) => ({
+    const result = await this.patchSection(input.tenantId, (current) => ({
       compliance: {
         ...current.compliance,
         ...(input.dataResidency !== undefined && { dataResidency: input.dataResidency }),
@@ -200,25 +207,77 @@ export class TenantSettingsResolver {
         ...(input.webhookUrl !== undefined && { webhookUrl: input.webhookUrl }),
       } as CommunityCustomizationCompliance,
     }));
-  }
-
-  @UseGuards(TenantStaffGuard(TenantStaffRole.Owner))
-  @Mutation(() => MutationResult)
-  async transferTenantBilling(@Args('input') input: TransferTenantBillingInput): Promise<MutationResult> {
-    return this.admin.transferTenantBilling(input.tenantId, input.newBillingUserId);
-  }
-
-  @UseGuards(TenantStaffGuard(TenantStaffRole.Owner))
-  @Mutation(() => MutationResult)
-  async setTenantActive(@Args('input') input: SetTenantActiveInput): Promise<MutationResult> {
-    const result = await this.admin.setTenantActive(input.tenantId, input.active);
-    this.customization.invalidate(input.tenantId);
+    if (actor && result.status) {
+      void this.audit.record({
+        tenantId: input.tenantId,
+        userId: actor,
+        action: AuditAction.TenantComplianceUpdated,
+        payload: {
+          dataResidency: input.dataResidency,
+          encryptionEnabled: input.encryptionEnabled,
+          webhookUrlChanged: input.webhookUrl !== undefined,
+        },
+      });
+    }
     return result;
   }
 
   @UseGuards(TenantStaffGuard(TenantStaffRole.Owner))
   @Mutation(() => MutationResult)
-  async deleteTenant(@Args('input') input: DeleteTenantInput): Promise<MutationResult> {
+  async transferTenantBilling(
+    @Args('input') input: TransferTenantBillingInput,
+    @CurrentUserId() actor?: string,
+  ): Promise<MutationResult> {
+    const result = await this.admin.transferTenantBilling(input.tenantId, input.newBillingUserId);
+    if (actor && result.status) {
+      void this.audit.record({
+        tenantId: input.tenantId,
+        userId: actor,
+        action: AuditAction.TenantBillingTransferred,
+        payload: { newBillingUserId: input.newBillingUserId },
+      });
+    }
+    return result;
+  }
+
+  @UseGuards(TenantStaffGuard(TenantStaffRole.Owner))
+  @Mutation(() => MutationResult)
+  async setTenantActive(
+    @Args('input') input: SetTenantActiveInput,
+    @CurrentUserId() actor?: string,
+  ): Promise<MutationResult> {
+    const result = await this.admin.setTenantActive(input.tenantId, input.active);
+    this.customization.invalidate(input.tenantId);
+    if (actor && result.status) {
+      void this.audit.record({
+        tenantId: input.tenantId,
+        userId: actor,
+        action: AuditAction.TenantSetActive,
+        payload: { active: input.active },
+      });
+    }
+    return result;
+  }
+
+  @UseGuards(TenantStaffGuard(TenantStaffRole.Owner))
+  @Mutation(() => MutationResult)
+  async deleteTenant(
+    @Args('input') input: DeleteTenantInput,
+    @CurrentUserId() actor?: string,
+  ): Promise<MutationResult> {
+    // Audit BEFORE delete: the FK CASCADE drops the tenants row but the
+    // FK on tenant_audit_log.tenant_id is ON DELETE SET NULL, so the row
+    // survives — but we want a "before" snapshot in case the delete fails
+    // halfway. The audit write itself is fire-and-forget, so even if both
+    // ran in parallel we'd be fine.
+    if (actor) {
+      void this.audit.record({
+        tenantId: input.tenantId,
+        userId: actor,
+        action: AuditAction.TenantDeleted,
+        payload: { slug: input.slugConfirmation },
+      });
+    }
     const result = await this.admin.deleteTenant(input.tenantId, input.slugConfirmation);
     this.customization.invalidate(input.tenantId);
     return result;

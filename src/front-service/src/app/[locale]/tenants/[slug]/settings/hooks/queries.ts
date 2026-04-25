@@ -145,3 +145,17 @@ export const CHANGE_TENANT_STAFF_ROLE_MUTATION = graphql(`
     }
   }
 `);
+
+export const TENANT_AUDIT_LOG_QUERY = graphql(`
+  query TenantAuditLog($tenantId: String!) {
+    tenantAuditLog(tenantId: $tenantId) {
+      id
+      tenantId
+      userId
+      action
+      payload
+      correlationId
+      createdAt
+    }
+  }
+`);

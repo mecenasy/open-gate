@@ -38,6 +38,7 @@ describe('SubscriptionResolver', () => {
   >;
   let quotas: jest.Mocked<Pick<QuotasClientService, 'listViolations'>>;
   let cache: jest.Mocked<Pick<CacheService, 'removeFromCache'>>;
+  let audit: { record: jest.Mock };
 
   beforeEach(() => {
     subs = {
@@ -49,11 +50,13 @@ describe('SubscriptionResolver', () => {
     };
     quotas = { listViolations: jest.fn() };
     cache = { removeFromCache: jest.fn().mockResolvedValue(undefined) };
+    audit = { record: jest.fn().mockResolvedValue(undefined) };
 
     resolver = new SubscriptionResolver(
       subs as unknown as SubscriptionClientService,
       quotas as unknown as QuotasClientService,
       cache as unknown as CacheService,
+      audit as unknown as ConstructorParameters<typeof SubscriptionResolver>[3],
     );
   });
 

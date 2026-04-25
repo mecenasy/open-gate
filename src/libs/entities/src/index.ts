@@ -45,6 +45,7 @@ export * from './tenant/platform-credentials.entity';
 export * from './tenant/tenant-command-config.entity';
 export * from './tenant/tenant-prompt-override.entity';
 export * from './tenant/tenant-staff.entity';
+export * from './tenant/tenant-audit-log.entity';
 
 // Contact
 export * from './contact/contact.entity';

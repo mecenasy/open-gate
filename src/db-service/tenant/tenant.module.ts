@@ -5,6 +5,7 @@ import { Tenant } from './entity/tenant.entity';
 import { CustomizationConfig } from './entity/customization-config.entity';
 import {
   PlatformCredentials,
+  TenantAuditLog,
   TenantCommandConfig,
   TenantPromptOverride,
   TenantStaff,
@@ -24,6 +25,7 @@ import { TenantModule } from '@app/tenant';
 import { DatabaseModule } from '@app/database';
 import { CommandModule } from '../command/command.module';
 import { TenantUsageService } from './tenant-usage.service';
+import { AuditService } from './audit.service';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { TenantUsageService } from './tenant-usage.service';
       TenantCommandConfig,
       TenantPromptOverride,
       TenantStaff,
+      TenantAuditLog,
       Contact,
       ContactMembership,
       Prompt,
@@ -51,6 +54,7 @@ import { TenantUsageService } from './tenant-usage.service';
     TenantStaffService,
     ContactService,
     TenantUsageService,
+    AuditService,
     TenantGrpcInterceptor,
     { provide: APP_INTERCEPTOR, useClass: TenantGrpcInterceptor },
   ],
@@ -63,6 +67,7 @@ import { TenantUsageService } from './tenant-usage.service';
     TenantStaffService,
     ContactService,
     TenantUsageService,
+    AuditService,
   ],
 })
 export class TenantDbModule {}

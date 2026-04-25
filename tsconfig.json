@@ -126,6 +126,12 @@
       "@app/quotas/*": [
         "src/libs/quotas/src/*"
       ],
+      "@app/audit": [
+        "src/libs/audit/src"
+      ],
+      "@app/audit/*": [
+        "src/libs/audit/src/*"
+      ],
       "src/*": [
         "src/*"
       ]

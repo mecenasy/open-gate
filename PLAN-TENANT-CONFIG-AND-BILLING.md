@@ -188,7 +188,7 @@ Reguły:
 
 ---
 
-### Commit 7 — audit log (sensitive operations)
+### Commit 7 — audit log (sensitive operations)  ✅ ZREALIZOWANE
 
 1. Migracja `shared_config.tenant_audit_log` (`id, tenantId nullable, userId, action text, payload_json jsonb, ip text, user_agent text, correlation_id, created_at`).
 2. Nowa biblioteka `src/libs/audit/` → `AuditService` + dekorator `@Audit(action)` dla resolverów.

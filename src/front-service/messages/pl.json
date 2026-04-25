@@ -208,6 +208,7 @@
     "tab_commands": "Komendy",
     "tab_compliance": "Compliance",
     "tab_staff": "Zespół",
+    "tab_audit": "Audyt",
     "common": {
       "save": "Zapisz zmiany",
       "saving": "Zapisuję…",
@@ -294,6 +295,15 @@
       "confirmAdd": "Dodaj",
       "adding": "Dodaję…",
       "cancel": "Anuluj"
+    },
+    "audit": {
+      "desc": "Wrażliwe operacje wykonane na tej wspólnocie. Tylko dla Owner.",
+      "when": "Kiedy",
+      "action": "Akcja",
+      "user": "Użytkownik",
+      "payload": "Szczegóły",
+      "empty": "Brak wpisów audytu.",
+      "loadError": "Nie udało się pobrać dziennika audytu."
     }
   },
   "schemas": {

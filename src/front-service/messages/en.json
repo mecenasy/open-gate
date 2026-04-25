@@ -208,6 +208,7 @@
     "tab_commands": "Commands",
     "tab_compliance": "Compliance",
     "tab_staff": "Staff",
+    "tab_audit": "Audit",
     "common": {
       "save": "Save changes",
       "saving": "Saving…",
@@ -294,6 +295,15 @@
       "confirmAdd": "Add",
       "adding": "Adding…",
       "cancel": "Cancel"
+    },
+    "audit": {
+      "desc": "Sensitive actions performed on this tenant. Owner-only.",
+      "when": "When",
+      "action": "Action",
+      "user": "User",
+      "payload": "Details",
+      "empty": "No audit entries yet.",
+      "loadError": "Failed to load audit log."
     }
   },
   "schemas": {

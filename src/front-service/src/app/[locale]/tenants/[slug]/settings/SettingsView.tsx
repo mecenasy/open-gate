@@ -15,6 +15,7 @@ import { MessagingTab } from './tabs/messaging/MessagingTab';
 import { CommandsTab } from './tabs/commands/CommandsTab';
 import { ComplianceTab } from './tabs/compliance/ComplianceTab';
 import { StaffTab } from './tabs/staff/StaffTab';
+import { AuditTab } from './tabs/audit/AuditTab';
 
 interface SettingsViewProps {
   slug: string;
@@ -83,6 +84,7 @@ export function SettingsView({ slug }: SettingsViewProps) {
           commands: commands ? <CommandsTab tenantId={tenant.id} commands={commands} /> : null,
           compliance: compliance ? <ComplianceTab tenantId={tenant.id} compliance={compliance} /> : null,
           staff: <StaffTab tenantId={tenant.id} staff={staff} />,
+          audit: <AuditTab tenantId={tenant.id} />,
         }}
       />
     </main>

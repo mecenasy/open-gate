@@ -57,6 +57,9 @@ import {
   TransferTenantBillingRequest,
   SetTenantActiveRequest,
   DeleteTenantRequest,
+  RecordAuditEntryRequest,
+  GetTenantAuditLogRequest,
+  GetTenantAuditLogResponse,
 } from 'src/proto/tenant';
 import { TenantDbService } from './tenant.service';
 import { PlatformCredentialsService } from './platform-credentials.service';
@@ -65,6 +68,7 @@ import { TenantPromptOverrideService } from './tenant-prompt-override.service';
 import { TenantStaffService } from './tenant-staff.service';
 import { ContactService } from '../contact/contact.service';
 import { TenantUsageService } from './tenant-usage.service';
+import { AuditService } from './audit.service';
 import type { CommunityCustomization } from './entity/customization-config.entity';
 import { TenantPromptOverride, UserType, TenantStaffRole, ContactAccessLevel } from '@app/entities';
 
@@ -96,6 +100,7 @@ export class TenantController implements TenantServiceController {
     private readonly tenantStaffService: TenantStaffService,
     private readonly contactService: ContactService,
     private readonly usageService: TenantUsageService,
+    private readonly auditService: AuditService,
   ) {}
 
   async getCustomization({ tenantId }: GetCustomizationRequest): Promise<GetCustomizationResponse> {
@@ -536,5 +541,46 @@ export class TenantController implements TenantServiceController {
   async deleteTenant({ tenantId, slugConfirmation }: DeleteTenantRequest): Promise<MutationResponse> {
     await this.tenantDbService.hardDelete(String(tenantId), String(slugConfirmation));
     return { status: true, message: 'Tenant deleted' };
+  }
+
+  async recordAuditEntry(req: RecordAuditEntryRequest): Promise<MutationResponse> {
+    let payload: Record<string, unknown> | null = null;
+    if (req.payloadJson) {
+      try {
+        payload = JSON.parse(String(req.payloadJson)) as Record<string, unknown>;
+      } catch {
+        // ignore malformed payload — audit must never throw
+      }
+    }
+    await this.auditService.record({
+      tenantId: req.tenantId ? String(req.tenantId) : null,
+      userId: String(req.userId),
+      action: String(req.action),
+      payload,
+      ip: req.ip ? String(req.ip) : null,
+      userAgent: req.userAgent ? String(req.userAgent) : null,
+      correlationId: req.correlationId ? String(req.correlationId) : null,
+    });
+    return { status: true, message: 'OK' };
+  }
+
+  async getTenantAuditLog({
+    tenantId,
+    limit,
+  }: GetTenantAuditLogRequest): Promise<GetTenantAuditLogResponse> {
+    const items = await this.auditService.listForTenant(String(tenantId), limit && limit > 0 ? limit : 100);
+    return {
+      status: true,
+      message: 'OK',
+      entries: items.map((e) => ({
+        id: e.id,
+        tenantId: e.tenantId ?? '',
+        userId: e.userId,
+        action: e.action,
+        payloadJson: e.payloadJson ? JSON.stringify(e.payloadJson) : '',
+        correlationId: e.correlationId ?? '',
+        createdAt: e.createdAt.toISOString(),
+      })),
+    };
   }
 }

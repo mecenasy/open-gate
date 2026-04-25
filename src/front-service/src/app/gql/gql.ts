@@ -62,6 +62,7 @@ type Documents = {
     "\n  mutation AddTenantStaff($input: AddTenantStaffInput!) {\n    addTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.AddTenantStaffDocument,
     "\n  mutation RemoveTenantStaff($input: RemoveTenantStaffInput!) {\n    removeTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.RemoveTenantStaffDocument,
     "\n  mutation ChangeTenantStaffRole($input: ChangeTenantStaffRoleInput!) {\n    changeTenantStaffRole(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.ChangeTenantStaffRoleDocument,
+    "\n  query TenantAuditLog($tenantId: String!) {\n    tenantAuditLog(tenantId: $tenantId) {\n      id\n      tenantId\n      userId\n      action\n      payload\n      correlationId\n      createdAt\n    }\n  }\n": typeof types.TenantAuditLogDocument,
     "\n  query TenantSlugAvailable($slug: String!) {\n    tenantSlugAvailable(slug: $slug)\n  }\n": typeof types.TenantSlugAvailableDocument,
     "\n  mutation CreateTenantWizard($input: CreateTenantInput!) {\n    createTenant(input: $input) {\n      id\n      slug\n      schemaName\n    }\n  }\n": typeof types.CreateTenantWizardDocument,
     "\n  mutation SwitchTenantWizard($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n": typeof types.SwitchTenantWizardDocument,
@@ -131,6 +132,7 @@ const documents: Documents = {
     "\n  mutation AddTenantStaff($input: AddTenantStaffInput!) {\n    addTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n": types.AddTenantStaffDocument,
     "\n  mutation RemoveTenantStaff($input: RemoveTenantStaffInput!) {\n    removeTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n": types.RemoveTenantStaffDocument,
     "\n  mutation ChangeTenantStaffRole($input: ChangeTenantStaffRoleInput!) {\n    changeTenantStaffRole(input: $input) {\n      status\n      message\n    }\n  }\n": types.ChangeTenantStaffRoleDocument,
+    "\n  query TenantAuditLog($tenantId: String!) {\n    tenantAuditLog(tenantId: $tenantId) {\n      id\n      tenantId\n      userId\n      action\n      payload\n      correlationId\n      createdAt\n    }\n  }\n": types.TenantAuditLogDocument,
     "\n  query TenantSlugAvailable($slug: String!) {\n    tenantSlugAvailable(slug: $slug)\n  }\n": types.TenantSlugAvailableDocument,
     "\n  mutation CreateTenantWizard($input: CreateTenantInput!) {\n    createTenant(input: $input) {\n      id\n      slug\n      schemaName\n    }\n  }\n": types.CreateTenantWizardDocument,
     "\n  mutation SwitchTenantWizard($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n": types.SwitchTenantWizardDocument,
@@ -358,6 +360,10 @@ export function graphql(source: "\n  mutation RemoveTenantStaff($input: RemoveTe
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation ChangeTenantStaffRole($input: ChangeTenantStaffRoleInput!) {\n    changeTenantStaffRole(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation ChangeTenantStaffRole($input: ChangeTenantStaffRoleInput!) {\n    changeTenantStaffRole(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query TenantAuditLog($tenantId: String!) {\n    tenantAuditLog(tenantId: $tenantId) {\n      id\n      tenantId\n      userId\n      action\n      payload\n      correlationId\n      createdAt\n    }\n  }\n"): (typeof documents)["\n  query TenantAuditLog($tenantId: String!) {\n    tenantAuditLog(tenantId: $tenantId) {\n      id\n      tenantId\n      userId\n      action\n      payload\n      correlationId\n      createdAt\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -16,6 +16,7 @@ import { CoreConfigModule } from './core-config/core-config.module';
 import { TenantBffModule } from './tenant/tenant.module';
 import { SubscriptionBffModule } from './subscription/subscription.module';
 import { QuotasBffModule } from './quotas/quotas.module';
+import { AuditBffModule } from './audit/audit.module';
 import { LoggerModule } from '@app/logger';
 import { TenantModule, TenantInterceptor, TenantService } from '@app/tenant';
 import { TENANT_SERVICE_TOKEN } from '@app/handler';
@@ -51,6 +52,7 @@ import { TENANT_SERVICE_TOKEN } from '@app/handler';
     TenantBffModule,
     SubscriptionBffModule,
     QuotasBffModule,
+    AuditBffModule,
     CsrfModule,
   ],
   controllers: [AppController],

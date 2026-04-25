@@ -201,6 +201,16 @@ type UsageReportType {
   perTenant: [TenantUsageEntryType!]!
 }
 
+type TenantAuditLogEntryType {
+  id: String!
+  tenantId: String
+  userId: String!
+  action: String!
+  payload: JSON
+  correlationId: String
+  createdAt: String!
+}
+
 type SubscriptionPlanType {
   id: String!
   code: String!
@@ -403,6 +413,7 @@ type Query {
   commandsByPermission(input: GetAllByPermissionType!): CommandsListType!
   commandByPermission(input: GetByPermissionType!): CommandResponseType!
   myUsage: UsageReportType!
+  tenantAuditLog(tenantId: String!): [TenantAuditLogEntryType!]!
   subscriptionPlans: [SubscriptionPlanType!]!
   mySubscription: UserSubscriptionType
   previewPlanChange(newPlanId: String!): PlanChangePreviewType!

@@ -7,9 +7,10 @@ import { TenantCustomizationModule } from '../common/customization/tenant-custom
 import { OwnerGuard } from '../common/guards/owner.guard';
 import { AdminGuard } from '../common/guards/admin.guard';
 import { QuotasBffModule } from '../quotas/quotas.module';
+import { AuditBffModule } from '../audit/audit.module';
 
 @Module({
-  imports: [TenantModule, TenantCustomizationModule, QuotasBffModule],
+  imports: [TenantModule, TenantCustomizationModule, QuotasBffModule, AuditBffModule],
   providers: [TenantResolver, TenantSettingsResolver, TenantAdminService, OwnerGuard, AdminGuard],
   exports: [TenantAdminService],
 })

@@ -386,6 +386,37 @@ export interface DeleteTenantRequest {
   slugConfirmation: string;
 }
 
+export interface RecordAuditEntryRequest {
+  tenantId: string;
+  userId: string;
+  action: string;
+  payloadJson: string;
+  ip: string;
+  userAgent: string;
+  correlationId: string;
+}
+
+export interface AuditEntry {
+  id: string;
+  tenantId: string;
+  userId: string;
+  action: string;
+  payloadJson: string;
+  correlationId: string;
+  createdAt: string;
+}
+
+export interface GetTenantAuditLogRequest {
+  tenantId: string;
+  limit: number;
+}
+
+export interface GetTenantAuditLogResponse {
+  status: boolean;
+  message: string;
+  entries: AuditEntry[];
+}
+
 export const TENANT_PACKAGE_NAME = "tenant";
 
 export interface TenantServiceClient {
@@ -489,6 +520,10 @@ export interface TenantServiceClient {
   setTenantActive(request: SetTenantActiveRequest, metadata?: Metadata): Observable<MutationResponse>;
 
   deleteTenant(request: DeleteTenantRequest, metadata?: Metadata): Observable<MutationResponse>;
+
+  recordAuditEntry(request: RecordAuditEntryRequest, metadata?: Metadata): Observable<MutationResponse>;
+
+  getTenantAuditLog(request: GetTenantAuditLogRequest, metadata?: Metadata): Observable<GetTenantAuditLogResponse>;
 }
 
 export interface TenantServiceController {
@@ -676,6 +711,16 @@ export interface TenantServiceController {
     request: DeleteTenantRequest,
     metadata?: Metadata,
   ): Promise<MutationResponse> | Observable<MutationResponse> | MutationResponse;
+
+  recordAuditEntry(
+    request: RecordAuditEntryRequest,
+    metadata?: Metadata,
+  ): Promise<MutationResponse> | Observable<MutationResponse> | MutationResponse;
+
+  getTenantAuditLog(
+    request: GetTenantAuditLogRequest,
+    metadata?: Metadata,
+  ): Promise<GetTenantAuditLogResponse> | Observable<GetTenantAuditLogResponse> | GetTenantAuditLogResponse;
 }
 
 export function TenantServiceControllerMethods() {
@@ -712,6 +757,8 @@ export function TenantServiceControllerMethods() {
       "transferTenantBilling",
       "setTenantActive",
       "deleteTenant",
+      "recordAuditEntry",
+      "getTenantAuditLog",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

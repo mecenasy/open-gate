@@ -34,6 +34,8 @@ service TenantService {
   rpc TransferTenantBilling (TransferTenantBillingRequest) returns (MutationResponse);
   rpc SetTenantActive (SetTenantActiveRequest) returns (MutationResponse);
   rpc DeleteTenant (DeleteTenantRequest) returns (MutationResponse);
+  rpc RecordAuditEntry (RecordAuditEntryRequest) returns (MutationResponse);
+  rpc GetTenantAuditLog (GetTenantAuditLogRequest) returns (GetTenantAuditLogResponse);
 }
 
 message GetCustomizationRequest {
@@ -408,4 +410,35 @@ message SetTenantActiveRequest {
 message DeleteTenantRequest {
   string tenant_id = 1;
   string slug_confirmation = 2;
+}
+
+message RecordAuditEntryRequest {
+  string tenant_id = 1;
+  string user_id = 2;
+  string action = 3;
+  string payload_json = 4;
+  string ip = 5;
+  string user_agent = 6;
+  string correlation_id = 7;
+}
+
+message AuditEntry {
+  string id = 1;
+  string tenant_id = 2;
+  string user_id = 3;
+  string action = 4;
+  string payload_json = 5;
+  string correlation_id = 6;
+  string created_at = 7;
+}
+
+message GetTenantAuditLogRequest {
+  string tenant_id = 1;
+  int32 limit = 2;
+}
+
+message GetTenantAuditLogResponse {
+  bool status = 1;
+  string message = 2;
+  repeated AuditEntry entries = 3;
 }

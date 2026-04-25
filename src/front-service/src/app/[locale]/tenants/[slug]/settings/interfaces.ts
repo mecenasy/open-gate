@@ -5,7 +5,18 @@ export type TenantSettingsTabKey =
   | 'messaging'
   | 'commands'
   | 'compliance'
-  | 'staff';
+  | 'staff'
+  | 'audit';
+
+export interface AuditEntry {
+  id: string;
+  tenantId?: string | null;
+  userId: string;
+  action: string;
+  payload?: Record<string, unknown> | null;
+  correlationId?: string | null;
+  createdAt: string;
+}
 
 export interface TenantBrandingForm {
   logoUrl: string;

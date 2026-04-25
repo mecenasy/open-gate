@@ -9,6 +9,7 @@ export const TENANT_SETTINGS_TABS: TenantSettingsTabKey[] = [
   'commands',
   'compliance',
   'staff',
+  'audit',
 ];
 
 export const SMS_PROVIDERS = ['twilio', 'legacy', 'africastalking'] as const;

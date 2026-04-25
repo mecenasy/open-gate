@@ -746,6 +746,7 @@ export type Query = {
   prompts: PromptsListType;
   subscriptionHistory: Array<SubscriptionChangeType>;
   subscriptionPlans: Array<SubscriptionPlanType>;
+  tenantAuditLog: Array<TenantAuditLogEntryType>;
   tenantCommandConfigs: Array<TenantCommandConfigType>;
   tenantContacts: Array<ContactType>;
   tenantCustomization: TenantCustomizationFullType;
@@ -804,6 +805,11 @@ export type QueryPromptByKeyArgs = {
 
 export type QueryPromptsArgs = {
   input?: InputMaybe<GetAllPromptsType>;
+};
+
+
+export type QueryTenantAuditLogArgs = {
+  tenantId: Scalars['String']['input'];
 };
 
 
@@ -926,6 +932,17 @@ export type SubscriptionPlanType = {
 export type SuccessResponseType = {
   __typename?: 'SuccessResponseType';
   success: Scalars['Boolean']['output'];
+};
+
+export type TenantAuditLogEntryType = {
+  __typename?: 'TenantAuditLogEntryType';
+  action: Scalars['String']['output'];
+  correlationId?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  payload?: Maybe<Scalars['JSON']['output']>;
+  tenantId?: Maybe<Scalars['String']['output']>;
+  userId: Scalars['String']['output'];
 };
 
 export type TenantBrandingType = {
@@ -1548,6 +1565,13 @@ export type ChangeTenantStaffRoleMutationVariables = Exact<{
 
 export type ChangeTenantStaffRoleMutation = { __typename?: 'Mutation', changeTenantStaffRole: { __typename?: 'MutationResult', status: boolean, message: string } };
 
+export type TenantAuditLogQueryVariables = Exact<{
+  tenantId: Scalars['String']['input'];
+}>;
+
+
+export type TenantAuditLogQuery = { __typename?: 'Query', tenantAuditLog: Array<{ __typename?: 'TenantAuditLogEntryType', id: string, tenantId?: string | null, userId: string, action: string, payload?: any | null, correlationId?: string | null, createdAt: string }> };
+
 export type TenantSlugAvailableQueryVariables = Exact<{
   slug: Scalars['String']['input'];
 }>;
@@ -1720,6 +1744,7 @@ export const DeleteTenantDocument = {"kind":"Document","definitions":[{"kind":"O
 export const AddTenantStaffDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddTenantStaff"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AddTenantStaffInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addTenantStaff"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<AddTenantStaffMutation, AddTenantStaffMutationVariables>;
 export const RemoveTenantStaffDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveTenantStaff"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RemoveTenantStaffInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeTenantStaff"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<RemoveTenantStaffMutation, RemoveTenantStaffMutationVariables>;
 export const ChangeTenantStaffRoleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangeTenantStaffRole"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChangeTenantStaffRoleInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"changeTenantStaffRole"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<ChangeTenantStaffRoleMutation, ChangeTenantStaffRoleMutationVariables>;
+export const TenantAuditLogDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantAuditLog"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantAuditLog"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tenantId"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"payload"}},{"kind":"Field","name":{"kind":"Name","value":"correlationId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<TenantAuditLogQuery, TenantAuditLogQueryVariables>;
 export const TenantSlugAvailableDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TenantSlugAvailable"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"slug"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tenantSlugAvailable"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"slug"},"value":{"kind":"Variable","name":{"kind":"Name","value":"slug"}}}]}]}}]} as unknown as DocumentNode<TenantSlugAvailableQuery, TenantSlugAvailableQueryVariables>;
 export const CreateTenantWizardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateTenantWizard"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateTenantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTenant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"schemaName"}}]}}]}}]} as unknown as DocumentNode<CreateTenantWizardMutation, CreateTenantWizardMutationVariables>;
 export const SwitchTenantWizardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SwitchTenantWizard"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"switchTenant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tenantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tenantId"}}}]}]}}]} as unknown as DocumentNode<SwitchTenantWizardMutation, SwitchTenantWizardMutationVariables>;

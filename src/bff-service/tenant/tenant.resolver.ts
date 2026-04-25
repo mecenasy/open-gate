@@ -9,6 +9,8 @@ import { TenantCustomizationService } from '../common/customization/tenant-custo
 import { OwnerGuard } from '../common/guards/owner.guard';
 import { AdminGuard } from '../common/guards/admin.guard';
 import { TenantStaffGuard } from '../common/guards/tenant-staff.guard';
+import { AuditAction } from '@app/audit';
+import { AuditClientService } from '../audit/audit.client.service';
 import { TenantAdminService } from './tenant-admin.service';
 import { TenantFeaturesType } from './dto/tenant-features.type';
 import {
@@ -45,6 +47,7 @@ export class TenantResolver {
     private readonly customizationService: TenantCustomizationService,
     private readonly tenantAdminService: TenantAdminService,
     private readonly cache: CacheService,
+    private readonly audit: AuditClientService,
   ) {}
 
   // ── Public (auth-guarded only) ──────────────────────────────────────────────
@@ -108,7 +111,14 @@ export class TenantResolver {
     @CurrentUserId() userId?: string,
   ): Promise<CreateTenantResult> {
     if (!userId) throw new UnauthorizedException();
-    return this.tenantAdminService.createTenant(input.slug, userId);
+    const result = await this.tenantAdminService.createTenant(input.slug, userId);
+    void this.audit.record({
+      tenantId: result.id,
+      userId,
+      action: AuditAction.TenantCreated,
+      payload: { slug: result.slug },
+    });
+    return result;
   }
 
   @Mutation(() => Boolean)
@@ -146,20 +156,56 @@ export class TenantResolver {
 
   @UseGuards(TenantStaffGuard(TenantStaffRole.Owner))
   @Mutation(() => MutationResult)
-  async addTenantStaff(@Args('input') input: AddTenantStaffInput): Promise<MutationResult> {
-    return this.tenantAdminService.addTenantStaff(input.tenantId, input.userId, input.role);
+  async addTenantStaff(
+    @Args('input') input: AddTenantStaffInput,
+    @CurrentUserId() actor?: string,
+  ): Promise<MutationResult> {
+    const result = await this.tenantAdminService.addTenantStaff(input.tenantId, input.userId, input.role);
+    if (actor && result.status) {
+      void this.audit.record({
+        tenantId: input.tenantId,
+        userId: actor,
+        action: AuditAction.TenantStaffAdded,
+        payload: { addedUserId: input.userId, role: input.role },
+      });
+    }
+    return result;
   }
 
   @UseGuards(TenantStaffGuard(TenantStaffRole.Owner))
   @Mutation(() => MutationResult)
-  async removeTenantStaff(@Args('input') input: RemoveTenantStaffInput): Promise<MutationResult> {
-    return this.tenantAdminService.removeTenantStaff(input.tenantId, input.userId);
+  async removeTenantStaff(
+    @Args('input') input: RemoveTenantStaffInput,
+    @CurrentUserId() actor?: string,
+  ): Promise<MutationResult> {
+    const result = await this.tenantAdminService.removeTenantStaff(input.tenantId, input.userId);
+    if (actor && result.status) {
+      void this.audit.record({
+        tenantId: input.tenantId,
+        userId: actor,
+        action: AuditAction.TenantStaffRemoved,
+        payload: { removedUserId: input.userId },
+      });
+    }
+    return result;
   }
 
   @UseGuards(TenantStaffGuard(TenantStaffRole.Owner))
   @Mutation(() => MutationResult)
-  async changeTenantStaffRole(@Args('input') input: ChangeTenantStaffRoleInput): Promise<MutationResult> {
-    return this.tenantAdminService.changeTenantStaffRole(input.tenantId, input.userId, input.role);
+  async changeTenantStaffRole(
+    @Args('input') input: ChangeTenantStaffRoleInput,
+    @CurrentUserId() actor?: string,
+  ): Promise<MutationResult> {
+    const result = await this.tenantAdminService.changeTenantStaffRole(input.tenantId, input.userId, input.role);
+    if (actor && result.status) {
+      void this.audit.record({
+        tenantId: input.tenantId,
+        userId: actor,
+        action: AuditAction.TenantStaffRoleChanged,
+        payload: { targetUserId: input.userId, newRole: input.role },
+      });
+    }
+    return result;
   }
 
   @UseGuards(TenantStaffGuard(TenantStaffRole.Support))

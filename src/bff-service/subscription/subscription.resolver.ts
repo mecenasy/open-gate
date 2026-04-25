@@ -2,7 +2,9 @@ import { BadRequestException, NotFoundException, UnauthorizedException } from '@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUserId } from '@app/auth';
 import type { QuotaViolation } from '@app/quotas';
+import { AuditAction } from '@app/audit';
 import { CacheService } from '@app/redis';
+import { AuditClientService } from '../audit/audit.client.service';
 import { SubscriptionClientService, type PlanChangeKind } from './subscription.service';
 import {
   PlanChangePreviewType,
@@ -20,6 +22,7 @@ export class SubscriptionResolver {
     private readonly subscriptions: SubscriptionClientService,
     private readonly quotas: QuotasClientService,
     private readonly cache: CacheService,
+    private readonly audit: AuditClientService,
   ) {}
 
   @Query(() => [SubscriptionPlanType])
@@ -70,6 +73,16 @@ export class SubscriptionResolver {
       kind: preview.kind as PlanChangeKind,
     });
     await this.cache.removeFromCache({ identifier: userId, prefix: 'user-state' });
+    void this.audit.record({
+      tenantId: null,
+      userId,
+      action: AuditAction.SubscriptionSelected,
+      payload: {
+        kind: preview.kind,
+        newPlanCode: preview.newPlan.code,
+        deltaPriceCents: preview.deltaPriceCents,
+      },
+    });
     return result;
   }
 
@@ -78,6 +91,13 @@ export class SubscriptionResolver {
     if (!userId) throw new UnauthorizedException();
     const ok = await this.subscriptions.cancelSubscription(userId);
     await this.cache.removeFromCache({ identifier: userId, prefix: 'user-state' });
+    if (ok) {
+      void this.audit.record({
+        tenantId: null,
+        userId,
+        action: AuditAction.SubscriptionCanceled,
+      });
+    }
     return ok;
   }
 

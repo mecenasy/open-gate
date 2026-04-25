@@ -55,4 +55,8 @@ export class PlatformCredentialsService {
       await this.repo.save(this.repo.create({ tenantId, platform, config }));
     }
   }
+
+  countForTenant(tenantId: string): Promise<number> {
+    return this.repo.count({ where: { tenantId } });
+  }
 }

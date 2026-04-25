@@ -22,6 +22,8 @@ import { TenantGrpcInterceptor } from './interceptors/tenant-grpc.interceptor';
 import { TenantController } from './tenant.controller';
 import { TenantModule } from '@app/tenant';
 import { DatabaseModule } from '@app/database';
+import { CommandModule } from '../command/command.module';
+import { TenantUsageService } from './tenant-usage.service';
 
 @Module({
   imports: [
@@ -38,6 +40,7 @@ import { DatabaseModule } from '@app/database';
     ]),
     TenantModule,
     DatabaseModule,
+    CommandModule,
   ],
   controllers: [TenantController],
   providers: [
@@ -47,6 +50,7 @@ import { DatabaseModule } from '@app/database';
     TenantPromptOverrideService,
     TenantStaffService,
     ContactService,
+    TenantUsageService,
     TenantGrpcInterceptor,
     { provide: APP_INTERCEPTOR, useClass: TenantGrpcInterceptor },
   ],
@@ -58,6 +62,7 @@ import { DatabaseModule } from '@app/database';
     TenantPromptOverrideService,
     TenantStaffService,
     ContactService,
+    TenantUsageService,
   ],
 })
 export class TenantDbModule {}

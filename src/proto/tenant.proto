@@ -30,6 +30,7 @@ service TenantService {
   rpc UpdateContact (UpdateContactRequest) returns (ContactEntryResponse);
   rpc GetTenantContacts (GetTenantContactsRequest) returns (GetTenantContactsResponse);
   rpc RemoveContactFromTenant (RemoveContactFromTenantRequest) returns (MutationResponse);
+  rpc GetTenantUsage (GetTenantUsageRequest) returns (GetTenantUsageResponse);
 }
 
 message GetCustomizationRequest {
@@ -53,6 +54,7 @@ message GetTenantResponse {
   string slug = 4;
   string schema_name = 5;
   bool is_active = 6;
+  string billing_user_id = 7;
 }
 
 message GetPlatformCredentialsRequest {
@@ -369,4 +371,23 @@ message GetTenantPromptOverridesResponse {
   bool status = 1;
   string message = 2;
   repeated TenantPromptOverrideEntry overrides = 3;
+}
+
+message TenantUsageEntry {
+  string tenant_id = 1;
+  int32 staff = 2;
+  int32 platforms = 3;
+  int32 contacts = 4;
+  int32 custom_commands = 5;
+}
+
+message GetTenantUsageRequest {
+  string billing_user_id = 1;
+}
+
+message GetTenantUsageResponse {
+  bool status = 1;
+  string message = 2;
+  int32 tenants = 3;
+  repeated TenantUsageEntry per_tenant = 4;
 }

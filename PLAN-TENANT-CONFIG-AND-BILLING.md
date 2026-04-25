@@ -37,7 +37,7 @@ Wykluczone jako niezwiązane: `command.service.ts:89 actionFilter`, `gate.servic
 
 ## Fazy (= commity)
 
-### Commit 1 — backend: enforcement limitów planu
+### Commit 1 — backend: enforcement limitów planu  ✅ ZREALIZOWANE
 
 **Fundament. Bez tego nie da się zrobić uczciwego downgrade'u ani `ChangePlanModal`.**
 

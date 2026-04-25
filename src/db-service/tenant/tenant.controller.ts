@@ -52,6 +52,8 @@ import {
   GetTenantContactsResponse,
   RemoveContactFromTenantRequest,
   MutationResponse,
+  GetTenantUsageRequest,
+  GetTenantUsageResponse,
 } from 'src/proto/tenant';
 import { TenantDbService } from './tenant.service';
 import { PlatformCredentialsService } from './platform-credentials.service';
@@ -59,6 +61,7 @@ import { TenantCommandConfigService } from './tenant-command-config.service';
 import { TenantPromptOverrideService } from './tenant-prompt-override.service';
 import { TenantStaffService } from './tenant-staff.service';
 import { ContactService } from '../contact/contact.service';
+import { TenantUsageService } from './tenant-usage.service';
 import type { CommunityCustomization } from './entity/customization-config.entity';
 import { TenantPromptOverride, UserType, TenantStaffRole, ContactAccessLevel } from '@app/entities';
 
@@ -89,6 +92,7 @@ export class TenantController implements TenantServiceController {
     private readonly promptOverrideService: TenantPromptOverrideService,
     private readonly tenantStaffService: TenantStaffService,
     private readonly contactService: ContactService,
+    private readonly usageService: TenantUsageService,
   ) {}
 
   async getCustomization({ tenantId }: GetCustomizationRequest): Promise<GetCustomizationResponse> {
@@ -103,7 +107,15 @@ export class TenantController implements TenantServiceController {
   async getTenant({ tenantId }: GetTenantRequest): Promise<GetTenantResponse> {
     const tenant = await this.tenantDbService.findById(tenantId);
     if (!tenant) {
-      return { status: false, message: 'Tenant not found', id: '', slug: '', schemaName: '', isActive: false };
+      return {
+        status: false,
+        message: 'Tenant not found',
+        id: '',
+        slug: '',
+        schemaName: '',
+        isActive: false,
+        billingUserId: '',
+      };
     }
     return {
       status: true,
@@ -112,6 +124,7 @@ export class TenantController implements TenantServiceController {
       slug: tenant.slug,
       schemaName: tenant.schemaName,
       isActive: tenant.isActive,
+      billingUserId: tenant.billingUserId ?? '',
     };
   }
 
@@ -484,6 +497,22 @@ export class TenantController implements TenantServiceController {
         userType: String(o.userType),
         descriptionI18nJson: o.descriptionI18n ? JSON.stringify(o.descriptionI18n) : '',
         prompt: String(o.prompt),
+      })),
+    };
+  }
+
+  async getTenantUsage({ billingUserId }: GetTenantUsageRequest): Promise<GetTenantUsageResponse> {
+    const report = await this.usageService.getForBillingUser(String(billingUserId));
+    return {
+      status: true,
+      message: 'OK',
+      tenants: report.tenants,
+      perTenant: report.perTenant.map((e) => ({
+        tenantId: e.tenantId,
+        staff: e.staff,
+        platforms: e.platforms,
+        contacts: e.contacts,
+        customCommands: e.customCommands,
       })),
     };
   }

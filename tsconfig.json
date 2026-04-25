@@ -120,6 +120,12 @@
       "@app/dto/*": [
         "src/libs/dto/src/*"
       ],
+      "@app/quotas": [
+        "src/libs/quotas/src"
+      ],
+      "@app/quotas/*": [
+        "src/libs/quotas/src/*"
+      ],
       "src/*": [
         "src/*"
       ]

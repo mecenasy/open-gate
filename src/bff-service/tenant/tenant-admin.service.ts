@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import type { ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { DbGrpcKey } from '@app/db-grpc';
@@ -15,18 +15,34 @@ import type {
   TenantPlatformCredentialType,
 } from './dto/tenant-admin.types';
 import type { CommunityCustomization } from '@app/customization';
+import { QuotasClientService } from '../quotas/quotas.client.service';
 
 @Injectable()
 export class TenantAdminService implements OnModuleInit {
   private tenantGrpcService!: TenantServiceClient;
 
-  constructor(@Inject(DbGrpcKey) private readonly grpcClient: ClientGrpc) {}
+  constructor(
+    @Inject(DbGrpcKey) private readonly grpcClient: ClientGrpc,
+    private readonly quotas: QuotasClientService,
+  ) {}
 
   onModuleInit() {
     this.tenantGrpcService = this.grpcClient.getService<TenantServiceClient>(TENANT_SERVICE_NAME);
   }
 
+  private async getBillingUserIdForTenant(tenantId: string): Promise<string> {
+    const res = await lastValueFrom(this.tenantGrpcService.getTenant({ tenantId }));
+    if (!res.status || !res.id) {
+      throw new NotFoundException(`Tenant ${tenantId} not found`);
+    }
+    if (!res.billingUserId) {
+      throw new NotFoundException(`Tenant ${tenantId} has no billing user — cannot validate plan limits`);
+    }
+    return res.billingUserId;
+  }
+
   async createTenant(slug: string, billingUserId: string): Promise<CreateTenantResult> {
+    await this.quotas.assertCanCreateTenant(billingUserId);
     const res = await lastValueFrom(this.tenantGrpcService.createTenant({ slug, billingUserId }));
     return { id: res.id, slug: res.slug, schemaName: res.schemaName };
   }
@@ -78,6 +94,8 @@ export class TenantAdminService implements OnModuleInit {
   }
 
   async addTenantStaff(tenantId: string, userId: string, role: string): Promise<MutationResult> {
+    const billingUserId = await this.getBillingUserIdForTenant(tenantId);
+    await this.quotas.assertCanAddStaff(tenantId, billingUserId);
     const res = await lastValueFrom(this.tenantGrpcService.addTenantStaff({ tenantId, userId, role }));
     return { status: res.status, message: res.message };
   }
@@ -100,6 +118,8 @@ export class TenantAdminService implements OnModuleInit {
     surname?: string;
     accessLevel: string;
   }) {
+    const billingUserId = await this.getBillingUserIdForTenant(input.tenantId);
+    await this.quotas.assertCanAddContact(input.tenantId, billingUserId);
     const res = await lastValueFrom(
       this.tenantGrpcService.addContact({
         tenantId: input.tenantId,
@@ -168,6 +188,12 @@ export class TenantAdminService implements OnModuleInit {
   }
 
   async upsertPlatformCredentials(tenantId: string, platform: string, configJson: string): Promise<MutationResult> {
+    const existing = await this.getTenantPlatformCredentials(tenantId);
+    const isNew = !existing.some((e) => e.platform === platform && !e.isDefault);
+    if (isNew) {
+      const billingUserId = await this.getBillingUserIdForTenant(tenantId);
+      await this.quotas.assertCanAddPlatform(tenantId, billingUserId);
+    }
     const res = await lastValueFrom(
       this.tenantGrpcService.upsertPlatformCredentials({ tenantId, platform, configJson }),
     );

@@ -184,6 +184,10 @@ export class CommandService {
     return (result.affected || 0) > 0;
   }
 
+  countCustomForTenant(tenantId: string): Promise<number> {
+    return this.commandRepository.count({ where: { tenantId, isSystem: false } });
+  }
+
   // Helper method to convert Command entity to CommandProto
   entityToProto(command: Command): CommandProto {
     return {

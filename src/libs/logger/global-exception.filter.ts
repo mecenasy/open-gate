@@ -12,11 +12,20 @@ interface GraphQLErrorExtensions {
   code: string;
   statusCode: number;
   timestamp: string;
+  [key: string]: unknown;
 }
 
 interface GraphQLErrorBody {
   message: string;
   extensions: GraphQLErrorExtensions;
+}
+
+function isStructuredPayload(value: unknown): value is Record<string, unknown> & { code: string; message?: string } {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as Record<string, unknown>).code === 'string'
+  );
 }
 
 @Catch()
@@ -57,24 +66,36 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   private buildGraphQLError(exception: unknown, status: number): GraphQLErrorBody {
     let message = 'Internal server error';
     let code = 'INTERNAL_SERVER_ERROR';
+    const extensions: GraphQLErrorExtensions = {
+      code,
+      statusCode: status,
+      timestamp: new Date().toISOString(),
+    };
 
     if (exception instanceof HttpException) {
       const resp = exception.getResponse();
-      if (typeof resp === 'object' && resp !== null) {
+      if (isStructuredPayload(resp)) {
+        // Exception carries a structured payload (e.g. PlanLimitExceededException):
+        // surface the custom `code` and spread the rest of the fields into extensions
+        // so clients can read typed details without string-parsing the message.
+        code = resp.code;
+        message = typeof resp.message === 'string' ? resp.message : exception.message;
+        const { code: _c, message: _m, ...rest } = resp;
+        Object.assign(extensions, rest);
+      } else if (typeof resp === 'object' && resp !== null) {
         message = ((resp as Record<string, unknown>).message as string) || exception.message;
+        code = exception.constructor.name;
       } else {
         message = String(resp);
+        code = exception.constructor.name;
       }
-      code = exception.constructor.name;
     } else if (exception instanceof Error) {
       message = exception.message;
       code = exception.name || 'UNKNOWN_ERROR';
     }
 
-    return {
-      message,
-      extensions: { code, statusCode: status, timestamp: new Date().toISOString() },
-    };
+    extensions.code = code;
+    return { message, extensions };
   }
 
   private buildErrorResponse(exception: unknown, status: number, request: Request): Record<string, unknown> {

@@ -153,6 +153,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/dto/tsconfig.lib.json"
       }
+    },
+    "quotas": {
+      "type": "library",
+      "root": "libs/quotas",
+      "entryFile": "index",
+      "sourceRoot": "libs/quotas/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/quotas/tsconfig.lib.json"
+      }
     }
   }
 }

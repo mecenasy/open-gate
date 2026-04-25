@@ -170,6 +170,9 @@
       "^@app/cqrs(|/.*)$": "<rootDir>/src/libs/cqrs/src/$1",
       "^@app/database(|/.*)$": "<rootDir>/src/libs/database/src/$1",
       "^@app/customization(|/.*)$": "<rootDir>/src/libs/customization/src/$1",
+      "^@app/entities(|/.*)$": "<rootDir>/src/libs/entities/src/$1",
+      "^@app/dto(|/.*)$": "<rootDir>/src/libs/dto/src/$1",
+      "^@app/quotas(|/.*)$": "<rootDir>/src/libs/quotas/src/$1",
       "^src/(.*)$": "<rootDir>/src/$1"
     },
     "roots": [

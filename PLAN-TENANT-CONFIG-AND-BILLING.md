@@ -141,7 +141,7 @@ Wykluczone jako niezwiązane: `command.service.ts:89 actionFilter`, `gate.servic
 
 ---
 
-### Commit 5 — frontend: `/tenants/[slug]/settings/` feature
+### Commit 5 — frontend: `/tenants/[slug]/settings/` feature  ✅ ZREALIZOWANE (7 z 9 zakładek; platforms+custom-commands w osobnym commicie)
 
 Zgodne z [src/front-service/CLAUDE.md](src/front-service/CLAUDE.md) (feature-local, RHF + zod, jeden FormModal per feature, i18n).
 

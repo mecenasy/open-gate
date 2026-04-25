@@ -1,5 +1,5 @@
 import { BadRequestException, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { TenantStaffRole } from '@app/entities';
 import {
   validateMessagingChannels,
@@ -21,6 +21,7 @@ import {
   DeleteTenantInput,
   MessagingInput,
   SetTenantActiveInput,
+  TenantCustomizationFullType,
   TransferTenantBillingInput,
 } from './dto/tenant-settings.types';
 
@@ -56,6 +57,46 @@ export class TenantSettingsResolver {
     private readonly customization: TenantCustomizationService,
     private readonly admin: TenantAdminService,
   ) {}
+
+  @UseGuards(TenantStaffGuard(TenantStaffRole.Support))
+  @Query(() => TenantCustomizationFullType)
+  async tenantCustomization(@Args('tenantId') tenantId: string): Promise<TenantCustomizationFullType> {
+    const cfg = await this.customization.getForTenant(tenantId);
+    return {
+      branding: {
+        logoUrl: cfg.branding.logoUrl,
+        primaryColor: cfg.branding.primaryColor,
+        secondaryColor: cfg.branding.secondaryColor,
+        fontSize: cfg.branding.fontSize,
+      },
+      features: {
+        enableSignal: cfg.features.enableSignal,
+        enableWhatsApp: cfg.features.enableWhatsApp,
+        enableMessenger: cfg.features.enableMessenger,
+        enableGate: cfg.features.enableGate,
+        enablePayment: cfg.features.enablePayment,
+        enableCommandScheduling: cfg.features.enableCommandScheduling,
+        enableAnalytics: cfg.features.enableAnalytics,
+        enableAudioRecognition: cfg.features.enableAudioRecognition,
+      },
+      messaging: {
+        defaultSmsProvider: cfg.messaging.defaultSmsProvider,
+        priorityChannels: cfg.messaging.priorityChannels,
+        rateLimitPerMinute: cfg.messaging.rateLimitPerMinute,
+      },
+      commands: {
+        timeout: cfg.commands.timeout,
+        maxRetries: cfg.commands.maxRetries,
+        processingDelay: cfg.commands.processingDelay,
+        customPromptLibraryEnabled: cfg.commands.customPromptLibraryEnabled,
+      },
+      compliance: {
+        dataResidency: cfg.compliance.dataResidency,
+        encryptionEnabled: cfg.compliance.encryptionEnabled,
+        webhookUrl: cfg.compliance.webhookUrl,
+      },
+    };
+  }
 
   @UseGuards(TenantStaffGuard(TenantStaffRole.Admin))
   @Mutation(() => MutationResult)

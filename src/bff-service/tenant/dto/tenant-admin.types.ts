@@ -222,6 +222,9 @@ export class UpdateMyPlatformCredentialsInput {
 
 @InputType()
 export class UpdateTenantFeaturesInput {
+  @Field()
+  tenantId!: string;
+
   @Field({ nullable: true })
   enableSignal?: boolean;
 

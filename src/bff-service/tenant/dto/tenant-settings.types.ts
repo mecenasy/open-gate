@@ -151,3 +151,48 @@ export class TenantComplianceType {
   @Field({ nullable: true })
   webhookUrl?: string;
 }
+
+@ObjectType()
+export class TenantFeaturesEmbedType {
+  @Field()
+  enableSignal!: boolean;
+
+  @Field()
+  enableWhatsApp!: boolean;
+
+  @Field()
+  enableMessenger!: boolean;
+
+  @Field()
+  enableGate!: boolean;
+
+  @Field()
+  enablePayment!: boolean;
+
+  @Field()
+  enableCommandScheduling!: boolean;
+
+  @Field()
+  enableAnalytics!: boolean;
+
+  @Field()
+  enableAudioRecognition!: boolean;
+}
+
+@ObjectType()
+export class TenantCustomizationFullType {
+  @Field(() => TenantBrandingType)
+  branding!: TenantBrandingType;
+
+  @Field(() => TenantFeaturesEmbedType)
+  features!: TenantFeaturesEmbedType;
+
+  @Field(() => TenantMessagingType)
+  messaging!: TenantMessagingType;
+
+  @Field(() => TenantCommandsConfigType)
+  commands!: TenantCommandsConfigType;
+
+  @Field(() => TenantComplianceType)
+  compliance!: TenantComplianceType;
+}

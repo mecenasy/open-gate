@@ -38,7 +38,7 @@ export const useCreateTenantWizard = () => {
 
       await doSwitch({ variables: { tenantId } });
 
-      await doFeatures({ variables: { input: input.features } });
+      await doFeatures({ variables: { input: { tenantId, ...input.features } } });
 
       for (const c of input.contacts) {
         await doContact({

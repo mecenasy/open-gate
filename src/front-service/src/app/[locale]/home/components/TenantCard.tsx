@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui';
+import { useRouter } from '@/components/navigation/navigation';
 import { useSwitchTenant } from '../hooks/use-switch-tenant';
 
 interface TenantCardProps {
@@ -13,6 +14,7 @@ interface TenantCardProps {
 
 export function TenantCard({ tenantId, slug, badgeLabel, onOpened }: TenantCardProps) {
   const t = useTranslations('home');
+  const router = useRouter();
   const { switchTenant, isSwitching } = useSwitchTenant();
 
   const open = async () => {
@@ -28,9 +30,19 @@ export function TenantCard({ tenantId, slug, badgeLabel, onOpened }: TenantCardP
           {badgeLabel}
         </span>
       </div>
-      <Button type="button" size="sm" variant="blue" disabled={isSwitching} onClick={open}>
-        {isSwitching ? t('tenantOpening') : t('tenantOpen')}
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant="green"
+          onClick={() => router.push(`/tenants/${slug}/settings`)}
+        >
+          {t('tenantSettings')}
+        </Button>
+        <Button type="button" size="sm" variant="blue" disabled={isSwitching} onClick={open}>
+          {isSwitching ? t('tenantOpening') : t('tenantOpen')}
+        </Button>
+      </div>
     </div>
   );
 }

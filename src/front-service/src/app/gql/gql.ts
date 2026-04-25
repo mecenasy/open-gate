@@ -47,10 +47,21 @@ type Documents = {
     "\n  query TenantPlatformCredentials {\n    tenantPlatformCredentials {\n      platform\n      configJson\n      isDefault\n    }\n  }\n": typeof types.TenantPlatformCredentialsDocument,
     "\n  mutation UpdateMyPlatformCredentials($input: UpdateMyPlatformCredentialsInput!) {\n    updateMyPlatformCredentials(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpdateMyPlatformCredentialsDocument,
     "\n  query TenantFeaturesSettings {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      enableAudioRecognition\n    }\n  }\n": typeof types.TenantFeaturesSettingsDocument,
-    "\n  mutation UpdateTenantFeatures($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpdateTenantFeaturesDocument,
+    "\n  mutation UpdateTenantFeaturesActive($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpdateTenantFeaturesActiveDocument,
     "\n  query GetTenantPromptOverrides {\n    tenantPromptOverrides {\n      id\n      commandId\n      userType\n      descriptionI18nJson\n      prompt\n    }\n  }\n": typeof types.GetTenantPromptOverridesDocument,
     "\n  query GetTenantCommandConfigsForPrompts {\n    tenantCommandConfigs {\n      id\n      commandName\n    }\n  }\n": typeof types.GetTenantCommandConfigsForPromptsDocument,
     "\n  mutation UpsertTenantPromptOverride($input: UpsertTenantPromptOverrideInput!) {\n    upsertTenantPromptOverride(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpsertTenantPromptOverrideDocument,
+    "\n  query TenantSettings($tenantId: String!) {\n    tenantCustomization(tenantId: $tenantId) {\n      branding {\n        logoUrl\n        primaryColor\n        secondaryColor\n        fontSize\n      }\n      features {\n        enableSignal\n        enableWhatsApp\n        enableMessenger\n        enableGate\n        enablePayment\n        enableCommandScheduling\n        enableAnalytics\n        enableAudioRecognition\n      }\n      messaging {\n        defaultSmsProvider\n        priorityChannels\n        rateLimitPerMinute\n      }\n      commands {\n        timeout\n        maxRetries\n        processingDelay\n        customPromptLibraryEnabled\n      }\n      compliance {\n        dataResidency\n        encryptionEnabled\n        webhookUrl\n      }\n    }\n    tenantStaff(tenantId: $tenantId) {\n      tenantId\n      userId\n      role\n    }\n    myTenants {\n      id\n      slug\n      schemaName\n      isActive\n      billingUserId\n    }\n    tenantsIStaffAt {\n      tenantId\n      tenantSlug\n      role\n    }\n  }\n": typeof types.TenantSettingsDocument,
+    "\n  mutation UpdateTenantBranding($input: BrandingInput!) {\n    updateTenantBranding(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpdateTenantBrandingDocument,
+    "\n  mutation UpdateTenantSettingsFeatures($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpdateTenantSettingsFeaturesDocument,
+    "\n  mutation UpdateTenantMessaging($input: MessagingInput!) {\n    updateTenantMessaging(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpdateTenantMessagingDocument,
+    "\n  mutation UpdateTenantCommands($input: CommandsConfigInput!) {\n    updateTenantCommands(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpdateTenantCommandsDocument,
+    "\n  mutation UpdateTenantCompliance($input: ComplianceInput!) {\n    updateTenantCompliance(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpdateTenantComplianceDocument,
+    "\n  mutation SetTenantActive($input: SetTenantActiveInput!) {\n    setTenantActive(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.SetTenantActiveDocument,
+    "\n  mutation DeleteTenant($input: DeleteTenantInput!) {\n    deleteTenant(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.DeleteTenantDocument,
+    "\n  mutation AddTenantStaff($input: AddTenantStaffInput!) {\n    addTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.AddTenantStaffDocument,
+    "\n  mutation RemoveTenantStaff($input: RemoveTenantStaffInput!) {\n    removeTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.RemoveTenantStaffDocument,
+    "\n  mutation ChangeTenantStaffRole($input: ChangeTenantStaffRoleInput!) {\n    changeTenantStaffRole(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.ChangeTenantStaffRoleDocument,
     "\n  query TenantSlugAvailable($slug: String!) {\n    tenantSlugAvailable(slug: $slug)\n  }\n": typeof types.TenantSlugAvailableDocument,
     "\n  mutation CreateTenantWizard($input: CreateTenantInput!) {\n    createTenant(input: $input) {\n      id\n      slug\n      schemaName\n    }\n  }\n": typeof types.CreateTenantWizardDocument,
     "\n  mutation SwitchTenantWizard($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n": typeof types.SwitchTenantWizardDocument,
@@ -102,10 +113,21 @@ const documents: Documents = {
     "\n  query TenantPlatformCredentials {\n    tenantPlatformCredentials {\n      platform\n      configJson\n      isDefault\n    }\n  }\n": types.TenantPlatformCredentialsDocument,
     "\n  mutation UpdateMyPlatformCredentials($input: UpdateMyPlatformCredentialsInput!) {\n    updateMyPlatformCredentials(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpdateMyPlatformCredentialsDocument,
     "\n  query TenantFeaturesSettings {\n    tenantFeatures {\n      enableSignal\n      enableWhatsApp\n      enableMessenger\n      enableGate\n      enablePayment\n      enableCommandScheduling\n      enableAnalytics\n      enableAudioRecognition\n    }\n  }\n": types.TenantFeaturesSettingsDocument,
-    "\n  mutation UpdateTenantFeatures($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpdateTenantFeaturesDocument,
+    "\n  mutation UpdateTenantFeaturesActive($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpdateTenantFeaturesActiveDocument,
     "\n  query GetTenantPromptOverrides {\n    tenantPromptOverrides {\n      id\n      commandId\n      userType\n      descriptionI18nJson\n      prompt\n    }\n  }\n": types.GetTenantPromptOverridesDocument,
     "\n  query GetTenantCommandConfigsForPrompts {\n    tenantCommandConfigs {\n      id\n      commandName\n    }\n  }\n": types.GetTenantCommandConfigsForPromptsDocument,
     "\n  mutation UpsertTenantPromptOverride($input: UpsertTenantPromptOverrideInput!) {\n    upsertTenantPromptOverride(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpsertTenantPromptOverrideDocument,
+    "\n  query TenantSettings($tenantId: String!) {\n    tenantCustomization(tenantId: $tenantId) {\n      branding {\n        logoUrl\n        primaryColor\n        secondaryColor\n        fontSize\n      }\n      features {\n        enableSignal\n        enableWhatsApp\n        enableMessenger\n        enableGate\n        enablePayment\n        enableCommandScheduling\n        enableAnalytics\n        enableAudioRecognition\n      }\n      messaging {\n        defaultSmsProvider\n        priorityChannels\n        rateLimitPerMinute\n      }\n      commands {\n        timeout\n        maxRetries\n        processingDelay\n        customPromptLibraryEnabled\n      }\n      compliance {\n        dataResidency\n        encryptionEnabled\n        webhookUrl\n      }\n    }\n    tenantStaff(tenantId: $tenantId) {\n      tenantId\n      userId\n      role\n    }\n    myTenants {\n      id\n      slug\n      schemaName\n      isActive\n      billingUserId\n    }\n    tenantsIStaffAt {\n      tenantId\n      tenantSlug\n      role\n    }\n  }\n": types.TenantSettingsDocument,
+    "\n  mutation UpdateTenantBranding($input: BrandingInput!) {\n    updateTenantBranding(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpdateTenantBrandingDocument,
+    "\n  mutation UpdateTenantSettingsFeatures($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpdateTenantSettingsFeaturesDocument,
+    "\n  mutation UpdateTenantMessaging($input: MessagingInput!) {\n    updateTenantMessaging(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpdateTenantMessagingDocument,
+    "\n  mutation UpdateTenantCommands($input: CommandsConfigInput!) {\n    updateTenantCommands(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpdateTenantCommandsDocument,
+    "\n  mutation UpdateTenantCompliance($input: ComplianceInput!) {\n    updateTenantCompliance(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpdateTenantComplianceDocument,
+    "\n  mutation SetTenantActive($input: SetTenantActiveInput!) {\n    setTenantActive(input: $input) {\n      status\n      message\n    }\n  }\n": types.SetTenantActiveDocument,
+    "\n  mutation DeleteTenant($input: DeleteTenantInput!) {\n    deleteTenant(input: $input) {\n      status\n      message\n    }\n  }\n": types.DeleteTenantDocument,
+    "\n  mutation AddTenantStaff($input: AddTenantStaffInput!) {\n    addTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n": types.AddTenantStaffDocument,
+    "\n  mutation RemoveTenantStaff($input: RemoveTenantStaffInput!) {\n    removeTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n": types.RemoveTenantStaffDocument,
+    "\n  mutation ChangeTenantStaffRole($input: ChangeTenantStaffRoleInput!) {\n    changeTenantStaffRole(input: $input) {\n      status\n      message\n    }\n  }\n": types.ChangeTenantStaffRoleDocument,
     "\n  query TenantSlugAvailable($slug: String!) {\n    tenantSlugAvailable(slug: $slug)\n  }\n": types.TenantSlugAvailableDocument,
     "\n  mutation CreateTenantWizard($input: CreateTenantInput!) {\n    createTenant(input: $input) {\n      id\n      slug\n      schemaName\n    }\n  }\n": types.CreateTenantWizardDocument,
     "\n  mutation SwitchTenantWizard($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n": types.SwitchTenantWizardDocument,
@@ -273,7 +295,7 @@ export function graphql(source: "\n  query TenantFeaturesSettings {\n    tenantF
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation UpdateTenantFeatures($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateTenantFeatures($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n"];
+export function graphql(source: "\n  mutation UpdateTenantFeaturesActive($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateTenantFeaturesActive($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -286,6 +308,50 @@ export function graphql(source: "\n  query GetTenantCommandConfigsForPrompts {\n
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation UpsertTenantPromptOverride($input: UpsertTenantPromptOverrideInput!) {\n    upsertTenantPromptOverride(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation UpsertTenantPromptOverride($input: UpsertTenantPromptOverrideInput!) {\n    upsertTenantPromptOverride(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query TenantSettings($tenantId: String!) {\n    tenantCustomization(tenantId: $tenantId) {\n      branding {\n        logoUrl\n        primaryColor\n        secondaryColor\n        fontSize\n      }\n      features {\n        enableSignal\n        enableWhatsApp\n        enableMessenger\n        enableGate\n        enablePayment\n        enableCommandScheduling\n        enableAnalytics\n        enableAudioRecognition\n      }\n      messaging {\n        defaultSmsProvider\n        priorityChannels\n        rateLimitPerMinute\n      }\n      commands {\n        timeout\n        maxRetries\n        processingDelay\n        customPromptLibraryEnabled\n      }\n      compliance {\n        dataResidency\n        encryptionEnabled\n        webhookUrl\n      }\n    }\n    tenantStaff(tenantId: $tenantId) {\n      tenantId\n      userId\n      role\n    }\n    myTenants {\n      id\n      slug\n      schemaName\n      isActive\n      billingUserId\n    }\n    tenantsIStaffAt {\n      tenantId\n      tenantSlug\n      role\n    }\n  }\n"): (typeof documents)["\n  query TenantSettings($tenantId: String!) {\n    tenantCustomization(tenantId: $tenantId) {\n      branding {\n        logoUrl\n        primaryColor\n        secondaryColor\n        fontSize\n      }\n      features {\n        enableSignal\n        enableWhatsApp\n        enableMessenger\n        enableGate\n        enablePayment\n        enableCommandScheduling\n        enableAnalytics\n        enableAudioRecognition\n      }\n      messaging {\n        defaultSmsProvider\n        priorityChannels\n        rateLimitPerMinute\n      }\n      commands {\n        timeout\n        maxRetries\n        processingDelay\n        customPromptLibraryEnabled\n      }\n      compliance {\n        dataResidency\n        encryptionEnabled\n        webhookUrl\n      }\n    }\n    tenantStaff(tenantId: $tenantId) {\n      tenantId\n      userId\n      role\n    }\n    myTenants {\n      id\n      slug\n      schemaName\n      isActive\n      billingUserId\n    }\n    tenantsIStaffAt {\n      tenantId\n      tenantSlug\n      role\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateTenantBranding($input: BrandingInput!) {\n    updateTenantBranding(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateTenantBranding($input: BrandingInput!) {\n    updateTenantBranding(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateTenantSettingsFeatures($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateTenantSettingsFeatures($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateTenantMessaging($input: MessagingInput!) {\n    updateTenantMessaging(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateTenantMessaging($input: MessagingInput!) {\n    updateTenantMessaging(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateTenantCommands($input: CommandsConfigInput!) {\n    updateTenantCommands(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateTenantCommands($input: CommandsConfigInput!) {\n    updateTenantCommands(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateTenantCompliance($input: ComplianceInput!) {\n    updateTenantCompliance(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateTenantCompliance($input: ComplianceInput!) {\n    updateTenantCompliance(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetTenantActive($input: SetTenantActiveInput!) {\n    setTenantActive(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation SetTenantActive($input: SetTenantActiveInput!) {\n    setTenantActive(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DeleteTenant($input: DeleteTenantInput!) {\n    deleteTenant(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation DeleteTenant($input: DeleteTenantInput!) {\n    deleteTenant(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation AddTenantStaff($input: AddTenantStaffInput!) {\n    addTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation AddTenantStaff($input: AddTenantStaffInput!) {\n    addTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RemoveTenantStaff($input: RemoveTenantStaffInput!) {\n    removeTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation RemoveTenantStaff($input: RemoveTenantStaffInput!) {\n    removeTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ChangeTenantStaffRole($input: ChangeTenantStaffRoleInput!) {\n    changeTenantStaffRole(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation ChangeTenantStaffRole($input: ChangeTenantStaffRoleInput!) {\n    changeTenantStaffRole(input: $input) {\n      status\n      message\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -223,10 +223,10 @@ export class TenantResolver {
     return this.tenantAdminService.removeContactFromTenant(input.tenantId, input.contactId);
   }
 
-  @UseGuards(OwnerGuard)
+  @UseGuards(TenantStaffGuard(TenantStaffRole.Admin))
   @Mutation(() => MutationResult)
   async updateTenantFeatures(@Args('input') input: UpdateTenantFeaturesInput): Promise<MutationResult> {
-    const { tenantId } = this.tenantService.getContextOrThrow();
+    const { tenantId } = input;
     const current = await this.customizationService.getForTenant(tenantId);
     const result = await this.tenantAdminService.updateFeatures(tenantId, current, input);
     this.customizationService.invalidate(tenantId);

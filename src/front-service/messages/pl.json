@@ -38,6 +38,7 @@
     "tenantLimitReached": "Osiągnięto limit planu",
     "tenantOpen": "Otwórz",
     "tenantOpening": "Otwieram…",
+    "tenantSettings": "Ustawienia",
     "badgeOwner": "Właściciel",
     "badgeAdmin": "Admin",
     "badgeSupport": "Wsparcie"
@@ -194,6 +195,106 @@
     "historyOldPlan": "Z",
     "historyNewPlan": "Na",
     "loadError": "Nie udało się pobrać danych subskrypcji."
+  },
+  "tenantSettings": {
+    "breadcrumb": "Wspólnota",
+    "title": "Ustawienia: {slug}",
+    "notFoundTitle": "Nie znaleziono wspólnoty",
+    "notFoundDesc": "Nie masz dostępu do wspólnoty „{slug}\".",
+    "tab_general": "Ogólne",
+    "tab_branding": "Branding",
+    "tab_features": "Funkcje",
+    "tab_messaging": "Wiadomości",
+    "tab_commands": "Komendy",
+    "tab_compliance": "Compliance",
+    "tab_staff": "Zespół",
+    "common": {
+      "save": "Zapisz zmiany",
+      "saving": "Zapisuję…",
+      "errorUrl": "Wymagany poprawny URL http(s)",
+      "errorHex": "Wymagany kolor hex (np. #ff8800)",
+      "errorChannelsRequireSmsOrEmail": "Wymagany przynajmniej jeden kanał: sms lub email",
+      "errorRateLimit": "Limit musi być ≥ 1",
+      "errorTimeout": "Timeout musi być ≥ 100 ms",
+      "errorRetries": "Liczba ponowień musi być ≥ 0",
+      "errorDelay": "Opóźnienie musi być ≥ 0"
+    },
+    "general": {
+      "identity": "Identyfikacja",
+      "slug": "Slug",
+      "billingUser": "Płatnik",
+      "activeTitle": "Aktywna",
+      "activeDesc": "Wspólnoty nieaktywne nie przyjmują nowych mutacji.",
+      "dangerTitle": "Strefa zagrożenia",
+      "dangerDesc": "Trwałe usunięcie wspólnoty i wszystkich powiązanych danych.",
+      "deleteTenant": "Usuń wspólnotę",
+      "deleteTitle": "Usunięcie wspólnoty",
+      "deleteWarning": "Spowoduje usunięcie schematu i wszystkich danych. Operacja nieodwracalna.",
+      "deleteTypeToConfirm": "Wpisz slug „{slug}\", aby potwierdzić.",
+      "confirmDelete": "Usuń trwale",
+      "deleting": "Usuwam…",
+      "cancel": "Anuluj"
+    },
+    "branding": {
+      "logoUrl": "URL logo",
+      "primaryColor": "Kolor podstawowy",
+      "secondaryColor": "Kolor wtórny",
+      "fontSize": "Rozmiar czcionki",
+      "fontDefault": "Domyślny",
+      "font_small": "Mały",
+      "font_normal": "Normalny",
+      "font_large": "Duży"
+    },
+    "features": {
+      "desc": "Włącz/wyłącz funkcje dostępne w tej wspólnocie."
+    },
+    "messaging": {
+      "provider": "Domyślny dostawca SMS",
+      "channels": "Kanały priorytetowe",
+      "rateLimit": "Limit wiadomości (na minutę)",
+      "provider_twilio": "Twilio",
+      "provider_legacy": "Legacy",
+      "provider_africastalking": "Africa's Talking",
+      "channel_sms": "SMS",
+      "channel_email": "Email",
+      "channel_signal": "Signal",
+      "channel_whatsapp": "WhatsApp",
+      "channel_messenger": "Messenger"
+    },
+    "commands": {
+      "timeout": "Timeout (ms)",
+      "timeoutHint": "Maksymalny czas wykonania komendy.",
+      "maxRetries": "Maks. ponowień",
+      "processingDelay": "Opóźnienie przetwarzania (ms)",
+      "delayHint": "Czekaj tyle przed wykonaniem każdej komendy.",
+      "promptLibrary": "Własna biblioteka promptów",
+      "promptLibraryHint": "Pozwól wspólnocie utrzymywać własne nadpisania promptów."
+    },
+    "compliance": {
+      "residency": "Lokalizacja danych",
+      "residency_EU": "Unia Europejska",
+      "residency_US": "Stany Zjednoczone",
+      "residency_APAC": "Azja-Pacyfik",
+      "encryption": "Szyfrowanie at rest",
+      "encryptionHint": "Szyfruj wrażliwe dane w schemacie wspólnoty.",
+      "webhookUrl": "Webhook audytu"
+    },
+    "staff": {
+      "desc": "Zarządzaj kto może administrować tą wspólnotą.",
+      "addStaff": "Dodaj członka",
+      "addStaffTitle": "Dodanie członka zespołu",
+      "userId": "ID użytkownika",
+      "userIdPlaceholder": "uuid",
+      "role": "Rola",
+      "roleOwner": "Właściciel",
+      "roleAdmin": "Admin",
+      "roleSupport": "Support",
+      "remove": "Usuń",
+      "empty": "Brak członków zespołu.",
+      "confirmAdd": "Dodaj",
+      "adding": "Dodaję…",
+      "cancel": "Anuluj"
+    }
   },
   "schemas": {
     "codeMin": "Minimum 6 cyfr",

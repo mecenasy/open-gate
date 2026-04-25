@@ -38,6 +38,7 @@
     "tenantLimitReached": "Plan limit reached",
     "tenantOpen": "Open",
     "tenantOpening": "Opening…",
+    "tenantSettings": "Settings",
     "badgeOwner": "Owner",
     "badgeAdmin": "Admin",
     "badgeSupport": "Support"
@@ -194,6 +195,106 @@
     "historyOldPlan": "From",
     "historyNewPlan": "To",
     "loadError": "Failed to load billing data."
+  },
+  "tenantSettings": {
+    "breadcrumb": "Tenant",
+    "title": "{slug} settings",
+    "notFoundTitle": "Tenant not found",
+    "notFoundDesc": "You don't have access to a tenant with slug \"{slug}\".",
+    "tab_general": "General",
+    "tab_branding": "Branding",
+    "tab_features": "Features",
+    "tab_messaging": "Messaging",
+    "tab_commands": "Commands",
+    "tab_compliance": "Compliance",
+    "tab_staff": "Staff",
+    "common": {
+      "save": "Save changes",
+      "saving": "Saving…",
+      "errorUrl": "Must be a valid http(s) URL",
+      "errorHex": "Must be a hex color (e.g. #ff8800)",
+      "errorChannelsRequireSmsOrEmail": "At least one of sms or email is required",
+      "errorRateLimit": "Rate limit must be ≥ 1",
+      "errorTimeout": "Timeout must be ≥ 100 ms",
+      "errorRetries": "Max retries must be ≥ 0",
+      "errorDelay": "Processing delay must be ≥ 0"
+    },
+    "general": {
+      "identity": "Identity",
+      "slug": "Slug",
+      "billingUser": "Billing user",
+      "activeTitle": "Active",
+      "activeDesc": "Inactive tenants stop accepting new mutations.",
+      "dangerTitle": "Danger zone",
+      "dangerDesc": "Permanently delete the tenant and all related data.",
+      "deleteTenant": "Delete tenant",
+      "deleteTitle": "Delete tenant",
+      "deleteWarning": "This will drop the tenant schema and all its data. This cannot be undone.",
+      "deleteTypeToConfirm": "Type the slug \"{slug}\" to confirm.",
+      "confirmDelete": "Delete permanently",
+      "deleting": "Deleting…",
+      "cancel": "Cancel"
+    },
+    "branding": {
+      "logoUrl": "Logo URL",
+      "primaryColor": "Primary color",
+      "secondaryColor": "Secondary color",
+      "fontSize": "Font size",
+      "fontDefault": "Default",
+      "font_small": "Small",
+      "font_normal": "Normal",
+      "font_large": "Large"
+    },
+    "features": {
+      "desc": "Toggle features available in this tenant."
+    },
+    "messaging": {
+      "provider": "Default SMS provider",
+      "channels": "Priority channels",
+      "rateLimit": "Rate limit (per minute)",
+      "provider_twilio": "Twilio",
+      "provider_legacy": "Legacy",
+      "provider_africastalking": "Africa's Talking",
+      "channel_sms": "SMS",
+      "channel_email": "Email",
+      "channel_signal": "Signal",
+      "channel_whatsapp": "WhatsApp",
+      "channel_messenger": "Messenger"
+    },
+    "commands": {
+      "timeout": "Timeout (ms)",
+      "timeoutHint": "How long a command can run before being aborted.",
+      "maxRetries": "Max retries",
+      "processingDelay": "Processing delay (ms)",
+      "delayHint": "Wait this long before processing each command.",
+      "promptLibrary": "Custom prompt library",
+      "promptLibraryHint": "Allow this tenant to maintain its own prompt overrides."
+    },
+    "compliance": {
+      "residency": "Data residency",
+      "residency_EU": "European Union",
+      "residency_US": "United States",
+      "residency_APAC": "Asia-Pacific",
+      "encryption": "Encryption at rest",
+      "encryptionHint": "Encrypt sensitive data stored in the tenant schema.",
+      "webhookUrl": "Audit webhook URL"
+    },
+    "staff": {
+      "desc": "Manage who can administer this tenant.",
+      "addStaff": "Add staff",
+      "addStaffTitle": "Add staff member",
+      "userId": "User ID",
+      "userIdPlaceholder": "uuid",
+      "role": "Role",
+      "roleOwner": "Owner",
+      "roleAdmin": "Admin",
+      "roleSupport": "Support",
+      "remove": "Remove",
+      "empty": "No staff members yet.",
+      "confirmAdd": "Add",
+      "adding": "Adding…",
+      "cancel": "Cancel"
+    }
   },
   "schemas": {
     "codeMin": "Minimum 6 digits",

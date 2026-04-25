@@ -284,6 +284,51 @@ type TenantPromptOverrideType {
   prompt: String!
 }
 
+type TenantBrandingType {
+  logoUrl: String
+  primaryColor: String
+  secondaryColor: String
+  fontSize: String
+}
+
+type TenantMessagingType {
+  defaultSmsProvider: String!
+  priorityChannels: [String!]!
+  rateLimitPerMinute: Int!
+}
+
+type TenantCommandsConfigType {
+  timeout: Int!
+  maxRetries: Int!
+  processingDelay: Int!
+  customPromptLibraryEnabled: Boolean!
+}
+
+type TenantComplianceType {
+  dataResidency: String!
+  encryptionEnabled: Boolean!
+  webhookUrl: String
+}
+
+type TenantFeaturesEmbedType {
+  enableSignal: Boolean!
+  enableWhatsApp: Boolean!
+  enableMessenger: Boolean!
+  enableGate: Boolean!
+  enablePayment: Boolean!
+  enableCommandScheduling: Boolean!
+  enableAnalytics: Boolean!
+  enableAudioRecognition: Boolean!
+}
+
+type TenantCustomizationFullType {
+  branding: TenantBrandingType!
+  features: TenantFeaturesEmbedType!
+  messaging: TenantMessagingType!
+  commands: TenantCommandsConfigType!
+  compliance: TenantComplianceType!
+}
+
 type TenantUsageEntryType {
   tenantId: String!
   staff: Int!
@@ -370,6 +415,7 @@ type Query {
   tenantContacts(tenantId: String!): [ContactType!]!
   tenantCommandConfigs: [TenantCommandConfigType!]!
   tenantPromptOverrides: [TenantPromptOverrideType!]!
+  tenantCustomization(tenantId: String!): TenantCustomizationFullType!
   myUsage: UsageReportType!
   subscriptionPlans: [SubscriptionPlanType!]!
   mySubscription: UserSubscriptionType
@@ -672,6 +718,7 @@ input RemoveContactFromTenantInput {
 }
 
 input UpdateTenantFeaturesInput {
+  tenantId: String!
   enableSignal: Boolean
   enableWhatsApp: Boolean
   enableMessenger: Boolean

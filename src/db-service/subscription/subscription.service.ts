@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
 import {
   SubscriptionChange,
   SubscriptionChangeKind,
@@ -8,6 +8,7 @@ import {
   SubscriptionStatus,
   UserSubscription,
 } from '@app/entities';
+import { BILLING_PROVIDER_TOKEN, type BillingProvider } from '@app/billing';
 
 interface RecordChangeInput {
   userId: string;
@@ -27,6 +28,8 @@ export class SubscriptionService {
     private readonly userSubRepo: Repository<UserSubscription>,
     @InjectRepository(SubscriptionChange)
     private readonly changesRepo: Repository<SubscriptionChange>,
+    @Inject(BILLING_PROVIDER_TOKEN)
+    private readonly billing: BillingProvider,
   ) {}
 
   findAllPlans(): Promise<SubscriptionPlan[]> {
@@ -57,14 +60,31 @@ export class SubscriptionService {
 
     const existing = await this.userSubRepo.findOne({ where: { userId } });
     const oldPlanId = existing?.planId ?? null;
+    const oldPlan = oldPlanId ? await this.planRepo.findOne({ where: { id: oldPlanId } }) : null;
 
     const kind = oldPlanId === null ? SubscriptionChangeKind.Initial : (options.kindHint ?? SubscriptionChangeKind.Upgrade);
+
+    // Hand off to the billing provider before writing local state. With
+    // NoopBillingProvider this is a no-op; with Stripe the prorated charge
+    // happens here and we persist whatever externalSubscriptionId / period
+    // window the provider hands back.
+    const billingResult = await this.billing.applyChange({
+      userId,
+      externalSubscriptionId: existing?.externalSubscriptionId ?? null,
+      fromPlan: oldPlan
+        ? { id: oldPlan.id, code: String(oldPlan.code), priceCents: oldPlan.priceCents, currency: oldPlan.currency }
+        : null,
+      toPlan: { id: plan.id, code: String(plan.code), priceCents: plan.priceCents, currency: plan.currency },
+    });
 
     if (existing) {
       existing.planId = plan.id;
       existing.status = SubscriptionStatus.Active;
       existing.startedAt = new Date();
       existing.expiresAt = null;
+      existing.externalSubscriptionId = billingResult.externalSubscriptionId;
+      existing.cancelAtPeriodEnd = false;
+      existing.currentPeriodEnd = billingResult.currentPeriodEnd;
       const saved = await this.userSubRepo.save(existing);
       await this.recordChange({
         userId,
@@ -80,6 +100,9 @@ export class SubscriptionService {
       userId,
       planId: plan.id,
       status: SubscriptionStatus.Active,
+      externalSubscriptionId: billingResult.externalSubscriptionId,
+      cancelAtPeriodEnd: false,
+      currentPeriodEnd: billingResult.currentPeriodEnd,
     });
     const saved = await this.userSubRepo.save(created);
     await this.recordChange({
@@ -92,19 +115,61 @@ export class SubscriptionService {
     return { ...saved, plan };
   }
 
-  async cancel(userId: string, correlationId?: string | null): Promise<void> {
+  async cancel(
+    userId: string,
+    options: { atPeriodEnd?: boolean; correlationId?: string | null } = {},
+  ): Promise<void> {
     const existing = await this.userSubRepo.findOne({ where: { userId } });
     if (!existing) return;
     const oldPlanId = existing.planId;
-    existing.status = SubscriptionStatus.Canceled;
+    const atPeriodEnd = options.atPeriodEnd ?? false;
+
+    const cancelResult = await this.billing.cancel({
+      userId,
+      externalSubscriptionId: existing.externalSubscriptionId,
+      atPeriodEnd,
+    });
+
+    if (atPeriodEnd && cancelResult.effectiveAt) {
+      existing.status = SubscriptionStatus.ScheduledCancellation;
+      existing.cancelAtPeriodEnd = true;
+      existing.currentPeriodEnd = cancelResult.effectiveAt;
+    } else {
+      existing.status = SubscriptionStatus.Canceled;
+      existing.cancelAtPeriodEnd = false;
+    }
+
     await this.userSubRepo.save(existing);
     await this.recordChange({
       userId,
       oldPlanId,
       newPlanId: null,
       kind: SubscriptionChangeKind.Cancel,
-      correlationId,
+      correlationId: options.correlationId,
     });
+  }
+
+  /**
+   * Promotes ScheduledCancellation → Canceled for subscriptions whose
+   * currentPeriodEnd has passed. Intended to be invoked by a periodic
+   * job (cron / lambda) — runs idempotently in batches.
+   */
+  async finalizeScheduledCancellations(now: Date = new Date()): Promise<number> {
+    const due = await this.userSubRepo.find({
+      where: {
+        status: SubscriptionStatus.ScheduledCancellation,
+        cancelAtPeriodEnd: true,
+        currentPeriodEnd: LessThanOrEqual(now),
+      },
+    });
+    if (due.length === 0) return 0;
+
+    for (const sub of due) {
+      sub.status = SubscriptionStatus.Canceled;
+      sub.cancelAtPeriodEnd = false;
+    }
+    await this.userSubRepo.save(due);
+    return due.length;
   }
 
   async getHistory(userId: string, limit = 50): Promise<SubscriptionChange[]> {

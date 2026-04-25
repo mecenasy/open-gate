@@ -35,6 +35,15 @@ export class UserSubscription {
   })
   expiresAt!: Date | null;
 
+  @Column({ name: 'external_subscription_id', type: 'varchar', length: 128, nullable: true })
+  externalSubscriptionId!: string | null;
+
+  @Column({ name: 'cancel_at_period_end', type: 'boolean', default: false, nullable: false })
+  cancelAtPeriodEnd!: boolean;
+
+  @Column({ name: 'current_period_end', type: 'timestamptz', nullable: true })
+  currentPeriodEnd!: Date | null;
+
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamptz',

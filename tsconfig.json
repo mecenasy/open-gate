@@ -132,6 +132,12 @@
       "@app/audit/*": [
         "src/libs/audit/src/*"
       ],
+      "@app/billing": [
+        "src/libs/billing/src"
+      ],
+      "@app/billing/*": [
+        "src/libs/billing/src/*"
+      ],
       "src/*": [
         "src/*"
       ]

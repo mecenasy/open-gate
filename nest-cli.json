@@ -171,6 +171,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/audit/tsconfig.lib.json"
       }
+    },
+    "billing": {
+      "type": "library",
+      "root": "libs/billing",
+      "entryFile": "index",
+      "sourceRoot": "libs/billing/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/billing/tsconfig.lib.json"
+      }
     }
   }
 }

@@ -204,7 +204,7 @@ Reguły:
 
 ---
 
-### Commit 8 — BillingProvider abstraction (przygotowanie pod Stripe)
+### Commit 8 — BillingProvider abstraction (przygotowanie pod Stripe)  ✅ ZREALIZOWANE
 
 1. `src/libs/billing/` → `interface BillingProvider { previewChange, applyChange, cancel }` + `NoopBillingProvider` (zawsze success, 0€ prorated).
 2. `SubscriptionService` używa providera przed zapisem.

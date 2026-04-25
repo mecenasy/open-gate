@@ -148,12 +148,12 @@ if [ "$RESERVED" -eq 1 ]; then
     (cd "$REPO_ROOT" && docker compose up -d --force-recreate --no-deps front-service)
   fi
 
-  start_share "bff"   share reserved "$BFF_NAME"
-  start_share "front" share reserved "$FRONT_NAME"
+  start_share "bff"   share reserved --headless "$BFF_NAME"
+  start_share "front" share reserved --headless "$FRONT_NAME"
 else
   echo "Tryb ephemeral — losowe URL-e. Dla stałych użyj: --reserved --sync-env"
-  start_share "bff"   share public "http://127.0.0.1:$BFF_PORT"
-  start_share "front" share public "http://127.0.0.1:$FRONT_PORT"
+  start_share "bff"   share public --headless "http://127.0.0.1:$BFF_PORT"
+  start_share "front" share public --headless "http://127.0.0.1:$FRONT_PORT"
 fi
 
 if [ "$KEEPALIVE" -eq 1 ]; then
@@ -162,8 +162,9 @@ if [ "$KEEPALIVE" -eq 1 ]; then
   echo "[keepalive] start (co 30s pinguje front + bff)"
   (
     while true; do
-      curl -fsS -m 25 -o /dev/null "http://127.0.0.1:$FRONT_PORT/" 2>>"$ka_log" || echo "$(date -Is) front fail" >> "$ka_log"
-      curl -fsS -m 25 -o /dev/null "http://127.0.0.1:$BFF_PORT/health" 2>>"$ka_log" || echo "$(date -Is) bff fail" >> "$ka_log"
+      # -s -o /dev/null bez -f: 4xx jest OK, chodzi tylko o trzymanie ciepło
+      curl -sS -m 25 -o /dev/null -w "$(date -Is) front %{http_code} %{time_total}s\n" "http://127.0.0.1:$FRONT_PORT/" >>"$ka_log" 2>&1 || true
+      curl -sS -m 25 -o /dev/null -w "$(date -Is) bff   %{http_code} %{time_total}s\n" "http://127.0.0.1:$BFF_PORT/health" >>"$ka_log" 2>&1 || true
       sleep 30
     done
   ) >/dev/null 2>&1 &

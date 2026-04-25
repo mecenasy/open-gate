@@ -62,7 +62,7 @@ export class SubscriptionController implements SubscriptionServiceController {
   }
 
   async cancelSubscription({ userId, correlationId }: CancelSubscriptionRequest): Promise<CancelSubscriptionResponse> {
-    await this.subscriptionService.cancel(String(userId), correlationId || null);
+    await this.subscriptionService.cancel(String(userId), { correlationId: correlationId || null });
     return { status: true, message: 'Subscription canceled' };
   }
 

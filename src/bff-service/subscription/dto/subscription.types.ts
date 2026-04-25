@@ -62,3 +62,55 @@ export class SelectSubscriptionInput {
   @Field()
   planId!: string;
 }
+
+@ObjectType()
+export class QuotaViolationType {
+  @Field()
+  kind!: string;
+
+  @Field({ nullable: true })
+  tenantId?: string;
+
+  @Field(() => Int)
+  current!: number;
+
+  @Field(() => Int)
+  max!: number;
+}
+
+@ObjectType()
+export class PlanChangePreviewType {
+  @Field(() => SubscriptionPlanType)
+  newPlan!: SubscriptionPlanType;
+
+  @Field(() => SubscriptionPlanType, { nullable: true })
+  currentPlan?: SubscriptionPlanType;
+
+  /** 'initial' | 'upgrade' | 'downgrade' | 'same' */
+  @Field()
+  kind!: string;
+
+  @Field(() => [QuotaViolationType])
+  violations!: QuotaViolationType[];
+
+  @Field(() => Int)
+  deltaPriceCents!: number;
+}
+
+@ObjectType()
+export class SubscriptionChangeType {
+  @Field()
+  id!: string;
+
+  @Field({ nullable: true })
+  oldPlanId?: string;
+
+  @Field({ nullable: true })
+  newPlanId?: string;
+
+  @Field()
+  kind!: string;
+
+  @Field()
+  initiatedAt!: string;
+}

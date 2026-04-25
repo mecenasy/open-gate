@@ -12,35 +12,11 @@ import {
   SelectSubscriptionResponse,
   CancelSubscriptionRequest,
   CancelSubscriptionResponse,
-  PlanEntry,
-  UserSubscriptionEntry,
+  GetSubscriptionHistoryRequest,
+  GetSubscriptionHistoryResponse,
 } from 'src/proto/subscription';
 import { SubscriptionService } from './subscription.service';
-import { SubscriptionPlan, UserSubscription } from '@app/entities';
-
-const toPlanEntry = (plan: SubscriptionPlan): PlanEntry => ({
-  id: plan.id,
-  code: String(plan.code),
-  name: plan.name,
-  maxTenants: plan.maxTenants,
-  maxPlatformsPerTenant: plan.maxPlatformsPerTenant,
-  maxContactsPerTenant: plan.maxContactsPerTenant,
-  maxStaffPerTenant: plan.maxStaffPerTenant,
-  maxCustomCommandsPerTenant: plan.maxCustomCommandsPerTenant,
-  priceCents: plan.priceCents,
-  currency: plan.currency,
-  isActive: plan.isActive,
-});
-
-const toSubscriptionEntry = (sub: UserSubscription & { plan: SubscriptionPlan }): UserSubscriptionEntry => ({
-  id: sub.id,
-  userId: sub.userId,
-  planId: sub.planId,
-  status: String(sub.status),
-  startedAt: sub.startedAt.toISOString(),
-  expiresAt: sub.expiresAt ? sub.expiresAt.toISOString() : '',
-  plan: toPlanEntry(sub.plan),
-});
+import { parseKindHint, toPlanEntry, toSubscriptionEntry } from './subscription.controller.helpers';
 
 @Controller()
 @SubscriptionServiceControllerMethods()
@@ -72,13 +48,40 @@ export class SubscriptionController implements SubscriptionServiceController {
     return { status: true, message: 'OK', subscription: toSubscriptionEntry(sub) };
   }
 
-  async selectSubscription({ userId, planId }: SelectSubscriptionRequest): Promise<SelectSubscriptionResponse> {
-    const sub = await this.subscriptionService.selectPlan(String(userId), String(planId));
+  async selectSubscription({
+    userId,
+    planId,
+    kind,
+    correlationId,
+  }: SelectSubscriptionRequest): Promise<SelectSubscriptionResponse> {
+    const sub = await this.subscriptionService.selectPlan(String(userId), String(planId), {
+      kindHint: parseKindHint(kind),
+      correlationId: correlationId || null,
+    });
     return { status: true, message: 'Subscription selected', subscription: toSubscriptionEntry(sub) };
   }
 
-  async cancelSubscription({ userId }: CancelSubscriptionRequest): Promise<CancelSubscriptionResponse> {
-    await this.subscriptionService.cancel(String(userId));
+  async cancelSubscription({ userId, correlationId }: CancelSubscriptionRequest): Promise<CancelSubscriptionResponse> {
+    await this.subscriptionService.cancel(String(userId), correlationId || null);
     return { status: true, message: 'Subscription canceled' };
+  }
+
+  async getSubscriptionHistory({
+    userId,
+    limit,
+  }: GetSubscriptionHistoryRequest): Promise<GetSubscriptionHistoryResponse> {
+    const items = await this.subscriptionService.getHistory(String(userId), limit && limit > 0 ? limit : 50);
+    return {
+      status: true,
+      message: 'OK',
+      changes: items.map((c) => ({
+        id: c.id,
+        userId: c.userId,
+        oldPlanId: c.oldPlanId ?? '',
+        newPlanId: c.newPlanId ?? '',
+        kind: String(c.kind),
+        initiatedAt: c.initiatedAt.toISOString(),
+      })),
+    };
   }
 }

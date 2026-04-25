@@ -60,7 +60,7 @@ Wykluczone jako niezwiązane: `command.service.ts:89 actionFilter`, `gate.servic
 
 ---
 
-### Commit 2 — backend: preview + zmiana + anulowanie planu
+### Commit 2 — backend: preview + zmiana + anulowanie planu  ✅ ZREALIZOWANE
 
 1. Migracja `shared_config.subscription_changes` (`id, userId, oldPlanId, newPlanId, kind ENUM('upgrade'|'downgrade'|'cancel'|'initial'), violations_json jsonb, initiated_at, correlation_id`).
 2. Nowa query GraphQL `previewPlanChange(newPlanId)`:

@@ -67,6 +67,9 @@ export interface GetUserSubscriptionResponse {
 export interface SelectSubscriptionRequest {
   userId: string;
   planId: string;
+  /** 'initial' | 'upgrade' | 'downgrade' | 'same' — set by BFF after comparing plans */
+  kind: string;
+  correlationId: string;
 }
 
 export interface SelectSubscriptionResponse {
@@ -77,11 +80,32 @@ export interface SelectSubscriptionResponse {
 
 export interface CancelSubscriptionRequest {
   userId: string;
+  correlationId: string;
 }
 
 export interface CancelSubscriptionResponse {
   status: boolean;
   message: string;
+}
+
+export interface SubscriptionChangeEntry {
+  id: string;
+  userId: string;
+  oldPlanId: string;
+  newPlanId: string;
+  kind: string;
+  initiatedAt: string;
+}
+
+export interface GetSubscriptionHistoryRequest {
+  userId: string;
+  limit: number;
+}
+
+export interface GetSubscriptionHistoryResponse {
+  status: boolean;
+  message: string;
+  changes: SubscriptionChangeEntry[];
 }
 
 export const SUBSCRIPTION_PACKAGE_NAME = "subscription";
@@ -99,6 +123,11 @@ export interface SubscriptionServiceClient {
   selectSubscription(request: SelectSubscriptionRequest, metadata?: Metadata): Observable<SelectSubscriptionResponse>;
 
   cancelSubscription(request: CancelSubscriptionRequest, metadata?: Metadata): Observable<CancelSubscriptionResponse>;
+
+  getSubscriptionHistory(
+    request: GetSubscriptionHistoryRequest,
+    metadata?: Metadata,
+  ): Observable<GetSubscriptionHistoryResponse>;
 }
 
 export interface SubscriptionServiceController {
@@ -126,6 +155,14 @@ export interface SubscriptionServiceController {
     request: CancelSubscriptionRequest,
     metadata?: Metadata,
   ): Promise<CancelSubscriptionResponse> | Observable<CancelSubscriptionResponse> | CancelSubscriptionResponse;
+
+  getSubscriptionHistory(
+    request: GetSubscriptionHistoryRequest,
+    metadata?: Metadata,
+  ):
+    | Promise<GetSubscriptionHistoryResponse>
+    | Observable<GetSubscriptionHistoryResponse>
+    | GetSubscriptionHistoryResponse;
 }
 
 export function SubscriptionServiceControllerMethods() {
@@ -136,6 +173,7 @@ export function SubscriptionServiceControllerMethods() {
       "getUserSubscription",
       "selectSubscription",
       "cancelSubscription",
+      "getSubscriptionHistory",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

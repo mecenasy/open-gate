@@ -7,6 +7,7 @@ export * from './enums/config-type.enum';
 export * from './enums/message-type.enum';
 export * from './enums/subscription-plan-code.enum';
 export * from './enums/subscription-status.enum';
+export * from './enums/subscription-change-kind.enum';
 export * from './enums/tenant-staff-role.enum';
 export * from './enums/contact-access-level.enum';
 
@@ -35,6 +36,7 @@ export * from './config/config.entity';
 // Subscription
 export * from './subscription/subscription-plan.entity';
 export * from './subscription/user-subscription.entity';
+export * from './subscription/subscription-change.entity';
 
 // Tenant
 export * from './tenant/tenant.entity';

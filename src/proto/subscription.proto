@@ -8,6 +8,7 @@ service SubscriptionService {
   rpc GetUserSubscription (GetUserSubscriptionRequest) returns (GetUserSubscriptionResponse);
   rpc SelectSubscription (SelectSubscriptionRequest) returns (SelectSubscriptionResponse);
   rpc CancelSubscription (CancelSubscriptionRequest) returns (CancelSubscriptionResponse);
+  rpc GetSubscriptionHistory (GetSubscriptionHistoryRequest) returns (GetSubscriptionHistoryResponse);
 }
 
 message PlanEntry {
@@ -65,6 +66,8 @@ message GetUserSubscriptionResponse {
 message SelectSubscriptionRequest {
   string user_id = 1;
   string plan_id = 2;
+  string kind = 3; // 'initial' | 'upgrade' | 'downgrade' | 'same' — set by BFF after comparing plans
+  string correlation_id = 4;
 }
 
 message SelectSubscriptionResponse {
@@ -75,9 +78,30 @@ message SelectSubscriptionResponse {
 
 message CancelSubscriptionRequest {
   string user_id = 1;
+  string correlation_id = 2;
 }
 
 message CancelSubscriptionResponse {
   bool status = 1;
   string message = 2;
+}
+
+message SubscriptionChangeEntry {
+  string id = 1;
+  string user_id = 2;
+  string old_plan_id = 3;
+  string new_plan_id = 4;
+  string kind = 5;
+  string initiated_at = 6;
+}
+
+message GetSubscriptionHistoryRequest {
+  string user_id = 1;
+  int32 limit = 2;
+}
+
+message GetSubscriptionHistoryResponse {
+  bool status = 1;
+  string message = 2;
+  repeated SubscriptionChangeEntry changes = 3;
 }

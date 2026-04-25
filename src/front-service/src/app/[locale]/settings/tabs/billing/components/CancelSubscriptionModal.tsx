@@ -35,7 +35,7 @@ export function CancelSubscriptionModal({
       onClose={handleClose}
       title={t('cancelTitle')}
       footer={
-        <div className="flex justify-between">
+        <div className="flex justify-between gap-4">
           <Button type="button" variant="green" onClick={handleClose}>
             {t('cancel')}
           </Button>

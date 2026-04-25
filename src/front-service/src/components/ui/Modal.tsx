@@ -1,7 +1,8 @@
 'use client';
 
 import { useTransition, animated } from '@react-spring/web';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface ModalProps {
   isOpen: boolean;
@@ -24,6 +25,12 @@ export function Modal({
   showBackdrop = true,
   className,
 }: ModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (!showBackdrop) return;
     document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -50,7 +57,9 @@ export function Modal({
     config: { tension: 320, friction: 28 },
   });
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <>
       {showBackdrop &&
         backdropTransition((style, show) =>
@@ -91,6 +100,7 @@ export function Modal({
           </animated.div>
         ) : null,
       )}
-    </>
+    </>,
+    document.body,
   );
 }

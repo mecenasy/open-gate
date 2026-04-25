@@ -54,6 +54,9 @@ import {
   MutationResponse,
   GetTenantUsageRequest,
   GetTenantUsageResponse,
+  TransferTenantBillingRequest,
+  SetTenantActiveRequest,
+  DeleteTenantRequest,
 } from 'src/proto/tenant';
 import { TenantDbService } from './tenant.service';
 import { PlatformCredentialsService } from './platform-credentials.service';
@@ -515,5 +518,23 @@ export class TenantController implements TenantServiceController {
         customCommands: e.customCommands,
       })),
     };
+  }
+
+  async transferTenantBilling({
+    tenantId,
+    newBillingUserId,
+  }: TransferTenantBillingRequest): Promise<MutationResponse> {
+    await this.tenantDbService.transferBilling(String(tenantId), String(newBillingUserId));
+    return { status: true, message: 'Billing transferred' };
+  }
+
+  async setTenantActive({ tenantId, active }: SetTenantActiveRequest): Promise<MutationResponse> {
+    await this.tenantDbService.setActive(String(tenantId), Boolean(active));
+    return { status: true, message: active ? 'Tenant activated' : 'Tenant deactivated' };
+  }
+
+  async deleteTenant({ tenantId, slugConfirmation }: DeleteTenantRequest): Promise<MutationResponse> {
+    await this.tenantDbService.hardDelete(String(tenantId), String(slugConfirmation));
+    return { status: true, message: 'Tenant deleted' };
   }
 }

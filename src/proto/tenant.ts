@@ -371,6 +371,21 @@ export interface GetTenantUsageResponse {
   perTenant: TenantUsageEntry[];
 }
 
+export interface TransferTenantBillingRequest {
+  tenantId: string;
+  newBillingUserId: string;
+}
+
+export interface SetTenantActiveRequest {
+  tenantId: string;
+  active: boolean;
+}
+
+export interface DeleteTenantRequest {
+  tenantId: string;
+  slugConfirmation: string;
+}
+
 export const TENANT_PACKAGE_NAME = "tenant";
 
 export interface TenantServiceClient {
@@ -468,6 +483,12 @@ export interface TenantServiceClient {
   removeContactFromTenant(request: RemoveContactFromTenantRequest, metadata?: Metadata): Observable<MutationResponse>;
 
   getTenantUsage(request: GetTenantUsageRequest, metadata?: Metadata): Observable<GetTenantUsageResponse>;
+
+  transferTenantBilling(request: TransferTenantBillingRequest, metadata?: Metadata): Observable<MutationResponse>;
+
+  setTenantActive(request: SetTenantActiveRequest, metadata?: Metadata): Observable<MutationResponse>;
+
+  deleteTenant(request: DeleteTenantRequest, metadata?: Metadata): Observable<MutationResponse>;
 }
 
 export interface TenantServiceController {
@@ -640,6 +661,21 @@ export interface TenantServiceController {
     request: GetTenantUsageRequest,
     metadata?: Metadata,
   ): Promise<GetTenantUsageResponse> | Observable<GetTenantUsageResponse> | GetTenantUsageResponse;
+
+  transferTenantBilling(
+    request: TransferTenantBillingRequest,
+    metadata?: Metadata,
+  ): Promise<MutationResponse> | Observable<MutationResponse> | MutationResponse;
+
+  setTenantActive(
+    request: SetTenantActiveRequest,
+    metadata?: Metadata,
+  ): Promise<MutationResponse> | Observable<MutationResponse> | MutationResponse;
+
+  deleteTenant(
+    request: DeleteTenantRequest,
+    metadata?: Metadata,
+  ): Promise<MutationResponse> | Observable<MutationResponse> | MutationResponse;
 }
 
 export function TenantServiceControllerMethods() {
@@ -673,6 +709,9 @@ export function TenantServiceControllerMethods() {
       "getTenantContacts",
       "removeContactFromTenant",
       "getTenantUsage",
+      "transferTenantBilling",
+      "setTenantActive",
+      "deleteTenant",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

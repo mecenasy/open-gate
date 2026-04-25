@@ -20,4 +20,11 @@ export class TenantSchemaManager {
     );
     return result[0]?.exists ?? false;
   }
+
+  async dropSchema(schemaName: string): Promise<void> {
+    if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(schemaName)) {
+      throw new Error(`Refusing to drop schema with unsafe name: ${schemaName}`);
+    }
+    await this.dataSource.query(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`);
+  }
 }

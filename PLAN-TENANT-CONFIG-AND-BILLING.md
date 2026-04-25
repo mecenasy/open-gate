@@ -116,7 +116,7 @@ Wykluczone jako niezwiązane: `command.service.ts:89 actionFilter`, `gate.servic
 
 ---
 
-### Commit 4 — backend: mutacje konfiguracji tenanta (per sekcja)
+### Commit 4 — backend: mutacje konfiguracji tenanta (per sekcja)  ✅ ZREALIZOWANE
 
 **Dziś jest tylko `updateCustomization(tenantId, customizationJson)` (cały JSON) i `updateFeatures`. Dokładam per-sekcję z optimistic lock.**
 

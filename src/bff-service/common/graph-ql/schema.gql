@@ -483,6 +483,13 @@ type Mutation {
   upsertTenantCommandConfig(input: UpsertTenantCommandConfigInput!): MutationResult!
   deleteTenantCommandConfig(input: DeleteTenantCommandConfigInput!): MutationResult!
   upsertTenantPromptOverride(input: UpsertTenantPromptOverrideInput!): MutationResult!
+  updateTenantBranding(input: BrandingInput!): MutationResult!
+  updateTenantMessaging(input: MessagingInput!): MutationResult!
+  updateTenantCommands(input: CommandsConfigInput!): MutationResult!
+  updateTenantCompliance(input: ComplianceInput!): MutationResult!
+  transferTenantBilling(input: TransferTenantBillingInput!): MutationResult!
+  setTenantActive(input: SetTenantActiveInput!): MutationResult!
+  deleteTenant(input: DeleteTenantInput!): MutationResult!
   selectSubscription(input: SelectSubscriptionInput!): UserSubscriptionType!
   cancelSubscription: Boolean!
 }
@@ -704,6 +711,51 @@ input UpsertTenantPromptOverrideInput {
   userType: String!
   descriptionI18nJson: String
   prompt: String!
+}
+
+input BrandingInput {
+  tenantId: String!
+  logoUrl: String
+  primaryColor: String
+  secondaryColor: String
+  fontSize: String
+}
+
+input MessagingInput {
+  tenantId: String!
+  defaultSmsProvider: String
+  priorityChannels: [String!]
+  rateLimitPerMinute: Int
+}
+
+input CommandsConfigInput {
+  tenantId: String!
+  timeout: Int
+  maxRetries: Int
+  processingDelay: Int
+  customPromptLibraryEnabled: Boolean
+}
+
+input ComplianceInput {
+  tenantId: String!
+  dataResidency: String
+  encryptionEnabled: Boolean
+  webhookUrl: String
+}
+
+input TransferTenantBillingInput {
+  tenantId: String!
+  newBillingUserId: String!
+}
+
+input SetTenantActiveInput {
+  tenantId: String!
+  active: Boolean!
+}
+
+input DeleteTenantInput {
+  tenantId: String!
+  slugConfirmation: String!
 }
 
 input SelectSubscriptionInput {

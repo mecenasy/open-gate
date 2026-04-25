@@ -182,6 +182,24 @@ export class TenantAdminService implements OnModuleInit {
     return { status: res.status, message: res.message };
   }
 
+  async transferTenantBilling(tenantId: string, newBillingUserId: string): Promise<MutationResult> {
+    await this.quotas.assertCanCreateTenant(newBillingUserId);
+    const res = await lastValueFrom(
+      this.tenantGrpcService.transferTenantBilling({ tenantId, newBillingUserId }),
+    );
+    return { status: res.status, message: res.message };
+  }
+
+  async setTenantActive(tenantId: string, active: boolean): Promise<MutationResult> {
+    const res = await lastValueFrom(this.tenantGrpcService.setTenantActive({ tenantId, active }));
+    return { status: res.status, message: res.message };
+  }
+
+  async deleteTenant(tenantId: string, slugConfirmation: string): Promise<MutationResult> {
+    const res = await lastValueFrom(this.tenantGrpcService.deleteTenant({ tenantId, slugConfirmation }));
+    return { status: res.status, message: res.message };
+  }
+
   async getTenantPlatformCredentials(tenantId: string): Promise<TenantPlatformCredentialType[]> {
     const res = await lastValueFrom(this.tenantGrpcService.getAllPlatformCredentials({ tenantId }));
     return res.items.map((i) => ({ platform: i.platform, configJson: i.configJson, isDefault: i.isDefault }));

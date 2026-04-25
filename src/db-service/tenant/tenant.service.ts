@@ -87,4 +87,46 @@ export class TenantDbService {
     existing.config = updated;
     await this.customizationRepo.save(existing);
   }
+
+  async transferBilling(tenantId: string, newBillingUserId: string): Promise<void> {
+    const tenant = await this.tenantRepo.findOne({ where: { id: tenantId } });
+    if (!tenant) {
+      throw new NotFoundException(`Tenant ${tenantId} not found`);
+    }
+    await this.tenantRepo.update(tenantId, { billingUserId: newBillingUserId });
+  }
+
+  async setActive(tenantId: string, active: boolean): Promise<void> {
+    const tenant = await this.tenantRepo.findOne({ where: { id: tenantId } });
+    if (!tenant) {
+      throw new NotFoundException(`Tenant ${tenantId} not found`);
+    }
+    await this.tenantRepo.update(tenantId, { isActive: active });
+  }
+
+  async hardDelete(tenantId: string, slugConfirmation: string): Promise<void> {
+    const tenant = await this.tenantRepo.findOne({ where: { id: tenantId } });
+    if (!tenant) {
+      throw new NotFoundException(`Tenant ${tenantId} not found`);
+    }
+    if (tenant.slug !== slugConfirmation) {
+      throw new BadRequestException(
+        `Slug confirmation mismatch — expected "${tenant.slug}", got "${slugConfirmation}"`,
+      );
+    }
+
+    const schemaName = tenant.schemaName;
+
+    // FK CASCADE on tenants.id deletes tenant_staff, contact_memberships,
+    // platform_credentials, tenant_command_config, tenant_prompt_overrides.
+    // customization_config has no FK in the current schema — drop it explicitly.
+    await this.tenantRepo.manager.transaction(async (manager) => {
+      await manager.delete(CustomizationConfig, { tenantId });
+      await manager.delete(this.tenantRepo.target, { id: tenantId });
+    });
+
+    // Schema drop is irreversible and lives outside the transaction —
+    // do it last so a failure here leaves the rest intact for retry.
+    await this.schemaManager.dropSchema(schemaName);
+  }
 }

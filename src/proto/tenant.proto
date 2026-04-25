@@ -31,6 +31,9 @@ service TenantService {
   rpc GetTenantContacts (GetTenantContactsRequest) returns (GetTenantContactsResponse);
   rpc RemoveContactFromTenant (RemoveContactFromTenantRequest) returns (MutationResponse);
   rpc GetTenantUsage (GetTenantUsageRequest) returns (GetTenantUsageResponse);
+  rpc TransferTenantBilling (TransferTenantBillingRequest) returns (MutationResponse);
+  rpc SetTenantActive (SetTenantActiveRequest) returns (MutationResponse);
+  rpc DeleteTenant (DeleteTenantRequest) returns (MutationResponse);
 }
 
 message GetCustomizationRequest {
@@ -390,4 +393,19 @@ message GetTenantUsageResponse {
   string message = 2;
   int32 tenants = 3;
   repeated TenantUsageEntry per_tenant = 4;
+}
+
+message TransferTenantBillingRequest {
+  string tenant_id = 1;
+  string new_billing_user_id = 2;
+}
+
+message SetTenantActiveRequest {
+  string tenant_id = 1;
+  bool active = 2;
+}
+
+message DeleteTenantRequest {
+  string tenant_id = 1;
+  string slug_confirmation = 2;
 }

@@ -67,6 +67,9 @@ type Documents = {
     "\n  mutation SwitchTenantWizard($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n": typeof types.SwitchTenantWizardDocument,
     "\n  mutation UpdateTenantFeaturesWizard($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpdateTenantFeaturesWizardDocument,
     "\n  mutation AddContactWizard($input: AddContactInput!) {\n    addContact(input: $input) {\n      id\n    }\n  }\n": typeof types.AddContactWizardDocument,
+    "\n  mutation UpsertPlatformWizard($input: UpsertPlatformCredentialsInput!) {\n    upsertPlatformCredentials(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.UpsertPlatformWizardDocument,
+    "\n  mutation AddCustomCommandWizard($input: AddCustomCommandInput!) {\n    addCustomCommand(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.AddCustomCommandWizardDocument,
+    "\n  query WizardUsage {\n    myUsage {\n      tenants\n    }\n    mySubscription {\n      plan {\n        maxTenants\n        maxPlatformsPerTenant\n        maxCustomCommandsPerTenant\n        maxContactsPerTenant\n      }\n    }\n  }\n": typeof types.WizardUsageDocument,
     "\n  query GetUsers($input: GetAllUsersType) {\n    users(input: $input) {\n      users {\n        id\n        name\n        surname\n        email\n        phone\n        status\n        type\n      }\n      total\n    }\n  }\n": typeof types.GetUsersDocument,
     "\n  mutation CreateSimpleUser($input: CreateSimpleUserType!) {\n    createSimpleUser(input: $input) {\n      id\n      email\n    }\n  }\n": typeof types.CreateSimpleUserDocument,
     "\n  mutation UpdateUser($input: UpdateUserType!) {\n    updateUser(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n": typeof types.UpdateUserDocument,
@@ -133,6 +136,9 @@ const documents: Documents = {
     "\n  mutation SwitchTenantWizard($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n": types.SwitchTenantWizardDocument,
     "\n  mutation UpdateTenantFeaturesWizard($input: UpdateTenantFeaturesInput!) {\n    updateTenantFeatures(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpdateTenantFeaturesWizardDocument,
     "\n  mutation AddContactWizard($input: AddContactInput!) {\n    addContact(input: $input) {\n      id\n    }\n  }\n": types.AddContactWizardDocument,
+    "\n  mutation UpsertPlatformWizard($input: UpsertPlatformCredentialsInput!) {\n    upsertPlatformCredentials(input: $input) {\n      status\n      message\n    }\n  }\n": types.UpsertPlatformWizardDocument,
+    "\n  mutation AddCustomCommandWizard($input: AddCustomCommandInput!) {\n    addCustomCommand(input: $input) {\n      status\n      message\n    }\n  }\n": types.AddCustomCommandWizardDocument,
+    "\n  query WizardUsage {\n    myUsage {\n      tenants\n    }\n    mySubscription {\n      plan {\n        maxTenants\n        maxPlatformsPerTenant\n        maxCustomCommandsPerTenant\n        maxContactsPerTenant\n      }\n    }\n  }\n": types.WizardUsageDocument,
     "\n  query GetUsers($input: GetAllUsersType) {\n    users(input: $input) {\n      users {\n        id\n        name\n        surname\n        email\n        phone\n        status\n        type\n      }\n      total\n    }\n  }\n": types.GetUsersDocument,
     "\n  mutation CreateSimpleUser($input: CreateSimpleUserType!) {\n    createSimpleUser(input: $input) {\n      id\n      email\n    }\n  }\n": types.CreateSimpleUserDocument,
     "\n  mutation UpdateUser($input: UpdateUserType!) {\n    updateUser(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n": types.UpdateUserDocument,
@@ -372,6 +378,18 @@ export function graphql(source: "\n  mutation UpdateTenantFeaturesWizard($input:
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation AddContactWizard($input: AddContactInput!) {\n    addContact(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation AddContactWizard($input: AddContactInput!) {\n    addContact(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpsertPlatformWizard($input: UpsertPlatformCredentialsInput!) {\n    upsertPlatformCredentials(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation UpsertPlatformWizard($input: UpsertPlatformCredentialsInput!) {\n    upsertPlatformCredentials(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation AddCustomCommandWizard($input: AddCustomCommandInput!) {\n    addCustomCommand(input: $input) {\n      status\n      message\n    }\n  }\n"): (typeof documents)["\n  mutation AddCustomCommandWizard($input: AddCustomCommandInput!) {\n    addCustomCommand(input: $input) {\n      status\n      message\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query WizardUsage {\n    myUsage {\n      tenants\n    }\n    mySubscription {\n      plan {\n        maxTenants\n        maxPlatformsPerTenant\n        maxCustomCommandsPerTenant\n        maxContactsPerTenant\n      }\n    }\n  }\n"): (typeof documents)["\n  query WizardUsage {\n    myUsage {\n      tenants\n    }\n    mySubscription {\n      plan {\n        maxTenants\n        maxPlatformsPerTenant\n        maxCustomCommandsPerTenant\n        maxContactsPerTenant\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

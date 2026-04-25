@@ -187,25 +187,64 @@ type CommandsListType {
   limit: Int!
 }
 
-type ConfigType {
-  id: ID!
-  key: String!
-  value: String!
-  description: String!
-  createdAt: String!
-  updatedAt: String!
+type TenantUsageEntryType {
+  tenantId: String!
+  staff: Int!
+  platforms: Int!
+  contacts: Int!
+  customCommands: Int!
 }
 
-type ConfigResponseType {
-  status: Boolean!
-  message: String!
-  data: ConfigType
+type UsageReportType {
+  billingUserId: String!
+  tenants: Int!
+  perTenant: [TenantUsageEntryType!]!
 }
 
-type ConfigsListType {
-  status: Boolean!
-  message: String!
-  data: [ConfigType!]!
+type SubscriptionPlanType {
+  id: String!
+  code: String!
+  name: String!
+  maxTenants: Int!
+  maxPlatformsPerTenant: Int!
+  maxContactsPerTenant: Int!
+  maxStaffPerTenant: Int!
+  maxCustomCommandsPerTenant: Int!
+  priceCents: Int!
+  currency: String!
+  isActive: Boolean!
+}
+
+type UserSubscriptionType {
+  id: String!
+  planId: String!
+  status: String!
+  startedAt: String!
+  expiresAt: String
+  plan: SubscriptionPlanType!
+}
+
+type QuotaViolationType {
+  kind: String!
+  tenantId: String
+  current: Int!
+  max: Int!
+}
+
+type PlanChangePreviewType {
+  newPlan: SubscriptionPlanType!
+  currentPlan: SubscriptionPlanType
+  kind: String!
+  violations: [QuotaViolationType!]!
+  deltaPriceCents: Int!
+}
+
+type SubscriptionChangeType {
+  id: String!
+  oldPlanId: String
+  newPlanId: String
+  kind: String!
+  initiatedAt: String!
 }
 
 type TenantFeaturesType {
@@ -329,64 +368,25 @@ type TenantCustomizationFullType {
   compliance: TenantComplianceType!
 }
 
-type TenantUsageEntryType {
-  tenantId: String!
-  staff: Int!
-  platforms: Int!
-  contacts: Int!
-  customCommands: Int!
+type ConfigType {
+  id: ID!
+  key: String!
+  value: String!
+  description: String!
+  createdAt: String!
+  updatedAt: String!
 }
 
-type UsageReportType {
-  billingUserId: String!
-  tenants: Int!
-  perTenant: [TenantUsageEntryType!]!
+type ConfigResponseType {
+  status: Boolean!
+  message: String!
+  data: ConfigType
 }
 
-type SubscriptionPlanType {
-  id: String!
-  code: String!
-  name: String!
-  maxTenants: Int!
-  maxPlatformsPerTenant: Int!
-  maxContactsPerTenant: Int!
-  maxStaffPerTenant: Int!
-  maxCustomCommandsPerTenant: Int!
-  priceCents: Int!
-  currency: String!
-  isActive: Boolean!
-}
-
-type UserSubscriptionType {
-  id: String!
-  planId: String!
-  status: String!
-  startedAt: String!
-  expiresAt: String
-  plan: SubscriptionPlanType!
-}
-
-type QuotaViolationType {
-  kind: String!
-  tenantId: String
-  current: Int!
-  max: Int!
-}
-
-type PlanChangePreviewType {
-  newPlan: SubscriptionPlanType!
-  currentPlan: SubscriptionPlanType
-  kind: String!
-  violations: [QuotaViolationType!]!
-  deltaPriceCents: Int!
-}
-
-type SubscriptionChangeType {
-  id: String!
-  oldPlanId: String
-  newPlanId: String
-  kind: String!
-  initiatedAt: String!
+type ConfigsListType {
+  status: Boolean!
+  message: String!
+  data: [ConfigType!]!
 }
 
 type Query {
@@ -402,9 +402,11 @@ type Query {
   commands(input: GetAllCommandsType): CommandsListType!
   commandsByPermission(input: GetAllByPermissionType!): CommandsListType!
   commandByPermission(input: GetByPermissionType!): CommandResponseType!
-  coreConfigs: ConfigsListType!
-  featureConfigs: ConfigsListType!
-  featureConfig(input: GetFeatureConfigType!): ConfigsListType!
+  myUsage: UsageReportType!
+  subscriptionPlans: [SubscriptionPlanType!]!
+  mySubscription: UserSubscriptionType
+  previewPlanChange(newPlanId: String!): PlanChangePreviewType!
+  subscriptionHistory: [SubscriptionChangeType!]!
   tenantFeatures: TenantFeaturesType!
   tenantPlatformCredentials: [TenantPlatformCredentialType!]!
   tenants: [TenantType!]!
@@ -416,11 +418,9 @@ type Query {
   tenantCommandConfigs: [TenantCommandConfigType!]!
   tenantPromptOverrides: [TenantPromptOverrideType!]!
   tenantCustomization(tenantId: String!): TenantCustomizationFullType!
-  myUsage: UsageReportType!
-  subscriptionPlans: [SubscriptionPlanType!]!
-  mySubscription: UserSubscriptionType
-  previewPlanChange(newPlanId: String!): PlanChangePreviewType!
-  subscriptionHistory: [SubscriptionChangeType!]!
+  coreConfigs: ConfigsListType!
+  featureConfigs: ConfigsListType!
+  featureConfig(input: GetFeatureConfigType!): ConfigsListType!
   csrfToken: CsrfTokenType!
 }
 
@@ -513,7 +513,9 @@ type Mutation {
   updateCommand(input: UpdateCommandType!): CommandResponseType!
   toggleActiveStatus(input: ToggleActiveStatusType!): CommandResponseType!
   removeCommand(input: RemoveCommandType!): CommandResponseType!
-  updateConfig(input: UpdateConfigType!): ConfigResponseType!
+  addCustomCommand(input: AddCustomCommandInput!): CommandResponseType!
+  selectSubscription(input: SelectSubscriptionInput!): UserSubscriptionType!
+  cancelSubscription: Boolean!
   updateMyPlatformCredentials(input: UpdateMyPlatformCredentialsInput!): MutationResult!
   createTenant(input: CreateTenantInput!): CreateTenantResult!
   switchTenant(tenantId: String!): Boolean!
@@ -536,8 +538,7 @@ type Mutation {
   transferTenantBilling(input: TransferTenantBillingInput!): MutationResult!
   setTenantActive(input: SetTenantActiveInput!): MutationResult!
   deleteTenant(input: DeleteTenantInput!): MutationResult!
-  selectSubscription(input: SelectSubscriptionInput!): UserSubscriptionType!
-  cancelSubscription: Boolean!
+  updateConfig(input: UpdateConfigType!): ConfigResponseType!
 }
 
 input RegisterInput {
@@ -664,9 +665,16 @@ input RemoveCommandType {
   id: ID!
 }
 
-input UpdateConfigType {
-  key: String!
-  value: String!
+input AddCustomCommandInput {
+  tenantId: String!
+  name: String!
+  description: String
+  actions: JSON
+  parameters: JSON
+}
+
+input SelectSubscriptionInput {
+  planId: String!
 }
 
 input UpdateMyPlatformCredentialsInput {
@@ -805,6 +813,7 @@ input DeleteTenantInput {
   slugConfirmation: String!
 }
 
-input SelectSubscriptionInput {
-  planId: String!
+input UpdateConfigType {
+  key: String!
+  value: String!
 }

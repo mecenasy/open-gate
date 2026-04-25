@@ -6,6 +6,7 @@ import type {
   CommandResponse,
   GetAllCommandsResponse,
   AddCommandRequest,
+  AddCustomCommandRequest,
   GetCommandRequest,
   GetCommandFromMatchesRequest,
   UpdateCommandRequest,
@@ -26,12 +27,14 @@ import { GetAllCommandsQuery } from './queries/impl/get-all-commands.query';
 import { GetAllByPermissionQuery } from './queries/impl/get-all-by-permission.query';
 import { GetByPermissionQuery } from './queries/impl/get-by-permission.query';
 import { GetCommandFromMatchesQuery } from './queries/impl/get-command-from-matches.query';
+import { CommandService } from './command.service';
 
 @Controller()
 export class CommandGrpcController implements CommandServiceController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly commandService: CommandService,
   ) {}
 
   @GrpcMethod(COMMAND_SERVICE_NAME, 'AddCommand')
@@ -196,6 +199,29 @@ export class CommandGrpcController implements CommandServiceController {
       return {
         status: false,
         message: `Failed to toggle command status: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+  }
+
+  @GrpcMethod(COMMAND_SERVICE_NAME, 'AddCustomCommand')
+  async addCustomCommand(request: AddCustomCommandRequest): Promise<CommandResponse> {
+    try {
+      const cmd = await this.commandService.createCustom({
+        tenantId: request.tenantId,
+        name: request.name,
+        description: request.description,
+        actions: request.actions ?? {},
+        parameters: request.parameters ?? {},
+      });
+      return {
+        status: true,
+        message: 'Custom command created successfully',
+        data: this.commandService.entityToProto(cmd),
+      };
+    } catch (error) {
+      return {
+        status: false,
+        message: `Failed to create custom command: ${error instanceof Error ? error.message : 'Unknown error'}`,
       };
     }
   }

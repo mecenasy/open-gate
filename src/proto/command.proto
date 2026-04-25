@@ -26,6 +26,17 @@ service CommandService {
   
   // Change only the active boolean field
   rpc ToggleActiveStatus (ToggleActiveStatusRequest) returns (CommandResponse);
+
+  // Create a tenant-scoped custom command (isSystem=false)
+  rpc AddCustomCommand (AddCustomCommandRequest) returns (CommandResponse);
+}
+
+message AddCustomCommandRequest {
+  string tenant_id = 1;
+  string name = 2;
+  string description = 3;
+  map<string, bool> actions = 4;
+  map<string, bool> parameters = 5;
 }
 
 

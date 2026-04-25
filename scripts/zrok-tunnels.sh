@@ -80,6 +80,8 @@ check_port "$FRONT_PORT" || echo "[ostrz] Front (127.0.0.1:$FRONT_PORT) nie odpo
 stop_tunnels
 
 ensure_reserved() {
+  # best-effort: jeśli reserve nie wyjdzie (już istnieje, glitch WSL), lecimy dalej —
+  # 'share reserved' zadziała o ile token był kiedykolwiek zarezerwowany.
   local name="$1" port="$2"
   echo "[reserved] zapewniam $name -> http://127.0.0.1:$port"
   local out
@@ -87,13 +89,13 @@ ensure_reserved() {
     echo "$out"
   else
     if echo "$out" | grep -qiE 'conflict|409|already'; then
-      echo "[reserved] $name już istnieje — pomijam"
+      echo "[reserved] $name już istnieje"
     else
-      echo "$out" >&2
-      echo "Nie udało się zarezerwować $name" >&2
-      return 1
+      echo "[reserved] reserve nie wyszedł (zakładam że token istnieje):" >&2
+      echo "$out" | sed 's/^/  /' >&2
     fi
   fi
+  return 0
 }
 
 reserved_url() {

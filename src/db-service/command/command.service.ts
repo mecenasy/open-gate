@@ -188,6 +188,28 @@ export class CommandService {
     return this.commandRepository.count({ where: { tenantId, isSystem: false } });
   }
 
+  async createCustom(input: {
+    tenantId: string;
+    name: string;
+    description?: string;
+    actions?: Record<string, boolean>;
+    parameters?: Record<string, boolean>;
+  }): Promise<Command> {
+    return this.dataSource.transaction(async (manager) => {
+      const cmd = manager.create(Command, {
+        name: input.name,
+        description: input.description ?? '',
+        active: true,
+        actions: input.actions ?? {},
+        parameters: input.parameters ?? {},
+        isSystem: false,
+        tenantId: input.tenantId,
+        userRoles: [],
+      });
+      return manager.save(cmd);
+    });
+  }
+
   // Helper method to convert Command entity to CommandProto
   entityToProto(command: Command): CommandProto {
     return {

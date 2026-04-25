@@ -11,6 +11,8 @@ interface WizardStepperProps {
 const STEP_LABEL_KEYS: Record<WizardStepKey, string> = {
   basics: 'stepBasicsLabel',
   features: 'stepFeaturesLabel',
+  platforms: 'stepPlatformsLabel',
+  commands: 'stepCommandsLabel',
   contacts: 'stepContactsLabel',
 };
 

@@ -38,3 +38,37 @@ export const ADD_CONTACT_WIZARD_MUTATION = graphql(`
     }
   }
 `);
+
+export const UPSERT_PLATFORM_WIZARD_MUTATION = graphql(`
+  mutation UpsertPlatformWizard($input: UpsertPlatformCredentialsInput!) {
+    upsertPlatformCredentials(input: $input) {
+      status
+      message
+    }
+  }
+`);
+
+export const ADD_CUSTOM_COMMAND_WIZARD_MUTATION = graphql(`
+  mutation AddCustomCommandWizard($input: AddCustomCommandInput!) {
+    addCustomCommand(input: $input) {
+      status
+      message
+    }
+  }
+`);
+
+export const WIZARD_USAGE_QUERY = graphql(`
+  query WizardUsage {
+    myUsage {
+      tenants
+    }
+    mySubscription {
+      plan {
+        maxTenants
+        maxPlatformsPerTenant
+        maxCustomCommandsPerTenant
+        maxContactsPerTenant
+      }
+    }
+  }
+`);

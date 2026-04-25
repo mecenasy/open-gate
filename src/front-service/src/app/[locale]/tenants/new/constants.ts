@@ -1,6 +1,8 @@
 import type { TenantFeaturesDraft, WizardStepKey } from './interfaces';
 
-export const WIZARD_STEPS: WizardStepKey[] = ['basics', 'features', 'contacts'];
+export const WIZARD_STEPS: WizardStepKey[] = ['basics', 'features', 'platforms', 'commands', 'contacts'];
+
+export const PLATFORM_KEYS = ['signal', 'sms', 'smtp', 'whatsapp', 'messenger'] as const;
 
 export const DEFAULT_FEATURES: TenantFeaturesDraft = {
   enableSignal: false,

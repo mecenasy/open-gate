@@ -52,6 +52,18 @@ export class TenantAdminService implements OnModuleInit {
     return res.isAvailable;
   }
 
+  async getTenantById(tenantId: string): Promise<TenantType | null> {
+    const res = await lastValueFrom(this.tenantGrpcService.getTenant({ tenantId }));
+    if (!res.status || !res.id) return null;
+    return {
+      id: res.id,
+      slug: res.slug,
+      schemaName: res.schemaName,
+      isActive: res.isActive,
+      billingUserId: res.billingUserId || null,
+    };
+  }
+
   async getAllTenants(): Promise<TenantType[]> {
     const res = await lastValueFrom(this.tenantGrpcService.getAllTenants({}));
     return res.tenants.map((t) => ({

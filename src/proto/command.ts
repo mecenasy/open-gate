@@ -11,6 +11,24 @@ import { Observable } from "rxjs";
 
 export const protobufPackage = "command";
 
+export interface AddCustomCommandRequest {
+  tenantId: string;
+  name: string;
+  description: string;
+  actions: { [key: string]: boolean };
+  parameters: { [key: string]: boolean };
+}
+
+export interface AddCustomCommandRequest_ActionsEntry {
+  key: string;
+  value: boolean;
+}
+
+export interface AddCustomCommandRequest_ParametersEntry {
+  key: string;
+  value: boolean;
+}
+
 export interface GetCommandFromMatchesRequest {
   matches: string[];
 }
@@ -184,6 +202,10 @@ export interface CommandServiceClient {
   /** Change only the active boolean field */
 
   toggleActiveStatus(request: ToggleActiveStatusRequest, metadata?: Metadata): Observable<CommandResponse>;
+
+  /** Create a tenant-scoped custom command (isSystem=false) */
+
+  addCustomCommand(request: AddCustomCommandRequest, metadata?: Metadata): Observable<CommandResponse>;
 }
 
 export interface CommandServiceController {
@@ -247,6 +269,13 @@ export interface CommandServiceController {
     request: ToggleActiveStatusRequest,
     metadata?: Metadata,
   ): Promise<CommandResponse> | Observable<CommandResponse> | CommandResponse;
+
+  /** Create a tenant-scoped custom command (isSystem=false) */
+
+  addCustomCommand(
+    request: AddCustomCommandRequest,
+    metadata?: Metadata,
+  ): Promise<CommandResponse> | Observable<CommandResponse> | CommandResponse;
 }
 
 export function CommandServiceControllerMethods() {
@@ -261,6 +290,7 @@ export function CommandServiceControllerMethods() {
       "getAllByPermission",
       "getByPermission",
       "toggleActiveStatus",
+      "addCustomCommand",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

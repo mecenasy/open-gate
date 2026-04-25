@@ -175,7 +175,7 @@ Reguły:
 
 ---
 
-### Commit 6 — wizard: domknięcie (PLAN-MT-OWNERSHIP Faza 5)
+### Commit 6 — wizard: domknięcie (PLAN-MT-OWNERSHIP Faza 5)  ✅ ZREALIZOWANE (bez CSV import)
 
 1. Dodać kroki 4–5 do [TenantWizardView](src/front-service/src/app/[locale]/tenants/new/TenantWizardView.tsx):
    - **Platforms** — lista platform + pole JSON credentials; skip → defaults; walidacja `maxPlatformsPerTenant`.

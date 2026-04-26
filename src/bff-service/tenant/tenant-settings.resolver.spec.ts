@@ -7,10 +7,9 @@ import type { TenantAdminService } from './tenant-admin.service';
 describe('TenantSettingsResolver', () => {
   let resolver: TenantSettingsResolver;
   let customization: jest.Mocked<Pick<TenantCustomizationService, 'getForTenant' | 'invalidate'>>;
-  let admin: jest.Mocked<Pick<
-    TenantAdminService,
-    'updateCustomization' | 'transferTenantBilling' | 'setTenantActive' | 'deleteTenant'
-  >>;
+  let admin: jest.Mocked<
+    Pick<TenantAdminService, 'updateCustomization' | 'transferTenantBilling' | 'setTenantActive' | 'deleteTenant'>
+  >;
 
   const baseConfig: CommunityCustomization = JSON.parse(JSON.stringify(DEFAULT_CUSTOMIZATION));
 
@@ -33,23 +32,23 @@ describe('TenantSettingsResolver', () => {
 
   describe('updateTenantBranding', () => {
     it('rejects malformed hex color', async () => {
-      await expect(
-        resolver.updateTenantBranding({ tenantId: 't1', primaryColor: 'red' }),
-      ).rejects.toBeInstanceOf(BadRequestException);
+      await expect(resolver.updateTenantBranding({ tenantId: 't1', primaryColor: 'red' })).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
       expect(admin.updateCustomization).not.toHaveBeenCalled();
     });
 
     it('rejects invalid font size', async () => {
-      await expect(
-        resolver.updateTenantBranding({ tenantId: 't1', fontSize: 'huge' }),
-      ).rejects.toBeInstanceOf(BadRequestException);
+      await expect(resolver.updateTenantBranding({ tenantId: 't1', fontSize: 'huge' })).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
     });
 
     it('merges branding fields and invalidates cache', async () => {
       await resolver.updateTenantBranding({ tenantId: 't1', primaryColor: '#ff8800', fontSize: 'large' });
 
       expect(admin.updateCustomization).toHaveBeenCalledWith('t1', expect.any(String));
-      const written = JSON.parse((admin.updateCustomization.mock.calls[0]![1] as string));
+      const written = JSON.parse(admin.updateCustomization.mock.calls[0]![1] as string);
       expect(written.branding).toMatchObject({ primaryColor: '#ff8800', fontSize: 'large' });
       expect(customization.invalidate).toHaveBeenCalledWith('t1');
     });
@@ -81,7 +80,7 @@ describe('TenantSettingsResolver', () => {
         rateLimitPerMinute: 30,
       });
 
-      const written = JSON.parse((admin.updateCustomization.mock.calls[0]![1] as string));
+      const written = JSON.parse(admin.updateCustomization.mock.calls[0]![1] as string);
       expect(written.messaging.priorityChannels).toEqual(['email', 'signal']);
       expect(written.messaging.rateLimitPerMinute).toBe(30);
     });
@@ -89,21 +88,21 @@ describe('TenantSettingsResolver', () => {
 
   describe('updateTenantCommands', () => {
     it('rejects timeout below 100ms', async () => {
-      await expect(
-        resolver.updateTenantCommands({ tenantId: 't1', timeout: 50 }),
-      ).rejects.toBeInstanceOf(BadRequestException);
+      await expect(resolver.updateTenantCommands({ tenantId: 't1', timeout: 50 })).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
     });
 
     it('rejects negative retries', async () => {
-      await expect(
-        resolver.updateTenantCommands({ tenantId: 't1', maxRetries: -1 }),
-      ).rejects.toBeInstanceOf(BadRequestException);
+      await expect(resolver.updateTenantCommands({ tenantId: 't1', maxRetries: -1 })).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
     });
 
     it('persists partial command patch', async () => {
       await resolver.updateTenantCommands({ tenantId: 't1', timeout: 5000, customPromptLibraryEnabled: true });
 
-      const written = JSON.parse((admin.updateCustomization.mock.calls[0]![1] as string));
+      const written = JSON.parse(admin.updateCustomization.mock.calls[0]![1] as string);
       expect(written.commands.timeout).toBe(5000);
       expect(written.commands.customPromptLibraryEnabled).toBe(true);
       // unchanged fields preserved
@@ -113,21 +112,21 @@ describe('TenantSettingsResolver', () => {
 
   describe('updateTenantCompliance', () => {
     it('rejects unknown residency', async () => {
-      await expect(
-        resolver.updateTenantCompliance({ tenantId: 't1', dataResidency: 'MARS' }),
-      ).rejects.toBeInstanceOf(BadRequestException);
+      await expect(resolver.updateTenantCompliance({ tenantId: 't1', dataResidency: 'MARS' })).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
     });
 
     it('rejects malformed webhook URL', async () => {
-      await expect(
-        resolver.updateTenantCompliance({ tenantId: 't1', webhookUrl: 'not a url' }),
-      ).rejects.toBeInstanceOf(BadRequestException);
+      await expect(resolver.updateTenantCompliance({ tenantId: 't1', webhookUrl: 'not a url' })).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
     });
 
     it('accepts empty webhook URL (clearing)', async () => {
       await resolver.updateTenantCompliance({ tenantId: 't1', webhookUrl: '' });
 
-      const written = JSON.parse((admin.updateCustomization.mock.calls[0]![1] as string));
+      const written = JSON.parse(admin.updateCustomization.mock.calls[0]![1] as string);
       expect(written.compliance.webhookUrl).toBe('');
     });
   });

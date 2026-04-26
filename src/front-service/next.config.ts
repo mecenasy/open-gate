@@ -7,7 +7,7 @@ const BFF_URL = process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_HOST
 
 const DEV_ORIGINS = (process.env.NEXT_DEV_ALLOWED_ORIGINS ?? '')
   .split(',')
-  .map(s => s.trim())
+  .map((s) => s.trim())
   .filter(Boolean);
 
 const nextConfig: NextConfig = {

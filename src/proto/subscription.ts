@@ -5,11 +5,11 @@
 // source: src/proto/subscription.proto
 
 /* eslint-disable */
-import type { Metadata } from "@grpc/grpc-js";
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { Observable } from "rxjs";
+import type { Metadata } from '@grpc/grpc-js';
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
 
-export const protobufPackage = "subscription";
+export const protobufPackage = 'subscription';
 
 export interface PlanEntry {
   id: string;
@@ -25,8 +25,7 @@ export interface PlanEntry {
   isActive: boolean;
 }
 
-export interface GetAllPlansRequest {
-}
+export interface GetAllPlansRequest {}
 
 export interface GetAllPlansResponse {
   status: boolean;
@@ -108,7 +107,7 @@ export interface GetSubscriptionHistoryResponse {
   changes: SubscriptionChangeEntry[];
 }
 
-export const SUBSCRIPTION_PACKAGE_NAME = "subscription";
+export const SUBSCRIPTION_PACKAGE_NAME = 'subscription';
 
 export interface SubscriptionServiceClient {
   getAllPlans(request: GetAllPlansRequest, metadata?: Metadata): Observable<GetAllPlansResponse>;
@@ -168,23 +167,23 @@ export interface SubscriptionServiceController {
 export function SubscriptionServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      "getAllPlans",
-      "getPlanById",
-      "getUserSubscription",
-      "selectSubscription",
-      "cancelSubscription",
-      "getSubscriptionHistory",
+      'getAllPlans',
+      'getPlanById',
+      'getUserSubscription',
+      'selectSubscription',
+      'cancelSubscription',
+      'getSubscriptionHistory',
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("SubscriptionService", method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod('SubscriptionService', method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("SubscriptionService", method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod('SubscriptionService', method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const SUBSCRIPTION_SERVICE_NAME = "SubscriptionService";
+export const SUBSCRIPTION_SERVICE_NAME = 'SubscriptionService';

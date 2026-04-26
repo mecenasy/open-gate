@@ -69,9 +69,7 @@ export const useUserEdit = () => {
     next: Omit<UpdateUserType, 'id'> & { status: UserStatus; type: UserRole },
   ) => {
     const { status, type, ...rest } = next;
-    const tasks: Promise<unknown>[] = [
-      doUpdateUser({ variables: { input: { ...rest, id: current.id } } }),
-    ];
+    const tasks: Promise<unknown>[] = [doUpdateUser({ variables: { input: { ...rest, id: current.id } } })];
     if (status !== current.status) {
       tasks.push(doUpdateStatus({ variables: { input: { id: current.id, status } } }));
     }

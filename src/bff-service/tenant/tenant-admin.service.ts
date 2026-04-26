@@ -196,9 +196,7 @@ export class TenantAdminService implements OnModuleInit {
 
   async transferTenantBilling(tenantId: string, newBillingUserId: string): Promise<MutationResult> {
     await this.quotas.assertCanCreateTenant(newBillingUserId);
-    const res = await lastValueFrom(
-      this.tenantGrpcService.transferTenantBilling({ tenantId, newBillingUserId }),
-    );
+    const res = await lastValueFrom(this.tenantGrpcService.transferTenantBilling({ tenantId, newBillingUserId }));
     return { status: res.status, message: res.message };
   }
 

@@ -7,7 +7,7 @@ import { useRouter } from '@/components/navigation/navigation';
 import { graphql } from '@/app/gql';
 
 const QR_REJECT_MUTATION = graphql(`
-  mutation QrReject ($challenge: String!) {
+  mutation QrReject($challenge: String!) {
     qrReject(challenge: $challenge) {
       status
     }
@@ -15,13 +15,13 @@ const QR_REJECT_MUTATION = graphql(`
 `);
 
 const QR_OPTION_MUTATION = graphql(`
-  mutation QrOption ($challenge: String!, $nonce: String!) {
+  mutation QrOption($challenge: String!, $nonce: String!) {
     qrOption(challenge: $challenge, nonce: $nonce)
   }
 `);
 
 const QR_CONFIRM_MUTATION = graphql(`
-  mutation QrVerify ($challenge: String!, $data: JSON!) {
+  mutation QrVerify($challenge: String!, $data: JSON!) {
     qrConfirm(challenge: $challenge, data: $data) {
       status
     }

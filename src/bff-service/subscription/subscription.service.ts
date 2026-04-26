@@ -8,11 +8,7 @@ import {
   SubscriptionServiceClient,
   UserSubscriptionEntry,
 } from 'src/proto/subscription';
-import type {
-  SubscriptionChangeType,
-  SubscriptionPlanType,
-  UserSubscriptionType,
-} from './dto/subscription.types';
+import type { SubscriptionChangeType, SubscriptionPlanType, UserSubscriptionType } from './dto/subscription.types';
 
 const toPlan = (p: PlanEntry): SubscriptionPlanType => ({
   id: p.id,
@@ -116,14 +112,16 @@ export class SubscriptionClientService implements OnModuleInit {
     if (!currentPlan) return 'initial';
     if (currentPlan.id === newPlan.id) return 'same';
 
-    const fields: Array<keyof Pick<
-      SubscriptionPlanType,
-      | 'maxTenants'
-      | 'maxPlatformsPerTenant'
-      | 'maxContactsPerTenant'
-      | 'maxStaffPerTenant'
-      | 'maxCustomCommandsPerTenant'
-    >> = [
+    const fields: Array<
+      keyof Pick<
+        SubscriptionPlanType,
+        | 'maxTenants'
+        | 'maxPlatformsPerTenant'
+        | 'maxContactsPerTenant'
+        | 'maxStaffPerTenant'
+        | 'maxCustomCommandsPerTenant'
+      >
+    > = [
       'maxTenants',
       'maxPlatformsPerTenant',
       'maxContactsPerTenant',

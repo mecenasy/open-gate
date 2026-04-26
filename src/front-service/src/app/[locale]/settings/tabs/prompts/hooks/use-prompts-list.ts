@@ -3,20 +3,16 @@
 import { useQuery } from '@apollo/client/react';
 import type { CommandOption, PromptSummary } from '../interfaces';
 import { parseDescriptionI18n } from '../helpers';
-import {
-  GET_TENANT_COMMAND_CONFIGS_FOR_PROMPTS_QUERY,
-  GET_TENANT_PROMPT_OVERRIDES_QUERY,
-} from './queries';
+import { GET_TENANT_COMMAND_CONFIGS_FOR_PROMPTS_QUERY, GET_TENANT_PROMPT_OVERRIDES_QUERY } from './queries';
 
 export const usePromptsList = () => {
   const { loading: promptsLoading, data: promptsData } = useQuery(GET_TENANT_PROMPT_OVERRIDES_QUERY, {
     fetchPolicy: 'cache-and-network',
   });
 
-  const { loading: commandsLoading, data: commandsData } = useQuery(
-    GET_TENANT_COMMAND_CONFIGS_FOR_PROMPTS_QUERY,
-    { fetchPolicy: 'cache-and-network' },
-  );
+  const { loading: commandsLoading, data: commandsData } = useQuery(GET_TENANT_COMMAND_CONFIGS_FOR_PROMPTS_QUERY, {
+    fetchPolicy: 'cache-and-network',
+  });
 
   const commandOptions: CommandOption[] = (commandsData?.tenantCommandConfigs ?? []).map((c) => ({
     value: c.id,

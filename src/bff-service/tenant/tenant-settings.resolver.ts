@@ -128,8 +128,10 @@ export class TenantSettingsResolver {
   @UseGuards(TenantStaffGuard(TenantStaffRole.Admin))
   @Mutation(() => MutationResult)
   async updateTenantMessaging(@Args('input') input: MessagingInput): Promise<MutationResult> {
-    if (input.defaultSmsProvider !== undefined &&
-        !SMS_PROVIDERS.has(input.defaultSmsProvider as CommunityCustomizationMessaging['defaultSmsProvider'])) {
+    if (
+      input.defaultSmsProvider !== undefined &&
+      !SMS_PROVIDERS.has(input.defaultSmsProvider as CommunityCustomizationMessaging['defaultSmsProvider'])
+    ) {
       throw new BadRequestException(`defaultSmsProvider must be one of: ${[...SMS_PROVIDERS].join(', ')}`);
     }
     if (input.priorityChannels) {

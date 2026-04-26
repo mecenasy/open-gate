@@ -2,12 +2,7 @@
 
 import { useQuery } from '@apollo/client/react';
 import { GET_BILLING_DATA_QUERY } from './queries';
-import type {
-  PlanSummary,
-  SubscriptionChangeEntry,
-  SubscriptionSummary,
-  UsageReport,
-} from '../interfaces';
+import type { PlanSummary, SubscriptionChangeEntry, SubscriptionSummary, UsageReport } from '../interfaces';
 
 export const useBillingData = () => {
   const { data, loading, error } = useQuery(GET_BILLING_DATA_QUERY, {

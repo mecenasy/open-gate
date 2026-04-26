@@ -2,12 +2,7 @@ import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import type { ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { DbGrpcKey } from '@app/db-grpc';
-import {
-  PlanLimitExceededException,
-  type QuotaViolation,
-  type TenantUsageEntry,
-  type UsageReport,
-} from '@app/quotas';
+import { PlanLimitExceededException, type QuotaViolation, type TenantUsageEntry, type UsageReport } from '@app/quotas';
 import { TENANT_SERVICE_NAME, TenantServiceClient } from 'src/proto/tenant';
 import { SubscriptionClientService } from '../subscription/subscription.service';
 import type { SubscriptionPlanType } from '../subscription/dto/subscription.types';

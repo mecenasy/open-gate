@@ -1,6 +1,10 @@
-export const parseJson = <T,>(json?: string | null, fallback: T = {} as T): T => {
+export const parseJson = <T>(json?: string | null, fallback: T = {} as T): T => {
   if (!json) return fallback;
-  try { return JSON.parse(json) as T; } catch { return fallback; }
+  try {
+    return JSON.parse(json) as T;
+  } catch {
+    return fallback;
+  }
 };
 
 export const toKeysJson = (keys: string[]): string | undefined =>

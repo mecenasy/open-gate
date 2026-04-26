@@ -10,7 +10,7 @@ export const useAuditLog = (tenantId: string) => {
     fetchPolicy: 'cache-and-network',
   });
   return {
-    entries: ((data?.tenantAuditLog ?? []) as AuditEntry[]),
+    entries: (data?.tenantAuditLog ?? []) as AuditEntry[],
     isLoading: loading,
     error,
   };

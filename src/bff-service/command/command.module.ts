@@ -9,12 +9,6 @@ import { TenantBffModule } from '../tenant/tenant.module';
 
 @Module({
   imports: [QuotasBffModule, TenantBffModule],
-  providers: [
-    ...commandCommands,
-    ...commandQueries,
-    CommandCommandResolver,
-    CommandQueryResolver,
-    PlatformAdminGuard,
-  ],
+  providers: [...commandCommands, ...commandQueries, CommandCommandResolver, CommandQueryResolver, PlatformAdminGuard],
 })
 export class CommandModule {}

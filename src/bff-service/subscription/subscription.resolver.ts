@@ -111,8 +111,7 @@ export class SubscriptionResolver {
     const currentPlan = currentSub?.plan ?? null;
     const kind = this.subscriptions.classifyChange(currentPlan, newPlan);
 
-    const violations: QuotaViolation[] =
-      kind === 'downgrade' ? await this.quotas.listViolations(userId, newPlan) : [];
+    const violations: QuotaViolation[] = kind === 'downgrade' ? await this.quotas.listViolations(userId, newPlan) : [];
 
     const violationsTyped: QuotaViolationType[] = violations.map((v) => ({
       kind: v.kind,

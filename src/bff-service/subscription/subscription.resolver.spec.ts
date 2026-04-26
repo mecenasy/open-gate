@@ -96,9 +96,7 @@ describe('SubscriptionResolver', () => {
       subs.getPlanById.mockResolvedValue(target);
       subs.getUserSubscription.mockResolvedValue(subscription(current));
       subs.classifyChange.mockReturnValue('downgrade');
-      quotas.listViolations.mockResolvedValue([
-        { kind: 'tenants', current: 3, max: 1 },
-      ]);
+      quotas.listViolations.mockResolvedValue([{ kind: 'tenants', current: 3, max: 1 }]);
 
       const preview = await resolver.previewPlanChange('minimal', 'user-1');
 

@@ -21,7 +21,13 @@ export interface PlatformFieldDef {
 
 export const PLATFORM_FIELDS: Record<PlatformKey, PlatformFieldDef[]> = {
   signal: [
-    { name: 'apiUrl', type: 'url', labelKey: 'signal_apiUrl', placeholder: 'https://signal-bridge.local', required: true },
+    {
+      name: 'apiUrl',
+      type: 'url',
+      labelKey: 'signal_apiUrl',
+      placeholder: 'https://signal-bridge.local',
+      required: true,
+    },
     { name: 'account', type: 'text', labelKey: 'signal_account', placeholder: '+48...', required: true },
   ],
   sms: [

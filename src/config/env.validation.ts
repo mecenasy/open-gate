@@ -46,7 +46,10 @@ export const envValidationSchema = Joi.object({
     .required()
     .description('Secret for session encryption (must be at least 32 chars)'),
   SESSION_NAME: Joi.string().default('session_auth').description('Session cookie name'),
-  SESSION_DOMAIN: Joi.string().allow('').default('localhost').description('Session cookie domain (empty = scoped to request origin)'),
+  SESSION_DOMAIN: Joi.string()
+    .allow('')
+    .default('localhost')
+    .description('Session cookie domain (empty = scoped to request origin)'),
   SESSION_MAX_AGE: Joi.number().integer().positive().default(86400000).description('Session max age in ms'),
   SESSION_HTTP_ONLY: Joi.string()
     .valid('true', 'false')

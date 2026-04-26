@@ -65,4 +65,10 @@ export const ROLE_LABEL_KEYS: Record<string, string> = {
 };
 
 export const STATUS_VALUES = [UserStatus.Pending, UserStatus.Active, UserStatus.Suspended, UserStatus.Banned] as const;
-export const ROLE_VALUES = [UserRole.Owner, UserRole.Admin, UserRole.SuperUser, UserRole.Member, UserRole.User] as const;
+export const ROLE_VALUES = [
+  UserRole.Owner,
+  UserRole.Admin,
+  UserRole.SuperUser,
+  UserRole.Member,
+  UserRole.User,
+] as const;

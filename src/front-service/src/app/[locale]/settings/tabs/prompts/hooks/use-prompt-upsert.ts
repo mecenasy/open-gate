@@ -2,10 +2,7 @@
 
 import { useMutation } from '@apollo/client/react';
 import type { PromptFormValues } from '../schemas/prompt.schema';
-import {
-  GET_TENANT_PROMPT_OVERRIDES_QUERY,
-  UPSERT_TENANT_PROMPT_OVERRIDE_MUTATION,
-} from './queries';
+import { GET_TENANT_PROMPT_OVERRIDES_QUERY, UPSERT_TENANT_PROMPT_OVERRIDE_MUTATION } from './queries';
 
 export const usePromptUpsert = () => {
   const [doUpsert, { loading }] = useMutation(UPSERT_TENANT_PROMPT_OVERRIDE_MUTATION, {
@@ -13,9 +10,8 @@ export const usePromptUpsert = () => {
   });
 
   const upsertPrompt = async (values: PromptFormValues) => {
-    const descriptionI18nJson = Object.keys(values.descriptionI18n).length > 0
-      ? JSON.stringify(values.descriptionI18n)
-      : undefined;
+    const descriptionI18nJson =
+      Object.keys(values.descriptionI18n).length > 0 ? JSON.stringify(values.descriptionI18n) : undefined;
 
     await doUpsert({
       variables: {

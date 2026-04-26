@@ -9,10 +9,21 @@ import { AdminGuard } from '../common/guards/admin.guard';
 import { QuotasBffModule } from '../quotas/quotas.module';
 import { AuditBffModule } from '../audit/audit.module';
 import { AuditResolver } from '../audit/audit.resolver';
+import { PlatformOnboardingResolver } from './platform-onboarding.resolver';
+import { PlatformOnboardingService } from './platform-onboarding.service';
 
 @Module({
   imports: [TenantModule, TenantCustomizationModule, QuotasBffModule, AuditBffModule],
-  providers: [TenantResolver, TenantSettingsResolver, TenantAdminService, OwnerGuard, AdminGuard, AuditResolver],
+  providers: [
+    TenantResolver,
+    TenantSettingsResolver,
+    TenantAdminService,
+    OwnerGuard,
+    AdminGuard,
+    AuditResolver,
+    PlatformOnboardingResolver,
+    PlatformOnboardingService,
+  ],
   exports: [TenantAdminService],
 })
 export class TenantBffModule {}

@@ -18,8 +18,7 @@ export const useStaffMutations = (tenantId: string) => {
   return {
     addStaff: (userId: string, role: string) => doAdd({ variables: { input: { tenantId, userId, role } } }),
     removeStaff: (userId: string) => doRemove({ variables: { input: { tenantId, userId } } }),
-    changeRole: (userId: string, role: string) =>
-      doChange({ variables: { input: { tenantId, userId, role } } }),
+    changeRole: (userId: string, role: string) => doChange({ variables: { input: { tenantId, userId, role } } }),
     isAdding: addState.loading,
     isRemoving: removeState.loading,
     isChanging: changeState.loading,

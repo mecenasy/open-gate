@@ -62,7 +62,8 @@ export class SubscriptionService {
     const oldPlanId = existing?.planId ?? null;
     const oldPlan = oldPlanId ? await this.planRepo.findOne({ where: { id: oldPlanId } }) : null;
 
-    const kind = oldPlanId === null ? SubscriptionChangeKind.Initial : (options.kindHint ?? SubscriptionChangeKind.Upgrade);
+    const kind =
+      oldPlanId === null ? SubscriptionChangeKind.Initial : (options.kindHint ?? SubscriptionChangeKind.Upgrade);
 
     // Hand off to the billing provider before writing local state. With
     // NoopBillingProvider this is a no-op; with Stripe the prorated charge
@@ -115,10 +116,7 @@ export class SubscriptionService {
     return { ...saved, plan };
   }
 
-  async cancel(
-    userId: string,
-    options: { atPeriodEnd?: boolean; correlationId?: string | null } = {},
-  ): Promise<void> {
+  async cancel(userId: string, options: { atPeriodEnd?: boolean; correlationId?: string | null } = {}): Promise<void> {
     const existing = await this.userSubRepo.findOne({ where: { userId } });
     if (!existing) return;
     const oldPlanId = existing.planId;
@@ -192,5 +190,4 @@ export class SubscriptionService {
       }),
     );
   }
-
 }

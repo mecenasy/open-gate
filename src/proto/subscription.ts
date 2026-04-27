@@ -23,6 +23,16 @@ export interface PlanEntry {
   priceCents: number;
   currency: string;
   isActive: boolean;
+  /**
+   * Phone procurement limits — 0 across the board for legacy plans where the
+   * managed flow isn't available.
+   */
+  phoneNumbersIncluded: number;
+  messagesPerMonthIncluded: number;
+  /** Cents charged per SMS sent over the included quota (operator pass-through + our markup). */
+  pricePerExtraMessageCents: number;
+  /** Informational — what the number costs us per month from the operator. */
+  phoneMonthlyCostCents: number;
 }
 
 export interface GetAllPlansRequest {}

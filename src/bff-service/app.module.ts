@@ -17,6 +17,7 @@ import { TenantBffModule } from './tenant/tenant.module';
 import { SubscriptionBffModule } from './subscription/subscription.module';
 import { QuotasBffModule } from './quotas/quotas.module';
 import { AuditBffModule } from './audit/audit.module';
+import { PhoneProcurementBffModule } from './phone-procurement/phone-procurement.module';
 import { LoggerModule } from '@app/logger';
 import { TenantModule, TenantInterceptor, TenantService } from '@app/tenant';
 import { TENANT_SERVICE_TOKEN } from '@app/handler';
@@ -53,6 +54,7 @@ import { TENANT_SERVICE_TOKEN } from '@app/handler';
     SubscriptionBffModule,
     QuotasBffModule,
     AuditBffModule,
+    PhoneProcurementBffModule,
     CsrfModule,
   ],
   controllers: [AppController],

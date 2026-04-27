@@ -23,6 +23,14 @@ message PlanEntry {
   int32 price_cents = 9;
   string currency = 10;
   bool is_active = 11;
+  // Phone procurement limits — 0 across the board for legacy plans where the
+  // managed flow isn't available.
+  int32 phone_numbers_included = 12;
+  int32 messages_per_month_included = 13;
+  // Cents charged per SMS sent over the included quota (operator pass-through + our markup).
+  int32 price_per_extra_message_cents = 14;
+  // Informational — what the number costs us per month from the operator.
+  int32 phone_monthly_cost_cents = 15;
 }
 
 message GetAllPlansRequest {}

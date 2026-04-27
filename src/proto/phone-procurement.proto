@@ -1,0 +1,213 @@
+syntax = "proto3";
+
+package phoneProcurement;
+
+// Hosted by db-service (port 50051) — CRUD over tenant_phone_numbers,
+// pending_phone_purchases and sms_sync_log. Consumed by:
+//   - notify-service Twilio webhook (tenant lookup by E.164)
+//   - notify-service crons (counter sync, stale-purchase cleanup)
+//   - bff-service phone-procurement resolver (purchase / attach / release)
+//
+// Provider-agnostic by design — providerKey + providerExternalId are
+// opaque strings. The active provider lives in notify-service.
+service PhoneProcurementDbService {
+  // --- tenant_phone_numbers ---
+  rpc GetTenantPhoneNumberByE164 (GetTenantPhoneNumberByE164Request) returns (GetTenantPhoneNumberResponse);
+  rpc GetTenantPhoneNumber (GetTenantPhoneNumberRequest) returns (GetTenantPhoneNumberResponse);
+  rpc ListManagedPhoneNumbers (ListManagedPhoneNumbersRequest) returns (ListManagedPhoneNumbersResponse);
+  rpc IncrementMonthlyMessageCount (IncrementMonthlyMessageCountRequest) returns (MutationResponse);
+  rpc ResetAllMonthlyMessageCounts (ResetAllMonthlyMessageCountsRequest) returns (MutationResponse);
+
+  // --- sms_sync_log ---
+  rpc HasSmsSyncLogForDate (HasSmsSyncLogForDateRequest) returns (HasSmsSyncLogForDateResponse);
+  rpc InsertSmsSyncLog (InsertSmsSyncLogRequest) returns (MutationResponse);
+
+  // --- pending_phone_purchases ---
+  rpc InsertPendingPurchase (InsertPendingPurchaseRequest) returns (PendingPurchaseResponse);
+  rpc AttachPendingPurchaseToTenant (AttachPendingPurchaseToTenantRequest) returns (PendingPurchaseResponse);
+  rpc DeletePendingPurchase (DeletePendingPurchaseRequest) returns (MutationResponse);
+  rpc ListUnattachedPendingPurchases (ListUnattachedPendingPurchasesRequest) returns (ListUnattachedPendingPurchasesResponse);
+  rpc GetPendingPurchase (GetPendingPurchaseRequest) returns (PendingPurchaseResponse);
+}
+
+message MutationResponse {
+  bool status = 1;
+  string message = 2;
+}
+
+message TenantPhoneNumberEntry {
+  string id = 1;
+  string tenant_id = 2;
+  string phone_e164 = 3;
+  string provider_key = 4;
+  string provider_external_id = 5;
+  // 'managed' | 'self'
+  string provisioned_by = 6;
+  int32 monthly_message_count = 7;
+  // ISO 8601 timestamp; empty when never synced.
+  string last_synced_at = 8;
+  // ISO 8601 timestamp.
+  string purchased_at = 9;
+}
+
+message GetTenantPhoneNumberByE164Request {
+  string phone_e164 = 1;
+}
+
+message GetTenantPhoneNumberRequest {
+  string tenant_id = 1;
+}
+
+message GetTenantPhoneNumberResponse {
+  bool status = 1;
+  string message = 2;
+  // Empty when no row matched.
+  TenantPhoneNumberEntry entry = 3;
+}
+
+message ListManagedPhoneNumbersRequest {}
+
+message ListManagedPhoneNumbersResponse {
+  bool status = 1;
+  string message = 2;
+  repeated TenantPhoneNumberEntry entries = 3;
+}
+
+message IncrementMonthlyMessageCountRequest {
+  string tenant_id = 1;
+  int32 delta = 2;
+  // ISO 8601 timestamp — written to last_synced_at.
+  string synced_at = 3;
+}
+
+message ResetAllMonthlyMessageCountsRequest {}
+
+message HasSmsSyncLogForDateRequest {
+  string tenant_id = 1;
+  // ISO date 'YYYY-MM-DD' (UTC).
+  string sync_date = 2;
+}
+
+message HasSmsSyncLogForDateResponse {
+  bool status = 1;
+  string message = 2;
+  bool exists = 3;
+}
+
+message InsertSmsSyncLogRequest {
+  string tenant_id = 1;
+  string sync_date = 2;
+  int32 messages_counted = 3;
+}
+
+message PendingPurchaseEntry {
+  string id = 1;
+  string owner_user_id = 2;
+  string provider_key = 3;
+  string provider_external_id = 4;
+  string phone_e164 = 5;
+  // Empty when not yet attached.
+  string attached_to_tenant_id = 6;
+  string purchased_at = 7;
+  // Empty when not yet attached.
+  string attached_at = 8;
+}
+
+message PendingPurchaseResponse {
+  bool status = 1;
+  string message = 2;
+  PendingPurchaseEntry entry = 3;
+}
+
+message InsertPendingPurchaseRequest {
+  string owner_user_id = 1;
+  string provider_key = 2;
+  string provider_external_id = 3;
+  string phone_e164 = 4;
+}
+
+message AttachPendingPurchaseToTenantRequest {
+  string pending_id = 1;
+  string tenant_id = 2;
+  // 'managed' | 'self'. Determines tenant_phone_numbers.provisioned_by.
+  string provisioned_by = 3;
+}
+
+message DeletePendingPurchaseRequest {
+  string pending_id = 1;
+}
+
+message GetPendingPurchaseRequest {
+  string pending_id = 1;
+}
+
+message ListUnattachedPendingPurchasesRequest {
+  // ISO 8601 timestamp — only return rows with purchased_at < cutoff_iso.
+  string cutoff_iso = 1;
+}
+
+message ListUnattachedPendingPurchasesResponse {
+  bool status = 1;
+  string message = 2;
+  repeated PendingPurchaseEntry entries = 3;
+}
+
+// Hosted by notify-service (port 50052) — wraps the active phone provider
+// (Twilio / mock sandbox) and the matching pending-purchase bookkeeping
+// in db-service so callers (BFF resolver) get an atomic "buy + persist"
+// or "release + delete" operation.
+service PhoneProcurementNotifyService {
+  rpc ListAvailableNumbers (ListAvailableNumbersRequest) returns (ListAvailableNumbersResponse);
+  rpc PurchasePhoneNumber (PurchasePhoneNumberRequest) returns (PendingPurchaseResponse);
+  rpc ReleasePendingPurchase (ReleasePendingPurchaseRequest) returns (MutationResponse);
+  rpc GetActiveProviderInfo (GetActiveProviderInfoRequest) returns (GetActiveProviderInfoResponse);
+}
+
+message PhoneCapabilitiesEntry {
+  bool sms = 1;
+  bool mms = 2;
+  bool voice = 3;
+}
+
+message AvailablePhoneNumberEntry {
+  string phone_e164 = 1;
+  PhoneCapabilitiesEntry capabilities = 2;
+  string region = 3;
+  string locality = 4;
+}
+
+message ListAvailableNumbersRequest {
+  // ISO 3166-1 alpha-2 country code: 'PL', 'DE', 'US', ...
+  string country = 1;
+  // 'mobile' | 'local' | 'tollfree'. Empty defaults to 'mobile'.
+  string type = 2;
+  int32 limit = 3;
+}
+
+message ListAvailableNumbersResponse {
+  bool status = 1;
+  string message = 2;
+  repeated AvailablePhoneNumberEntry numbers = 3;
+}
+
+message PurchasePhoneNumberRequest {
+  // Authenticated user driving the wizard — owns the pending row until attach.
+  string owner_user_id = 1;
+  string country = 2;
+  string phone_e164 = 3;
+}
+
+message ReleasePendingPurchaseRequest {
+  string pending_id = 1;
+  // Caller (BFF) checks ownership before invoking; the notify side trusts
+  // the request for now.
+  string owner_user_id = 2;
+}
+
+message GetActiveProviderInfoRequest {}
+
+message GetActiveProviderInfoResponse {
+  bool status = 1;
+  string provider_key = 2;
+  bool is_sandbox = 3;
+}

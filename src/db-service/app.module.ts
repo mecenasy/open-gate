@@ -8,6 +8,7 @@ import { CommandModule } from './command/command.module';
 import { MessagesModule } from './messages/messages.module';
 import { TenantDbModule } from './tenant/tenant.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { PhoneProcurementDbModule } from './phone-procurement/phone-procurement.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
     MessagesModule,
     TenantDbModule,
     SubscriptionModule,
+    PhoneProcurementDbModule,
   ],
 })
 export class AppModule {}

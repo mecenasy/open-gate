@@ -1,17 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { PhoneProcurementService } from './phone-procurement.service';
+import { PhoneProcurementDbClient } from './db/phone-procurement-db.client';
 
 /** Wizard abandonment safety window — anything older has clearly been forgotten. */
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000;
-
-interface UnattachedPurchaseRow {
-  id: string;
-  providerKey: string;
-  providerExternalId: string;
-  phoneE164: string;
-  purchasedAt: Date;
-}
 
 /**
  * Hourly cron — releases phone numbers the master account bought during
@@ -27,21 +20,20 @@ interface UnattachedPurchaseRow {
  *
  * The 1h cadence is plenty — wizards complete in minutes, so we'd never
  * release a number a user is actively about to attach.
- *
- * The DB-touching helpers below are stubs until the phone-procurement
- * gRPC contract lands; the cron is in place so wiring becomes a small
- * follow-up.
  */
 @Injectable()
 export class PendingPurchaseCleanupService {
   private readonly logger = new Logger(PendingPurchaseCleanupService.name);
 
-  constructor(private readonly procurement: PhoneProcurementService) {}
+  constructor(
+    private readonly procurement: PhoneProcurementService,
+    private readonly dbClient: PhoneProcurementDbClient,
+  ) {}
 
   @Cron('0 * * * *', { name: 'pending-purchase-cleanup', timeZone: 'UTC' })
   async cleanupStale(): Promise<void> {
     const cutoff = new Date(Date.now() - STALE_AFTER_MS);
-    const stale = await this.listStaleUnattached(cutoff);
+    const stale = await this.dbClient.listUnattachedPendingPurchases(cutoff);
     if (stale.length === 0) {
       this.logger.debug('No stale pending purchases to release.');
       return;
@@ -52,7 +44,7 @@ export class PendingPurchaseCleanupService {
     for (const row of stale) {
       try {
         await this.procurement.releaseFromProvider(row.providerKey, row.providerExternalId);
-        await this.deletePendingRow(row.id);
+        await this.dbClient.deletePendingPurchase(row.id);
         released++;
         this.logger.log(`Released stale purchase ${row.providerKey}/${row.providerExternalId} (${row.phoneE164}).`);
       } catch (err) {
@@ -63,16 +55,6 @@ export class PendingPurchaseCleanupService {
       }
     }
     this.logger.log(`Pending purchase cleanup done: released=${released} failed=${failed}.`);
-  }
-
-  // ----- DB-side stubs (wired to gRPC in the procurement-contract commit) ---
-
-  private async listStaleUnattached(_cutoff: Date): Promise<UnattachedPurchaseRow[]> {
-    return [];
-  }
-
-  private async deletePendingRow(id: string): Promise<void> {
-    this.logger.debug(`[stub] DELETE pending_phone_purchases id=${id}`);
   }
 }
 

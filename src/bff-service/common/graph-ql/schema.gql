@@ -210,6 +210,10 @@ type SubscriptionPlanType {
   maxContactsPerTenant: Int!
   maxStaffPerTenant: Int!
   maxCustomCommandsPerTenant: Int!
+  phoneNumbersIncluded: Int!
+  messagesPerMonthIncluded: Int!
+  pricePerExtraMessageCents: Int!
+  phoneMonthlyCostCents: Int!
   priceCents: Int!
   currency: String!
   isActive: Boolean!
@@ -408,6 +412,45 @@ type ConfigsListType {
   data: [ConfigType!]!
 }
 
+type PhoneCapabilitiesType {
+  sms: Boolean!
+  mms: Boolean!
+  voice: Boolean!
+}
+
+type AvailablePhoneNumberType {
+  phoneE164: String!
+  capabilities: PhoneCapabilitiesType!
+  region: String
+  locality: String
+}
+
+type PendingPhonePurchaseType {
+  id: String!
+  ownerUserId: String!
+  providerKey: String!
+  phoneE164: String!
+  attachedToTenantId: String
+  purchasedAt: String!
+  attachedAt: String
+}
+
+type TenantPhoneNumberType {
+  id: String!
+  tenantId: String!
+  phoneE164: String!
+  providerKey: String!
+  provisionedBy: String!
+  monthlyMessageCount: Int!
+  lastSyncedAt: String
+  purchasedAt: String!
+}
+
+type PhoneProcurementInfoType {
+  providerKey: String!
+  isSandbox: Boolean!
+}
+
 type Query {
   users(input: GetAllUsersType): UsersListType!
   user(input: GetUserType!): UserSummaryType!
@@ -441,6 +484,9 @@ type Query {
   coreConfigs: ConfigsListType!
   featureConfigs: ConfigsListType!
   featureConfig(input: GetFeatureConfigType!): ConfigsListType!
+  phoneProcurementInfo: PhoneProcurementInfoType!
+  availablePhoneNumbers(input: ListAvailablePhoneNumbersInput!): [AvailablePhoneNumberType!]!
+  tenantPhoneNumber(tenantId: String!): TenantPhoneNumberType
   csrfToken: CsrfTokenType!
 }
 
@@ -494,6 +540,12 @@ input GetByPermissionType {
 
 input GetFeatureConfigType {
   key: String!
+}
+
+input ListAvailablePhoneNumbersInput {
+  country: String!
+  type: String
+  limit: Int
 }
 
 type Mutation {
@@ -562,6 +614,9 @@ type Mutation {
   submitPlatformOnboarding(input: SubmitPlatformOnboardingInput!): OnboardingStepType!
   cancelPlatformOnboarding(sessionId: String!): Boolean!
   updateConfig(input: UpdateConfigType!): ConfigResponseType!
+  purchasePhoneNumber(input: PurchasePhoneNumberInput!): PendingPhonePurchaseType!
+  attachPhoneToTenant(input: AttachPhoneToTenantInput!): PendingPhonePurchaseType!
+  releasePendingPurchase(pendingId: String!): Boolean!
 }
 
 input RegisterInput {
@@ -853,4 +908,14 @@ input SubmitPlatformOnboardingInput {
 input UpdateConfigType {
   key: String!
   value: String!
+}
+
+input PurchasePhoneNumberInput {
+  country: String!
+  phoneE164: String!
+}
+
+input AttachPhoneToTenantInput {
+  pendingId: String!
+  tenantId: String!
 }

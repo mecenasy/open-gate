@@ -26,6 +26,22 @@ export class SubscriptionPlanType {
   @Field(() => Int)
   maxCustomCommandsPerTenant!: number;
 
+  /** Phone procurement: how many managed numbers the plan covers (0 disables managed flow). */
+  @Field(() => Int)
+  phoneNumbersIncluded!: number;
+
+  /** Phone procurement: SMS quota covered by the subscription before overage. */
+  @Field(() => Int)
+  messagesPerMonthIncluded!: number;
+
+  /** Phone procurement: cents charged per SMS sent over the quota (operator pass-through + our markup). */
+  @Field(() => Int)
+  pricePerExtraMessageCents!: number;
+
+  /** Phone procurement: informational — what the number costs us per month from the operator. */
+  @Field(() => Int)
+  phoneMonthlyCostCents!: number;
+
   @Field(() => Int)
   priceCents!: number;
 

@@ -1,22 +1,31 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { PhoneProcurementDbClient } from '../../../phone-procurement/db/phone-procurement-db.client';
 
 /**
  * Routes inbound Twilio webhooks to the tenant that owns the receiving
- * number. The actual db-side query lands with the phone-procurement gRPC
- * contract in a follow-up commit; until then this stub returns null so
- * webhooks for unknown numbers (which is all of them, pre-wiring) are
- * accepted by the controller (returns 200 to Twilio so it doesn't retry)
- * but produce no MessageEvent.
+ * number — exact `phone_e164` match against shared_config.tenant_phone_numbers
+ * via the db-service gRPC contract.
  *
- * Once wired, lookup is by exact `phone_e164` match against
- * shared_config.tenant_phone_numbers.
+ * Returns null when the number isn't recognised; the bridge logs that and
+ * drops the webhook with a 200 to keep Twilio from retrying.
  */
 @Injectable()
 export class TwilioTenantLookupService {
   private readonly logger = new Logger(TwilioTenantLookupService.name);
 
+  constructor(private readonly dbClient: PhoneProcurementDbClient) {}
+
   async lookupTenantByPhoneNumber(phoneE164: string): Promise<string | null> {
-    this.logger.debug(`Tenant lookup for ${phoneE164} — not yet wired (gRPC service lands next phase).`);
-    return null;
+    try {
+      const entry = await this.dbClient.getTenantPhoneNumberByE164(phoneE164);
+      return entry?.tenantId ?? null;
+    } catch (err) {
+      this.logger.warn(`Tenant lookup failed for ${phoneE164}: ${stringifyError(err)}`);
+      return null;
+    }
   }
+}
+
+function stringifyError(err: unknown): string {
+  return err instanceof Error ? (err.stack ?? err.message) : String(err);
 }

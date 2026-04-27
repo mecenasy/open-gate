@@ -8,6 +8,7 @@ import {
   type SignalCredentials,
 } from '../../../platform-config/platform-config.service';
 import { SignalBridgeManager } from '../../../incoming/platforms/signal/signal-bridge.manager';
+import { SignalVerificationBridgeService } from '../../../signal-verification/signal-verification-bridge.service';
 import {
   SIGNAL_CAPTCHA_PAGE_URL,
   SIGNAL_CAPTCHA_TOKEN_SCHEME,
@@ -28,6 +29,7 @@ export class SignalOnboardingProvider extends OnboardingProvider {
     private readonly client: SignalRestClient,
     private readonly platformConfigService: PlatformConfigService,
     private readonly bridgeManager: SignalBridgeManager,
+    private readonly verificationBridge: SignalVerificationBridgeService,
   ) {
     super();
   }
@@ -85,8 +87,13 @@ export class SignalOnboardingProvider extends OnboardingProvider {
     }
   }
 
-  async cancel(): Promise<void> {
-    // No upstream session to drop — signal-cli REST is stateless per call.
+  async cancel(ctx: OnboardingContext): Promise<void> {
+    // No upstream session to drop — signal-cli REST is stateless per call —
+    // but the verification bridge's pending flag has to come down so a stale
+    // SMS arriving during the next session doesn't auto-fill an old tenant.
+    if (ctx.session.tenantId) {
+      await this.verificationBridge.clearPending(ctx.session.tenantId);
+    }
   }
 
   // ----- step handlers ------------------------------------------------------
@@ -154,7 +161,7 @@ export class SignalOnboardingProvider extends OnboardingProvider {
       return errorStep('REGISTER_FAILED', result.error.message, true);
     }
     this.setMeta(ctx, { registrationStarted: true });
-    return this.verificationCodeStep(params.account);
+    return this.enterVerificationStep(ctx, params.account);
   }
 
   private async handleVerifyCode(ctx: OnboardingContext, payload: Record<string, unknown>): Promise<OnboardingStep> {
@@ -200,7 +207,7 @@ export class SignalOnboardingProvider extends OnboardingProvider {
     const result = await this.client.register(apiUrl, params.account, { use_voice: false });
     if (result.ok) {
       this.setMeta(ctx, { registrationStarted: true });
-      return this.verificationCodeStep(params.account);
+      return this.enterVerificationStep(ctx, params.account);
     }
     if (result.error.kind === 'captcha_required') {
       return this.captchaStep();
@@ -236,6 +243,20 @@ export class SignalOnboardingProvider extends OnboardingProvider {
   }
 
   /**
+   * Marks the verification bridge so an inbound SMS to the tenant's
+   * managed number can auto-supply the code, then returns the step the
+   * client should render. The flag stays up until cancel(), successDone(),
+   * or its 10-minute TTL — retriable verify failures keep it active so
+   * the user can paste a corrected code.
+   */
+  private async enterVerificationStep(ctx: OnboardingContext, recipient: string): Promise<OnboardingStep> {
+    if (ctx.session.tenantId) {
+      await this.verificationBridge.markPending(ctx.session.tenantId);
+    }
+    return this.verificationCodeStep(recipient);
+  }
+
+  /**
    * Final step. For replace flow, best-effort unregisters the previous
    * account on the same gateway — we don't fail the whole flow if this
    * cleanup call errors out.
@@ -264,6 +285,7 @@ export class SignalOnboardingProvider extends OnboardingProvider {
       } catch (err) {
         this.logger.warn(`Bridge refresh failed for tenant ${ctx.session.tenantId}: ${String(err)}`);
       }
+      await this.verificationBridge.clearPending(ctx.session.tenantId);
     }
 
     return {

@@ -114,6 +114,13 @@ export const envValidationSchema = Joi.object({
     .description(
       'Phone procurement sandbox mode — when true, the mock provider replaces Twilio so no real numbers are bought. Independent of NODE_ENV/MODE; can be enabled in any environment.',
     ),
+  WEBHOOK_BASE_URL: Joi.string()
+    .uri()
+    .allow('')
+    .default('')
+    .description(
+      "Public origin Twilio (and other providers) hit for webhooks — e.g. 'https://opengate.example.com'. Used both when registering webhooks on a purchased number and when validating inbound signatures. When empty the signature guard derives the URL from request headers (works behind a properly configured proxy).",
+    ),
 
   // ============ Signal Bridge Configuration ============
   SIGNAL_API_URL: Joi.string().uri().default('http://signal-api:8080').description('Signal bridge API URL'),

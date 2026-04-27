@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GateGrpcModule, config as gateGrpcConfig } from '@app/gate-grpc';
@@ -13,10 +14,12 @@ import { envValidationSchema } from 'src/config/env.validation';
 import { PlatformConfigModule } from './platform-config/platform-config.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
 import { PhoneProcurementModule } from './phone-procurement/phone-procurement.module';
+import { SignalVerificationModule } from './signal-verification/signal-verification.module';
 
 @Module({
   imports: [
     LoggerModule,
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [gateGrpcConfig, signalConfig, dbGrpcConfig],
@@ -31,6 +34,7 @@ import { PhoneProcurementModule } from './phone-procurement/phone-procurement.mo
     CqrsModule,
     GateGrpcModule,
     PlatformConfigModule,
+    SignalVerificationModule,
     OnboardingModule,
     PhoneProcurementModule,
   ],

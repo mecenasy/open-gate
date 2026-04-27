@@ -4,6 +4,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { RedisModule } from '@app/redis';
 import { PlatformConfigModule } from '../platform-config/platform-config.module';
 import { MessageBridgeModule } from '../incoming/message-bridge.module';
+import { SignalVerificationModule } from '../signal-verification/signal-verification.module';
 import { OnboardingController } from './onboarding.controller';
 import { OnboardingService, ONBOARDING_PROVIDERS } from './onboarding.service';
 import { OnboardingSessionStore } from './onboarding-session.store';
@@ -11,7 +12,7 @@ import { SignalOnboardingProvider } from './platforms/signal/signal-onboarding.p
 import { SignalRestClient } from './platforms/signal/signal-rest.client';
 
 @Module({
-  imports: [HttpModule, CqrsModule, RedisModule, PlatformConfigModule, MessageBridgeModule],
+  imports: [HttpModule, CqrsModule, RedisModule, PlatformConfigModule, MessageBridgeModule, SignalVerificationModule],
   controllers: [OnboardingController],
   providers: [
     OnboardingService,

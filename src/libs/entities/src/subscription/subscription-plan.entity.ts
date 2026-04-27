@@ -32,6 +32,18 @@ export class SubscriptionPlan {
   @Column({ name: 'max_custom_commands_per_tenant', type: 'int', nullable: false })
   maxCustomCommandsPerTenant!: number;
 
+  @Column({ name: 'phone_numbers_included', type: 'int', nullable: false, default: 0 })
+  phoneNumbersIncluded!: number;
+
+  @Column({ name: 'messages_per_month_included', type: 'int', nullable: false, default: 0 })
+  messagesPerMonthIncluded!: number;
+
+  @Column({ name: 'price_per_extra_message_cents', type: 'int', nullable: false, default: 0 })
+  pricePerExtraMessageCents!: number;
+
+  @Column({ name: 'phone_monthly_cost_cents', type: 'int', nullable: false, default: 0 })
+  phoneMonthlyCostCents!: number;
+
   @Column({ name: 'price_cents', type: 'int', nullable: false, default: 0 })
   priceCents!: number;
 

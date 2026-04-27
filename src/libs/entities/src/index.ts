@@ -10,6 +10,7 @@ export * from './enums/subscription-status.enum';
 export * from './enums/subscription-change-kind.enum';
 export * from './enums/tenant-staff-role.enum';
 export * from './enums/contact-access-level.enum';
+export * from './enums/phone-provisioned-by.enum';
 
 // User domain
 export * from './user/user.entity';
@@ -46,6 +47,9 @@ export * from './tenant/tenant-command-config.entity';
 export * from './tenant/tenant-prompt-override.entity';
 export * from './tenant/tenant-staff.entity';
 export * from './tenant/tenant-audit-log.entity';
+export * from './tenant/tenant-phone-number.entity';
+export * from './tenant/sms-sync-log.entity';
+export * from './tenant/pending-phone-purchase.entity';
 
 // Contact
 export * from './contact/contact.entity';

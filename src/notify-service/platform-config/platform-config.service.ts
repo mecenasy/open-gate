@@ -19,6 +19,19 @@ export interface SmsCredentials {
   sid: string;
   token: string;
   phone: string;
+  /**
+   * Provider tag, optional for legacy tenant rows that don't carry it.
+   * The master row at DEFAULT_PLATFORM_FALLBACK_ID always sets it.
+   * A discriminator type is introduced in a follow-up commit; treating this
+   * as optional keeps existing self-hosted credentials reading correctly.
+   */
+  provider?: string;
+  /**
+   * Country → regulatory bundle ID, only present on the master row. Used
+   * by phone procurement to attach the right compliance bundle when buying
+   * a number in countries that require one (PL, DE, ...).
+   */
+  bundleSidByCountry?: Record<string, string>;
 }
 
 export interface SmtpCredentials {

@@ -15,7 +15,7 @@ const CONFIRM_REGISTRATION_MUTATION = graphql(`
 type State = 'verifying' | 'success' | 'error';
 
 export const useConfirmRegistration = (token: string | null) => {
-  console.log("🚀 ~ useConfirmRegistration ~ token:", token)
+  console.log('🚀 ~ useConfirmRegistration ~ token:', token);
   const [state, setState] = useState<State>('verifying');
   const [confirmMutation] = useMutation(CONFIRM_REGISTRATION_MUTATION);
 
@@ -29,7 +29,7 @@ export const useConfirmRegistration = (token: string | null) => {
     (async () => {
       try {
         const { data } = await confirmMutation({ variables: { token } });
-        console.log("🚀 ~ useConfirmRegistration ~ data:", data)
+        console.log('🚀 ~ useConfirmRegistration ~ data:', data);
         if (cancelled) return;
         setState(data?.confirmRegistration?.success ? 'success' : 'error');
       } catch {

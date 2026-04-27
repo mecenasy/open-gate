@@ -86,11 +86,11 @@ export const signalOnboardingMachine = (deps: SignalMachineDeps) =>
       input: {} as SignalMachineInput,
     },
     actors: {
-      startOnboarding: fromPromise<{ sessionId: string; step: OnboardingStep }, StartCallArgs>(
-        ({ input }) => deps.start(input),
+      startOnboarding: fromPromise<{ sessionId: string; step: OnboardingStep }, StartCallArgs>(({ input }) =>
+        deps.start(input),
       ),
-      submitOnboarding: fromPromise<{ sessionId: string; step: OnboardingStep }, SubmitCallArgs>(
-        ({ input }) => deps.submit(input),
+      submitOnboarding: fromPromise<{ sessionId: string; step: OnboardingStep }, SubmitCallArgs>(({ input }) =>
+        deps.submit(input),
       ),
       cancelOnboarding: fromPromise<void, string>(({ input }) => deps.cancel(input)),
     },

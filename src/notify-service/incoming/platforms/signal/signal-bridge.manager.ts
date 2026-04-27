@@ -41,9 +41,7 @@ export class SignalBridgeManager implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     await this.reconcile();
     this.reconcileTimer = setInterval(() => {
-      this.reconcile().catch((err) =>
-        this.logger.warn(`Signal bridge reconcile failed: ${String(err)}`),
-      );
+      this.reconcile().catch((err) => this.logger.warn(`Signal bridge reconcile failed: ${String(err)}`));
     }, RECONCILE_INTERVAL_MS);
   }
 

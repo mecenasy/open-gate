@@ -31,9 +31,5 @@ export function openSignalCaptchaPopup(): Window | null {
   // Routed outside [locale] and excluded from the next-intl middleware
   // (see middleware.ts matcher) so the popup loads without locale prefix
   // and without auth redirects.
-  return window.open(
-    '/signal-captcha',
-    'signal-captcha',
-    'width=520,height=680,resizable=yes,scrollbars=yes',
-  );
+  return window.open('/signal-captcha', 'signal-captcha', 'width=520,height=680,resizable=yes,scrollbars=yes');
 }

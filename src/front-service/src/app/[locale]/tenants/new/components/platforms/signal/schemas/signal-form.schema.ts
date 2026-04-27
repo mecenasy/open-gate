@@ -20,10 +20,7 @@ export const createSignalFormSchema = (t: (key: string) => string) =>
         },
         { message: t('errorUrl') },
       ),
-    account: z
-      .string()
-      .trim()
-      .regex(E164_REGEX, t('errorPhoneE164')),
+    account: z.string().trim().regex(E164_REGEX, t('errorPhoneE164')),
     mode: z.enum(['register', 'link']),
   });
 

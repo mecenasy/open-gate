@@ -6,11 +6,7 @@ import { useMachine } from '@xstate/react';
 import { CANCEL_PLATFORM_ONBOARDING, START_PLATFORM_ONBOARDING, SUBMIT_PLATFORM_ONBOARDING } from './queries';
 import type { OnboardingStepResponse } from '../interfaces';
 import { parseOnboardingStep } from '../helpers';
-import {
-  signalOnboardingMachine,
-  type SignalIntent,
-  type SignalMachineDeps,
-} from '../signal-onboarding.machine';
+import { signalOnboardingMachine, type SignalIntent, type SignalMachineDeps } from '../signal-onboarding.machine';
 
 interface UseSignalOnboardingArgs {
   tenantId?: string;

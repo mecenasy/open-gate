@@ -33,7 +33,7 @@ export class AddUserHandler extends BaseCommandHandler<AddUserCommand, UserData>
       'AddUser',
       async () => {
         const { email, phone, password, name, surname, type, phoneOwner } = command.request;
-        console.log("🚀 ~ AddUserHandler ~ execute ~ type:", type)
+        console.log('🚀 ~ AddUserHandler ~ execute ~ type:', type);
 
         const userType = await this.userRoleRepository.findOneOrFail({
           where: { userType: protoToJsUserType(type ?? ProtoUserType.USER) },

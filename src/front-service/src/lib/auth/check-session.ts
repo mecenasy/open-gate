@@ -35,8 +35,7 @@ const globalScope = globalThis as typeof globalThis & {
   __sessionCache?: Map<string, CacheEntry>;
 };
 
-const sessionCache: Map<string, CacheEntry> =
-  globalScope.__sessionCache ?? (globalScope.__sessionCache = new Map());
+const sessionCache: Map<string, CacheEntry> = globalScope.__sessionCache ?? (globalScope.__sessionCache = new Map());
 
 function pruneCache(now: number) {
   if (sessionCache.size < MAX_CACHE_ENTRIES) return;

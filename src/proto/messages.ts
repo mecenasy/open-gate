@@ -5,11 +5,11 @@
 // source: src/proto/messages.proto
 
 /* eslint-disable */
-import type { Metadata } from '@grpc/grpc-js';
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import type { Metadata } from "@grpc/grpc-js";
+import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { Observable } from "rxjs";
 
-export const protobufPackage = 'messages';
+export const protobufPackage = "messages";
 
 export enum MessageType {
   message = 0,
@@ -62,7 +62,7 @@ export interface GetAllMessagesResponse {
   total: number;
 }
 
-export const MESSAGES_PACKAGE_NAME = 'messages';
+export const MESSAGES_PACKAGE_NAME = "messages";
 
 export interface MessagesServiceClient {
   addMessage(request: AddMessageRequest, metadata?: Metadata): Observable<MessageResponse>;
@@ -105,17 +105,17 @@ export interface MessagesServiceController {
 
 export function MessagesServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['addMessage', 'getMessage', 'getAllMessages', 'updateMessage', 'removeMessage'];
+    const grpcMethods: string[] = ["addMessage", "getMessage", "getAllMessages", "updateMessage", "removeMessage"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('MessagesService', method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod("MessagesService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('MessagesService', method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod("MessagesService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const MESSAGES_SERVICE_NAME = 'MessagesService';
+export const MESSAGES_SERVICE_NAME = "MessagesService";

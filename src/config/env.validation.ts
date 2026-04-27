@@ -109,6 +109,11 @@ export const envValidationSchema = Joi.object({
     .pattern(/^\+\d{1,15}$/)
     .default('+1234567890')
     .description('Twilio phone number for SMS'),
+  TWILIO_SANDBOX: Joi.boolean()
+    .default(false)
+    .description(
+      'Phone procurement sandbox mode — when true, the mock provider replaces Twilio so no real numbers are bought. Independent of NODE_ENV/MODE; can be enabled in any environment.',
+    ),
 
   // ============ Signal Bridge Configuration ============
   SIGNAL_API_URL: Joi.string().uri().default('http://signal-api:8080').description('Signal bridge API URL'),

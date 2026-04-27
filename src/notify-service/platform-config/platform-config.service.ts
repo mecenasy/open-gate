@@ -15,22 +15,40 @@ export interface SignalCredentials {
   account: string;
 }
 
+/**
+ * Raw SMS credentials as stored in platform_credentials.config.
+ *
+ * Three valid shapes share this interface, distinguished by `provider`:
+ *
+ *   - undefined / 'twilio' — self-hosted: tenant carries their own Twilio
+ *     account, sid/token/phone all on the tenant row.
+ *   - 'managed' — tenant uses the master Twilio account; only `phone` is on
+ *     the tenant row, sid/token come from the sentinel-UUID master row.
+ *   - master row at DEFAULT_PLATFORM_FALLBACK_ID — always 'twilio' with
+ *     full sid/token; phone is informational, may be empty.
+ *
+ * Use `resolveSmsCredentials(tenantId)` rather than reading sid/token off
+ * this type directly — the resolver enforces the merge between managed
+ * tenant rows and the master row.
+ */
 export interface SmsCredentials {
+  provider?: 'twilio' | 'managed';
+  sid?: string;
+  token?: string;
+  phone: string;
+  /** Country → regulatory bundle ID. Only the master row carries this. */
+  bundleSidByCountry?: Record<string, string>;
+}
+
+/**
+ * SMS credentials with sid/token guaranteed present — what callers actually
+ * need to send a message. Produced by `resolveSmsCredentials`.
+ */
+export interface ResolvedSmsCredentials {
+  provider: 'twilio' | 'managed';
   sid: string;
   token: string;
   phone: string;
-  /**
-   * Provider tag, optional for legacy tenant rows that don't carry it.
-   * The master row at DEFAULT_PLATFORM_FALLBACK_ID always sets it.
-   * A discriminator type is introduced in a follow-up commit; treating this
-   * as optional keeps existing self-hosted credentials reading correctly.
-   */
-  provider?: string;
-  /**
-   * Country → regulatory bundle ID, only present on the master row. Used
-   * by phone procurement to attach the right compliance bundle when buying
-   * a number in countries that require one (PL, DE, ...).
-   */
   bundleSidByCountry?: Record<string, string>;
 }
 
@@ -147,6 +165,60 @@ export class PlatformConfigService implements OnModuleInit {
       );
       return [];
     }
+  }
+
+  /**
+   * Resolves SMS credentials usable for actually sending a message.
+   *
+   * For `provider: 'managed'` rows, the tenant row only carries `phone` —
+   * sid/token are pulled from the master row at DEFAULT_PLATFORM_FALLBACK_ID.
+   * For self-hosted ('twilio' or undefined) rows, the tenant config is
+   * returned as-is provided sid/token are present.
+   *
+   * Returns null when required fields are missing (e.g. master row missing
+   * sid/token, or tenant managed row without master configured) — the
+   * caller is expected to log + skip rather than throw.
+   */
+  async resolveSmsCredentials(tenantId: string): Promise<ResolvedSmsCredentials | null> {
+    const cfg = await this.getConfig(tenantId, 'sms');
+    if (!cfg) return null;
+
+    if (cfg.provider === 'managed') {
+      // Managed: merge master sid/token with tenant phone. Don't trust the
+      // tenant row's provider tag without verifying the master row exists.
+      if (tenantId === DEFAULT_PLATFORM_FALLBACK_ID) {
+        this.logger.warn('SMS master row marked provider=managed; treating as misconfigured.');
+        return null;
+      }
+      const master = await this.getConfig(DEFAULT_PLATFORM_FALLBACK_ID, 'sms');
+      if (!master?.sid || !master.token) {
+        this.logger.warn(`Managed SMS for tenant ${tenantId} but master row has no sid/token.`);
+        return null;
+      }
+      if (!cfg.phone) {
+        this.logger.warn(`Managed SMS for tenant ${tenantId} but tenant row has no phone.`);
+        return null;
+      }
+      return {
+        provider: 'managed',
+        sid: master.sid,
+        token: master.token,
+        phone: cfg.phone,
+        bundleSidByCountry: master.bundleSidByCountry,
+      };
+    }
+
+    if (!cfg.sid || !cfg.token || !cfg.phone) {
+      this.logger.warn(`Self-hosted SMS for tenant ${tenantId} missing sid/token/phone.`);
+      return null;
+    }
+    return {
+      provider: 'twilio',
+      sid: cfg.sid,
+      token: cfg.token,
+      phone: cfg.phone,
+      bundleSidByCountry: cfg.bundleSidByCountry,
+    };
   }
 
   invalidate(tenantId: string, platform: keyof PlatformCredentialMap): void {

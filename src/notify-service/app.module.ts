@@ -12,6 +12,7 @@ import { LoggerModule } from '@app/logger';
 import { envValidationSchema } from 'src/config/env.validation';
 import { PlatformConfigModule } from './platform-config/platform-config.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
+import { PhoneProcurementModule } from './phone-procurement/phone-procurement.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { OnboardingModule } from './onboarding/onboarding.module';
     GateGrpcModule,
     PlatformConfigModule,
     OnboardingModule,
+    PhoneProcurementModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -21,9 +21,35 @@ export interface SessionResult {
   isOwner: boolean;
 }
 
-export async function checkSession(cookieHeader: string): Promise<SessionResult> {
-  if (!cookieHeader) return { authenticated: false, isOwner: false };
+interface CacheEntry {
+  result: SessionResult;
+  expiresAt: number;
+  inflight?: Promise<SessionResult>;
+}
 
+const POSITIVE_TTL_MS = 30_000;
+const NEGATIVE_TTL_MS = 3_000;
+const MAX_CACHE_ENTRIES = 500;
+
+const globalScope = globalThis as typeof globalThis & {
+  __sessionCache?: Map<string, CacheEntry>;
+};
+
+const sessionCache: Map<string, CacheEntry> =
+  globalScope.__sessionCache ?? (globalScope.__sessionCache = new Map());
+
+function pruneCache(now: number) {
+  if (sessionCache.size < MAX_CACHE_ENTRIES) return;
+  for (const [key, entry] of sessionCache) {
+    if (entry.expiresAt <= now) sessionCache.delete(key);
+  }
+  if (sessionCache.size >= MAX_CACHE_ENTRIES) {
+    const firstKey = sessionCache.keys().next().value;
+    if (firstKey !== undefined) sessionCache.delete(firstKey);
+  }
+}
+
+async function fetchSession(cookieHeader: string): Promise<SessionResult> {
   try {
     const res = await fetch(BFF_URL, {
       method: 'POST',
@@ -47,4 +73,30 @@ export async function checkSession(cookieHeader: string): Promise<SessionResult>
   } catch {
     return { authenticated: false, isOwner: false };
   }
+}
+
+export async function checkSession(cookieHeader: string): Promise<SessionResult> {
+  if (!cookieHeader) return { authenticated: false, isOwner: false };
+
+  const now = Date.now();
+  const cached = sessionCache.get(cookieHeader);
+
+  if (cached) {
+    if (cached.inflight) return cached.inflight;
+    if (cached.expiresAt > now) return cached.result;
+  }
+
+  const inflight = fetchSession(cookieHeader);
+  sessionCache.set(cookieHeader, {
+    result: cached?.result ?? { authenticated: false, isOwner: false },
+    expiresAt: cached?.expiresAt ?? 0,
+    inflight,
+  });
+
+  const result = await inflight;
+  const ttl = result.authenticated ? POSITIVE_TTL_MS : NEGATIVE_TTL_MS;
+  sessionCache.set(cookieHeader, { result, expiresAt: Date.now() + ttl });
+  pruneCache(Date.now());
+
+  return result;
 }

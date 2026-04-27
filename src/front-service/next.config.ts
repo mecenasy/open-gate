@@ -13,6 +13,14 @@ const DEV_ORIGINS = (process.env.NEXT_DEV_ALLOWED_ORIGINS ?? '')
 const nextConfig: NextConfig = {
   output: 'standalone',
   allowedDevOrigins: DEV_ORIGINS,
+  experimental: {
+    swcPlugins: [
+      [
+        '@swc-contrib/plugin-graphql-codegen-client-preset',
+        { artifactDirectory: './src/app/gql', gqlTagName: 'graphql' },
+      ],
+    ],
+  },
   async rewrites() {
     return [
       { source: '/api/graphql', destination: `${BFF_URL}/graphql` },

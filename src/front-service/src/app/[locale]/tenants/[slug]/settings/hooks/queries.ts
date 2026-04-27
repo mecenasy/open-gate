@@ -41,18 +41,6 @@ export const TENANT_SETTINGS_QUERY = graphql(`
       userId
       role
     }
-    myTenants {
-      id
-      slug
-      schemaName
-      isActive
-      billingUserId
-    }
-    tenantsIStaffAt {
-      tenantId
-      tenantSlug
-      role
-    }
   }
 `);
 

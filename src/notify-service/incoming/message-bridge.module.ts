@@ -33,6 +33,6 @@ import { PlatformConfigModule } from '../platform-config/platform-config.module'
       inject: [SignalAttachment],
     },
   ],
-  exports: [SignalTransformer],
+  exports: [SignalTransformer, SignalBridgeManager],
 })
 export class MessageBridgeModule {}

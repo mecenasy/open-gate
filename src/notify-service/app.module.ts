@@ -11,6 +11,7 @@ import { OutgoingNotifyModule } from './outgoing/outgoing-notify.module';
 import { LoggerModule } from '@app/logger';
 import { envValidationSchema } from 'src/config/env.validation';
 import { PlatformConfigModule } from './platform-config/platform-config.module';
+import { OnboardingModule } from './onboarding/onboarding.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PlatformConfigModule } from './platform-config/platform-config.module';
     CqrsModule,
     GateGrpcModule,
     PlatformConfigModule,
+    OnboardingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

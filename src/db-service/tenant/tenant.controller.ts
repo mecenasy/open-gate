@@ -187,7 +187,9 @@ export class TenantController implements TenantServiceController {
   }
 
   async checkTenantSlug({ slug }: CheckTenantSlugRequest): Promise<CheckTenantSlugResponse> {
-    const normalized = String(slug || '').trim().toLowerCase();
+    const normalized = String(slug || '')
+      .trim()
+      .toLowerCase();
     if (!normalized) {
       return { status: false, message: 'Slug is required', isAvailable: false };
     }
@@ -370,10 +372,7 @@ export class TenantController implements TenantServiceController {
     };
   }
 
-  async removeContactFromTenant({
-    tenantId,
-    contactId,
-  }: RemoveContactFromTenantRequest): Promise<MutationResponse> {
+  async removeContactFromTenant({ tenantId, contactId }: RemoveContactFromTenantRequest): Promise<MutationResponse> {
     const removed = await this.contactService.removeFromTenant(String(tenantId), String(contactId));
     return { status: removed, message: removed ? 'Contact removed from tenant' : 'Membership not found' };
   }
@@ -525,10 +524,7 @@ export class TenantController implements TenantServiceController {
     };
   }
 
-  async transferTenantBilling({
-    tenantId,
-    newBillingUserId,
-  }: TransferTenantBillingRequest): Promise<MutationResponse> {
+  async transferTenantBilling({ tenantId, newBillingUserId }: TransferTenantBillingRequest): Promise<MutationResponse> {
     await this.tenantDbService.transferBilling(String(tenantId), String(newBillingUserId));
     return { status: true, message: 'Billing transferred' };
   }
@@ -564,10 +560,7 @@ export class TenantController implements TenantServiceController {
     return { status: true, message: 'OK' };
   }
 
-  async getTenantAuditLog({
-    tenantId,
-    limit,
-  }: GetTenantAuditLogRequest): Promise<GetTenantAuditLogResponse> {
+  async getTenantAuditLog({ tenantId, limit }: GetTenantAuditLogRequest): Promise<GetTenantAuditLogResponse> {
     const items = await this.auditService.listForTenant(String(tenantId), limit && limit > 0 ? limit : 100);
     return {
       status: true,

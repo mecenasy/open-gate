@@ -13,6 +13,7 @@ import {
   type PlatformsState,
 } from './platforms/platform-fields';
 import { PlatformConfigModal } from './platforms/PlatformConfigModal';
+import { SignalOnboardingFlow } from './platforms/signal/SignalOnboardingFlow';
 
 interface StepPlatformsProps {
   defaultPlatforms: PlatformDraft[];
@@ -69,6 +70,7 @@ export function StepPlatforms({ defaultPlatforms, maxPlatforms, onBack, onNext }
 
   const [state, setState] = useState<PlatformsState>(() => hydrate(defaultPlatforms));
   const [editing, setEditing] = useState<PlatformKey | null>(null);
+  const [signalOnboarding, setSignalOnboarding] = useState(false);
 
   const enabledCount = PLATFORM_KEYS.filter((p) => state[p].enabled).length;
   const overLimit = enabledCount > maxPlatforms;
@@ -77,15 +79,34 @@ export function StepPlatforms({ defaultPlatforms, maxPlatforms, onBack, onNext }
     setState((prev) => ({ ...prev, [platform]: slot }));
   };
 
+  const openConfig = (platform: PlatformKey) => {
+    if (platform === 'signal') {
+      setSignalOnboarding(true);
+    } else {
+      setEditing(platform);
+    }
+  };
+
   const handleToggle = (platform: PlatformKey, value: boolean) => {
     const slot = state[platform];
     if (value && !slot.config) {
-      // Trying to enable a never-configured platform — open the modal
-      // instead of silently flipping to a useless "enabled but empty" state.
-      setEditing(platform);
+      // Trying to enable a never-configured platform — open the right
+      // configurator instead of silently flipping to "enabled but empty".
+      openConfig(platform);
       return;
     }
     setSlot(platform, { ...slot, enabled: value });
+  };
+
+  const handleSignalDone = (credentialsJson: string) => {
+    try {
+      const config = JSON.parse(credentialsJson) as Record<string, unknown>;
+      setSlot('signal', { enabled: true, config });
+    } catch {
+      // Server should always return valid JSON; if it doesn't there's no
+      // reasonable fallback in the wizard (we'd be saving garbage).
+    }
+    setSignalOnboarding(false);
   };
 
   const handleSave = (platform: PlatformKey, config: Record<string, unknown>) => {
@@ -134,7 +155,7 @@ export function StepPlatforms({ defaultPlatforms, maxPlatforms, onBack, onNext }
             >
               <button
                 type="button"
-                onClick={() => setEditing(platform)}
+                onClick={() => openConfig(platform)}
                 className="flex items-start justify-between gap-3 text-left"
               >
                 <div className="flex flex-col gap-0.5 min-w-0">
@@ -191,6 +212,20 @@ export function StepPlatforms({ defaultPlatforms, maxPlatforms, onBack, onNext }
         onClose={() => setEditing(null)}
         onSave={handleSave}
       />
+
+      {signalOnboarding && (
+        <SignalOnboardingFlow
+          isOpen={signalOnboarding}
+          intent="initial"
+          defaults={{
+            apiUrl: (state.signal.config?.apiUrl as string | undefined) ?? '',
+            account: (state.signal.config?.account as string | undefined) ?? '',
+            mode: 'register',
+          }}
+          onClose={() => setSignalOnboarding(false)}
+          onDone={handleSignalDone}
+        />
+      )}
     </div>
   );
 }

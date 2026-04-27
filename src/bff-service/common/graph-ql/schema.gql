@@ -378,6 +378,15 @@ type TenantAuditLogEntryType {
   createdAt: String!
 }
 
+type OnboardingStepType {
+  sessionId: ID!
+  stepType: String!
+  stepKey: String!
+  dataJson: String!
+  error: String
+  success: Boolean!
+}
+
 type ConfigType {
   id: ID!
   key: String!
@@ -549,6 +558,9 @@ type Mutation {
   transferTenantBilling(input: TransferTenantBillingInput!): MutationResult!
   setTenantActive(input: SetTenantActiveInput!): MutationResult!
   deleteTenant(input: DeleteTenantInput!): MutationResult!
+  startPlatformOnboarding(input: StartPlatformOnboardingInput!): OnboardingStepType!
+  submitPlatformOnboarding(input: SubmitPlatformOnboardingInput!): OnboardingStepType!
+  cancelPlatformOnboarding(sessionId: String!): Boolean!
   updateConfig(input: UpdateConfigType!): ConfigResponseType!
 }
 
@@ -822,6 +834,20 @@ input SetTenantActiveInput {
 input DeleteTenantInput {
   tenantId: String!
   slugConfirmation: String!
+}
+
+input StartPlatformOnboardingInput {
+  tenantId: String
+  platform: String!
+  paramsJson: String!
+}
+
+input SubmitPlatformOnboardingInput {
+  sessionId: ID!
+  stepKey: String!
+  payloadJson: String!
+  tenantId: String
+  platform: String
 }
 
 input UpdateConfigType {

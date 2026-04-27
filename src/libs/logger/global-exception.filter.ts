@@ -21,11 +21,7 @@ interface GraphQLErrorBody {
 }
 
 function isStructuredPayload(value: unknown): value is Record<string, unknown> & { code: string; message?: string } {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    typeof (value as Record<string, unknown>).code === 'string'
-  );
+  return typeof value === 'object' && value !== null && typeof (value as Record<string, unknown>).code === 'string';
 }
 
 @Catch()

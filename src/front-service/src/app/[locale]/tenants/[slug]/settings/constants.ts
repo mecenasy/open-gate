@@ -6,6 +6,7 @@ export const TENANT_SETTINGS_TABS: TenantSettingsTabKey[] = [
   'branding',
   'features',
   'messaging',
+  'platforms',
   'commands',
   'compliance',
   'staff',

@@ -25,9 +25,9 @@ type Documents = {
     "\n  mutation Verify2faCode($input: Verify2faCodeType!) {\n    verify2faCode(input: $input) {\n      status\n    }\n  }\n": typeof types.Verify2faCodeDocument,
     "\n  mutation GetPasskeyOptions {\n    optionPasskey\n  }\n": typeof types.GetPasskeyOptionsDocument,
     "\n  mutation VerifyPasskey($input: JSON!) {\n    optionPasskeyVerify(data: $input) {\n      status\n    }\n  }\n": typeof types.VerifyPasskeyDocument,
-    "\n  mutation QrReject ($challenge: String!) {\n    qrReject(challenge: $challenge) {\n      status\n    }\n  }\n": typeof types.QrRejectDocument,
-    "\n  mutation QrOption ($challenge: String!, $nonce: String!) {\n    qrOption(challenge: $challenge, nonce: $nonce)\n  }\n": typeof types.QrOptionDocument,
-    "\n  mutation QrVerify ($challenge: String!, $data: JSON!) {\n    qrConfirm(challenge: $challenge, data: $data) {\n      status\n    }\n  }\n": typeof types.QrVerifyDocument,
+    "\n  mutation QrReject($challenge: String!) {\n    qrReject(challenge: $challenge) {\n      status\n    }\n  }\n": typeof types.QrRejectDocument,
+    "\n  mutation QrOption($challenge: String!, $nonce: String!) {\n    qrOption(challenge: $challenge, nonce: $nonce)\n  }\n": typeof types.QrOptionDocument,
+    "\n  mutation QrVerify($challenge: String!, $data: JSON!) {\n    qrConfirm(challenge: $challenge, data: $data) {\n      status\n    }\n  }\n": typeof types.QrVerifyDocument,
     "\n  mutation Register($input: RegisterInput!) {\n    register(input: $input) {\n      success\n    }\n  }\n": typeof types.RegisterDocument,
     "\n  query GetPasskeys {\n    getPasskeys {\n      id\n      createAt\n      deviceName\n      credentialID\n    }\n  }\n": typeof types.GetPasskeysDocument,
     "\n  mutation RemovePasskey($id: String!) {\n    removePasskey(id: $id) {\n      status\n    }\n  }\n": typeof types.RemovePasskeyDocument,
@@ -63,6 +63,9 @@ type Documents = {
     "\n  mutation RemoveTenantStaff($input: RemoveTenantStaffInput!) {\n    removeTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.RemoveTenantStaffDocument,
     "\n  mutation ChangeTenantStaffRole($input: ChangeTenantStaffRoleInput!) {\n    changeTenantStaffRole(input: $input) {\n      status\n      message\n    }\n  }\n": typeof types.ChangeTenantStaffRoleDocument,
     "\n  query TenantAuditLog($tenantId: String!) {\n    tenantAuditLog(tenantId: $tenantId) {\n      id\n      tenantId\n      userId\n      action\n      payload\n      correlationId\n      createdAt\n    }\n  }\n": typeof types.TenantAuditLogDocument,
+    "\n  mutation StartPlatformOnboarding($input: StartPlatformOnboardingInput!) {\n    startPlatformOnboarding(input: $input) {\n      sessionId\n      stepType\n      stepKey\n      dataJson\n      error\n      success\n    }\n  }\n": typeof types.StartPlatformOnboardingDocument,
+    "\n  mutation SubmitPlatformOnboarding($input: SubmitPlatformOnboardingInput!) {\n    submitPlatformOnboarding(input: $input) {\n      sessionId\n      stepType\n      stepKey\n      dataJson\n      error\n      success\n    }\n  }\n": typeof types.SubmitPlatformOnboardingDocument,
+    "\n  mutation CancelPlatformOnboarding($sessionId: String!) {\n    cancelPlatformOnboarding(sessionId: $sessionId)\n  }\n": typeof types.CancelPlatformOnboardingDocument,
     "\n  query TenantSlugAvailable($slug: String!) {\n    tenantSlugAvailable(slug: $slug)\n  }\n": typeof types.TenantSlugAvailableDocument,
     "\n  mutation CreateTenantWizard($input: CreateTenantInput!) {\n    createTenant(input: $input) {\n      id\n      slug\n      schemaName\n    }\n  }\n": typeof types.CreateTenantWizardDocument,
     "\n  mutation SwitchTenantWizard($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n": typeof types.SwitchTenantWizardDocument,
@@ -95,9 +98,9 @@ const documents: Documents = {
     "\n  mutation Verify2faCode($input: Verify2faCodeType!) {\n    verify2faCode(input: $input) {\n      status\n    }\n  }\n": types.Verify2faCodeDocument,
     "\n  mutation GetPasskeyOptions {\n    optionPasskey\n  }\n": types.GetPasskeyOptionsDocument,
     "\n  mutation VerifyPasskey($input: JSON!) {\n    optionPasskeyVerify(data: $input) {\n      status\n    }\n  }\n": types.VerifyPasskeyDocument,
-    "\n  mutation QrReject ($challenge: String!) {\n    qrReject(challenge: $challenge) {\n      status\n    }\n  }\n": types.QrRejectDocument,
-    "\n  mutation QrOption ($challenge: String!, $nonce: String!) {\n    qrOption(challenge: $challenge, nonce: $nonce)\n  }\n": types.QrOptionDocument,
-    "\n  mutation QrVerify ($challenge: String!, $data: JSON!) {\n    qrConfirm(challenge: $challenge, data: $data) {\n      status\n    }\n  }\n": types.QrVerifyDocument,
+    "\n  mutation QrReject($challenge: String!) {\n    qrReject(challenge: $challenge) {\n      status\n    }\n  }\n": types.QrRejectDocument,
+    "\n  mutation QrOption($challenge: String!, $nonce: String!) {\n    qrOption(challenge: $challenge, nonce: $nonce)\n  }\n": types.QrOptionDocument,
+    "\n  mutation QrVerify($challenge: String!, $data: JSON!) {\n    qrConfirm(challenge: $challenge, data: $data) {\n      status\n    }\n  }\n": types.QrVerifyDocument,
     "\n  mutation Register($input: RegisterInput!) {\n    register(input: $input) {\n      success\n    }\n  }\n": types.RegisterDocument,
     "\n  query GetPasskeys {\n    getPasskeys {\n      id\n      createAt\n      deviceName\n      credentialID\n    }\n  }\n": types.GetPasskeysDocument,
     "\n  mutation RemovePasskey($id: String!) {\n    removePasskey(id: $id) {\n      status\n    }\n  }\n": types.RemovePasskeyDocument,
@@ -133,6 +136,9 @@ const documents: Documents = {
     "\n  mutation RemoveTenantStaff($input: RemoveTenantStaffInput!) {\n    removeTenantStaff(input: $input) {\n      status\n      message\n    }\n  }\n": types.RemoveTenantStaffDocument,
     "\n  mutation ChangeTenantStaffRole($input: ChangeTenantStaffRoleInput!) {\n    changeTenantStaffRole(input: $input) {\n      status\n      message\n    }\n  }\n": types.ChangeTenantStaffRoleDocument,
     "\n  query TenantAuditLog($tenantId: String!) {\n    tenantAuditLog(tenantId: $tenantId) {\n      id\n      tenantId\n      userId\n      action\n      payload\n      correlationId\n      createdAt\n    }\n  }\n": types.TenantAuditLogDocument,
+    "\n  mutation StartPlatformOnboarding($input: StartPlatformOnboardingInput!) {\n    startPlatformOnboarding(input: $input) {\n      sessionId\n      stepType\n      stepKey\n      dataJson\n      error\n      success\n    }\n  }\n": types.StartPlatformOnboardingDocument,
+    "\n  mutation SubmitPlatformOnboarding($input: SubmitPlatformOnboardingInput!) {\n    submitPlatformOnboarding(input: $input) {\n      sessionId\n      stepType\n      stepKey\n      dataJson\n      error\n      success\n    }\n  }\n": types.SubmitPlatformOnboardingDocument,
+    "\n  mutation CancelPlatformOnboarding($sessionId: String!) {\n    cancelPlatformOnboarding(sessionId: $sessionId)\n  }\n": types.CancelPlatformOnboardingDocument,
     "\n  query TenantSlugAvailable($slug: String!) {\n    tenantSlugAvailable(slug: $slug)\n  }\n": types.TenantSlugAvailableDocument,
     "\n  mutation CreateTenantWizard($input: CreateTenantInput!) {\n    createTenant(input: $input) {\n      id\n      slug\n      schemaName\n    }\n  }\n": types.CreateTenantWizardDocument,
     "\n  mutation SwitchTenantWizard($tenantId: String!) {\n    switchTenant(tenantId: $tenantId)\n  }\n": types.SwitchTenantWizardDocument,
@@ -215,15 +221,15 @@ export function graphql(source: "\n  mutation VerifyPasskey($input: JSON!) {\n  
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation QrReject ($challenge: String!) {\n    qrReject(challenge: $challenge) {\n      status\n    }\n  }\n"): (typeof documents)["\n  mutation QrReject ($challenge: String!) {\n    qrReject(challenge: $challenge) {\n      status\n    }\n  }\n"];
+export function graphql(source: "\n  mutation QrReject($challenge: String!) {\n    qrReject(challenge: $challenge) {\n      status\n    }\n  }\n"): (typeof documents)["\n  mutation QrReject($challenge: String!) {\n    qrReject(challenge: $challenge) {\n      status\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation QrOption ($challenge: String!, $nonce: String!) {\n    qrOption(challenge: $challenge, nonce: $nonce)\n  }\n"): (typeof documents)["\n  mutation QrOption ($challenge: String!, $nonce: String!) {\n    qrOption(challenge: $challenge, nonce: $nonce)\n  }\n"];
+export function graphql(source: "\n  mutation QrOption($challenge: String!, $nonce: String!) {\n    qrOption(challenge: $challenge, nonce: $nonce)\n  }\n"): (typeof documents)["\n  mutation QrOption($challenge: String!, $nonce: String!) {\n    qrOption(challenge: $challenge, nonce: $nonce)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation QrVerify ($challenge: String!, $data: JSON!) {\n    qrConfirm(challenge: $challenge, data: $data) {\n      status\n    }\n  }\n"): (typeof documents)["\n  mutation QrVerify ($challenge: String!, $data: JSON!) {\n    qrConfirm(challenge: $challenge, data: $data) {\n      status\n    }\n  }\n"];
+export function graphql(source: "\n  mutation QrVerify($challenge: String!, $data: JSON!) {\n    qrConfirm(challenge: $challenge, data: $data) {\n      status\n    }\n  }\n"): (typeof documents)["\n  mutation QrVerify($challenge: String!, $data: JSON!) {\n    qrConfirm(challenge: $challenge, data: $data) {\n      status\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -364,6 +370,18 @@ export function graphql(source: "\n  mutation ChangeTenantStaffRole($input: Chan
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query TenantAuditLog($tenantId: String!) {\n    tenantAuditLog(tenantId: $tenantId) {\n      id\n      tenantId\n      userId\n      action\n      payload\n      correlationId\n      createdAt\n    }\n  }\n"): (typeof documents)["\n  query TenantAuditLog($tenantId: String!) {\n    tenantAuditLog(tenantId: $tenantId) {\n      id\n      tenantId\n      userId\n      action\n      payload\n      correlationId\n      createdAt\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation StartPlatformOnboarding($input: StartPlatformOnboardingInput!) {\n    startPlatformOnboarding(input: $input) {\n      sessionId\n      stepType\n      stepKey\n      dataJson\n      error\n      success\n    }\n  }\n"): (typeof documents)["\n  mutation StartPlatformOnboarding($input: StartPlatformOnboardingInput!) {\n    startPlatformOnboarding(input: $input) {\n      sessionId\n      stepType\n      stepKey\n      dataJson\n      error\n      success\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SubmitPlatformOnboarding($input: SubmitPlatformOnboardingInput!) {\n    submitPlatformOnboarding(input: $input) {\n      sessionId\n      stepType\n      stepKey\n      dataJson\n      error\n      success\n    }\n  }\n"): (typeof documents)["\n  mutation SubmitPlatformOnboarding($input: SubmitPlatformOnboardingInput!) {\n    submitPlatformOnboarding(input: $input) {\n      sessionId\n      stepType\n      stepKey\n      dataJson\n      error\n      success\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CancelPlatformOnboarding($sessionId: String!) {\n    cancelPlatformOnboarding(sessionId: $sessionId)\n  }\n"): (typeof documents)["\n  mutation CancelPlatformOnboarding($sessionId: String!) {\n    cancelPlatformOnboarding(sessionId: $sessionId)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

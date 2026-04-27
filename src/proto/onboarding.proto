@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package onboarding;
+
+// Hosted by notify-service (port 50052) — drives multi-step platform onboarding
+// flows (e.g. Signal phone registration / device-link). Per-platform logic lives
+// behind an OnboardingProvider; this contract is intentionally generic so new
+// platforms can register their own flow without changing the wire format.
+service PlatformOnboardingService {
+  rpc StartOnboarding (StartOnboardingRequest) returns (OnboardingStepResponse);
+  rpc SubmitOnboarding (SubmitOnboardingRequest) returns (OnboardingStepResponse);
+  rpc CancelOnboarding (CancelOnboardingRequest) returns (OnboardingAck);
+}
+
+message StartOnboardingRequest {
+  // Empty when a wizard creates credentials before the tenant exists.
+  // Required when intent='replace' (settings flow).
+  optional string tenant_id = 1;
+  // 'signal' | 'whatsapp' | 'messenger' | ... — string, not enum, so a new
+  // platform doesn't require a contract redeploy.
+  string platform = 2;
+  // Platform-specific JSON payload (e.g. for signal: { apiUrl, account, mode, intent, previousAccount }).
+  string params_json = 3;
+}
+
+message SubmitOnboardingRequest {
+  string session_id = 1;
+  // The step the client is responding to. Must equal the stepKey returned in
+  // the previous OnboardingStepResponse — guards against out-of-order submits.
+  string step_key = 2;
+  // Step-specific payload JSON (captcha token, verification code, etc.).
+  string payload_json = 3;
+}
+
+message CancelOnboardingRequest {
+  string session_id = 1;
+}
+
+message OnboardingStepResponse {
+  bool success = 1;
+  string session_id = 2;
+  // 'form' | 'qrcode' | 'captcha' | 'verification_code' | 'info' | 'done' | 'error'
+  string step_type = 3;
+  // Identifies which step the next submit must address.
+  string step_key = 4;
+  // Step-type-specific JSON payload (qr image, captcha url, credentials json, ...).
+  string data_json = 5;
+  string error = 6;
+}
+
+message OnboardingAck {
+  bool success = 1;
+  string message = 2;
+}

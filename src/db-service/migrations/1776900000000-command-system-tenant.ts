@@ -4,9 +4,7 @@ export class CommandSystemTenant1776900000000 implements MigrationInterface {
   name = 'CommandSystemTenant1776900000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `ALTER TABLE "commands" ADD COLUMN "is_system" boolean NOT NULL DEFAULT false`,
-    );
+    await queryRunner.query(`ALTER TABLE "commands" ADD COLUMN "is_system" boolean NOT NULL DEFAULT false`);
     await queryRunner.query(`ALTER TABLE "commands" ADD COLUMN "tenant_id" uuid`);
 
     // Existing commands are pre-platform commands — treat them as system commands.

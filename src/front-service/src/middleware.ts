@@ -47,5 +47,9 @@ export default async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  // signal-captcha is a same-origin proxy popup that hosts the hCaptcha
+  // widget for Signal registration. It must NOT go through next-intl
+  // (no locale redirect) or the auth gate (popup must work without a
+  // session) — exclude it from the middleware matcher entirely.
+  matcher: ['/((?!api|_next|_vercel|signal-captcha|.*\\..*).*)'],
 };

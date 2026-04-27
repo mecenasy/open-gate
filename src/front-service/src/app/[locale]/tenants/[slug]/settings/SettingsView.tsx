@@ -12,6 +12,7 @@ import { GeneralTab } from './tabs/general/GeneralTab';
 import { BrandingTab } from './tabs/branding/BrandingTab';
 import { FeaturesTab } from './tabs/features/FeaturesTab';
 import { MessagingTab } from './tabs/messaging/MessagingTab';
+import { PlatformsTab } from './tabs/platforms/PlatformsTab';
 import { CommandsTab } from './tabs/commands/CommandsTab';
 import { ComplianceTab } from './tabs/compliance/ComplianceTab';
 import { StaffTab } from './tabs/staff/StaffTab';
@@ -81,6 +82,7 @@ export function SettingsView({ slug }: SettingsViewProps) {
           branding: branding ? <BrandingTab tenantId={tenant.id} branding={branding} /> : null,
           features: features ? <FeaturesTab tenantId={tenant.id} features={features} /> : null,
           messaging: messaging ? <MessagingTab tenantId={tenant.id} messaging={messaging} /> : null,
+          platforms: <PlatformsTab tenantId={tenant.id} />,
           commands: commands ? <CommandsTab tenantId={tenant.id} commands={commands} /> : null,
           compliance: compliance ? <ComplianceTab tenantId={tenant.id} compliance={compliance} /> : null,
           staff: <StaffTab tenantId={tenant.id} staff={staff} />,

@@ -3,6 +3,7 @@ export type TenantSettingsTabKey =
   | 'branding'
   | 'features'
   | 'messaging'
+  | 'platforms'
   | 'commands'
   | 'compliance'
   | 'staff'

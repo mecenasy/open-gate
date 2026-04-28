@@ -103,12 +103,25 @@ export const envValidationSchema = Joi.object({
   SMTP_FROM: Joi.string().email().default('noreply@example.com').description('Sender email address'),
 
   // ============ SMS/Messaging Configuration (Twilio) ============
-  TWILO_SID: Joi.string().default('').description('Twilio Account SID'),
-  TWILO_TOKEN: Joi.string().default('').description('Twilio Auth Token'),
+  // The phone-procurement work moved master Twilio credentials into the
+  // shared_config.platform_credentials row at DEFAULT_PLATFORM_FALLBACK_ID.
+  // The TWILO_* env vars below remain only as a legacy fallback for the
+  // SMS envFallback path (PlatformConfigService.envFallback) — used when
+  // the master DB row is empty in greenfield environments. Seeding the
+  // master row from process.env.TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN
+  // happens in migration 1778000000000; those names are intentionally
+  // outside this Joi schema since they're consumed at migration time
+  // only and shouldn't be part of the runtime env surface.
+  TWILO_SID: Joi.string()
+    .default('')
+    .description('Legacy Twilio Account SID — env fallback for SMS sending when the master DB row is empty.'),
+  TWILO_TOKEN: Joi.string()
+    .default('')
+    .description('Legacy Twilio Auth Token — env fallback for SMS sending when the master DB row is empty.'),
   TWILO_PHONE: Joi.string()
     .pattern(/^\+\d{1,15}$/)
     .default('+1234567890')
-    .description('Twilio phone number for SMS'),
+    .description('Legacy Twilio phone number — env fallback for SMS sending when the master DB row is empty.'),
   TWILIO_SANDBOX: Joi.boolean()
     .default(false)
     .description(

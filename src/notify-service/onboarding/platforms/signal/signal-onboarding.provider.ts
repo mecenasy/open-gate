@@ -90,9 +90,10 @@ export class SignalOnboardingProvider extends OnboardingProvider {
   async cancel(ctx: OnboardingContext): Promise<void> {
     // No upstream session to drop — signal-cli REST is stateless per call —
     // but the verification bridge's pending flag has to come down so a stale
-    // SMS arriving during the next session doesn't auto-fill an old tenant.
-    if (ctx.session.tenantId) {
-      await this.verificationBridge.clearPending(ctx.session.tenantId);
+    // SMS arriving during the next session doesn't auto-fill an old account.
+    const account = (ctx.session.params as Partial<SignalOnboardingParams> | undefined)?.account;
+    if (account) {
+      await this.verificationBridge.clearPending(account);
     }
   }
 
@@ -161,7 +162,7 @@ export class SignalOnboardingProvider extends OnboardingProvider {
       return errorStep('REGISTER_FAILED', result.error.message, true);
     }
     this.setMeta(ctx, { registrationStarted: true });
-    return this.enterVerificationStep(ctx, params.account);
+    return this.enterVerificationStep(params.account);
   }
 
   private async handleVerifyCode(ctx: OnboardingContext, payload: Record<string, unknown>): Promise<OnboardingStep> {
@@ -207,7 +208,7 @@ export class SignalOnboardingProvider extends OnboardingProvider {
     const result = await this.client.register(apiUrl, params.account, { use_voice: false });
     if (result.ok) {
       this.setMeta(ctx, { registrationStarted: true });
-      return this.enterVerificationStep(ctx, params.account);
+      return this.enterVerificationStep(params.account);
     }
     if (result.error.kind === 'captcha_required') {
       return this.captchaStep();
@@ -243,16 +244,18 @@ export class SignalOnboardingProvider extends OnboardingProvider {
   }
 
   /**
-   * Marks the verification bridge so an inbound SMS to the tenant's
-   * managed number can auto-supply the code, then returns the step the
-   * client should render. The flag stays up until cancel(), successDone(),
-   * or its 10-minute TTL — retriable verify failures keep it active so
-   * the user can paste a corrected code.
+   * Marks the verification bridge so an inbound SMS to the account's
+   * number can auto-supply the code, then returns the step the client
+   * should render. Keyed on `account` (E.164) — same value the Twilio
+   * webhook sees in `To`, and works for both wizard (tenantId still
+   * null) and settings flows.
+   *
+   * The flag stays up until cancel(), successDone(), or its 10-minute
+   * TTL — retriable verify failures keep it active so the user can
+   * paste a corrected code.
    */
-  private async enterVerificationStep(ctx: OnboardingContext, recipient: string): Promise<OnboardingStep> {
-    if (ctx.session.tenantId) {
-      await this.verificationBridge.markPending(ctx.session.tenantId);
-    }
+  private async enterVerificationStep(recipient: string): Promise<OnboardingStep> {
+    await this.verificationBridge.markPending(recipient);
     return this.verificationCodeStep(recipient);
   }
 
@@ -285,8 +288,8 @@ export class SignalOnboardingProvider extends OnboardingProvider {
       } catch (err) {
         this.logger.warn(`Bridge refresh failed for tenant ${ctx.session.tenantId}: ${String(err)}`);
       }
-      await this.verificationBridge.clearPending(ctx.session.tenantId);
     }
+    await this.verificationBridge.clearPending(params.account);
 
     return {
       type: 'done',

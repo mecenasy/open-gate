@@ -779,6 +779,7 @@ export type Query = {
   promptById: PromptResponseType;
   promptByKey: PromptResponseType;
   prompts: PromptsListType;
+  signalVerificationCodeForPending?: Maybe<SignalVerificationCodeType>;
   subscriptionHistory: Array<SubscriptionChangeType>;
   subscriptionPlans: Array<SubscriptionPlanType>;
   tenantAuditLog: Array<TenantAuditLogEntryType>;
@@ -836,6 +837,10 @@ export type QueryPromptByKeyArgs = {
 
 export type QueryPromptsArgs = {
   input?: InputMaybe<GetAllPromptsType>;
+};
+
+export type QuerySignalVerificationCodeForPendingArgs = {
+  pendingId: Scalars['String']['input'];
 };
 
 export type QueryTenantAuditLogArgs = {
@@ -925,6 +930,12 @@ export type SelectSubscriptionInput = {
 export type SetTenantActiveInput = {
   active: Scalars['Boolean']['input'];
   tenantId: Scalars['String']['input'];
+};
+
+export type SignalVerificationCodeType = {
+  __typename?: 'SignalVerificationCodeType';
+  code: Scalars['String']['output'];
+  receivedAt: Scalars['String']['output'];
 };
 
 export type StartPlatformOnboardingInput = {
@@ -2097,6 +2108,19 @@ export type ReleasePendingPurchaseMutationVariables = Exact<{
 }>;
 
 export type ReleasePendingPurchaseMutation = { __typename?: 'Mutation'; releasePendingPurchase: boolean };
+
+export type SignalVerificationCodeForPendingQueryVariables = Exact<{
+  pendingId: Scalars['String']['input'];
+}>;
+
+export type SignalVerificationCodeForPendingQuery = {
+  __typename?: 'Query';
+  signalVerificationCodeForPending?: {
+    __typename?: 'SignalVerificationCodeType';
+    code: string;
+    receivedAt: string;
+  } | null;
+};
 
 export type GetUsersQueryVariables = Exact<{
   input?: InputMaybe<GetAllUsersType>;
@@ -4949,6 +4973,46 @@ export const ReleasePendingPurchaseDocument = {
     },
   ],
 } as unknown as DocumentNode<ReleasePendingPurchaseMutation, ReleasePendingPurchaseMutationVariables>;
+export const SignalVerificationCodeForPendingDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'SignalVerificationCodeForPending' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'pendingId' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'signalVerificationCodeForPending' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'pendingId' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'pendingId' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'receivedAt' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SignalVerificationCodeForPendingQuery, SignalVerificationCodeForPendingQueryVariables>;
 export const GetUsersDocument = {
   kind: 'Document',
   definitions: [

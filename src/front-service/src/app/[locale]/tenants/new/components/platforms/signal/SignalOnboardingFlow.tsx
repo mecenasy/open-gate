@@ -6,6 +6,7 @@ import { Modal } from '@/components/ui';
 import type { SignalFormSchema } from './schemas/signal-form.schema';
 import { useSignalOnboarding } from './hooks/use-signal-onboarding';
 import { useCaptchaListener } from './hooks/use-captcha-listener';
+import { useSignalVerificationCode } from '../../../hooks/use-signal-verification-code';
 import type { SignalIntent } from './signal-onboarding.machine';
 import { BusyStep } from './components/BusyStep';
 import { CaptchaStep } from './components/CaptchaStep';
@@ -32,6 +33,13 @@ interface SignalOnboardingFlowProps {
    * managed Twilio number.
    */
   lockMode?: boolean;
+  /**
+   * When set, the verifyCode step polls the BFF for a code recorded by
+   * the Twilio webhook and auto-fills the input. Required for the
+   * managed wizard flow because the user has no inbox to read the code
+   * from — Signal sent it to the managed Twilio number we own.
+   */
+  pendingPurchaseId?: string;
   onClose: () => void;
   /**
    * Fired when the flow finishes successfully. For wizard flow, the parent
@@ -56,12 +64,16 @@ export function SignalOnboardingFlow({
   previousAccount,
   defaults,
   lockMode = false,
+  pendingPurchaseId,
   onClose,
   onDone,
 }: SignalOnboardingFlowProps) {
   const t = useTranslations('signalOnboarding');
 
   const { state, send } = useSignalOnboarding({ tenantId, intent, previousAccount });
+
+  const onVerifyCodeStep = state.matches('verifyCode');
+  const verification = useSignalVerificationCode(pendingPurchaseId ?? null, onVerifyCodeStep);
 
   // Same-origin postMessage listener — only active on captcha step so a
   // stale popup can't push tokens into other states.
@@ -131,6 +143,7 @@ export function SignalOnboardingFlow({
         <VerifyCodeStep
           recipient={step.data.recipient}
           channel={step.data.channel}
+          autoFilledCode={verification.code}
           onSubmit={(code) => send({ type: 'SUBMIT_CODE', code })}
           onCancel={() => send({ type: 'CANCEL' })}
         />

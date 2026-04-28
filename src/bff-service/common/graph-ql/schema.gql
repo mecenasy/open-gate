@@ -451,6 +451,11 @@ type PhoneProcurementInfoType {
   isSandbox: Boolean!
 }
 
+type SignalVerificationCodeType {
+  code: String!
+  receivedAt: String!
+}
+
 type Query {
   users(input: GetAllUsersType): UsersListType!
   user(input: GetUserType!): UserSummaryType!
@@ -487,6 +492,7 @@ type Query {
   phoneProcurementInfo: PhoneProcurementInfoType!
   availablePhoneNumbers(input: ListAvailablePhoneNumbersInput!): [AvailablePhoneNumberType!]!
   tenantPhoneNumber(tenantId: String!): TenantPhoneNumberType
+  signalVerificationCodeForPending(pendingId: String!): SignalVerificationCodeType
   csrfToken: CsrfTokenType!
 }
 

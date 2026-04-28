@@ -121,3 +121,12 @@ export const RELEASE_PENDING_PURCHASE_MUTATION = graphql(`
     releasePendingPurchase(pendingId: $pendingId)
   }
 `);
+
+export const SIGNAL_VERIFICATION_CODE_QUERY = graphql(`
+  query SignalVerificationCodeForPending($pendingId: String!) {
+    signalVerificationCodeForPending(pendingId: $pendingId) {
+      code
+      receivedAt
+    }
+  }
+`);

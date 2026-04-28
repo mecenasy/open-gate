@@ -7,25 +7,34 @@ const TTL_SECONDS = 10 * 60;
 
 const SIX_DIGIT_PATTERN = /\b(\d{3})-?(\d{3})\b/;
 
+export interface RecordedVerificationCode {
+  code: string;
+  receivedAt: string;
+}
+
 /**
  * Redis-backed bridge that lets the Signal onboarding flow consume the
  * verification SMS arriving at a managed Twilio number, even though the
  * SMS lands in notify-service/incoming and the wait happens in
  * notify-service/onboarding.
  *
+ * Keyed by Signal account E.164 — that's the account being registered
+ * and the same value the Twilio webhook receives in `To`. Tenant ID
+ * isn't useful as a key because the wizard flow runs the registration
+ * before the tenant exists.
+ *
  * Lifecycle:
- *   1. Signal onboarding enters the verifyCode step → markPending(tenantId).
- *   2. SMS webhook arrives on the tenant's number → if isPending matches,
- *      extractCode() pulls a 6-digit group out of the body and recordCode()
- *      stashes it.
- *   3. Frontend (BFF resolver) polls / subscribes to read the code; the
- *      Signal provider verifies it and wins.
+ *   1. Signal onboarding enters the verifyCode step → markPending(account).
+ *   2. SMS webhook arrives on the same number → extractCode() pulls a
+ *      6-digit group out of the body and recordCode() stashes it.
+ *   3. Frontend (BFF resolver) polls to read the code and auto-fills
+ *      the verify input; the Signal provider verifies it and wins.
  *   4. clearPending() runs on success, cancel, or terminal error.
  *
  * Both keys carry a 10-minute TTL — Twilio retries inbound webhooks for
  * up to ~15 min, but a verification code that arrives later is no longer
  * useful (Signal expires the code) so the cache window is intentionally
- * shorter than full WebHook retry.
+ * shorter than full webhook retry.
  */
 @Injectable()
 export class SignalVerificationBridgeService {
@@ -33,32 +42,39 @@ export class SignalVerificationBridgeService {
 
   constructor(private readonly cache: CacheService) {}
 
-  async markPending(tenantId: string): Promise<void> {
+  async markPending(phoneE164: string): Promise<void> {
     await this.cache.saveInCache({
-      identifier: tenantId,
+      identifier: phoneE164,
       prefix: PENDING_PREFIX,
       data: { since: new Date().toISOString() },
       EX: TTL_SECONDS,
     });
   }
 
-  async clearPending(tenantId: string): Promise<void> {
-    await this.cache.removeFromCache({ identifier: tenantId, prefix: PENDING_PREFIX });
-    await this.cache.removeFromCache({ identifier: tenantId, prefix: CODE_PREFIX });
+  async clearPending(phoneE164: string): Promise<void> {
+    await this.cache.removeFromCache({ identifier: phoneE164, prefix: PENDING_PREFIX });
+    await this.cache.removeFromCache({ identifier: phoneE164, prefix: CODE_PREFIX });
   }
 
-  async isPending(tenantId: string): Promise<boolean> {
-    return this.cache.checkExistsInCache({ identifier: tenantId, prefix: PENDING_PREFIX });
+  async isPending(phoneE164: string): Promise<boolean> {
+    return this.cache.checkExistsInCache({ identifier: phoneE164, prefix: PENDING_PREFIX });
   }
 
-  async recordCode(tenantId: string, code: string): Promise<void> {
+  async recordCode(phoneE164: string, code: string): Promise<void> {
     await this.cache.saveInCache({
-      identifier: tenantId,
+      identifier: phoneE164,
       prefix: CODE_PREFIX,
       data: { code, receivedAt: new Date().toISOString() },
       EX: TTL_SECONDS,
     });
-    this.logger.log(`Recorded Signal verification code for tenant ${tenantId}.`);
+    this.logger.log(`Recorded Signal verification code for ${phoneE164}.`);
+  }
+
+  async getCode(phoneE164: string): Promise<RecordedVerificationCode | null> {
+    return this.cache.getFromCache<RecordedVerificationCode>({
+      identifier: phoneE164,
+      prefix: CODE_PREFIX,
+    });
   }
 
   /**

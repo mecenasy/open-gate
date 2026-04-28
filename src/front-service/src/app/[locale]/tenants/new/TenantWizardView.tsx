@@ -19,6 +19,7 @@ import { WizardStepper } from './components/WizardStepper';
 import { StepBasics } from './components/StepBasics';
 import { StepFeatures } from './components/StepFeatures';
 import { StepPhoneStrategy } from './components/StepPhoneStrategy';
+import { StepPhonePicker } from './components/StepPhonePicker';
 import { StepPlatforms } from './components/StepPlatforms';
 import { StepCommands } from './components/StepCommands';
 import { StepContacts } from './components/StepContacts';
@@ -93,6 +94,16 @@ export function TenantWizardView() {
     // Picker step belongs to the managed flow only; self users go
     // straight to platforms where they'll paste their own Twilio creds.
     setStep(draft.mode === 'managed' ? 'phonePicker' : 'platforms');
+  };
+
+  const handlePhonePickerBack = (draft: PhoneStrategyDraft) => {
+    setPhoneStrategy(draft);
+    setStep('phoneStrategy');
+  };
+
+  const handlePhonePickerNext = (draft: PhoneStrategyDraft) => {
+    setPhoneStrategy(draft);
+    setStep('platforms');
   };
 
   const handlePlatformsBack = (draft: PlatformDraft[]) => {
@@ -202,6 +213,14 @@ export function TenantWizardView() {
           currency={usage.currency}
           onBack={handlePhoneStrategyBack}
           onNext={handlePhoneStrategyNext}
+        />
+      )}
+
+      {step === 'phonePicker' && (
+        <StepPhonePicker
+          defaultStrategy={phoneStrategy}
+          onBack={handlePhonePickerBack}
+          onNext={handlePhonePickerNext}
         />
       )}
 

@@ -86,3 +86,38 @@ export const PHONE_PROCUREMENT_INFO_QUERY = graphql(`
     }
   }
 `);
+
+export const AVAILABLE_PHONE_NUMBERS_QUERY = graphql(`
+  query AvailablePhoneNumbers($input: ListAvailablePhoneNumbersInput!) {
+    availablePhoneNumbers(input: $input) {
+      phoneE164
+      capabilities {
+        sms
+        mms
+        voice
+      }
+      region
+      locality
+    }
+  }
+`);
+
+export const PURCHASE_PHONE_NUMBER_MUTATION = graphql(`
+  mutation PurchasePhoneNumber($input: PurchasePhoneNumberInput!) {
+    purchasePhoneNumber(input: $input) {
+      id
+      ownerUserId
+      providerKey
+      phoneE164
+      attachedToTenantId
+      purchasedAt
+      attachedAt
+    }
+  }
+`);
+
+export const RELEASE_PENDING_PURCHASE_MUTATION = graphql(`
+  mutation ReleasePendingPurchase($pendingId: String!) {
+    releasePendingPurchase(pendingId: $pendingId)
+  }
+`);

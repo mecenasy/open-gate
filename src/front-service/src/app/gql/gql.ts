@@ -75,6 +75,9 @@ type Documents = {
   '\n  mutation AddCustomCommandWizard($input: AddCustomCommandInput!) {\n    addCustomCommand(input: $input) {\n      status\n      message\n    }\n  }\n': typeof types.AddCustomCommandWizardDocument;
   '\n  query WizardUsage {\n    myUsage {\n      tenants\n    }\n    mySubscription {\n      plan {\n        maxTenants\n        maxPlatformsPerTenant\n        maxCustomCommandsPerTenant\n        maxContactsPerTenant\n        phoneNumbersIncluded\n        messagesPerMonthIncluded\n        pricePerExtraMessageCents\n        phoneMonthlyCostCents\n        currency\n      }\n    }\n  }\n': typeof types.WizardUsageDocument;
   '\n  query PhoneProcurementInfo {\n    phoneProcurementInfo {\n      providerKey\n      isSandbox\n    }\n  }\n': typeof types.PhoneProcurementInfoDocument;
+  '\n  query AvailablePhoneNumbers($input: ListAvailablePhoneNumbersInput!) {\n    availablePhoneNumbers(input: $input) {\n      phoneE164\n      capabilities {\n        sms\n        mms\n        voice\n      }\n      region\n      locality\n    }\n  }\n': typeof types.AvailablePhoneNumbersDocument;
+  '\n  mutation PurchasePhoneNumber($input: PurchasePhoneNumberInput!) {\n    purchasePhoneNumber(input: $input) {\n      id\n      ownerUserId\n      providerKey\n      phoneE164\n      attachedToTenantId\n      purchasedAt\n      attachedAt\n    }\n  }\n': typeof types.PurchasePhoneNumberDocument;
+  '\n  mutation ReleasePendingPurchase($pendingId: String!) {\n    releasePendingPurchase(pendingId: $pendingId)\n  }\n': typeof types.ReleasePendingPurchaseDocument;
   '\n  query GetUsers($input: GetAllUsersType) {\n    users(input: $input) {\n      users {\n        id\n        name\n        surname\n        email\n        phone\n        status\n        type\n      }\n      total\n    }\n  }\n': typeof types.GetUsersDocument;
   '\n  mutation CreateSimpleUser($input: CreateSimpleUserType!) {\n    createSimpleUser(input: $input) {\n      id\n      email\n    }\n  }\n': typeof types.CreateSimpleUserDocument;
   '\n  mutation UpdateUser($input: UpdateUserType!) {\n    updateUser(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n': typeof types.UpdateUserDocument;
@@ -205,6 +208,12 @@ const documents: Documents = {
     types.WizardUsageDocument,
   '\n  query PhoneProcurementInfo {\n    phoneProcurementInfo {\n      providerKey\n      isSandbox\n    }\n  }\n':
     types.PhoneProcurementInfoDocument,
+  '\n  query AvailablePhoneNumbers($input: ListAvailablePhoneNumbersInput!) {\n    availablePhoneNumbers(input: $input) {\n      phoneE164\n      capabilities {\n        sms\n        mms\n        voice\n      }\n      region\n      locality\n    }\n  }\n':
+    types.AvailablePhoneNumbersDocument,
+  '\n  mutation PurchasePhoneNumber($input: PurchasePhoneNumberInput!) {\n    purchasePhoneNumber(input: $input) {\n      id\n      ownerUserId\n      providerKey\n      phoneE164\n      attachedToTenantId\n      purchasedAt\n      attachedAt\n    }\n  }\n':
+    types.PurchasePhoneNumberDocument,
+  '\n  mutation ReleasePendingPurchase($pendingId: String!) {\n    releasePendingPurchase(pendingId: $pendingId)\n  }\n':
+    types.ReleasePendingPurchaseDocument,
   '\n  query GetUsers($input: GetAllUsersType) {\n    users(input: $input) {\n      users {\n        id\n        name\n        surname\n        email\n        phone\n        status\n        type\n      }\n      total\n    }\n  }\n':
     types.GetUsersDocument,
   '\n  mutation CreateSimpleUser($input: CreateSimpleUserType!) {\n    createSimpleUser(input: $input) {\n      id\n      email\n    }\n  }\n':
@@ -608,6 +617,24 @@ export function graphql(
 export function graphql(
   source: '\n  query PhoneProcurementInfo {\n    phoneProcurementInfo {\n      providerKey\n      isSandbox\n    }\n  }\n',
 ): (typeof documents)['\n  query PhoneProcurementInfo {\n    phoneProcurementInfo {\n      providerKey\n      isSandbox\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  query AvailablePhoneNumbers($input: ListAvailablePhoneNumbersInput!) {\n    availablePhoneNumbers(input: $input) {\n      phoneE164\n      capabilities {\n        sms\n        mms\n        voice\n      }\n      region\n      locality\n    }\n  }\n',
+): (typeof documents)['\n  query AvailablePhoneNumbers($input: ListAvailablePhoneNumbersInput!) {\n    availablePhoneNumbers(input: $input) {\n      phoneE164\n      capabilities {\n        sms\n        mms\n        voice\n      }\n      region\n      locality\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  mutation PurchasePhoneNumber($input: PurchasePhoneNumberInput!) {\n    purchasePhoneNumber(input: $input) {\n      id\n      ownerUserId\n      providerKey\n      phoneE164\n      attachedToTenantId\n      purchasedAt\n      attachedAt\n    }\n  }\n',
+): (typeof documents)['\n  mutation PurchasePhoneNumber($input: PurchasePhoneNumberInput!) {\n    purchasePhoneNumber(input: $input) {\n      id\n      ownerUserId\n      providerKey\n      phoneE164\n      attachedToTenantId\n      purchasedAt\n      attachedAt\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  mutation ReleasePendingPurchase($pendingId: String!) {\n    releasePendingPurchase(pendingId: $pendingId)\n  }\n',
+): (typeof documents)['\n  mutation ReleasePendingPurchase($pendingId: String!) {\n    releasePendingPurchase(pendingId: $pendingId)\n  }\n'];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

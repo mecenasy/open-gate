@@ -2059,6 +2059,45 @@ export type PhoneProcurementInfoQuery = {
   phoneProcurementInfo: { __typename?: 'PhoneProcurementInfoType'; providerKey: string; isSandbox: boolean };
 };
 
+export type AvailablePhoneNumbersQueryVariables = Exact<{
+  input: ListAvailablePhoneNumbersInput;
+}>;
+
+export type AvailablePhoneNumbersQuery = {
+  __typename?: 'Query';
+  availablePhoneNumbers: Array<{
+    __typename?: 'AvailablePhoneNumberType';
+    phoneE164: string;
+    region?: string | null;
+    locality?: string | null;
+    capabilities: { __typename?: 'PhoneCapabilitiesType'; sms: boolean; mms: boolean; voice: boolean };
+  }>;
+};
+
+export type PurchasePhoneNumberMutationVariables = Exact<{
+  input: PurchasePhoneNumberInput;
+}>;
+
+export type PurchasePhoneNumberMutation = {
+  __typename?: 'Mutation';
+  purchasePhoneNumber: {
+    __typename?: 'PendingPhonePurchaseType';
+    id: string;
+    ownerUserId: string;
+    providerKey: string;
+    phoneE164: string;
+    attachedToTenantId?: string | null;
+    purchasedAt: string;
+    attachedAt?: string | null;
+  };
+};
+
+export type ReleasePendingPurchaseMutationVariables = Exact<{
+  pendingId: Scalars['String']['input'];
+}>;
+
+export type ReleasePendingPurchaseMutation = { __typename?: 'Mutation'; releasePendingPurchase: boolean };
+
 export type GetUsersQueryVariables = Exact<{
   input?: InputMaybe<GetAllUsersType>;
 }>;
@@ -4773,6 +4812,143 @@ export const PhoneProcurementInfoDocument = {
     },
   ],
 } as unknown as DocumentNode<PhoneProcurementInfoQuery, PhoneProcurementInfoQueryVariables>;
+export const AvailablePhoneNumbersDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'AvailablePhoneNumbers' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ListAvailablePhoneNumbersInput' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'availablePhoneNumbers' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'phoneE164' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'capabilities' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'sms' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'mms' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'voice' } },
+                    ],
+                  },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'region' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'locality' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AvailablePhoneNumbersQuery, AvailablePhoneNumbersQueryVariables>;
+export const PurchasePhoneNumberDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'PurchasePhoneNumber' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'PurchasePhoneNumberInput' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'purchasePhoneNumber' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'ownerUserId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'providerKey' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'phoneE164' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'attachedToTenantId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'purchasedAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'attachedAt' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PurchasePhoneNumberMutation, PurchasePhoneNumberMutationVariables>;
+export const ReleasePendingPurchaseDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'ReleasePendingPurchase' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'pendingId' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'releasePendingPurchase' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'pendingId' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'pendingId' } },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ReleasePendingPurchaseMutation, ReleasePendingPurchaseMutationVariables>;
 export const GetUsersDocument = {
   kind: 'Document',
   definitions: [

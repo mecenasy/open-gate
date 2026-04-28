@@ -79,6 +79,7 @@ type Documents = {
   '\n  mutation PurchasePhoneNumber($input: PurchasePhoneNumberInput!) {\n    purchasePhoneNumber(input: $input) {\n      id\n      ownerUserId\n      providerKey\n      phoneE164\n      attachedToTenantId\n      purchasedAt\n      attachedAt\n    }\n  }\n': typeof types.PurchasePhoneNumberDocument;
   '\n  mutation ReleasePendingPurchase($pendingId: String!) {\n    releasePendingPurchase(pendingId: $pendingId)\n  }\n': typeof types.ReleasePendingPurchaseDocument;
   '\n  query SignalVerificationCodeForPending($pendingId: String!) {\n    signalVerificationCodeForPending(pendingId: $pendingId) {\n      code\n      receivedAt\n    }\n  }\n': typeof types.SignalVerificationCodeForPendingDocument;
+  '\n  mutation AttachPhoneToTenantWizard($input: AttachPhoneToTenantInput!) {\n    attachPhoneToTenant(input: $input) {\n      id\n      phoneE164\n      attachedToTenantId\n      attachedAt\n    }\n  }\n': typeof types.AttachPhoneToTenantWizardDocument;
   '\n  query GetUsers($input: GetAllUsersType) {\n    users(input: $input) {\n      users {\n        id\n        name\n        surname\n        email\n        phone\n        status\n        type\n      }\n      total\n    }\n  }\n': typeof types.GetUsersDocument;
   '\n  mutation CreateSimpleUser($input: CreateSimpleUserType!) {\n    createSimpleUser(input: $input) {\n      id\n      email\n    }\n  }\n': typeof types.CreateSimpleUserDocument;
   '\n  mutation UpdateUser($input: UpdateUserType!) {\n    updateUser(input: $input) {\n      id\n      name\n      surname\n      email\n      phone\n      status\n      type\n    }\n  }\n': typeof types.UpdateUserDocument;
@@ -217,6 +218,8 @@ const documents: Documents = {
     types.ReleasePendingPurchaseDocument,
   '\n  query SignalVerificationCodeForPending($pendingId: String!) {\n    signalVerificationCodeForPending(pendingId: $pendingId) {\n      code\n      receivedAt\n    }\n  }\n':
     types.SignalVerificationCodeForPendingDocument,
+  '\n  mutation AttachPhoneToTenantWizard($input: AttachPhoneToTenantInput!) {\n    attachPhoneToTenant(input: $input) {\n      id\n      phoneE164\n      attachedToTenantId\n      attachedAt\n    }\n  }\n':
+    types.AttachPhoneToTenantWizardDocument,
   '\n  query GetUsers($input: GetAllUsersType) {\n    users(input: $input) {\n      users {\n        id\n        name\n        surname\n        email\n        phone\n        status\n        type\n      }\n      total\n    }\n  }\n':
     types.GetUsersDocument,
   '\n  mutation CreateSimpleUser($input: CreateSimpleUserType!) {\n    createSimpleUser(input: $input) {\n      id\n      email\n    }\n  }\n':
@@ -644,6 +647,12 @@ export function graphql(
 export function graphql(
   source: '\n  query SignalVerificationCodeForPending($pendingId: String!) {\n    signalVerificationCodeForPending(pendingId: $pendingId) {\n      code\n      receivedAt\n    }\n  }\n',
 ): (typeof documents)['\n  query SignalVerificationCodeForPending($pendingId: String!) {\n    signalVerificationCodeForPending(pendingId: $pendingId) {\n      code\n      receivedAt\n    }\n  }\n'];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: '\n  mutation AttachPhoneToTenantWizard($input: AttachPhoneToTenantInput!) {\n    attachPhoneToTenant(input: $input) {\n      id\n      phoneE164\n      attachedToTenantId\n      attachedAt\n    }\n  }\n',
+): (typeof documents)['\n  mutation AttachPhoneToTenantWizard($input: AttachPhoneToTenantInput!) {\n    attachPhoneToTenant(input: $input) {\n      id\n      phoneE164\n      attachedToTenantId\n      attachedAt\n    }\n  }\n'];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

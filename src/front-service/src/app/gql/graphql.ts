@@ -2122,6 +2122,21 @@ export type SignalVerificationCodeForPendingQuery = {
   } | null;
 };
 
+export type AttachPhoneToTenantWizardMutationVariables = Exact<{
+  input: AttachPhoneToTenantInput;
+}>;
+
+export type AttachPhoneToTenantWizardMutation = {
+  __typename?: 'Mutation';
+  attachPhoneToTenant: {
+    __typename?: 'PendingPhonePurchaseType';
+    id: string;
+    phoneE164: string;
+    attachedToTenantId?: string | null;
+    attachedAt?: string | null;
+  };
+};
+
 export type GetUsersQueryVariables = Exact<{
   input?: InputMaybe<GetAllUsersType>;
 }>;
@@ -5013,6 +5028,51 @@ export const SignalVerificationCodeForPendingDocument = {
     },
   ],
 } as unknown as DocumentNode<SignalVerificationCodeForPendingQuery, SignalVerificationCodeForPendingQueryVariables>;
+export const AttachPhoneToTenantWizardDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'AttachPhoneToTenantWizard' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'AttachPhoneToTenantInput' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'attachPhoneToTenant' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'phoneE164' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'attachedToTenantId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'attachedAt' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AttachPhoneToTenantWizardMutation, AttachPhoneToTenantWizardMutationVariables>;
 export const GetUsersDocument = {
   kind: 'Document',
   definitions: [

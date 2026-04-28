@@ -137,6 +137,7 @@ export function TenantWizardView() {
     const tenantId = await submit({
       slug,
       features,
+      phoneStrategy,
       platforms,
       customCommands,
       contacts: draft,

@@ -5,23 +5,31 @@ import { useMutation } from '@apollo/client/react';
 import {
   ADD_CONTACT_WIZARD_MUTATION,
   ADD_CUSTOM_COMMAND_WIZARD_MUTATION,
+  ATTACH_PHONE_TO_TENANT_MUTATION,
   CREATE_TENANT_MUTATION,
   SWITCH_TENANT_WIZARD_MUTATION,
   UPDATE_TENANT_FEATURES_WIZARD_MUTATION,
   UPSERT_PLATFORM_WIZARD_MUTATION,
 } from './queries';
-import type { ContactDraft, CustomCommandDraft, PlatformDraft, TenantFeaturesDraft } from '../interfaces';
+import type {
+  ContactDraft,
+  CustomCommandDraft,
+  PhoneStrategyDraft,
+  PlatformDraft,
+  TenantFeaturesDraft,
+} from '../interfaces';
 
 interface SubmitInput {
   slug: string;
   features: TenantFeaturesDraft;
+  phoneStrategy: PhoneStrategyDraft;
   platforms: PlatformDraft[];
   customCommands: CustomCommandDraft[];
   contacts: ContactDraft[];
 }
 
 export interface PartialFailure {
-  step: 'features' | 'platforms' | 'commands' | 'contacts';
+  step: 'features' | 'platforms' | 'commands' | 'contacts' | 'phone';
   identifier: string;
   message: string;
 }
@@ -31,6 +39,7 @@ export const useCreateTenantWizard = () => {
     refetchQueries: ['GetMyTenants', 'GetTenantsIStaffAt'],
   });
   const [doSwitch] = useMutation(SWITCH_TENANT_WIZARD_MUTATION);
+  const [doAttachPhone] = useMutation(ATTACH_PHONE_TO_TENANT_MUTATION);
   const [doFeatures] = useMutation(UPDATE_TENANT_FEATURES_WIZARD_MUTATION);
   const [doPlatform] = useMutation(UPSERT_PLATFORM_WIZARD_MUTATION);
   const [doCustomCommand] = useMutation(ADD_CUSTOM_COMMAND_WIZARD_MUTATION);
@@ -52,6 +61,26 @@ export const useCreateTenantWizard = () => {
       if (!tenantId) throw new Error('Tenant not created');
 
       await doSwitch({ variables: { tenantId } });
+
+      // Attach managed phone first — the SMS platform upsert below needs
+      // the tenant_phone_numbers row to be in place so the resolver can
+      // see the managed number when sending later. A failure here doesn't
+      // block tenant creation but is surfaced as a high-visibility partial
+      // failure: the user paid for a number we couldn't link, and the
+      // cleanup cron would otherwise wait 24h before releasing it.
+      if (input.phoneStrategy.mode === 'managed' && input.phoneStrategy.pendingPurchaseId) {
+        try {
+          await doAttachPhone({
+            variables: { input: { pendingId: input.phoneStrategy.pendingPurchaseId, tenantId } },
+          });
+        } catch (err) {
+          failures.push({
+            step: 'phone',
+            identifier: input.phoneStrategy.purchasedPhoneE164 ?? input.phoneStrategy.pendingPurchaseId,
+            message: err instanceof Error ? err.message : 'Unknown error',
+          });
+        }
+      }
 
       try {
         await doFeatures({ variables: { input: { tenantId, ...input.features } } });

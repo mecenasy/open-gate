@@ -130,3 +130,14 @@ export const SIGNAL_VERIFICATION_CODE_QUERY = graphql(`
     }
   }
 `);
+
+export const ATTACH_PHONE_TO_TENANT_MUTATION = graphql(`
+  mutation AttachPhoneToTenantWizard($input: AttachPhoneToTenantInput!) {
+    attachPhoneToTenant(input: $input) {
+      id
+      phoneE164
+      attachedToTenantId
+      attachedAt
+    }
+  }
+`);

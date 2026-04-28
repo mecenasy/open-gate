@@ -60,11 +60,16 @@ export interface PhoneStrategyDraft {
   pendingPurchaseId?: string;
 }
 
+/**
+ * Snapshot persisted to localStorage so reload doesn't lose progress —
+ * including a phone purchase that's mid-flight. Includes `step` so the
+ * resume banner restores the user where they left off rather than at
+ * the basics step.
+ */
 export interface WizardState {
+  step: WizardStepKey;
   slug: string;
   name: string;
-  slugChecked: boolean;
-  slugAvailable: boolean;
   features: TenantFeaturesDraft;
   phoneStrategy: PhoneStrategyDraft;
   platforms: PlatformDraft[];

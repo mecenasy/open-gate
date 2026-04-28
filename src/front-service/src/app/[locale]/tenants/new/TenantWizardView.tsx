@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/components/navigation/navigation';
+import { Button } from '@/components/ui';
+import { useAuth } from '@/hooks/use-auth';
 import { DEFAULT_FEATURES, DEFAULT_PHONE_STRATEGY, getStepsForStrategy } from './constants';
 import type {
   ContactDraft,
@@ -10,6 +12,7 @@ import type {
   PhoneStrategyDraft,
   PlatformDraft,
   TenantFeaturesDraft,
+  WizardState,
   WizardStepKey,
 } from './interfaces';
 import { WizardStepper } from './components/WizardStepper';
@@ -20,18 +23,19 @@ import { StepCommands } from './components/StepCommands';
 import { StepContacts } from './components/StepContacts';
 import { useCreateTenantWizard } from './hooks/use-create-tenant-wizard';
 import { useWizardUsage } from './hooks/use-wizard-usage';
+import { useWizardPersistence } from './hooks/use-wizard-persistence';
 
 export function TenantWizardView() {
   const t = useTranslations('tenantWizard');
   const router = useRouter();
+  const { user } = useAuth();
   const [step, setStep] = useState<WizardStepKey>('basics');
   const [slug, setSlug] = useState('');
   const [name, setName] = useState('');
   const [features, setFeatures] = useState<TenantFeaturesDraft>(DEFAULT_FEATURES);
-  // Setter is wired in the phoneStrategy step commit; kept on state now so
-  // the stepper already knows which flow to render and the persistence
-  // hook lands a stable shape.
-  const [phoneStrategy] = useState<PhoneStrategyDraft>(DEFAULT_PHONE_STRATEGY);
+  // Setter is wired by the StepPhoneStrategy component in a follow-up
+  // commit; persistence/resume already use it (resume call below).
+  const [phoneStrategy, setPhoneStrategy] = useState<PhoneStrategyDraft>(DEFAULT_PHONE_STRATEGY);
   const [platforms, setPlatforms] = useState<PlatformDraft[]>([]);
   const [customCommands, setCustomCommands] = useState<CustomCommandDraft[]>([]);
   const [contacts, setContacts] = useState<ContactDraft[]>([]);
@@ -39,7 +43,30 @@ export function TenantWizardView() {
   const { submit, isSubmitting, error, partialFailures } = useCreateTenantWizard();
   const usage = useWizardUsage();
 
+  const wizardState = useMemo<WizardState>(
+    () => ({ step, slug, name, features, phoneStrategy, platforms, customCommands, contacts }),
+    [step, slug, name, features, phoneStrategy, platforms, customCommands, contacts],
+  );
+  const persistence = useWizardPersistence(wizardState, user?.id ?? null);
+
   const goHome = () => router.push('/');
+
+  const resumeDraft = () => {
+    const draft = persistence.loadDraft();
+    if (!draft) return;
+    setStep(draft.step);
+    setSlug(draft.slug);
+    setName(draft.name);
+    setFeatures(draft.features);
+    setPhoneStrategy(draft.phoneStrategy);
+    setPlatforms(draft.platforms);
+    setCustomCommands(draft.customCommands);
+    setContacts(draft.contacts);
+  };
+
+  const startOver = () => {
+    persistence.clearDraft();
+  };
 
   const handleBasicsNext = (values: { slug: string; name: string }) => {
     setSlug(values.slug);
@@ -92,6 +119,7 @@ export function TenantWizardView() {
       contacts: draft,
     });
     if (tenantId) {
+      persistence.clearDraft();
       router.push('/');
     }
   };
@@ -104,6 +132,24 @@ export function TenantWizardView() {
       </header>
 
       <WizardStepper current={step} steps={getStepsForStrategy(phoneStrategy.mode)} />
+
+      {persistence.hasDraft && (
+        <div className="bg-blue-500/5 border border-blue-500/40 rounded-xl p-3 mb-4 flex items-center justify-between gap-3">
+          <p className="text-xs text-blue-200">
+            {t('resumeDraftBody', {
+              savedAt: persistence.draftSavedAt ? new Date(persistence.draftSavedAt).toLocaleString() : '',
+            })}
+          </p>
+          <div className="flex gap-2">
+            <Button type="button" variant="green" onClick={startOver}>
+              {t('resumeDraftStartOver')}
+            </Button>
+            <Button type="button" variant="blue" onClick={resumeDraft}>
+              {t('resumeDraftResume')}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {partialFailures.length > 0 && (
         <div className="bg-amber-500/5 border border-amber-500/40 rounded-xl p-3 mb-4">

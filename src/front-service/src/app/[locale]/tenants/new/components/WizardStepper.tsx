@@ -1,28 +1,35 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { WIZARD_STEPS } from '../constants';
 import type { WizardStepKey } from '../interfaces';
 
 interface WizardStepperProps {
   current: WizardStepKey;
+  /**
+   * The list to render. Caller picks based on phoneStrategy.mode so the
+   * visible step count reflects the actual flow the user is on (managed
+   * shows phonePicker, self skips it).
+   */
+  steps: WizardStepKey[];
 }
 
 const STEP_LABEL_KEYS: Record<WizardStepKey, string> = {
   basics: 'stepBasicsLabel',
   features: 'stepFeaturesLabel',
+  phoneStrategy: 'stepPhoneStrategyLabel',
+  phonePicker: 'stepPhonePickerLabel',
   platforms: 'stepPlatformsLabel',
   commands: 'stepCommandsLabel',
   contacts: 'stepContactsLabel',
 };
 
-export function WizardStepper({ current }: WizardStepperProps) {
+export function WizardStepper({ current, steps }: WizardStepperProps) {
   const t = useTranslations('tenantWizard');
-  const currentIdx = WIZARD_STEPS.indexOf(current);
+  const currentIdx = steps.indexOf(current);
 
   return (
     <ol className="flex items-center gap-2 mb-6">
-      {WIZARD_STEPS.map((step, idx) => {
+      {steps.map((step, idx) => {
         const done = idx < currentIdx;
         const active = idx === currentIdx;
         return (
@@ -42,7 +49,7 @@ export function WizardStepper({ current }: WizardStepperProps) {
             <span className={active ? 'text-text text-sm' : 'text-muted text-sm'}>
               {t(STEP_LABEL_KEYS[step] as Parameters<typeof t>[0])}
             </span>
-            {idx < WIZARD_STEPS.length - 1 && <span className="w-6 h-px bg-border" />}
+            {idx < steps.length - 1 && <span className="w-6 h-px bg-border" />}
           </li>
         );
       })}

@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/components/navigation/navigation';
-import { DEFAULT_FEATURES } from './constants';
+import { DEFAULT_FEATURES, DEFAULT_PHONE_STRATEGY, getStepsForStrategy } from './constants';
 import type {
   ContactDraft,
   CustomCommandDraft,
+  PhoneStrategyDraft,
   PlatformDraft,
   TenantFeaturesDraft,
   WizardStepKey,
@@ -27,6 +28,10 @@ export function TenantWizardView() {
   const [slug, setSlug] = useState('');
   const [name, setName] = useState('');
   const [features, setFeatures] = useState<TenantFeaturesDraft>(DEFAULT_FEATURES);
+  // Setter is wired in the phoneStrategy step commit; kept on state now so
+  // the stepper already knows which flow to render and the persistence
+  // hook lands a stable shape.
+  const [phoneStrategy] = useState<PhoneStrategyDraft>(DEFAULT_PHONE_STRATEGY);
   const [platforms, setPlatforms] = useState<PlatformDraft[]>([]);
   const [customCommands, setCustomCommands] = useState<CustomCommandDraft[]>([]);
   const [contacts, setContacts] = useState<ContactDraft[]>([]);
@@ -98,7 +103,7 @@ export function TenantWizardView() {
         <p className="text-sm text-muted mt-1">{t('subtitle', { name: name || slug || t('yourTenant') })}</p>
       </header>
 
-      <WizardStepper current={step} />
+      <WizardStepper current={step} steps={getStepsForStrategy(phoneStrategy.mode)} />
 
       {partialFailures.length > 0 && (
         <div className="bg-amber-500/5 border border-amber-500/40 rounded-xl p-3 mb-4">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Toggle } from '@/components/ui';
 import type { PlatformDraft } from '../interfaces';
@@ -18,6 +18,15 @@ import { SignalOnboardingFlow } from './platforms/signal/SignalOnboardingFlow';
 interface StepPlatformsProps {
   defaultPlatforms: PlatformDraft[];
   maxPlatforms: number;
+  /**
+   * E.164 of the number bought in the picker step. When set:
+   *   - SMS tile is auto-enabled with `provider: 'managed'` and `phone`
+   *     prefilled; the user can't open its config or toggle it off.
+   *   - Signal modal opens with `account` locked to this number and
+   *     mode forced to 'register'. SMS verification arrives at the
+   *     managed number; the verification bridge auto-fills the code.
+   */
+  managedPhone?: string;
   onBack: (drafts: PlatformDraft[]) => void;
   onNext: (drafts: PlatformDraft[]) => void;
 }
@@ -65,12 +74,39 @@ function toDrafts(state: PlatformsState): PlatformDraft[] {
   return drafts;
 }
 
-export function StepPlatforms({ defaultPlatforms, maxPlatforms, onBack, onNext }: StepPlatformsProps) {
+export function StepPlatforms({
+  defaultPlatforms,
+  maxPlatforms,
+  managedPhone,
+  onBack,
+  onNext,
+}: StepPlatformsProps) {
   const t = useTranslations('tenantWizard');
 
   const [state, setState] = useState<PlatformsState>(() => hydrate(defaultPlatforms));
   const [editing, setEditing] = useState<PlatformKey | null>(null);
   const [signalOnboarding, setSignalOnboarding] = useState(false);
+
+  // Sync the managed SMS slot whenever managedPhone changes — covers
+  // back-and-forth navigation from the picker step. The config carries
+  // `provider: 'managed'` so the BFF resolver knows to merge sid/token
+  // from the master row at submit time rather than expecting tenant-side
+  // creds in this JSON.
+  useEffect(() => {
+    if (!managedPhone) return;
+    setState((prev) => {
+      const current = prev.sms.config as Record<string, unknown> | null;
+      const same = current?.provider === 'managed' && current?.phone === managedPhone;
+      if (same && prev.sms.enabled) return prev;
+      return {
+        ...prev,
+        sms: {
+          enabled: true,
+          config: { provider: 'managed', phone: managedPhone },
+        },
+      };
+    });
+  }, [managedPhone]);
 
   const enabledCount = PLATFORM_KEYS.filter((p) => state[p].enabled).length;
   const overLimit = enabledCount > maxPlatforms;
@@ -79,7 +115,11 @@ export function StepPlatforms({ defaultPlatforms, maxPlatforms, onBack, onNext }
     setState((prev) => ({ ...prev, [platform]: slot }));
   };
 
+  const isLockedManaged = (platform: PlatformKey): boolean =>
+    !!managedPhone && platform === 'sms';
+
   const openConfig = (platform: PlatformKey) => {
+    if (isLockedManaged(platform)) return;
     if (platform === 'signal') {
       setSignalOnboarding(true);
     } else {
@@ -88,6 +128,7 @@ export function StepPlatforms({ defaultPlatforms, maxPlatforms, onBack, onNext }
   };
 
   const handleToggle = (platform: PlatformKey, value: boolean) => {
+    if (isLockedManaged(platform)) return;
     const slot = state[platform];
     if (value && !slot.config) {
       // Trying to enable a never-configured platform — open the right
@@ -140,6 +181,7 @@ export function StepPlatforms({ defaultPlatforms, maxPlatforms, onBack, onNext }
         {PLATFORM_KEYS.map((platform) => {
           const slot = state[platform];
           const configured = slot.config !== null;
+          const locked = isLockedManaged(platform);
           const status = !configured ? 'off' : slot.enabled ? 'active' : 'paused';
           return (
             <div
@@ -156,33 +198,46 @@ export function StepPlatforms({ defaultPlatforms, maxPlatforms, onBack, onNext }
               <button
                 type="button"
                 onClick={() => openConfig(platform)}
-                className="flex items-start justify-between gap-3 text-left"
+                disabled={locked}
+                className={[
+                  'flex items-start justify-between gap-3 text-left',
+                  locked ? 'cursor-default' : '',
+                ].join(' ')}
               >
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <span className="text-sm font-medium text-text">
                     {t(`platform_${platform}` as Parameters<typeof t>[0])}
                   </span>
-                  <span
-                    className={[
-                      'text-xs',
-                      status === 'active'
-                        ? 'text-emerald-400'
-                        : status === 'paused'
-                          ? 'text-amber-400'
-                          : 'text-muted',
-                    ].join(' ')}
-                  >
-                    {t(`platformStatus_${status}` as Parameters<typeof t>[0])}
-                  </span>
+                  {locked ? (
+                    <span className="text-xs text-emerald-400">
+                      {t('platformStatus_managed', { phone: managedPhone ?? '' })}
+                    </span>
+                  ) : (
+                    <span
+                      className={[
+                        'text-xs',
+                        status === 'active'
+                          ? 'text-emerald-400'
+                          : status === 'paused'
+                            ? 'text-amber-400'
+                            : 'text-muted',
+                      ].join(' ')}
+                    >
+                      {t(`platformStatus_${status}` as Parameters<typeof t>[0])}
+                    </span>
+                  )}
                 </div>
-                <span className="text-xs text-blue-400 shrink-0 self-end">
-                  {configured ? t('platformEdit') : t('platformConfigure')}
-                </span>
+                {!locked && (
+                  <span className="text-xs text-blue-400 shrink-0 self-end">
+                    {configured ? t('platformEdit') : t('platformConfigure')}
+                  </span>
+                )}
               </button>
               <div className="flex items-center justify-between border-t border-border pt-3">
                 <span className="text-xs text-muted">{t('platformEnableLabel')}</span>
                 <Toggle
                   checked={slot.enabled}
+                  disabled={locked}
                   onChange={(value) => handleToggle(platform, value)}
                 />
               </div>
@@ -219,9 +274,10 @@ export function StepPlatforms({ defaultPlatforms, maxPlatforms, onBack, onNext }
           intent="initial"
           defaults={{
             apiUrl: (state.signal.config?.apiUrl as string | undefined) ?? '',
-            account: (state.signal.config?.account as string | undefined) ?? '',
+            account: managedPhone ?? (state.signal.config?.account as string | undefined) ?? '',
             mode: 'register',
           }}
+          lockMode={!!managedPhone}
           onClose={() => setSignalOnboarding(false)}
           onDone={handleSignalDone}
         />

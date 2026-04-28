@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,20 +12,33 @@ import type { SignalIntent } from '../signal-onboarding.machine';
 interface SignalFormStepProps {
   intent: SignalIntent;
   defaults?: Partial<SignalFormSchema>;
+  /**
+   * Managed-flow lock: account is read-only (the procured E.164) and
+   * the register/link toggle is hidden. Mode is forced to 'register'
+   * because Signal verification SMS lands on the managed Twilio number,
+   * not on a phone the user owns.
+   */
+  lockMode?: boolean;
   onSubmit: (values: SignalFormSchema) => void;
   onCancel: () => void;
 }
 
-export function SignalFormStep({ intent, defaults, onSubmit, onCancel }: SignalFormStepProps) {
+export function SignalFormStep({ intent, defaults, lockMode = false, onSubmit, onCancel }: SignalFormStepProps) {
   const t = useTranslations('signalOnboarding');
   const tCommon = useTranslations('tenantWizard');
 
   const form = useForm<SignalFormSchema>({
     resolver: zodResolver(createSignalFormSchema(t)) as unknown as Resolver<SignalFormSchema>,
-    defaultValues: { ...DEFAULT_SIGNAL_FORM, ...defaults },
+    defaultValues: { ...DEFAULT_SIGNAL_FORM, ...defaults, ...(lockMode ? { mode: 'register' as const } : {}) },
   });
 
   const mode = form.watch('mode');
+
+  // Belt-and-braces: if a parent flips lockMode on after mount, keep
+  // the mode field in sync so a stale 'link' value can't be submitted.
+  useEffect(() => {
+    if (lockMode) form.setValue('mode', 'register');
+  }, [lockMode, form]);
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 min-h-0">
@@ -43,24 +57,26 @@ export function SignalFormStep({ intent, defaults, onSubmit, onCancel }: SignalF
         type="tel"
         label={t('field_account')}
         placeholder="+48..."
+        readOnly={lockMode}
         error={form.formState.errors.account?.message}
         {...form.register('account')}
       />
 
-      <div className="flex flex-col gap-2 bg-surface-raised border border-border rounded-xl p-3">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-text">
-            {mode === 'link' ? t('mode_link_label') : t('mode_register_label')}
-          </span>
-          <Toggle
-            checked={mode === 'link'}
-            onChange={(v) => form.setValue('mode', v ? 'link' : 'register')}
-          />
+      {lockMode ? (
+        <div className="bg-emerald-500/5 border border-emerald-500/40 rounded-xl p-3">
+          <p className="text-xs text-emerald-200">{t('lockedRegister_hint')}</p>
         </div>
-        <p className="text-xs text-muted">
-          {mode === 'link' ? t('mode_link_hint') : t('mode_register_hint')}
-        </p>
-      </div>
+      ) : (
+        <div className="flex flex-col gap-2 bg-surface-raised border border-border rounded-xl p-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-text">
+              {mode === 'link' ? t('mode_link_label') : t('mode_register_label')}
+            </span>
+            <Toggle checked={mode === 'link'} onChange={(v) => form.setValue('mode', v ? 'link' : 'register')} />
+          </div>
+          <p className="text-xs text-muted">{mode === 'link' ? t('mode_link_hint') : t('mode_register_hint')}</p>
+        </div>
+      )}
 
       {mode === 'register' && (
         <div className="bg-amber-500/15 border border-amber-500/60 rounded-xl p-3">

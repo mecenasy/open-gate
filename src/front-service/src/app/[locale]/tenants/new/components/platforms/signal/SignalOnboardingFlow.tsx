@@ -23,6 +23,15 @@ interface SignalOnboardingFlowProps {
   previousAccount?: string;
   /** Prefill values when re-opening (e.g. wizard remembers what was typed). */
   defaults?: Partial<SignalFormSchema>;
+  /**
+   * When true, the form step renders `account` as read-only and hides
+   * the register/link toggle (mode is forced to 'register'). Used by the
+   * managed-flow wizard: the user just bought a phone number and
+   * shouldn't be able to type a different account or pick the link
+   * mode — Signal verification must be a fresh registration on the
+   * managed Twilio number.
+   */
+  lockMode?: boolean;
   onClose: () => void;
   /**
    * Fired when the flow finishes successfully. For wizard flow, the parent
@@ -46,6 +55,7 @@ export function SignalOnboardingFlow({
   intent,
   previousAccount,
   defaults,
+  lockMode = false,
   onClose,
   onDone,
 }: SignalOnboardingFlowProps) {
@@ -86,6 +96,7 @@ export function SignalOnboardingFlow({
         <SignalFormStep
           intent={intent}
           defaults={defaults}
+          lockMode={lockMode}
           onSubmit={(values) => send({ type: 'SUBMIT_FORM', values })}
           onCancel={() => send({ type: 'CANCEL' })}
         />

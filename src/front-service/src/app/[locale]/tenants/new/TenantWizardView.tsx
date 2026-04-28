@@ -228,6 +228,9 @@ export function TenantWizardView() {
         <StepPlatforms
           defaultPlatforms={platforms}
           maxPlatforms={usage.maxPlatformsPerTenant}
+          managedPhone={
+            phoneStrategy.mode === 'managed' ? phoneStrategy.purchasedPhoneE164 : undefined
+          }
           onBack={handlePlatformsBack}
           onNext={handlePlatformsNext}
         />

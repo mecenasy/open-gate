@@ -69,6 +69,11 @@ export type AddTenantStaffInput = {
   userId: Scalars['String']['input'];
 };
 
+export type AttachPhoneToTenantInput = {
+  pendingId: Scalars['String']['input'];
+  tenantId: Scalars['String']['input'];
+};
+
 export enum AuthStatus {
   Accept2fa = 'accept2fa',
   Adaptive = 'adaptive',
@@ -84,6 +89,14 @@ export enum AuthStatus {
   Sms = 'sms',
   Tfa = 'tfa',
 }
+
+export type AvailablePhoneNumberType = {
+  __typename?: 'AvailablePhoneNumberType';
+  capabilities: PhoneCapabilitiesType;
+  locality?: Maybe<Scalars['String']['output']>;
+  phoneE164: Scalars['String']['output'];
+  region?: Maybe<Scalars['String']['output']>;
+};
 
 export type BrandingInput = {
   fontSize?: InputMaybe<Scalars['String']['input']>;
@@ -284,6 +297,12 @@ export type GetUserType = {
   id: Scalars['String']['input'];
 };
 
+export type ListAvailablePhoneNumbersInput = {
+  country: Scalars['String']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type LoginStatusType = {
   __typename?: 'LoginStatusType';
   message?: Maybe<Scalars['String']['output']>;
@@ -313,6 +332,7 @@ export type Mutation = {
   addCustomCommand: CommandResponseType;
   addPrompt: PromptResponseType;
   addTenantStaff: MutationResult;
+  attachPhoneToTenant: PendingPhonePurchaseType;
   cancelPlatformOnboarding: Scalars['Boolean']['output'];
   cancelSubscription: Scalars['Boolean']['output'];
   changePassword: StatusType;
@@ -328,6 +348,7 @@ export type Mutation = {
   logoutUser: StatusType;
   optionPasskey: Scalars['JSON']['output'];
   optionPasskeyVerify: StatusType;
+  purchasePhoneNumber: PendingPhonePurchaseType;
   qrChallenge: QrChallengeType;
   qrConfirm: StatusType;
   qrLogin: StatusType;
@@ -337,6 +358,7 @@ export type Mutation = {
   registerOptionPasskey: Scalars['JSON']['output'];
   registerOptionPasskeyVerify: StatusType;
   reject2fa: StatusType;
+  releasePendingPurchase: Scalars['Boolean']['output'];
   removeCommand: CommandResponseType;
   removeContactFromTenant: MutationResult;
   removePasskey: RemovePasskeyType;
@@ -393,6 +415,10 @@ export type MutationAddTenantStaffArgs = {
   input: AddTenantStaffInput;
 };
 
+export type MutationAttachPhoneToTenantArgs = {
+  input: AttachPhoneToTenantInput;
+};
+
 export type MutationCancelPlatformOnboardingArgs = {
   sessionId: Scalars['String']['input'];
 };
@@ -441,6 +467,10 @@ export type MutationOptionPasskeyVerifyArgs = {
   data: Scalars['JSON']['input'];
 };
 
+export type MutationPurchasePhoneNumberArgs = {
+  input: PurchasePhoneNumberInput;
+};
+
 export type MutationQrChallengeArgs = {
   nonce: Scalars['String']['input'];
 };
@@ -470,6 +500,10 @@ export type MutationRegisterArgs = {
 
 export type MutationRegisterOptionPasskeyVerifyArgs = {
   data: Scalars['JSON']['input'];
+};
+
+export type MutationReleasePendingPurchaseArgs = {
+  pendingId: Scalars['String']['input'];
 };
 
 export type MutationRemoveCommandArgs = {
@@ -632,6 +666,30 @@ export type PassKeyType = {
   id: Scalars['String']['output'];
 };
 
+export type PendingPhonePurchaseType = {
+  __typename?: 'PendingPhonePurchaseType';
+  attachedAt?: Maybe<Scalars['String']['output']>;
+  attachedToTenantId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  ownerUserId: Scalars['String']['output'];
+  phoneE164: Scalars['String']['output'];
+  providerKey: Scalars['String']['output'];
+  purchasedAt: Scalars['String']['output'];
+};
+
+export type PhoneCapabilitiesType = {
+  __typename?: 'PhoneCapabilitiesType';
+  mms: Scalars['Boolean']['output'];
+  sms: Scalars['Boolean']['output'];
+  voice: Scalars['Boolean']['output'];
+};
+
+export type PhoneProcurementInfoType = {
+  __typename?: 'PhoneProcurementInfoType';
+  isSandbox: Scalars['Boolean']['output'];
+  providerKey: Scalars['String']['output'];
+};
+
 export type PlanChangePreviewType = {
   __typename?: 'PlanChangePreviewType';
   currentPlan?: Maybe<SubscriptionPlanType>;
@@ -689,6 +747,11 @@ export type PromptsListType = {
   total: Scalars['Int']['output'];
 };
 
+export type PurchasePhoneNumberInput = {
+  country: Scalars['String']['input'];
+  phoneE164: Scalars['String']['input'];
+};
+
 export type QrChallengeType = {
   __typename?: 'QrChallengeType';
   challenge: Scalars['String']['output'];
@@ -697,6 +760,7 @@ export type QrChallengeType = {
 
 export type Query = {
   __typename?: 'Query';
+  availablePhoneNumbers: Array<AvailablePhoneNumberType>;
   command: CommandResponseType;
   commandByPermission: CommandResponseType;
   commands: CommandsListType;
@@ -710,6 +774,7 @@ export type Query = {
   mySubscription?: Maybe<UserSubscriptionType>;
   myTenants: Array<TenantType>;
   myUsage: UsageReportType;
+  phoneProcurementInfo: PhoneProcurementInfoType;
   previewPlanChange: PlanChangePreviewType;
   promptById: PromptResponseType;
   promptByKey: PromptResponseType;
@@ -721,6 +786,7 @@ export type Query = {
   tenantContacts: Array<ContactType>;
   tenantCustomization: TenantCustomizationFullType;
   tenantFeatures: TenantFeaturesType;
+  tenantPhoneNumber?: Maybe<TenantPhoneNumberType>;
   tenantPlatformCredentials: Array<TenantPlatformCredentialType>;
   tenantPromptOverrides: Array<TenantPromptOverrideType>;
   tenantSlugAvailable: Scalars['Boolean']['output'];
@@ -730,6 +796,10 @@ export type Query = {
   user: UserSummaryType;
   users: UsersListType;
   verifyToken: VerifyTokenType;
+};
+
+export type QueryAvailablePhoneNumbersArgs = {
+  input: ListAvailablePhoneNumbersInput;
 };
 
 export type QueryCommandArgs = {
@@ -777,6 +847,10 @@ export type QueryTenantContactsArgs = {
 };
 
 export type QueryTenantCustomizationArgs = {
+  tenantId: Scalars['String']['input'];
+};
+
+export type QueryTenantPhoneNumberArgs = {
   tenantId: Scalars['String']['input'];
 };
 
@@ -892,8 +966,12 @@ export type SubscriptionPlanType = {
   maxPlatformsPerTenant: Scalars['Int']['output'];
   maxStaffPerTenant: Scalars['Int']['output'];
   maxTenants: Scalars['Int']['output'];
+  messagesPerMonthIncluded: Scalars['Int']['output'];
   name: Scalars['String']['output'];
+  phoneMonthlyCostCents: Scalars['Int']['output'];
+  phoneNumbersIncluded: Scalars['Int']['output'];
   priceCents: Scalars['Int']['output'];
+  pricePerExtraMessageCents: Scalars['Int']['output'];
 };
 
 export type SuccessResponseType = {
@@ -984,6 +1062,18 @@ export type TenantMessagingType = {
   defaultSmsProvider: Scalars['String']['output'];
   priorityChannels: Array<Scalars['String']['output']>;
   rateLimitPerMinute: Scalars['Int']['output'];
+};
+
+export type TenantPhoneNumberType = {
+  __typename?: 'TenantPhoneNumberType';
+  id: Scalars['String']['output'];
+  lastSyncedAt?: Maybe<Scalars['String']['output']>;
+  monthlyMessageCount: Scalars['Int']['output'];
+  phoneE164: Scalars['String']['output'];
+  providerKey: Scalars['String']['output'];
+  provisionedBy: Scalars['String']['output'];
+  purchasedAt: Scalars['String']['output'];
+  tenantId: Scalars['String']['output'];
 };
 
 export type TenantPlatformCredentialType = {
@@ -1953,8 +2043,20 @@ export type WizardUsageQuery = {
       maxPlatformsPerTenant: number;
       maxCustomCommandsPerTenant: number;
       maxContactsPerTenant: number;
+      phoneNumbersIncluded: number;
+      messagesPerMonthIncluded: number;
+      pricePerExtraMessageCents: number;
+      phoneMonthlyCostCents: number;
+      currency: string;
     };
   } | null;
+};
+
+export type PhoneProcurementInfoQueryVariables = Exact<{ [key: string]: never }>;
+
+export type PhoneProcurementInfoQuery = {
+  __typename?: 'Query';
+  phoneProcurementInfo: { __typename?: 'PhoneProcurementInfoType'; providerKey: string; isSandbox: boolean };
 };
 
 export type GetUsersQueryVariables = Exact<{
@@ -4629,6 +4731,11 @@ export const WizardUsageDocument = {
                       { kind: 'Field', name: { kind: 'Name', value: 'maxPlatformsPerTenant' } },
                       { kind: 'Field', name: { kind: 'Name', value: 'maxCustomCommandsPerTenant' } },
                       { kind: 'Field', name: { kind: 'Name', value: 'maxContactsPerTenant' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'phoneNumbersIncluded' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'messagesPerMonthIncluded' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'pricePerExtraMessageCents' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'phoneMonthlyCostCents' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'currency' } },
                     ],
                   },
                 },
@@ -4640,6 +4747,32 @@ export const WizardUsageDocument = {
     },
   ],
 } as unknown as DocumentNode<WizardUsageQuery, WizardUsageQueryVariables>;
+export const PhoneProcurementInfoDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'PhoneProcurementInfo' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'phoneProcurementInfo' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'providerKey' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'isSandbox' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PhoneProcurementInfoQuery, PhoneProcurementInfoQueryVariables>;
 export const GetUsersDocument = {
   kind: 'Document',
   definitions: [

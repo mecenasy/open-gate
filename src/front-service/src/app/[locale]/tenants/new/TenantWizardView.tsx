@@ -18,6 +18,7 @@ import type {
 import { WizardStepper } from './components/WizardStepper';
 import { StepBasics } from './components/StepBasics';
 import { StepFeatures } from './components/StepFeatures';
+import { StepPhoneStrategy } from './components/StepPhoneStrategy';
 import { StepPlatforms } from './components/StepPlatforms';
 import { StepCommands } from './components/StepCommands';
 import { StepContacts } from './components/StepContacts';
@@ -33,8 +34,6 @@ export function TenantWizardView() {
   const [slug, setSlug] = useState('');
   const [name, setName] = useState('');
   const [features, setFeatures] = useState<TenantFeaturesDraft>(DEFAULT_FEATURES);
-  // Setter is wired by the StepPhoneStrategy component in a follow-up
-  // commit; persistence/resume already use it (resume call below).
   const [phoneStrategy, setPhoneStrategy] = useState<PhoneStrategyDraft>(DEFAULT_PHONE_STRATEGY);
   const [platforms, setPlatforms] = useState<PlatformDraft[]>([]);
   const [customCommands, setCustomCommands] = useState<CustomCommandDraft[]>([]);
@@ -81,12 +80,25 @@ export function TenantWizardView() {
 
   const handleFeaturesNext = (draft: TenantFeaturesDraft) => {
     setFeatures(draft);
-    setStep('platforms');
+    setStep('phoneStrategy');
+  };
+
+  const handlePhoneStrategyBack = (draft: PhoneStrategyDraft) => {
+    setPhoneStrategy(draft);
+    setStep('features');
+  };
+
+  const handlePhoneStrategyNext = (draft: PhoneStrategyDraft) => {
+    setPhoneStrategy(draft);
+    // Picker step belongs to the managed flow only; self users go
+    // straight to platforms where they'll paste their own Twilio creds.
+    setStep(draft.mode === 'managed' ? 'phonePicker' : 'platforms');
   };
 
   const handlePlatformsBack = (draft: PlatformDraft[]) => {
     setPlatforms(draft);
-    setStep('features');
+    // Self flow comes back to phoneStrategy, managed comes back to phonePicker.
+    setStep(phoneStrategy.mode === 'managed' ? 'phonePicker' : 'phoneStrategy');
   };
 
   const handlePlatformsNext = (draft: PlatformDraft[]) => {
@@ -178,6 +190,18 @@ export function TenantWizardView() {
           defaultFeatures={features}
           onBack={handleFeaturesBack}
           onNext={handleFeaturesNext}
+        />
+      )}
+
+      {step === 'phoneStrategy' && (
+        <StepPhoneStrategy
+          defaultStrategy={phoneStrategy}
+          phoneNumbersIncluded={usage.phoneNumbersIncluded}
+          messagesPerMonthIncluded={usage.messagesPerMonthIncluded}
+          pricePerExtraMessageCents={usage.pricePerExtraMessageCents}
+          currency={usage.currency}
+          onBack={handlePhoneStrategyBack}
+          onNext={handlePhoneStrategyNext}
         />
       )}
 

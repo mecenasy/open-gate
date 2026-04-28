@@ -68,7 +68,21 @@ export const WIZARD_USAGE_QUERY = graphql(`
         maxPlatformsPerTenant
         maxCustomCommandsPerTenant
         maxContactsPerTenant
+        phoneNumbersIncluded
+        messagesPerMonthIncluded
+        pricePerExtraMessageCents
+        phoneMonthlyCostCents
+        currency
       }
+    }
+  }
+`);
+
+export const PHONE_PROCUREMENT_INFO_QUERY = graphql(`
+  query PhoneProcurementInfo {
+    phoneProcurementInfo {
+      providerKey
+      isSandbox
     }
   }
 `);

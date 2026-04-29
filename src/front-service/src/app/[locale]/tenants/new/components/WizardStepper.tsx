@@ -28,7 +28,7 @@ export function WizardStepper({ current, steps }: WizardStepperProps) {
   const currentIdx = steps.indexOf(current);
 
   return (
-    <ol className="flex items-center gap-2 mb-6">
+    <ol className="flex flex-wrap items-center gap-2 mb-6">
       {steps.map((step, idx) => {
         const done = idx < currentIdx;
         const active = idx === currentIdx;

@@ -38,6 +38,29 @@ export interface PartialFailure {
   message: string;
 }
 
+/** Phone-procurement domain types, surfaced by the picker substate. */
+export interface AvailablePhoneNumber {
+  phoneE164: string;
+  capabilities: { sms: boolean; mms: boolean; voice: boolean };
+  region?: string | null;
+  locality?: string | null;
+}
+
+export interface ListAvailableInput {
+  country: string;
+  limit: number;
+}
+
+export interface PurchaseInput {
+  country: string;
+  phoneE164: string;
+}
+
+export interface PurchaseResult {
+  pendingId: string;
+  phoneE164: string;
+}
+
 /**
  * Caller-supplied bridge between the machine and Apollo mutations —
  * keeps the machine module test-friendly and free of GraphQL imports.
@@ -45,6 +68,9 @@ export interface PartialFailure {
  */
 export interface TenantWizardDeps {
   submit: (input: SubmitWizardInput) => Promise<SubmitWizardOutcome>;
+  listAvailableNumbers: (input: ListAvailableInput) => Promise<AvailablePhoneNumber[]>;
+  purchasePhoneNumber: (input: PurchaseInput) => Promise<PurchaseResult>;
+  releasePendingPurchase: (pendingId: string) => Promise<void>;
 }
 
 export interface TenantWizardContext {
@@ -61,6 +87,11 @@ export interface TenantWizardContext {
   tenantId: string | null;
   partialFailures: PartialFailure[];
   error: string | null;
+  // Phone picker substate data — populated by the listAvailable /
+  // purchase actors so the view layer is a pure render of context.
+  pickerNumbers: AvailablePhoneNumber[];
+  pickerSelected: string | null;
+  pickerError: string | null;
 }
 
 export type TenantWizardEvent =
@@ -69,8 +100,12 @@ export type TenantWizardEvent =
   | { type: 'FEATURES_NEXT'; features: TenantFeaturesDraft }
   | { type: 'PHONE_STRATEGY_BACK'; phoneStrategy: PhoneStrategyDraft }
   | { type: 'PHONE_STRATEGY_NEXT'; phoneStrategy: PhoneStrategyDraft }
-  | { type: 'PHONE_PICKER_BACK'; phoneStrategy: PhoneStrategyDraft }
-  | { type: 'PHONE_PICKER_NEXT'; phoneStrategy: PhoneStrategyDraft }
+  | { type: 'PHONE_PICKER_BACK' }
+  | { type: 'PHONE_PICKER_NEXT' }
+  | { type: 'PHONE_PICKER_REFRESH' }
+  | { type: 'PHONE_PICKER_SELECT'; phoneE164: string }
+  | { type: 'PHONE_PICKER_BUY' }
+  | { type: 'PHONE_PICKER_CANCEL_PURCHASE' }
   | { type: 'PLATFORMS_BACK'; platforms: PlatformDraft[] }
   | { type: 'PLATFORMS_NEXT'; platforms: PlatformDraft[] }
   | { type: 'COMMANDS_BACK'; customCommands: CustomCommandDraft[] }
@@ -79,6 +114,9 @@ export type TenantWizardEvent =
   | { type: 'CONTACTS_FINISH'; contacts: ContactDraft[] }
   | { type: 'RESUME_DRAFT'; draft: WizardState }
   | { type: 'START_OVER' };
+
+const PICKER_COUNTRY = 'PL';
+const PICKER_LIMIT = 10;
 
 const defaultContext = (): TenantWizardContext => ({
   slug: '',
@@ -91,10 +129,16 @@ const defaultContext = (): TenantWizardContext => ({
   tenantId: null,
   partialFailures: [],
   error: null,
+  pickerNumbers: [],
+  pickerSelected: null,
+  pickerError: null,
 });
 
 const draftMatchesStep = (event: TenantWizardEvent, step: WizardStepKey): boolean =>
   event.type === 'RESUME_DRAFT' && event.draft.step === step;
+
+const hasPickerPurchase = (ctx: TenantWizardContext): boolean =>
+  !!ctx.phoneStrategy.purchasedPhoneE164 && !!ctx.phoneStrategy.pendingPurchaseId;
 
 export const tenantWizardMachine = (deps: TenantWizardDeps) =>
   setup({
@@ -104,9 +148,16 @@ export const tenantWizardMachine = (deps: TenantWizardDeps) =>
     },
     actors: {
       submitWizard: fromPromise<SubmitWizardOutcome, SubmitWizardInput>(({ input }) => deps.submit(input)),
+      listAvailable: fromPromise<AvailablePhoneNumber[], ListAvailableInput>(({ input }) =>
+        deps.listAvailableNumbers(input),
+      ),
+      buyPhone: fromPromise<PurchaseResult, PurchaseInput>(({ input }) => deps.purchasePhoneNumber(input)),
+      releasePhone: fromPromise<void, string>(({ input }) => deps.releasePendingPurchase(input)),
     },
     guards: {
       isManagedFlow: ({ context }) => context.phoneStrategy.mode === 'managed',
+      hasPurchase: ({ context }) => hasPickerPurchase(context),
+      hasSelection: ({ context }) => !!context.pickerSelected,
       resumesAtBasics: ({ event }) => draftMatchesStep(event, 'basics'),
       resumesAtFeatures: ({ event }) => draftMatchesStep(event, 'features'),
       resumesAtPhoneStrategy: ({ event }) => draftMatchesStep(event, 'phoneStrategy'),
@@ -128,12 +179,7 @@ export const tenantWizardMachine = (deps: TenantWizardDeps) =>
         return {};
       }),
       storePhoneStrategy: assign(({ event }) => {
-        if (
-          event.type === 'PHONE_STRATEGY_BACK' ||
-          event.type === 'PHONE_STRATEGY_NEXT' ||
-          event.type === 'PHONE_PICKER_BACK' ||
-          event.type === 'PHONE_PICKER_NEXT'
-        ) {
+        if (event.type === 'PHONE_STRATEGY_BACK' || event.type === 'PHONE_STRATEGY_NEXT') {
           return { phoneStrategy: event.phoneStrategy };
         }
         return {};
@@ -156,6 +202,47 @@ export const tenantWizardMachine = (deps: TenantWizardDeps) =>
         }
         return {};
       }),
+      storePickerNumbers: assign(({ event }) => {
+        const out = (event as unknown as { output?: AvailablePhoneNumber[] }).output;
+        return { pickerNumbers: out ?? [], pickerError: null };
+      }),
+      storePickerListError: assign(({ event }) => {
+        const err = (event as unknown as { error?: unknown }).error;
+        return {
+          pickerNumbers: [],
+          pickerError: err instanceof Error ? err.message : 'Failed to load numbers',
+        };
+      }),
+      storePickerSelection: assign(({ event }) => {
+        if (event.type !== 'PHONE_PICKER_SELECT') return {};
+        return { pickerSelected: event.phoneE164, pickerError: null };
+      }),
+      storePurchaseSuccess: assign(({ context, event }) => {
+        const out = (event as unknown as { output?: PurchaseResult }).output;
+        if (!out) return {};
+        return {
+          phoneStrategy: {
+            ...context.phoneStrategy,
+            mode: 'managed' as const,
+            purchasedPhoneE164: out.phoneE164,
+            pendingPurchaseId: out.pendingId,
+          },
+          pickerError: null,
+        };
+      }),
+      storePurchaseError: assign(({ event }) => {
+        const err = (event as unknown as { error?: unknown }).error;
+        return { pickerError: err instanceof Error ? err.message : 'Purchase failed' };
+      }),
+      clearPurchase: assign(({ context }) => ({
+        phoneStrategy: {
+          ...context.phoneStrategy,
+          purchasedPhoneE164: undefined,
+          pendingPurchaseId: undefined,
+        },
+        pickerSelected: null,
+        pickerError: null,
+      })),
       hydrateFromDraft: assign(({ event }) => {
         if (event.type !== 'RESUME_DRAFT') return {};
         const d = event.draft;
@@ -169,6 +256,9 @@ export const tenantWizardMachine = (deps: TenantWizardDeps) =>
           contacts: d.contacts,
           partialFailures: [],
           error: null,
+          pickerNumbers: [],
+          pickerSelected: null,
+          pickerError: null,
         };
       }),
       storeOutcome: assign(({ event }) => {
@@ -232,10 +322,68 @@ export const tenantWizardMachine = (deps: TenantWizardDeps) =>
           ],
         },
       },
+      // Phone picker is a parent state with substates driving the
+      // load → idle → purchase / cancel cycle. Navigation events
+      // (PHONE_PICKER_BACK / NEXT) live on the parent so they fire
+      // regardless of which substate the user is in (e.g. you can hit
+      // Back even while loading; cancelling-mid-buy is intentionally
+      // disallowed because the operator might have already charged us).
       phonePicker: {
+        initial: 'evaluate',
         on: {
-          PHONE_PICKER_BACK: { target: 'phoneStrategy', actions: 'storePhoneStrategy' },
-          PHONE_PICKER_NEXT: { target: 'platforms', actions: 'storePhoneStrategy' },
+          PHONE_PICKER_BACK: { target: 'phoneStrategy' },
+          PHONE_PICKER_NEXT: { guard: 'hasPurchase', target: 'platforms' },
+        },
+        states: {
+          evaluate: {
+            // Re-entry path (e.g. coming back from platforms with a
+            // purchase already on the strategy) routes straight to the
+            // purchased panel; first entry routes to loading.
+            always: [{ guard: 'hasPurchase', target: 'purchased' }, { target: 'loading' }],
+          },
+          loading: {
+            invoke: {
+              src: 'listAvailable',
+              input: () => ({ country: PICKER_COUNTRY, limit: PICKER_LIMIT }),
+              onDone: { target: 'idle', actions: 'storePickerNumbers' },
+              onError: { target: 'idle', actions: 'storePickerListError' },
+            },
+          },
+          idle: {
+            on: {
+              PHONE_PICKER_REFRESH: 'loading',
+              PHONE_PICKER_SELECT: { actions: 'storePickerSelection' },
+              PHONE_PICKER_BUY: { guard: 'hasSelection', target: 'purchasing' },
+            },
+          },
+          purchasing: {
+            invoke: {
+              src: 'buyPhone',
+              input: ({ context }) => ({
+                country: PICKER_COUNTRY,
+                phoneE164: context.pickerSelected ?? '',
+              }),
+              onDone: { target: 'purchased', actions: 'storePurchaseSuccess' },
+              onError: { target: 'idle', actions: 'storePurchaseError' },
+            },
+          },
+          purchased: {
+            on: {
+              PHONE_PICKER_CANCEL_PURCHASE: 'releasing',
+            },
+          },
+          releasing: {
+            invoke: {
+              src: 'releasePhone',
+              input: ({ context }) => context.phoneStrategy.pendingPurchaseId ?? '',
+              // Always clear the local purchase on completion (success or
+              // failure): if release failed, the cleanup cron will pick
+              // it up after 24h and we don't want the user stuck on a
+              // panel they can't escape.
+              onDone: { target: 'loading', actions: 'clearPurchase' },
+              onError: { target: 'loading', actions: 'clearPurchase' },
+            },
+          },
         },
       },
       platforms: {

@@ -1,25 +1,31 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
-import { useMutation } from '@apollo/client/react';
+import { useApolloClient, useMutation } from '@apollo/client/react';
 import { useMachine } from '@xstate/react';
 import {
   ADD_CONTACT_WIZARD_MUTATION,
   ADD_CUSTOM_COMMAND_WIZARD_MUTATION,
   ATTACH_PHONE_TO_TENANT_MUTATION,
+  AVAILABLE_PHONE_NUMBERS_QUERY,
   CREATE_TENANT_MUTATION,
+  PURCHASE_PHONE_NUMBER_MUTATION,
+  RELEASE_PENDING_PURCHASE_MUTATION,
   SWITCH_TENANT_WIZARD_MUTATION,
   UPDATE_TENANT_FEATURES_WIZARD_MUTATION,
   UPSERT_PLATFORM_WIZARD_MUTATION,
 } from './queries';
 import {
   tenantWizardMachine,
+  type AvailablePhoneNumber,
   type PartialFailure,
   type SubmitWizardInput,
   type SubmitWizardOutcome,
   type TenantWizardDeps,
 } from '../tenant-wizard.machine';
 import type { WizardState, WizardStepKey } from '../interfaces';
+
+export type PickerStatus = 'loading' | 'idle' | 'purchasing' | 'purchased' | 'releasing';
 
 /**
  * One submit chain shared by managed and self flows. Mirrors the order
@@ -148,6 +154,13 @@ const runSubmit = async (input: SubmitWizardInput, m: SubmitDeps): Promise<Submi
   }
 };
 
+interface PickerSlice {
+  status: PickerStatus;
+  numbers: AvailablePhoneNumber[];
+  selected: string | null;
+  error: string | null;
+}
+
 interface UseTenantWizardResult {
   /** Current step of the machine, narrowed to the wizard's vocabulary. */
   step: WizardStepKey;
@@ -161,15 +174,22 @@ interface UseTenantWizardResult {
   partialFailures: PartialFailure[];
   /** Tenant ID after successful create — set in `done`. */
   tenantId: string | null;
+  /** Phone picker substate snapshot — picker view renders from this. */
+  picker: PickerSlice;
   send: ReturnType<typeof useMachine<ReturnType<typeof tenantWizardMachine>>>[1];
 }
 
 /**
- * Wires the tenant wizard XState machine to Apollo mutations. Keeps the
- * machine module test-friendly (deps are injected) and surfaces a
- * react-friendly shape for the view layer.
+ * Wires the tenant wizard XState machine to Apollo mutations and queries.
+ * Keeps the machine module test-friendly (deps are injected) and surfaces
+ * a react-friendly shape for the view layer.
+ *
+ * Uses `apolloClient.query` for the phone-numbers list (via deps callback)
+ * rather than a hook-driven useQuery, so the fetch is owned by the machine
+ * actor — the picker view stays a pure render of context.
  */
 export function useTenantWizard(): UseTenantWizardResult {
+  const apolloClient = useApolloClient();
   const [doCreate] = useMutation(CREATE_TENANT_MUTATION, {
     refetchQueries: ['GetMyTenants', 'GetTenantsIStaffAt'],
   });
@@ -179,13 +199,44 @@ export function useTenantWizard(): UseTenantWizardResult {
   const [doPlatform] = useMutation(UPSERT_PLATFORM_WIZARD_MUTATION);
   const [doCustomCommand] = useMutation(ADD_CUSTOM_COMMAND_WIZARD_MUTATION);
   const [doContact] = useMutation(ADD_CONTACT_WIZARD_MUTATION);
+  const [doPurchase] = useMutation(PURCHASE_PHONE_NUMBER_MUTATION);
+  const [doRelease] = useMutation(RELEASE_PENDING_PURCHASE_MUTATION);
 
   const deps = useMemo<TenantWizardDeps>(
     () => ({
       submit: (input) =>
         runSubmit(input, { doCreate, doSwitch, doAttachPhone, doFeatures, doPlatform, doCustomCommand, doContact }),
+      listAvailableNumbers: async ({ country, limit }) => {
+        const res = await apolloClient.query({
+          query: AVAILABLE_PHONE_NUMBERS_QUERY,
+          variables: { input: { country, limit, type: 'mobile' } },
+          fetchPolicy: 'network-only',
+        });
+        const list = (res.data?.availablePhoneNumbers ?? []) as AvailablePhoneNumber[];
+        return list;
+      },
+      purchasePhoneNumber: async ({ country, phoneE164 }) => {
+        const res = await doPurchase({ variables: { input: { country, phoneE164 } } });
+        const entry = res.data?.purchasePhoneNumber;
+        if (!entry) throw new Error('Purchase did not return a pending row.');
+        return { pendingId: entry.id, phoneE164: entry.phoneE164 };
+      },
+      releasePendingPurchase: async (pendingId) => {
+        await doRelease({ variables: { pendingId } });
+      },
     }),
-    [doCreate, doSwitch, doAttachPhone, doFeatures, doPlatform, doCustomCommand, doContact],
+    [
+      apolloClient,
+      doCreate,
+      doSwitch,
+      doAttachPhone,
+      doFeatures,
+      doPlatform,
+      doCustomCommand,
+      doContact,
+      doPurchase,
+      doRelease,
+    ],
   );
 
   const machine = useMemo(() => tenantWizardMachine(deps), [deps]);
@@ -201,7 +252,24 @@ export function useTenantWizard(): UseTenantWizardResult {
     }
   }, [state]);
 
-  const step = state.value as WizardStepKey;
+  // Top-level state is either a step name (string) or the picker compound
+  // state (object like `{ phonePicker: 'idle' }`). Normalize to a single
+  // WizardStepKey so the view + persistence don't have to care about
+  // substates.
+  const stateValue = state.value;
+  const step: WizardStepKey =
+    typeof stateValue === 'string' ? (stateValue as WizardStepKey) : (Object.keys(stateValue)[0] as WizardStepKey);
+
+  const pickerStatus: PickerStatus = state.matches({ phonePicker: 'loading' })
+    ? 'loading'
+    : state.matches({ phonePicker: 'purchasing' })
+      ? 'purchasing'
+      : state.matches({ phonePicker: 'purchased' })
+        ? 'purchased'
+        : state.matches({ phonePicker: 'releasing' })
+          ? 'releasing'
+          : 'idle';
+
   const wizardState: WizardState = {
     step,
     slug: state.context.slug,
@@ -213,6 +281,13 @@ export function useTenantWizard(): UseTenantWizardResult {
     contacts: state.context.contacts,
   };
 
+  const picker: PickerSlice = {
+    status: pickerStatus,
+    numbers: state.context.pickerNumbers,
+    selected: state.context.pickerSelected,
+    error: state.context.pickerError,
+  };
+
   return {
     step,
     wizardState,
@@ -221,6 +296,7 @@ export function useTenantWizard(): UseTenantWizardResult {
     error: state.context.error,
     partialFailures: state.context.partialFailures,
     tenantId: state.context.tenantId,
+    picker,
     send,
   };
 }

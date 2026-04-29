@@ -1,74 +1,63 @@
 'use client';
 
-import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui';
 import { usePhoneProcurementInfo } from '../hooks/use-phone-procurement-info';
-import { useAvailablePhoneNumbers, type AvailablePhoneNumber } from '../hooks/use-available-phone-numbers';
-import { usePurchasePhoneNumber } from '../hooks/use-purchase-phone-number';
-import { useReleasePendingPurchase } from '../hooks/use-release-pending-purchase';
+import type { PickerStatus } from '../hooks/use-tenant-wizard';
+import type { AvailablePhoneNumber } from '../tenant-wizard.machine';
 import type { PhoneStrategyDraft } from '../interfaces';
 
 interface StepPhonePickerProps {
-  defaultStrategy: PhoneStrategyDraft;
-  /** ISO 3166-1 alpha-2 — defaults to PL (we only seeded a regulatory bundle for Poland). */
-  country?: string;
-  onBack: (draft: PhoneStrategyDraft) => void;
-  onNext: (draft: PhoneStrategyDraft) => void;
+  /** Strategy from machine context — read-only here, drives the purchased panel render. */
+  strategy: PhoneStrategyDraft;
+  /** Available numbers list, fetched by the machine actor. */
+  numbers: AvailablePhoneNumber[];
+  /** Currently selected E.164 (pre-purchase) — `null` until user picks. */
+  selected: string | null;
+  /** Error from the latest list/purchase attempt — surfaces as a red banner. */
+  error: string | null;
+  /** Picker substate — drives loading skeleton / purchase progress / cancel disabled state. */
+  status: PickerStatus;
+  onBack: () => void;
+  onNext: () => void;
+  onSelect: (phoneE164: string) => void;
+  onRefresh: () => void;
+  onBuy: () => void;
+  onCancelPurchase: () => void;
 }
 
 /**
- * Shows ten available numbers, lets the user pick one, then buys it via
- * the BFF mutation. After a successful purchase we hold the pending row
- * in the wizard state — actual binding to the tenant happens at submit
- * time. The cleanup cron releases anything left unattached for >24h.
+ * Pure render of the picker step — all data and async work live in the
+ * tenantWizard XState machine. Component dispatches events; the machine
+ * decides whether they're allowed (e.g. BUY only when something is
+ * selected, NEXT only after purchase).
  *
- * Capability filter: only SMS-capable numbers are surfaced. Signal
- * registration sends the verification code over SMS, so a voice-only
- * number would dead-end the managed flow.
- *
- * The "Cancel purchase" button (cancelling an *already-purchased* row)
- * fires the release mutation and clears the wizard's pendingPurchaseId
- * so the user can pick a different number without a stranded row.
+ * Capability filter (SMS-capable only) lives here because it's a render
+ * concern: the BFF returns whatever Twilio gave us, and Signal needs
+ * SMS to receive the verification code.
  */
-export function StepPhonePicker({ defaultStrategy, country = 'PL', onBack, onNext }: StepPhonePickerProps) {
+export function StepPhonePicker({
+  strategy,
+  numbers,
+  selected,
+  error,
+  status,
+  onBack,
+  onNext,
+  onSelect,
+  onRefresh,
+  onBuy,
+  onCancelPurchase,
+}: StepPhonePickerProps) {
   const t = useTranslations('tenantWizard');
   const info = usePhoneProcurementInfo();
-  const { numbers, isLoading, refetch } = useAvailablePhoneNumbers(country, 10);
-  const { purchase, isPurchasing, error: purchaseError } = usePurchasePhoneNumber();
-  const { release, isReleasing } = useReleasePendingPurchase();
-
-  const [selected, setSelected] = useState<string | null>(null);
-  const [purchasedPhone, setPurchasedPhone] = useState<string | undefined>(defaultStrategy.purchasedPhoneE164);
-  const [pendingId, setPendingId] = useState<string | undefined>(defaultStrategy.pendingPurchaseId);
 
   const smsCapable = numbers.filter((n) => n.capabilities.sms);
-  const hasPurchase = !!pendingId && !!purchasedPhone;
-
-  const handlePurchase = async () => {
-    if (!selected) return;
-    const result = await purchase({ country, phoneE164: selected });
-    if (!result) return;
-    setPurchasedPhone(result.phoneE164);
-    setPendingId(result.pendingId);
-  };
-
-  const handleCancelPurchase = async () => {
-    if (!pendingId) return;
-    await release(pendingId);
-    setPurchasedPhone(undefined);
-    setPendingId(undefined);
-    setSelected(null);
-  };
-
-  const handleBack = () => {
-    onBack({ ...defaultStrategy, purchasedPhoneE164: purchasedPhone, pendingPurchaseId: pendingId });
-  };
-
-  const handleNext = () => {
-    if (!hasPurchase) return;
-    onNext({ mode: 'managed', purchasedPhoneE164: purchasedPhone, pendingPurchaseId: pendingId });
-  };
+  const isLoading = status === 'loading';
+  const isPurchasing = status === 'purchasing';
+  const isReleasing = status === 'releasing';
+  const isPurchased = status === 'purchased';
+  const purchasedPhone = strategy.purchasedPhoneE164;
 
   return (
     <div className="flex flex-col gap-4">
@@ -83,14 +72,14 @@ export function StepPhonePicker({ defaultStrategy, country = 'PL', onBack, onNex
         </div>
       )}
 
-      {hasPurchase ? (
+      {isPurchased ? (
         <div className="bg-emerald-500/5 border border-emerald-500/40 rounded-xl p-4 flex flex-col gap-2">
           <p className="text-sm font-semibold text-emerald-200">
             {t('phonePicker_purchased_title', { phone: purchasedPhone ?? '' })}
           </p>
           <p className="text-xs text-emerald-200/80">{t('phonePicker_purchased_body')}</p>
           <div>
-            <Button type="button" variant="green" disabled={isReleasing} onClick={handleCancelPurchase}>
+            <Button type="button" variant="green" disabled={isReleasing} onClick={onCancelPurchase}>
               {isReleasing ? t('phonePicker_cancelling') : t('phonePicker_cancelPurchase')}
             </Button>
           </div>
@@ -99,7 +88,7 @@ export function StepPhonePicker({ defaultStrategy, country = 'PL', onBack, onNex
         <>
           <div className="flex items-center justify-between">
             <p className="text-xs text-muted">{t('phonePicker_listHint', { count: smsCapable.length })}</p>
-            <Button type="button" variant="green" disabled={isLoading} onClick={() => void refetch()}>
+            <Button type="button" variant="green" disabled={isLoading || isPurchasing} onClick={onRefresh}>
               {isLoading ? t('phonePicker_loading') : t('phonePicker_refresh')}
             </Button>
           </div>
@@ -122,29 +111,29 @@ export function StepPhonePicker({ defaultStrategy, country = 'PL', onBack, onNex
                 key={n.phoneE164}
                 number={n}
                 selected={selected === n.phoneE164}
-                onSelect={() => setSelected(n.phoneE164)}
+                onSelect={() => onSelect(n.phoneE164)}
               />
             ))}
           </div>
 
-          {purchaseError && (
+          {error && (
             <div className="bg-red-500/5 border border-red-500/40 rounded-xl p-3">
-              <p className="text-xs text-red-200">{purchaseError}</p>
+              <p className="text-xs text-red-200">{error}</p>
             </div>
           )}
         </>
       )}
 
       <div className="flex justify-between pt-4">
-        <Button type="button" variant="green" disabled={isPurchasing} onClick={handleBack}>
+        <Button type="button" variant="green" disabled={isPurchasing || isReleasing} onClick={onBack}>
           {t('back')}
         </Button>
-        {hasPurchase ? (
-          <Button type="button" variant="blue" onClick={handleNext}>
+        {isPurchased ? (
+          <Button type="button" variant="blue" onClick={onNext}>
             {t('next')}
           </Button>
         ) : (
-          <Button type="button" variant="blue" disabled={!selected || isPurchasing} onClick={handlePurchase}>
+          <Button type="button" variant="blue" disabled={!selected || isPurchasing} onClick={onBuy}>
             {isPurchasing ? t('phonePicker_purchasing') : t('phonePicker_buy')}
           </Button>
         )}

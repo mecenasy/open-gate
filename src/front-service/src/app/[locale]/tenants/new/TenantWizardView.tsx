@@ -34,7 +34,7 @@ export function TenantWizardView() {
   const { user } = useAuth();
 
   const wizard = useTenantWizard();
-  const { send, step, wizardState, isSubmitting, isDone, error, partialFailures, tenantId } = wizard;
+  const { send, step, wizardState, isSubmitting, isDone, error, partialFailures, tenantId, picker } = wizard;
 
   const usage = useWizardUsage();
   const persistence = useWizardPersistence(wizardState, user?.id ?? null);
@@ -75,7 +75,7 @@ export function TenantWizardView() {
 
       {persistence.hasDraft && (
         <div className="bg-blue-500/5 border border-blue-500/40 rounded-xl p-3 mb-4 flex items-center justify-between gap-3">
-          <p className="text-xs text-blue-200">
+          <p className="text-xs text-blue-500">
             {t('resumeDraftBody', {
               savedAt: persistence.draftSavedAt ? new Date(persistence.draftSavedAt).toLocaleString() : '',
             })}
@@ -135,9 +135,17 @@ export function TenantWizardView() {
 
       {step === 'phonePicker' && (
         <StepPhonePicker
-          defaultStrategy={wizardState.phoneStrategy}
-          onBack={(phoneStrategy) => send({ type: 'PHONE_PICKER_BACK', phoneStrategy })}
-          onNext={(phoneStrategy) => send({ type: 'PHONE_PICKER_NEXT', phoneStrategy })}
+          strategy={wizardState.phoneStrategy}
+          numbers={picker.numbers}
+          selected={picker.selected}
+          error={picker.error}
+          status={picker.status}
+          onBack={() => send({ type: 'PHONE_PICKER_BACK' })}
+          onNext={() => send({ type: 'PHONE_PICKER_NEXT' })}
+          onSelect={(phoneE164) => send({ type: 'PHONE_PICKER_SELECT', phoneE164 })}
+          onRefresh={() => send({ type: 'PHONE_PICKER_REFRESH' })}
+          onBuy={() => send({ type: 'PHONE_PICKER_BUY' })}
+          onCancelPurchase={() => send({ type: 'PHONE_PICKER_CANCEL_PURCHASE' })}
         />
       )}
 

@@ -38,39 +38,14 @@ export interface PartialFailure {
   message: string;
 }
 
-/** Phone-procurement domain types, surfaced by the picker substate. */
-export interface AvailablePhoneNumber {
-  phoneE164: string;
-  capabilities: { sms: boolean; mms: boolean; voice: boolean };
-  region?: string | null;
-  locality?: string | null;
-}
-
-export interface ListAvailableInput {
-  country: string;
-  limit: number;
-}
-
-export interface PurchaseInput {
-  country: string;
-  phoneE164: string;
-}
-
-export interface PurchaseResult {
-  pendingId: string;
-  phoneE164: string;
-}
-
 /**
  * Caller-supplied bridge between the machine and Apollo mutations —
  * keeps the machine module test-friendly and free of GraphQL imports.
- * Same pattern as signalOnboardingMachine.
+ * Phone-procurement actors live in their own machine (phoneProcurementMachine);
+ * this top-level wizard only owns the submit chain.
  */
 export interface TenantWizardDeps {
   submit: (input: SubmitWizardInput) => Promise<SubmitWizardOutcome>;
-  listAvailableNumbers: (input: ListAvailableInput) => Promise<AvailablePhoneNumber[]>;
-  purchasePhoneNumber: (input: PurchaseInput) => Promise<PurchaseResult>;
-  releasePendingPurchase: (pendingId: string) => Promise<void>;
 }
 
 export interface TenantWizardContext {
@@ -87,25 +62,14 @@ export interface TenantWizardContext {
   tenantId: string | null;
   partialFailures: PartialFailure[];
   error: string | null;
-  // Phone picker substate data — populated by the listAvailable /
-  // purchase actors so the view layer is a pure render of context.
-  pickerNumbers: AvailablePhoneNumber[];
-  pickerSelected: string | null;
-  pickerError: string | null;
 }
 
 export type TenantWizardEvent =
   | { type: 'BASICS_NEXT'; slug: string; name: string }
   | { type: 'FEATURES_BACK'; features: TenantFeaturesDraft }
   | { type: 'FEATURES_NEXT'; features: TenantFeaturesDraft }
-  | { type: 'PHONE_STRATEGY_BACK'; phoneStrategy: PhoneStrategyDraft }
-  | { type: 'PHONE_STRATEGY_NEXT'; phoneStrategy: PhoneStrategyDraft }
-  | { type: 'PHONE_PICKER_BACK' }
-  | { type: 'PHONE_PICKER_NEXT' }
-  | { type: 'PHONE_PICKER_REFRESH' }
-  | { type: 'PHONE_PICKER_SELECT'; phoneE164: string }
-  | { type: 'PHONE_PICKER_BUY' }
-  | { type: 'PHONE_PICKER_CANCEL_PURCHASE' }
+  | { type: 'PHONE_ACQUISITION_BACK' }
+  | { type: 'PHONE_ACQUISITION_DONE'; phoneStrategy: PhoneStrategyDraft }
   | { type: 'PLATFORMS_BACK'; platforms: PlatformDraft[] }
   | { type: 'PLATFORMS_NEXT'; platforms: PlatformDraft[] }
   | { type: 'COMMANDS_BACK'; customCommands: CustomCommandDraft[] }
@@ -114,9 +78,6 @@ export type TenantWizardEvent =
   | { type: 'CONTACTS_FINISH'; contacts: ContactDraft[] }
   | { type: 'RESUME_DRAFT'; draft: WizardState }
   | { type: 'START_OVER' };
-
-const PICKER_COUNTRY = 'PL';
-const PICKER_LIMIT = 10;
 
 const defaultContext = (): TenantWizardContext => ({
   slug: '',
@@ -129,16 +90,10 @@ const defaultContext = (): TenantWizardContext => ({
   tenantId: null,
   partialFailures: [],
   error: null,
-  pickerNumbers: [],
-  pickerSelected: null,
-  pickerError: null,
 });
 
 const draftMatchesStep = (event: TenantWizardEvent, step: WizardStepKey): boolean =>
   event.type === 'RESUME_DRAFT' && event.draft.step === step;
-
-const hasPickerPurchase = (ctx: TenantWizardContext): boolean =>
-  !!ctx.phoneStrategy.purchasedPhoneE164 && !!ctx.phoneStrategy.pendingPurchaseId;
 
 export const tenantWizardMachine = (deps: TenantWizardDeps) =>
   setup({
@@ -148,20 +103,15 @@ export const tenantWizardMachine = (deps: TenantWizardDeps) =>
     },
     actors: {
       submitWizard: fromPromise<SubmitWizardOutcome, SubmitWizardInput>(({ input }) => deps.submit(input)),
-      listAvailable: fromPromise<AvailablePhoneNumber[], ListAvailableInput>(({ input }) =>
-        deps.listAvailableNumbers(input),
-      ),
-      buyPhone: fromPromise<PurchaseResult, PurchaseInput>(({ input }) => deps.purchasePhoneNumber(input)),
-      releasePhone: fromPromise<void, string>(({ input }) => deps.releasePendingPurchase(input)),
     },
     guards: {
-      isManagedFlow: ({ context }) => context.phoneStrategy.mode === 'managed',
-      hasPurchase: ({ context }) => hasPickerPurchase(context),
-      hasSelection: ({ context }) => !!context.pickerSelected,
+      // Self users skip the platforms-back rewind directly to phoneAcquisition;
+      // managed users do the same — there's only one combined step now, so
+      // the guard collapses to "any phone-strategy mode chose".
+      hasPhoneStrategy: ({ context }) => context.phoneStrategy.mode !== null,
       resumesAtBasics: ({ event }) => draftMatchesStep(event, 'basics'),
       resumesAtFeatures: ({ event }) => draftMatchesStep(event, 'features'),
-      resumesAtPhoneStrategy: ({ event }) => draftMatchesStep(event, 'phoneStrategy'),
-      resumesAtPhonePicker: ({ event }) => draftMatchesStep(event, 'phonePicker'),
+      resumesAtPhoneAcquisition: ({ event }) => draftMatchesStep(event, 'phoneAcquisition'),
       resumesAtPlatforms: ({ event }) => draftMatchesStep(event, 'platforms'),
       resumesAtCommands: ({ event }) => draftMatchesStep(event, 'commands'),
       resumesAtContacts: ({ event }) => draftMatchesStep(event, 'contacts'),
@@ -178,11 +128,9 @@ export const tenantWizardMachine = (deps: TenantWizardDeps) =>
         }
         return {};
       }),
-      storePhoneStrategy: assign(({ event }) => {
-        if (event.type === 'PHONE_STRATEGY_BACK' || event.type === 'PHONE_STRATEGY_NEXT') {
-          return { phoneStrategy: event.phoneStrategy };
-        }
-        return {};
+      storePhoneAcquisitionOutcome: assign(({ event }) => {
+        if (event.type !== 'PHONE_ACQUISITION_DONE') return {};
+        return { phoneStrategy: event.phoneStrategy };
       }),
       storePlatforms: assign(({ event }) => {
         if (event.type === 'PLATFORMS_BACK' || event.type === 'PLATFORMS_NEXT') {
@@ -202,47 +150,6 @@ export const tenantWizardMachine = (deps: TenantWizardDeps) =>
         }
         return {};
       }),
-      storePickerNumbers: assign(({ event }) => {
-        const out = (event as unknown as { output?: AvailablePhoneNumber[] }).output;
-        return { pickerNumbers: out ?? [], pickerError: null };
-      }),
-      storePickerListError: assign(({ event }) => {
-        const err = (event as unknown as { error?: unknown }).error;
-        return {
-          pickerNumbers: [],
-          pickerError: err instanceof Error ? err.message : 'Failed to load numbers',
-        };
-      }),
-      storePickerSelection: assign(({ event }) => {
-        if (event.type !== 'PHONE_PICKER_SELECT') return {};
-        return { pickerSelected: event.phoneE164, pickerError: null };
-      }),
-      storePurchaseSuccess: assign(({ context, event }) => {
-        const out = (event as unknown as { output?: PurchaseResult }).output;
-        if (!out) return {};
-        return {
-          phoneStrategy: {
-            ...context.phoneStrategy,
-            mode: 'managed' as const,
-            purchasedPhoneE164: out.phoneE164,
-            pendingPurchaseId: out.pendingId,
-          },
-          pickerError: null,
-        };
-      }),
-      storePurchaseError: assign(({ event }) => {
-        const err = (event as unknown as { error?: unknown }).error;
-        return { pickerError: err instanceof Error ? err.message : 'Purchase failed' };
-      }),
-      clearPurchase: assign(({ context }) => ({
-        phoneStrategy: {
-          ...context.phoneStrategy,
-          purchasedPhoneE164: undefined,
-          pendingPurchaseId: undefined,
-        },
-        pickerSelected: null,
-        pickerError: null,
-      })),
       hydrateFromDraft: assign(({ event }) => {
         if (event.type !== 'RESUME_DRAFT') return {};
         const d = event.draft;
@@ -256,9 +163,6 @@ export const tenantWizardMachine = (deps: TenantWizardDeps) =>
           contacts: d.contacts,
           partialFailures: [],
           error: null,
-          pickerNumbers: [],
-          pickerSelected: null,
-          pickerError: null,
         };
       }),
       storeOutcome: assign(({ event }) => {
@@ -284,15 +188,15 @@ export const tenantWizardMachine = (deps: TenantWizardDeps) =>
     initial: 'basics',
     context: defaultContext(),
     // Resume can fire from any step — defined here so we don't repeat the
-    // seven targeted transitions inside every state node. Each guard
-    // matches one possible draft.step value; falls through silently if
-    // the draft has an unrecognised step name (defensive).
+    // targeted transitions inside every state node. Each guard matches
+    // one possible draft.step value; falls through silently if the draft
+    // has an unrecognised step name (defensive — STORAGE_VERSION bump
+    // already discards drafts from older schemas).
     on: {
       RESUME_DRAFT: [
         { guard: 'resumesAtBasics', target: '.basics', actions: 'hydrateFromDraft' },
         { guard: 'resumesAtFeatures', target: '.features', actions: 'hydrateFromDraft' },
-        { guard: 'resumesAtPhoneStrategy', target: '.phoneStrategy', actions: 'hydrateFromDraft' },
-        { guard: 'resumesAtPhonePicker', target: '.phonePicker', actions: 'hydrateFromDraft' },
+        { guard: 'resumesAtPhoneAcquisition', target: '.phoneAcquisition', actions: 'hydrateFromDraft' },
         { guard: 'resumesAtPlatforms', target: '.platforms', actions: 'hydrateFromDraft' },
         { guard: 'resumesAtCommands', target: '.commands', actions: 'hydrateFromDraft' },
         { guard: 'resumesAtContacts', target: '.contacts', actions: 'hydrateFromDraft' },
@@ -308,92 +212,24 @@ export const tenantWizardMachine = (deps: TenantWizardDeps) =>
       features: {
         on: {
           FEATURES_BACK: { target: 'basics', actions: 'storeFeatures' },
-          FEATURES_NEXT: { target: 'phoneStrategy', actions: 'storeFeatures' },
+          FEATURES_NEXT: { target: 'phoneAcquisition', actions: 'storeFeatures' },
         },
       },
-      phoneStrategy: {
+      // Combined strategy + picker step — the actual flow lives in
+      // phoneProcurementMachine, which the React layer runs as a child
+      // useMachine inside StepPhoneAcquisition. We only see two events:
+      // BACK to features, and DONE with the final strategy.
+      phoneAcquisition: {
         on: {
-          PHONE_STRATEGY_BACK: { target: 'features', actions: 'storePhoneStrategy' },
-          PHONE_STRATEGY_NEXT: [
-            // Picker step is managed-only; self users skip straight to
-            // platforms where they'll paste their own Twilio creds.
-            { guard: 'isManagedFlow', target: 'phonePicker', actions: 'storePhoneStrategy' },
-            { target: 'platforms', actions: 'storePhoneStrategy' },
-          ],
-        },
-      },
-      // Phone picker is a parent state with substates driving the
-      // load → idle → purchase / cancel cycle. Navigation events
-      // (PHONE_PICKER_BACK / NEXT) live on the parent so they fire
-      // regardless of which substate the user is in (e.g. you can hit
-      // Back even while loading; cancelling-mid-buy is intentionally
-      // disallowed because the operator might have already charged us).
-      phonePicker: {
-        initial: 'evaluate',
-        on: {
-          PHONE_PICKER_BACK: { target: 'phoneStrategy' },
-          PHONE_PICKER_NEXT: { guard: 'hasPurchase', target: 'platforms' },
-        },
-        states: {
-          evaluate: {
-            // Re-entry path (e.g. coming back from platforms with a
-            // purchase already on the strategy) routes straight to the
-            // purchased panel; first entry routes to loading.
-            always: [{ guard: 'hasPurchase', target: 'purchased' }, { target: 'loading' }],
-          },
-          loading: {
-            invoke: {
-              src: 'listAvailable',
-              input: () => ({ country: PICKER_COUNTRY, limit: PICKER_LIMIT }),
-              onDone: { target: 'idle', actions: 'storePickerNumbers' },
-              onError: { target: 'idle', actions: 'storePickerListError' },
-            },
-          },
-          idle: {
-            on: {
-              PHONE_PICKER_REFRESH: 'loading',
-              PHONE_PICKER_SELECT: { actions: 'storePickerSelection' },
-              PHONE_PICKER_BUY: { guard: 'hasSelection', target: 'purchasing' },
-            },
-          },
-          purchasing: {
-            invoke: {
-              src: 'buyPhone',
-              input: ({ context }) => ({
-                country: PICKER_COUNTRY,
-                phoneE164: context.pickerSelected ?? '',
-              }),
-              onDone: { target: 'purchased', actions: 'storePurchaseSuccess' },
-              onError: { target: 'idle', actions: 'storePurchaseError' },
-            },
-          },
-          purchased: {
-            on: {
-              PHONE_PICKER_CANCEL_PURCHASE: 'releasing',
-            },
-          },
-          releasing: {
-            invoke: {
-              src: 'releasePhone',
-              input: ({ context }) => context.phoneStrategy.pendingPurchaseId ?? '',
-              // Always clear the local purchase on completion (success or
-              // failure): if release failed, the cleanup cron will pick
-              // it up after 24h and we don't want the user stuck on a
-              // panel they can't escape.
-              onDone: { target: 'loading', actions: 'clearPurchase' },
-              onError: { target: 'loading', actions: 'clearPurchase' },
-            },
-          },
+          PHONE_ACQUISITION_BACK: { target: 'features' },
+          PHONE_ACQUISITION_DONE: { target: 'platforms', actions: 'storePhoneAcquisitionOutcome' },
         },
       },
       platforms: {
         on: {
-          PLATFORMS_BACK: [
-            // Symmetric with the forward transition: managed flow rewinds
-            // through the picker, self flow skips it.
-            { guard: 'isManagedFlow', target: 'phonePicker', actions: 'storePlatforms' },
-            { target: 'phoneStrategy', actions: 'storePlatforms' },
-          ],
+          // No more managed/self routing split — both flows rewind to
+          // the same combined acquisition step.
+          PLATFORMS_BACK: { target: 'phoneAcquisition', actions: 'storePlatforms' },
           PLATFORMS_NEXT: { target: 'commands', actions: 'storePlatforms' },
         },
       },

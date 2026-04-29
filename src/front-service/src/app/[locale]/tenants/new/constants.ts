@@ -1,39 +1,18 @@
-import type { PhoneStrategyDraft, PhoneStrategyMode, TenantFeaturesDraft, WizardStepKey } from './interfaces';
+import type { PhoneStrategyDraft, TenantFeaturesDraft, WizardStepKey } from './interfaces';
 
 /**
- * Two flows live in the wizard now: managed gets the extra phonePicker
- * step (10 numbers + buy), self skips it because the user will paste
- * their own Twilio creds later in the platforms step.
- *
- * Both lists pass through phoneStrategy so the user always makes the
- * managed-vs-self decision before continuing.
+ * One linear step list — the managed-vs-self decision and the picker
+ * collapsed into a single phoneAcquisition step driven by its own
+ * machine, so the stepper has the same shape regardless of strategy.
  */
-export const WIZARD_STEPS_MANAGED: WizardStepKey[] = [
+export const WIZARD_STEPS: WizardStepKey[] = [
   'basics',
   'features',
-  'phoneStrategy',
-  'phonePicker',
+  'phoneAcquisition',
   'platforms',
   'commands',
   'contacts',
 ];
-
-export const WIZARD_STEPS_SELF: WizardStepKey[] = [
-  'basics',
-  'features',
-  'phoneStrategy',
-  'platforms',
-  'commands',
-  'contacts',
-];
-
-/**
- * Step list for the current strategy. Before the user picks, treat the
- * flow as `self` — phonePicker is invisible until managed is chosen, so
- * the stepper doesn't briefly show a step that may go away.
- */
-export const getStepsForStrategy = (mode: PhoneStrategyMode | null): WizardStepKey[] =>
-  mode === 'managed' ? WIZARD_STEPS_MANAGED : WIZARD_STEPS_SELF;
 
 export const PLATFORM_KEYS = ['signal', 'sms', 'smtp', 'whatsapp', 'messenger'] as const;
 

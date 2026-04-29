@@ -5,12 +5,11 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from '@/components/navigation/navigation';
 import { Button } from '@/components/ui';
 import { useAuth } from '@/hooks/use-auth';
-import { getStepsForStrategy } from './constants';
+import { WIZARD_STEPS } from './constants';
 import { WizardStepper } from './components/WizardStepper';
 import { StepBasics } from './components/StepBasics';
 import { StepFeatures } from './components/StepFeatures';
-import { StepPhoneStrategy } from './components/StepPhoneStrategy';
-import { StepPhonePicker } from './components/StepPhonePicker';
+import { StepPhoneAcquisition } from './components/StepPhoneAcquisition';
 import { StepPlatforms } from './components/StepPlatforms';
 import { StepCommands } from './components/StepCommands';
 import { StepContacts } from './components/StepContacts';
@@ -21,7 +20,8 @@ import { useWizardPersistence } from './hooks/use-wizard-persistence';
 /**
  * View layer for the tenant creation wizard. State lives entirely in the
  * XState machine (`useTenantWizard`); this component is a thin event
- * dispatcher + step renderer.
+ * dispatcher + step renderer. The phoneAcquisition step owns its own
+ * child machine — see `phone-procurement.machine.ts`.
  *
  * Persistence is React-side: `useWizardPersistence` snapshots the machine
  * context to localStorage and surfaces the resume banner. Resume sends
@@ -34,7 +34,17 @@ export function TenantWizardView() {
   const { user } = useAuth();
 
   const wizard = useTenantWizard();
-  const { send, step, wizardState, isSubmitting, isDone, error, partialFailures, tenantId, picker } = wizard;
+  const {
+    send,
+    step,
+    wizardState,
+    isSubmitting,
+    isDone,
+    error,
+    partialFailures,
+    tenantId,
+    phoneProcurementDeps,
+  } = wizard;
 
   const usage = useWizardUsage();
   const persistence = useWizardPersistence(wizardState, user?.id ?? null);
@@ -71,7 +81,7 @@ export function TenantWizardView() {
         </p>
       </header>
 
-      <WizardStepper current={step} steps={getStepsForStrategy(wizardState.phoneStrategy.mode)} />
+      <WizardStepper current={step} steps={WIZARD_STEPS} />
 
       {persistence.hasDraft && (
         <div className="bg-blue-500/5 border border-blue-500/40 rounded-xl p-3 mb-4 flex items-center justify-between gap-3">
@@ -121,31 +131,16 @@ export function TenantWizardView() {
         />
       )}
 
-      {step === 'phoneStrategy' && (
-        <StepPhoneStrategy
+      {step === 'phoneAcquisition' && (
+        <StepPhoneAcquisition
           defaultStrategy={wizardState.phoneStrategy}
           phoneNumbersIncluded={usage.phoneNumbersIncluded}
           messagesPerMonthIncluded={usage.messagesPerMonthIncluded}
           pricePerExtraMessageCents={usage.pricePerExtraMessageCents}
           currency={usage.currency}
-          onBack={(phoneStrategy) => send({ type: 'PHONE_STRATEGY_BACK', phoneStrategy })}
-          onNext={(phoneStrategy) => send({ type: 'PHONE_STRATEGY_NEXT', phoneStrategy })}
-        />
-      )}
-
-      {step === 'phonePicker' && (
-        <StepPhonePicker
-          strategy={wizardState.phoneStrategy}
-          numbers={picker.numbers}
-          selected={picker.selected}
-          error={picker.error}
-          status={picker.status}
-          onBack={() => send({ type: 'PHONE_PICKER_BACK' })}
-          onNext={() => send({ type: 'PHONE_PICKER_NEXT' })}
-          onSelect={(phoneE164) => send({ type: 'PHONE_PICKER_SELECT', phoneE164 })}
-          onRefresh={() => send({ type: 'PHONE_PICKER_REFRESH' })}
-          onBuy={() => send({ type: 'PHONE_PICKER_BUY' })}
-          onCancelPurchase={() => send({ type: 'PHONE_PICKER_CANCEL_PURCHASE' })}
+          deps={phoneProcurementDeps}
+          onBack={() => send({ type: 'PHONE_ACQUISITION_BACK' })}
+          onDone={(phoneStrategy) => send({ type: 'PHONE_ACQUISITION_DONE', phoneStrategy })}
         />
       )}
 

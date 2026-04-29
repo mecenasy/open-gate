@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import type { WizardState } from '../interfaces';
 
 const STORAGE_KEY = 'tenantWizard:draft';
-const STORAGE_VERSION = 1;
+// v2: WizardStepKey collapsed phoneStrategy + phonePicker into phoneAcquisition;
+// drafts from v1 carry stale step values that no longer exist on the machine,
+// so we discard them rather than half-restore.
+const STORAGE_VERSION = 2;
 const MAX_AGE_DAYS = 7;
 const SAVE_DEBOUNCE_MS = 500;
 

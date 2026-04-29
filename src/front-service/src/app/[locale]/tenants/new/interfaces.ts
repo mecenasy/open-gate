@@ -1,11 +1,4 @@
-export type WizardStepKey =
-  | 'basics'
-  | 'features'
-  | 'phoneStrategy'
-  | 'phonePicker'
-  | 'platforms'
-  | 'commands'
-  | 'contacts';
+export type WizardStepKey = 'basics' | 'features' | 'phoneAcquisition' | 'platforms' | 'commands' | 'contacts';
 
 /** 'managed' = we buy the number, 'self' = user brings their own Twilio. */
 export type PhoneStrategyMode = 'managed' | 'self';
@@ -46,11 +39,11 @@ export interface CustomCommandDraft {
 /**
  * Carries the wizard's choice between managed (we procure the number) and
  * self (user brings their own Twilio). For managed flow, after the user
- * picks a number from the picker step, `purchasedPhoneE164` and
+ * picks a number on the phoneAcquisition step, `purchasedPhoneE164` and
  * `pendingPurchaseId` are filled in — those are what later steps lock the
  * SMS tile and Signal modal against.
  *
- * `mode` is null until the user explicitly picks on the phoneStrategy
+ * `mode` is null until the user explicitly picks on the phoneAcquisition
  * step — we don't pre-select to force an active decision rather than a
  * silent default the user might miss.
  */

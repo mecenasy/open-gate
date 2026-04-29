@@ -17,15 +17,13 @@ import {
 } from './queries';
 import {
   tenantWizardMachine,
-  type AvailablePhoneNumber,
   type PartialFailure,
   type SubmitWizardInput,
   type SubmitWizardOutcome,
   type TenantWizardDeps,
 } from '../tenant-wizard.machine';
+import type { AvailablePhoneNumber, PhoneProcurementDeps } from '../phone-procurement.machine';
 import type { WizardState, WizardStepKey } from '../interfaces';
-
-export type PickerStatus = 'loading' | 'idle' | 'purchasing' | 'purchased' | 'releasing';
 
 /**
  * One submit chain shared by managed and self flows. Mirrors the order
@@ -154,13 +152,6 @@ const runSubmit = async (input: SubmitWizardInput, m: SubmitDeps): Promise<Submi
   }
 };
 
-interface PickerSlice {
-  status: PickerStatus;
-  numbers: AvailablePhoneNumber[];
-  selected: string | null;
-  error: string | null;
-}
-
 interface UseTenantWizardResult {
   /** Current step of the machine, narrowed to the wizard's vocabulary. */
   step: WizardStepKey;
@@ -174,19 +165,21 @@ interface UseTenantWizardResult {
   partialFailures: PartialFailure[];
   /** Tenant ID after successful create — set in `done`. */
   tenantId: string | null;
-  /** Phone picker substate snapshot — picker view renders from this. */
-  picker: PickerSlice;
+  /**
+   * Deps for the StepPhoneAcquisition's child machine — listAvailableNumbers,
+   * purchasePhoneNumber, releasePendingPurchase wired to Apollo. Kept here so
+   * Apollo hooks stay in one place and the step component stays a pure render.
+   */
+  phoneProcurementDeps: PhoneProcurementDeps;
   send: ReturnType<typeof useMachine<ReturnType<typeof tenantWizardMachine>>>[1];
 }
 
 /**
- * Wires the tenant wizard XState machine to Apollo mutations and queries.
- * Keeps the machine module test-friendly (deps are injected) and surfaces
- * a react-friendly shape for the view layer.
- *
- * Uses `apolloClient.query` for the phone-numbers list (via deps callback)
- * rather than a hook-driven useQuery, so the fetch is owned by the machine
- * actor — the picker view stays a pure render of context.
+ * Wires the tenant wizard XState machine to Apollo mutations and queries,
+ * plus a separate set of deps for the phoneProcurementMachine that lives
+ * inside the StepPhoneAcquisition component. Splitting deps keeps the
+ * machines independent and the React layer the only place Apollo is
+ * imported.
  */
 export function useTenantWizard(): UseTenantWizardResult {
   const apolloClient = useApolloClient();
@@ -206,14 +199,19 @@ export function useTenantWizard(): UseTenantWizardResult {
     () => ({
       submit: (input) =>
         runSubmit(input, { doCreate, doSwitch, doAttachPhone, doFeatures, doPlatform, doCustomCommand, doContact }),
+    }),
+    [doCreate, doSwitch, doAttachPhone, doFeatures, doPlatform, doCustomCommand, doContact],
+  );
+
+  const phoneProcurementDeps = useMemo<PhoneProcurementDeps>(
+    () => ({
       listAvailableNumbers: async ({ country, limit }) => {
         const res = await apolloClient.query({
           query: AVAILABLE_PHONE_NUMBERS_QUERY,
           variables: { input: { country, limit, type: 'mobile' } },
           fetchPolicy: 'network-only',
         });
-        const list = (res.data?.availablePhoneNumbers ?? []) as AvailablePhoneNumber[];
-        return list;
+        return (res.data?.availablePhoneNumbers ?? []) as AvailablePhoneNumber[];
       },
       purchasePhoneNumber: async ({ country, phoneE164 }) => {
         const res = await doPurchase({ variables: { input: { country, phoneE164 } } });
@@ -221,22 +219,11 @@ export function useTenantWizard(): UseTenantWizardResult {
         if (!entry) throw new Error('Purchase did not return a pending row.');
         return { pendingId: entry.id, phoneE164: entry.phoneE164 };
       },
-      releasePendingPurchase: async (pendingId) => {
+      releasePendingPurchase: async (pendingId: string) => {
         await doRelease({ variables: { pendingId } });
       },
     }),
-    [
-      apolloClient,
-      doCreate,
-      doSwitch,
-      doAttachPhone,
-      doFeatures,
-      doPlatform,
-      doCustomCommand,
-      doContact,
-      doPurchase,
-      doRelease,
-    ],
+    [apolloClient, doPurchase, doRelease],
   );
 
   const machine = useMemo(() => tenantWizardMachine(deps), [deps]);
@@ -252,24 +239,7 @@ export function useTenantWizard(): UseTenantWizardResult {
     }
   }, [state]);
 
-  // Top-level state is either a step name (string) or the picker compound
-  // state (object like `{ phonePicker: 'idle' }`). Normalize to a single
-  // WizardStepKey so the view + persistence don't have to care about
-  // substates.
-  const stateValue = state.value;
-  const step: WizardStepKey =
-    typeof stateValue === 'string' ? (stateValue as WizardStepKey) : (Object.keys(stateValue)[0] as WizardStepKey);
-
-  const pickerStatus: PickerStatus = state.matches({ phonePicker: 'loading' })
-    ? 'loading'
-    : state.matches({ phonePicker: 'purchasing' })
-      ? 'purchasing'
-      : state.matches({ phonePicker: 'purchased' })
-        ? 'purchased'
-        : state.matches({ phonePicker: 'releasing' })
-          ? 'releasing'
-          : 'idle';
-
+  const step = state.value as WizardStepKey;
   const wizardState: WizardState = {
     step,
     slug: state.context.slug,
@@ -281,13 +251,6 @@ export function useTenantWizard(): UseTenantWizardResult {
     contacts: state.context.contacts,
   };
 
-  const picker: PickerSlice = {
-    status: pickerStatus,
-    numbers: state.context.pickerNumbers,
-    selected: state.context.pickerSelected,
-    error: state.context.pickerError,
-  };
-
   return {
     step,
     wizardState,
@@ -296,7 +259,7 @@ export function useTenantWizard(): UseTenantWizardResult {
     error: state.context.error,
     partialFailures: state.context.partialFailures,
     tenantId: state.context.tenantId,
-    picker,
+    phoneProcurementDeps,
     send,
   };
 }

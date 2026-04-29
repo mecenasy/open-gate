@@ -5,19 +5,16 @@ import type { WizardStepKey } from '../interfaces';
 
 interface WizardStepperProps {
   current: WizardStepKey;
-  /**
-   * The list to render. Caller picks based on phoneStrategy.mode so the
-   * visible step count reflects the actual flow the user is on (managed
-   * shows phonePicker, self skips it).
-   */
+  /** The full step list. After collapsing strategy + picker into one
+   * `phoneAcquisition` step, this is a single linear list — same for
+   * managed and self flows. */
   steps: WizardStepKey[];
 }
 
 const STEP_LABEL_KEYS: Record<WizardStepKey, string> = {
   basics: 'stepBasicsLabel',
   features: 'stepFeaturesLabel',
-  phoneStrategy: 'stepPhoneStrategyLabel',
-  phonePicker: 'stepPhonePickerLabel',
+  phoneAcquisition: 'stepPhoneAcquisitionLabel',
   platforms: 'stepPlatformsLabel',
   commands: 'stepCommandsLabel',
   contacts: 'stepContactsLabel',

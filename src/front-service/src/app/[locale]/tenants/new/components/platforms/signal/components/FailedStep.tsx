@@ -18,7 +18,7 @@ export function FailedStep({ errorCode, errorMessage, onRetry, onCancel }: Faile
     <div className="flex flex-col gap-4">
       <div className="bg-rose-500/10 border border-rose-500/40 rounded-xl p-3">
         <p className="text-sm font-semibold text-rose-300">{t('failed_title')}</p>
-        <p className="text-xs text-rose-200 mt-1">
+        <p className="text-xs text-rose-500 mt-1">
           {t(`error_${errorCode}` as Parameters<typeof t>[0], { fallback: errorMessage })}
         </p>
       </div>

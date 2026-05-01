@@ -38,6 +38,12 @@ export interface SmsCredentials {
   phone: string;
   /** Country → regulatory bundle ID. Only the master row carries this. */
   bundleSidByCountry?: Record<string, string>;
+  /**
+   * Country → Twilio Address SID. Required by Twilio for PL (and similar
+   * regulated regions) when calling incomingPhoneNumbers.create — the
+   * regulatory bundle alone isn't enough. Master row only.
+   */
+  addressSidByCountry?: Record<string, string>;
 }
 
 /**
@@ -50,6 +56,7 @@ export interface ResolvedSmsCredentials {
   token: string;
   phone: string;
   bundleSidByCountry?: Record<string, string>;
+  addressSidByCountry?: Record<string, string>;
 }
 
 export interface SmtpCredentials {
@@ -205,6 +212,7 @@ export class PlatformConfigService implements OnModuleInit {
         token: master.token,
         phone: cfg.phone,
         bundleSidByCountry: master.bundleSidByCountry,
+        addressSidByCountry: master.addressSidByCountry,
       };
     }
 
@@ -218,6 +226,7 @@ export class PlatformConfigService implements OnModuleInit {
       token: cfg.token,
       phone: cfg.phone,
       bundleSidByCountry: cfg.bundleSidByCountry,
+      addressSidByCountry: cfg.addressSidByCountry,
     };
   }
 

@@ -77,6 +77,20 @@
     },
     {
       "type": "shell",
+      "command": "./scripts/zrok-tunnels.sh --reserved --sync-env",
+      "problemMatcher": [],
+      "label": "Tunels Start",
+      "detail": "Tunels Start"
+    },
+    {
+      "type": "shell",
+      "command": "./scripts/zrok-tunnels.sh  stop",
+      "problemMatcher": [],
+      "label": "Tunels Stop",
+      "detail": "Tunels Stop"
+    },
+    {
+      "type": "shell",
       "command": "docker compose up",
       "problemMatcher": [],
       "label": "docker:up",

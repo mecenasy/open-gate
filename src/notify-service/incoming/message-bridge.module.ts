@@ -12,22 +12,14 @@ import { PlatformConfigModule } from '../platform-config/platform-config.module'
 import { SignalVerificationModule } from '../signal-verification/signal-verification.module';
 import { PhoneProcurementModule } from '../phone-procurement/phone-procurement.module';
 import { TwilioTransformer } from './platforms/twilio/twilio.transformer';
-import { TwilioSignatureGuard } from './platforms/twilio/twilio-signature.guard';
-import { TwilioTenantLookupService } from './platforms/twilio/twilio-tenant-lookup.service';
-import { TwilioBridgeService } from './platforms/twilio/twilio-bridge.service';
-import { TwilioWebhookController } from './platforms/twilio/twilio-webhook.controller';
 
 @Module({
   imports: [CqrsModule, HttpModule, PlatformConfigModule, SignalVerificationModule, PhoneProcurementModule],
-  controllers: [TwilioWebhookController],
   providers: [
     SignalTransformer,
     SignalBridgeManager,
     SignalAttachment,
     TwilioTransformer,
-    TwilioSignatureGuard,
-    TwilioTenantLookupService,
-    TwilioBridgeService,
     MessageBridgeHandler,
     AttachmentBridgeHandler,
     {

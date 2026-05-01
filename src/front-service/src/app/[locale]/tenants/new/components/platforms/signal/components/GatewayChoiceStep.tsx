@@ -23,7 +23,7 @@ export function GatewayChoiceStep({ reasonCode, context, onUseDefault, onCancel 
     <div className="flex flex-col gap-4">
       <div className="bg-amber-500/5 border border-amber-500/40 rounded-xl p-3">
         <p className="text-sm font-semibold text-amber-300">{t('gatewayUnreachable_title')}</p>
-        <p className="text-xs text-amber-200 mt-1">{t('gatewayUnreachable_body', { apiUrl })}</p>
+        <p className="text-xs text-amber-600 mt-1">{t('gatewayUnreachable_body', { apiUrl })}</p>
         {defaultApiUrl && (
           <p className="text-xs text-muted mt-2">
             {t('gatewayUnreachable_defaultHint', { defaultApiUrl })}

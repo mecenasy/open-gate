@@ -171,10 +171,32 @@ if [ "$KEEPALIVE" -eq 1 ]; then
   echo $! > "$ka_pid"
 fi
 
+extract_url_from_log() {
+  # zrok wypisuje URL w logu jako https://<token>.share.zrok.io — czekamy do 15s aż się pojawi
+  local logfile="$1"
+  local url=""
+  for _ in $(seq 1 30); do
+    url="$(grep -oE 'https://[a-zA-Z0-9.-]+\.share\.zrok\.io' "$logfile" 2>/dev/null | head -n1 || true)"
+    [ -n "$url" ] && { echo "$url"; return 0; }
+    sleep 0.5
+  done
+  return 1
+}
+
 sleep 2
 echo
+if [ "$RESERVED" -eq 1 ]; then
+  bff_url="$(reserved_url "$BFF_NAME")"
+  front_url="$(reserved_url "$FRONT_NAME")"
+else
+  bff_url="$(extract_url_from_log "$RUN_DIR/bff.log" || echo '(nie udało się odczytać — sprawdź log)')"
+  front_url="$(extract_url_from_log "$RUN_DIR/front.log" || echo '(nie udało się odczytać — sprawdź log)')"
+fi
+echo "URL-e tuneli:"
+echo "  BFF   -> $bff_url   (lokalnie 127.0.0.1:$BFF_PORT)"
+echo "  Front -> $front_url (lokalnie 127.0.0.1:$FRONT_PORT)"
+echo
 echo "Tunele uruchomione w tle. Logi: $RUN_DIR/{bff,front}.log"
-echo "Aby zobaczyć URL-e:  tail -f $RUN_DIR/bff.log $RUN_DIR/front.log"
 echo "Aby zatrzymać:       $0 stop"
 if [ "$RESERVED" -eq 1 ]; then
   echo "Lub:                 $ZROK_EXE overview"

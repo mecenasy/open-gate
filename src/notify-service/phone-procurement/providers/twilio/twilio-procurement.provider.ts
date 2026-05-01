@@ -61,15 +61,25 @@ export class TwilioProcurementProvider extends PhoneProcurementProvider {
   }
 
   async purchase(opts: PurchaseOptions): Promise<PurchaseResult> {
+    console.log('🚀 ~ TwilioProcurementProvider ~ purchase ~ opts:', opts);
+    console.log('🚀 ~ TwilioProcurementProvider ~ purchase ~ opts:', opts);
     const { client, master } = await this.getClientWithMaster();
+    console.log('🚀 ~ TwilioProcurementProvider ~ purchase ~ master:', master);
     const bundleSid = master.bundleSidByCountry?.[opts.country];
+    const addressSid = master.addressSidByCountry?.[opts.country];
     if (!bundleSid) {
       this.logger.warn(`No regulatory bundle for country=${opts.country}; purchase will rely on Twilio defaults.`);
+    }
+    if (!addressSid) {
+      this.logger.warn(
+        `No address SID for country=${opts.country}; Twilio will reject the purchase if the country requires one (e.g. PL).`,
+      );
     }
 
     const created = await client.incomingPhoneNumbers.create({
       phoneNumber: opts.phoneE164,
       ...(bundleSid ? { bundleSid } : {}),
+      ...(addressSid ? { addressSid } : {}),
       ...(opts.webhookSmsUrl ? { smsUrl: opts.webhookSmsUrl } : {}),
       ...(opts.webhookVoiceUrl ? { voiceUrl: opts.webhookVoiceUrl } : {}),
     });
@@ -107,6 +117,7 @@ export class TwilioProcurementProvider extends PhoneProcurementProvider {
 
   private async getClientWithMaster(): Promise<{ client: Twilio; master: SmsCredentials }> {
     const master = await this.platformConfig.getConfig(DEFAULT_PLATFORM_FALLBACK_ID, 'sms');
+    console.log('🚀 ~ TwilioProcurementProvider ~ getClientWithMaster ~ master:', master);
     if (!master?.sid || !master.token) {
       throw new Error('Twilio procurement provider: master SMS credentials missing on default row.');
     }

@@ -45,7 +45,7 @@ export function VerifyCodeStep({ recipient, channel, autoFilledCode, onSubmit, o
 
       {autoFilledCode && (
         <div className="bg-emerald-500/5 border border-emerald-500/40 rounded-xl p-3">
-          <p className="text-xs text-emerald-200">{t('verify_autoFilled_hint')}</p>
+          <p className="text-xs text-emerald-500">{t('verify_autoFilled_hint')}</p>
         </div>
       )}
 

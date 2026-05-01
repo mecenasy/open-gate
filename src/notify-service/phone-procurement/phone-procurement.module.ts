@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 import { DbGrpcModule } from '@app/db-grpc';
 import { PlatformConfigModule } from '../platform-config/platform-config.module';
 import { SignalVerificationModule } from '../signal-verification/signal-verification.module';
@@ -9,6 +10,8 @@ import { SmsCounterSyncService } from './sms-counter-sync.service';
 import { PendingPurchaseCleanupService } from './pending-purchase-cleanup.service';
 import { PhoneProcurementDbClient } from './db/phone-procurement-db.client';
 import { PhoneProcurementNotifyController } from './phone-procurement.controller';
+import { TwilioBridgeService } from './twilio-webhook/twilio-bridge.service';
+import { TwilioTenantLookupService } from './twilio-webhook/twilio-tenant-lookup.service';
 
 /**
  * Provider registry — every concrete `PhoneProcurementProvider` is
@@ -22,7 +25,7 @@ import { PhoneProcurementNotifyController } from './phone-procurement.controller
  * is enabled at the app level.
  */
 @Module({
-  imports: [PlatformConfigModule, DbGrpcModule, SignalVerificationModule],
+  imports: [CqrsModule, PlatformConfigModule, DbGrpcModule, SignalVerificationModule],
   controllers: [PhoneProcurementNotifyController],
   providers: [
     PhoneProcurementService,
@@ -31,6 +34,8 @@ import { PhoneProcurementNotifyController } from './phone-procurement.controller
     MockProcurementProvider,
     SmsCounterSyncService,
     PendingPurchaseCleanupService,
+    TwilioTenantLookupService,
+    TwilioBridgeService,
     {
       provide: PHONE_PROCUREMENT_PROVIDERS,
       inject: [TwilioProcurementProvider, MockProcurementProvider],

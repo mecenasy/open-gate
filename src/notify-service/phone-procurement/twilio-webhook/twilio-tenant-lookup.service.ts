@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PhoneProcurementDbClient } from '../../../phone-procurement/db/phone-procurement-db.client';
+import { PhoneProcurementDbClient } from '../db/phone-procurement-db.client';
 
 /**
  * Routes inbound Twilio webhooks to the tenant that owns the receiving
@@ -7,7 +7,8 @@ import { PhoneProcurementDbClient } from '../../../phone-procurement/db/phone-pr
  * via the db-service gRPC contract.
  *
  * Returns null when the number isn't recognised; the bridge logs that and
- * drops the webhook with a 200 to keep Twilio from retrying.
+ * drops the webhook with status:true so BFF can 200 Twilio (Twilio retries
+ * on non-2xx and we don't want retries for an unknown destination).
  */
 @Injectable()
 export class TwilioTenantLookupService {

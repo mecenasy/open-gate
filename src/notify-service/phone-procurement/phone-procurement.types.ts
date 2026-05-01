@@ -12,20 +12,25 @@ export interface PhoneCapabilities {
 
 /**
  * Loose shape upstream operators report capabilities in — fields can be
- * absent or null when the provider hasn't classified them. Normalize to
- * `PhoneCapabilities` (strict booleans) before exposing outward.
+ * absent or null when the provider hasn't classified them, and Twilio in
+ * particular uses uppercase `SMS`/`MMS` keys in the JSON response (only
+ * `voice` is lowercase). Normalize to `PhoneCapabilities` (strict
+ * booleans, lowercase keys) before exposing outward.
  */
 export interface RawProviderCapabilities {
   sms?: boolean | null;
   mms?: boolean | null;
   voice?: boolean | null;
+  SMS?: boolean | null;
+  MMS?: boolean | null;
+  Voice?: boolean | null;
 }
 
 export function normalizeCapabilities(raw: RawProviderCapabilities): PhoneCapabilities {
   return {
-    sms: !!raw.sms,
-    mms: !!raw.mms,
-    voice: !!raw.voice,
+    sms: !!(raw.sms ?? raw.SMS),
+    mms: !!(raw.mms ?? raw.MMS),
+    voice: !!(raw.voice ?? raw.Voice),
   };
 }
 

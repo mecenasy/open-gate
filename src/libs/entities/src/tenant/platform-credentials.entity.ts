@@ -7,7 +7,7 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateCol
  *
  * config shapes per platform:
  *   signal:    { apiUrl: string; account: string }
- *   sms:       { sid: string; token: string; phone: string }
+ *   sms:       { sid: string; token: string; phone: string ; bundleSid: string }
  *   smtp:      { host: string; port: number; user: string; password: string; from: string }
  *   whatsapp:  { phoneNumberId: string; accessToken: string }
  *   messenger: { pageAccessToken: string; pageId: string }

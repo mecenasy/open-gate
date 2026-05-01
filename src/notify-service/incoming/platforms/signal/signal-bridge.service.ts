@@ -36,6 +36,7 @@ export class SignalBridgeService implements OnModuleInit {
     });
 
     this.signalClient.on('message', (data) => {
+      console.log('🚀 ~ SignalBridgeService ~ initSignalConnection:', data);
       // eslint-disable-next-line @typescript-eslint/no-base-to-string
       const msg: SignalMessage = JSON.parse(data.toString()) as SignalMessage;
       this.subject.next(msg);

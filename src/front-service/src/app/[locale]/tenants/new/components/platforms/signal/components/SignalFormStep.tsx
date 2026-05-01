@@ -64,7 +64,7 @@ export function SignalFormStep({ intent, defaults, lockMode = false, onSubmit, o
 
       {lockMode ? (
         <div className="bg-emerald-500/5 border border-emerald-500/40 rounded-xl p-3">
-          <p className="text-xs text-emerald-200">{t('lockedRegister_hint')}</p>
+          <p className="text-xs text-emerald-500">{t('lockedRegister_hint')}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-2 bg-surface-raised border border-border rounded-xl p-3">
@@ -80,8 +80,8 @@ export function SignalFormStep({ intent, defaults, lockMode = false, onSubmit, o
 
       {mode === 'register' && (
         <div className="bg-amber-500/15 border border-amber-500/60 rounded-xl p-3">
-          <p className="text-xs font-semibold text-amber-700">{t('warning_title')}</p>
-          <p className="text-xs text-amber-700 mt-1">
+          <p className="text-xs font-semibold text-amber-600">{t('warning_title')}</p>
+          <p className="text-xs text-amber-600 mt-1">
             {intent === 'replace' ? t('warning_replace') : t('warning_initial')}
           </p>
         </div>

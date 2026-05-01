@@ -167,6 +167,13 @@ service PhoneProcurementNotifyService {
   // verifies the phone belongs to the calling user via pending purchase
   // or tenant phone numbers).
   rpc GetSignalVerificationCode (GetSignalVerificationCodeRequest) returns (GetSignalVerificationCodeResponse);
+
+  // BFF proxies inbound Twilio webhooks here. notify-service is not
+  // exposed publicly; BFF receives the HTTP request, captures the form
+  // body + signature header + reconstructed full URL (so signature
+  // validation has the same string Twilio signed), and forwards via this
+  // RPC. Response includes optional TwiML body for the voice route.
+  rpc HandleTwilioWebhook (TwilioWebhookRequest) returns (TwilioWebhookResponse);
 }
 
 message PhoneCapabilitiesEntry {
@@ -228,4 +235,24 @@ message GetSignalVerificationCodeResponse {
   string code = 2;
   // ISO 8601 timestamp; empty when no code recorded.
   string received_at = 3;
+}
+
+message TwilioWebhookRequest {
+  // 'sms' | 'voice' — selects which side of the bridge the body is fed into.
+  string kind = 1;
+  // Pelnym URL pod ktorym Twilio uderzyl do BFF (origin BFF + originalUrl).
+  // Wymagany do walidacji podpisu — Twilio podpisuje URL || sorted form params.
+  string full_url = 2;
+  // X-Twilio-Signature jak doszedl do BFF.
+  string signature = 3;
+  // Form-encoded body forwarded as-is. Keys/values are stringified by BFF
+  // (Twilio always sends strings); empty when voice with no body.
+  map<string, string> form_fields = 4;
+}
+
+message TwilioWebhookResponse {
+  bool status = 1;
+  string message = 2;
+  // Voice route returns TwiML to be relayed to Twilio. Empty for SMS.
+  string twiml = 3;
 }

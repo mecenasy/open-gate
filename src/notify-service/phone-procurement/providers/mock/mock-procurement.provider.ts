@@ -10,7 +10,7 @@ import type {
 } from '../../phone-procurement.types';
 
 /** One real test number + nine fakes — see SHARED_REAL_TEST_NUMBER below. */
-const SHARED_REAL_TEST_NUMBER = '+15613494418';
+const SHARED_REAL_TEST_NUMBER = '+48732144653';
 
 /**
  * Sandbox provider — activated by TWILIO_SANDBOX=true. Produces a stable
@@ -62,8 +62,9 @@ export class MockProcurementProvider extends PhoneProcurementProvider {
 function generateFakePool(country: string): AvailableNumber[] {
   // Static seeds so the list looks the same on every load (good UX —
   // the user can pick "the third one" reliably).
-  const prefix = country === 'PL' ? '+4850' : '+1555';
-  const seeds = ['1234567', '2345678', '3456789', '4567890', '5678901', '6789012', '7890123', '8901234', '9012345'];
+
+  const prefix = country === 'PL' ? '+4873' : '+1555';
+  const seeds = ['2144653', '2345678', '3456789', '4567890', '5678901', '6789012', '7890123', '8901234', '9012345'];
   return seeds.map((tail) => ({
     phoneE164: `${prefix}${tail}`,
     capabilities: { sms: true, mms: false, voice: false },

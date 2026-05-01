@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
-import { Platform } from '../../../types/platform';
-import { MessageEvent } from '../../event/message.event';
-import { SignalVerificationBridgeService } from '../../../signal-verification/signal-verification-bridge.service';
+import { Platform } from '../../types/platform';
+import { MessageEvent } from '../../incoming/event/message.event';
+import { SignalVerificationBridgeService } from '../../signal-verification/signal-verification-bridge.service';
 import { TwilioTenantLookupService } from './twilio-tenant-lookup.service';
-import type { TwilioSmsWebhookPayloadWithMedia } from './twilio.types';
+import type { TwilioSmsWebhookPayloadWithMedia } from '../../incoming/platforms/twilio/twilio.types';
 
 /**
  * Orchestrates an inbound Twilio webhook in two passes:
@@ -18,8 +18,8 @@ import type { TwilioSmsWebhookPayloadWithMedia } from './twilio.types';
  *
  *   2. Regular routing: look up which tenant owns the receiving number
  *      and emit a MessageEvent for the standard inbound pipeline. When
- *      no tenant matches we 200 Twilio anyway — retries on a number we
- *      don't recognise just waste their queue.
+ *      no tenant matches we report success anyway — retries on a number
+ *      we don't recognise just waste Twilio's queue.
  */
 @Injectable()
 export class TwilioBridgeService {

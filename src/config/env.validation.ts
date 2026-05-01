@@ -134,6 +134,20 @@ export const envValidationSchema = Joi.object({
     .description(
       "Public origin Twilio (and other providers) hit for webhooks — e.g. 'https://opengate.example.com'. Used both when registering webhooks on a purchased number and when validating inbound signatures. When empty the signature guard derives the URL from request headers (works behind a properly configured proxy).",
     ),
+  TWILIO_PL_BUNDLE_SID: Joi.string()
+    .pattern(/^BU[0-9a-fA-F]+$/)
+    .allow('')
+    .default('')
+    .description(
+      "Twilio regulatory bundle SID for Poland (BU…). Seeded into the SMS master row's bundleSidByCountry.PL by migration 1778100000000 and passed to incomingPhoneNumbers.create on managed PL purchases.",
+    ),
+  TWILIO_PL_ADDRESS_SID: Joi.string()
+    .pattern(/^AD[0-9a-fA-F]+$/)
+    .allow('')
+    .default('')
+    .description(
+      "Twilio Address SID for Poland (AD…) — required for PL number purchase. Seeded into the SMS master row's addressSidByCountry.PL by migration 1778100000000 and passed to incomingPhoneNumbers.create.",
+    ),
 
   // ============ Signal Bridge Configuration ============
   SIGNAL_API_URL: Joi.string().uri().default('http://signal-api:8080').description('Signal bridge API URL'),

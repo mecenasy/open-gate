@@ -196,9 +196,7 @@ function ChooseMode({
           <p className="text-xs text-muted mt-2">
             {t('phoneStrategy_managed_summary', { messages: messagesPerMonthIncluded, overage: overageRate })}
           </p>
-          {!managedAvailable && (
-            <p className="text-xs text-amber-400 mt-2">{t('phoneStrategy_managed_unavailable')}</p>
-          )}
+          {!managedAvailable && <p className="text-xs text-amber-400 mt-2">{t('phoneStrategy_managed_unavailable')}</p>}
         </button>
 
         <button type="button" onClick={onChooseSelf} className={tileClasses(false, false, false)}>
@@ -282,7 +280,7 @@ function ManagedPanel({
 
       {isSandbox && (
         <div className="bg-amber-500/5 border border-amber-500/40 rounded-xl p-3">
-          <p className="text-xs text-amber-200">{t('phonePicker_sandboxBanner')}</p>
+          <p className="text-xs text-amber-600">{t('phonePicker_sandboxBanner')}</p>
         </div>
       )}
 
@@ -291,7 +289,7 @@ function ManagedPanel({
           <p className="text-sm font-semibold text-emerald-200">
             {t('phonePicker_purchased_title', { phone: purchasedPhone ?? '' })}
           </p>
-          <p className="text-xs text-emerald-200/80">{t('phonePicker_purchased_body')}</p>
+          <p className="text-xs text-emerald-600/80">{t('phonePicker_purchased_body')}</p>
           <div>
             <Button type="button" variant="green" disabled={isReleasing} onClick={onCancelPurchase}>
               {isReleasing ? t('phonePicker_cancelling') : t('phonePicker_cancelPurchase')}
@@ -315,9 +313,7 @@ function ManagedPanel({
             </div>
           )}
 
-          {!isLoading && numbers.length === 0 && (
-            <p className="text-sm text-muted">{t('phonePicker_empty')}</p>
-          )}
+          {!isLoading && numbers.length === 0 && <p className="text-sm text-muted">{t('phonePicker_empty')}</p>}
 
           <div className="grid grid-cols-1 gap-2">
             {numbers.map((n) => (

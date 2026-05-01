@@ -11,6 +11,7 @@ export class SignalTransformer extends Transform {
   platform = Platform.Signal;
 
   transform(data: SignalMessage): Promise<UnifiedMessage<SignalMessage>> {
+    console.log('🚀 ~ SignalTransformer ~ transform ~ data:', data);
     const { envelope, account } = data;
 
     let media: Message['media'];

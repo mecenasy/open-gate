@@ -104,7 +104,7 @@ export function TenantWizardView() {
       {partialFailures.length > 0 && (
         <div className="bg-amber-500/5 border border-amber-500/40 rounded-xl p-3 mb-4">
           <p className="text-xs font-semibold text-amber-300">{t('partialFailureTitle')}</p>
-          <ul className="text-xs text-amber-200 mt-1 list-disc list-inside">
+          <ul className="text-xs text-amber-600 mt-1 list-disc list-inside">
             {partialFailures.map((f, idx) => (
               <li key={idx}>
                 {t(`partialFailure_${f.step}` as Parameters<typeof t>[0], { id: f.identifier })}: {f.message}

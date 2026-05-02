@@ -6,11 +6,57 @@ const CODE_PREFIX = 'signal-verification-code';
 const TTL_SECONDS = 10 * 60;
 
 const SIX_DIGIT_PATTERN = /\b(\d{3})-?(\d{3})\b/;
+// Placeholder — refine when we have real Messenger/Facebook SMS samples.
+const MESSENGER_PATTERN = /\bFB-(\d{4,8})\b/i;
+const SIGNAL_KEYWORD = /signal/i;
+const WHATSAPP_KEYWORD = /whats?app/i;
+const MESSENGER_KEYWORD = /(messenger|facebook|\bfb[-\s])/i;
+
+export type VerificationSource = 'signal' | 'whatsapp' | 'messenger';
 
 export interface RecordedVerificationCode {
   code: string;
+  source: VerificationSource;
   receivedAt: string;
 }
+
+export interface ExtractedVerificationCode {
+  code: string;
+  source: VerificationSource;
+}
+
+interface Pattern {
+  source: VerificationSource;
+  match: (body: string) => string | null;
+}
+
+const PATTERNS: Pattern[] = [
+  {
+    source: 'signal',
+    match: (body) => {
+      if (!SIGNAL_KEYWORD.test(body)) return null;
+      const m = body.match(SIX_DIGIT_PATTERN);
+      return m ? `${m[1]}${m[2]}` : null;
+    },
+  },
+  {
+    source: 'whatsapp',
+    match: (body) => {
+      if (!WHATSAPP_KEYWORD.test(body)) return null;
+      const m = body.match(SIX_DIGIT_PATTERN);
+      return m ? `${m[1]}${m[2]}` : null;
+    },
+  },
+  {
+    source: 'messenger',
+    match: (body) => {
+      if (!MESSENGER_KEYWORD.test(body)) return null;
+      const m = body.match(MESSENGER_PATTERN) ?? body.match(SIX_DIGIT_PATTERN);
+      if (!m) return null;
+      return m.length > 2 ? `${m[1]}${m[2]}` : m[1];
+    },
+  },
+];
 
 /**
  * Redis-backed bridge that lets the Signal onboarding flow consume the
@@ -60,14 +106,14 @@ export class SignalVerificationBridgeService {
     return this.cache.checkExistsInCache({ identifier: phoneE164, prefix: PENDING_PREFIX });
   }
 
-  async recordCode(phoneE164: string, code: string): Promise<void> {
+  async recordCode(phoneE164: string, code: string, source: VerificationSource): Promise<void> {
     await this.cache.saveInCache({
       identifier: phoneE164,
       prefix: CODE_PREFIX,
-      data: { code, receivedAt: new Date().toISOString() },
+      data: { code, source, receivedAt: new Date().toISOString() },
       EX: TTL_SECONDS,
     });
-    this.logger.log(`Recorded Signal verification code for ${phoneE164}.`);
+    this.logger.log(`Recorded ${source} verification code for ${phoneE164}.`);
   }
 
   async getCode(phoneE164: string): Promise<RecordedVerificationCode | null> {
@@ -78,12 +124,17 @@ export class SignalVerificationBridgeService {
   }
 
   /**
-   * Pulls a 6-digit code out of an SMS body. Signal's wording is
-   * "Your Signal verification code: 123-456" — we accept both with and
-   * without the dash, and we tolerate any surrounding text.
+   * Pulls a verification code out of an SMS body and identifies which
+   * platform sent it. Source detection runs on a keyword match in the
+   * body (e.g. "Signal", "WhatsApp", "Messenger"); the digit pattern is
+   * shared (6 digits with optional dash) for Signal/WhatsApp, and a
+   * placeholder pattern for Messenger until we have real samples.
    */
-  extractCode(body: string): string | null {
-    const match = body.match(SIX_DIGIT_PATTERN);
-    return match ? `${match[1]}${match[2]}` : null;
+  extractCode(body: string): ExtractedVerificationCode | null {
+    for (const pattern of PATTERNS) {
+      const code = pattern.match(body);
+      if (code) return { code, source: pattern.source };
+    }
+    return null;
   }
 }

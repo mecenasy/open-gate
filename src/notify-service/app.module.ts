@@ -5,6 +5,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GateGrpcModule, config as gateGrpcConfig } from '@app/gate-grpc';
+import { BffGrpcModule, config as bffGrpcConfig } from '@app/bff-grpc';
 import { config as dbGrpcConfig } from '@app/db-grpc';
 import { signalConfig } from './outgoing/platforms/signal/config/signal.config';
 import { MessageBridgeModule } from './incoming/message-bridge.module';
@@ -22,7 +23,7 @@ import { SignalVerificationModule } from './signal-verification/signal-verificat
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [gateGrpcConfig, signalConfig, dbGrpcConfig],
+      load: [gateGrpcConfig, signalConfig, dbGrpcConfig, bffGrpcConfig],
       validationSchema: envValidationSchema,
       validationOptions: {
         abortEarly: false,
@@ -33,6 +34,7 @@ import { SignalVerificationModule } from './signal-verification/signal-verificat
     OutgoingNotifyModule,
     CqrsModule,
     GateGrpcModule,
+    BffGrpcModule,
     PlatformConfigModule,
     SignalVerificationModule,
     OnboardingModule,

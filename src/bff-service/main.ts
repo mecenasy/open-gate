@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { join } from 'path';
 import { AppModule } from './app.module';
 import { ConsoleLogger, Logger, ValidationPipe } from '@nestjs/common';
 import { initSession } from './libs/session/init-session';
@@ -11,6 +13,7 @@ import { TypeConfigService } from './common/configs/types.config.service';
 import { AppConfig } from './common/configs/app.configs';
 import { initRedis, startMicroservices } from '@app/redis';
 import { GlobalExceptionFilter, LoggingInterceptor, RequestLoggingMiddleware } from '@app/logger';
+import { getGrpcOptions } from 'src/utils/get-proto-files';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -24,8 +27,19 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   initRedis(app);
+
+  // gRPC server — BffNotifyBridge (notify-service pushes verification codes here)
+  const bffGrpcPort = process.env.BFF_GRPC_URL?.split(':').pop() ?? '50054';
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.GRPC,
+    options: {
+      ...getGrpcOptions(join(__dirname, '../proto')),
+      url: `0.0.0.0:${bffGrpcPort}`,
+    },
+  });
+
   await startMicroservices(app);
-  logger.log('Proxy initialized');
+  logger.log(`Proxy initialized (gRPC listening on 0.0.0.0:${bffGrpcPort})`);
 
   // Setup request logging middleware
   app.use(new RequestLoggingMiddleware().use.bind(new RequestLoggingMiddleware()));

@@ -48,15 +48,18 @@ services:
       - .:/app
       - /app/node_modules
     # No host port mapping — bff is reached via edge (Caddy) only. Other
-    # services talk to it over backend-net at bff-service:3001.
+    # services talk to it over backend-net at bff-service:3001 (HTTP)
+    # and bff-service:50054 (gRPC, BffNotifyBridge).
     expose:
       - "3001"
+      - "50054"
     env_file:
       - .env
     environment:
       CHOKIDAR_USEPOLLING: true
       WATCHPACK_POLLING: true
       BFF_PORT: "${BFF_PORT}"
+      BFF_GRPC_URL: "${BFF_GRPC_URL}"
       NOTIFY_GRPC_URL: "${NOTIFY_GRPC_URL}"
       TS_NODE_PROJECT: /app/tsconfig.json
       NODE_OPTIONS: "--max-old-space-size=2048"
@@ -227,6 +230,7 @@ services:
       NOTIFY_PORT: "${NOTIFY_PORT}"
       TS_NODE_PROJECT: /app/tsconfig.json
       GATE_GRPC_URL: "${GATE_GRPC_URL}"
+      BFF_GRPC_URL: "${BFF_GRPC_URL}"
       SIGNAL_API_URL: "http://signal_bridge:8080"
       TWILO_SID: "${TWILO_SID}"
       TWILO_TOKEN: "${TWILO_TOKEN}"

@@ -94,6 +94,7 @@ export const envValidationSchema = Joi.object({
   DB_GRPC_URL: Joi.string().default('db-service:50051').description('DB gRPC service URL'),
   GATE_GRPC_URL: Joi.string().default('core-service:50053').description('Core/Gate gRPC service URL'),
   NOTIFY_GRPC_URL: Joi.string().default('notify-service:50052').description('Notify gRPC service URL'),
+  BFF_GRPC_URL: Joi.string().default('bff-service:50054').description('BFF gRPC service URL (BffNotifyBridge)'),
 
   // ============ Email Configuration (SMTP) ============
   SMTP_HOST: Joi.string().hostname().default('localhost').description('SMTP server host'),

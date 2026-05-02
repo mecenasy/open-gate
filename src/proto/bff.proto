@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package bff;
+
+// Hosted by bff-service — receives push-style notifications from notify-service.
+// Today: forwards verification codes captured from inbound SMS to the frontend
+// over the existing socket.io gateway.
+service BffNotifyBridge {
+  rpc ForwardVerificationCode (ForwardVerificationCodeRequest) returns (BffAck);
+}
+
+message ForwardVerificationCodeRequest {
+  string phone_e164 = 1;
+  string code = 2;
+  string source = 3; // "signal" | "whatsapp" | "messenger"
+}
+
+message BffAck {
+  bool ok = 1;
+}

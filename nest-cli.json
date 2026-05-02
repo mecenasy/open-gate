@@ -76,6 +76,15 @@
         "tsConfigPath": "libs/notify-grpc/tsconfig.lib.json"
       }
     },
+    "bff-grpc": {
+      "type": "library",
+      "root": "libs/bff-grpc",
+      "entryFile": "index",
+      "sourceRoot": "libs/bff-grpc/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/bff-grpc/tsconfig.lib.json"
+      }
+    },
     "notify-service": {
       "type": "application",
       "root": "apps/notify-service",

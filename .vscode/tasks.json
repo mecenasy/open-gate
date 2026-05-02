@@ -20,6 +20,24 @@
       "id": "fileName",
       "type": "promptString",
       "description": "File name of migration",
+    },
+    {
+      "id": "logService",
+      "type": "pickString",
+      "description": "Wybierz serwis do logowania",
+      "options": [
+        "all",
+        "edge",
+        "bff-service",
+        "front-service",
+        "core-service",
+        "db-service",
+        "notify-service",
+        "postgres",
+        "redis",
+        "signal-api"
+      ],
+      "default": "bff-service"
     }
   ],
   "tasks": [
@@ -141,7 +159,7 @@
     {
       "label": "docker: logs",
       "type": "shell",
-      "command": "docker logs -f bff-service",
+      "command": "if [ \"${input:logService}\" = \"all\" ]; then docker compose logs -f; else docker compose logs -f  ${input:logService}; fi",
       "problemMatcher": [],
       "presentation": {
         "echo": true,

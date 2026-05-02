@@ -139,7 +139,6 @@ export class SignalBridgeManager implements OnModuleInit, OnModuleDestroy {
 
     const encodedAccount = encodeURIComponent(conn.account);
     const url = `${conn.apiUrl.replace(/^http/, 'ws')}/v1/receive/${encodedAccount}`;
-    console.log('🚀 ~ SignalBridgeManager ~ connect ~ url:', url);
 
     conn.ws = new WebSocket(url);
 
@@ -149,7 +148,6 @@ export class SignalBridgeManager implements OnModuleInit, OnModuleDestroy {
     });
 
     conn.ws.on('message', (data) => {
-      console.log('🚀 ~ SignalBridgeManager ~ connect ~ data:', data);
       try {
         // eslint-disable-next-line @typescript-eslint/no-base-to-string
         const msg = JSON.parse(data.toString()) as SignalMessage;

@@ -62,11 +62,11 @@ export class TwilioWebhookHandler extends WebhookHandler {
 
     try {
       await this.bridge.handleInboundSms(formFields as TwilioSmsWebhookPayloadWithMedia);
-      return { statusCode: 200, contentType: 'text/plain; charset=utf-8', body: 'OK' };
+      return { statusCode: 200, contentType: 'text/plain; charset=utf-8', body: '' };
     } catch (err) {
       this.logger.error(`Twilio SMS bridge failed: ${stringifyError(err)}`);
       // Still 200 — message logged; we'd rather investigate than re-process.
-      return { statusCode: 200, contentType: 'text/plain; charset=utf-8', body: 'OK' };
+      return { statusCode: 200, contentType: 'text/plain; charset=utf-8', body: '' };
     }
   }
 }

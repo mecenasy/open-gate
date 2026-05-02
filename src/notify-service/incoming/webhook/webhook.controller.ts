@@ -36,7 +36,6 @@ export class WebhookController {
     @Res({ passthrough: true }) res: Response,
     @Body() body: Record<string, unknown>,
   ): Promise<string> {
-    console.log('🚀 ~ WebhookController ~ handley:', body);
     const handler = this.handlers.find((h) => h.provider === provider);
     if (!handler) {
       this.logger.warn(`Unknown webhook provider '${provider}' (path='${path}'); dropping.`);

@@ -196,35 +196,6 @@ export interface GetSignalVerificationCodeResponse {
   receivedAt: string;
 }
 
-export interface TwilioWebhookRequest {
-  /** 'sms' | 'voice' — selects which side of the bridge the body is fed into. */
-  kind: string;
-  /**
-   * Pelnym URL pod ktorym Twilio uderzyl do BFF (origin BFF + originalUrl).
-   * Wymagany do walidacji podpisu — Twilio podpisuje URL || sorted form params.
-   */
-  fullUrl: string;
-  /** X-Twilio-Signature jak doszedl do BFF. */
-  signature: string;
-  /**
-   * Form-encoded body forwarded as-is. Keys/values are stringified by BFF
-   * (Twilio always sends strings); empty when voice with no body.
-   */
-  formFields: { [key: string]: string };
-}
-
-export interface TwilioWebhookRequest_FormFieldsEntry {
-  key: string;
-  value: string;
-}
-
-export interface TwilioWebhookResponse {
-  status: boolean;
-  message: string;
-  /** Voice route returns TwiML to be relayed to Twilio. Empty for SMS. */
-  twiml: string;
-}
-
 export const PHONE_PROCUREMENT_PACKAGE_NAME = 'phoneProcurement';
 
 /**
@@ -446,16 +417,6 @@ export interface PhoneProcurementNotifyServiceClient {
     request: GetSignalVerificationCodeRequest,
     metadata?: Metadata,
   ): Observable<GetSignalVerificationCodeResponse>;
-
-  /**
-   * BFF proxies inbound Twilio webhooks here. notify-service is not
-   * exposed publicly; BFF receives the HTTP request, captures the form
-   * body + signature header + reconstructed full URL (so signature
-   * validation has the same string Twilio signed), and forwards via this
-   * RPC. Response includes optional TwiML body for the voice route.
-   */
-
-  handleTwilioWebhook(request: TwilioWebhookRequest, metadata?: Metadata): Observable<TwilioWebhookResponse>;
 }
 
 /**
@@ -501,19 +462,6 @@ export interface PhoneProcurementNotifyServiceController {
     | Promise<GetSignalVerificationCodeResponse>
     | Observable<GetSignalVerificationCodeResponse>
     | GetSignalVerificationCodeResponse;
-
-  /**
-   * BFF proxies inbound Twilio webhooks here. notify-service is not
-   * exposed publicly; BFF receives the HTTP request, captures the form
-   * body + signature header + reconstructed full URL (so signature
-   * validation has the same string Twilio signed), and forwards via this
-   * RPC. Response includes optional TwiML body for the voice route.
-   */
-
-  handleTwilioWebhook(
-    request: TwilioWebhookRequest,
-    metadata?: Metadata,
-  ): Promise<TwilioWebhookResponse> | Observable<TwilioWebhookResponse> | TwilioWebhookResponse;
 }
 
 export function PhoneProcurementNotifyServiceControllerMethods() {
@@ -524,7 +472,6 @@ export function PhoneProcurementNotifyServiceControllerMethods() {
       'releasePendingPurchase',
       'getActiveProviderInfo',
       'getSignalVerificationCode',
-      'handleTwilioWebhook',
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

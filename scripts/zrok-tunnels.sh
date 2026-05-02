@@ -17,7 +17,7 @@
 set -euo pipefail
 
 ZROK_EXE="${ZROK_EXE:-/mnt/c/Users/gajda/zrok.exe}"
-BFF_PORT="${BFF_PORT:-3001}"
+EDGE_PORT="${EDGE_PORT:-8080}"
 FRONT_PORT="${FRONT_PORT:-4002}"
 BFF_NAME="${BFF_NAME:-opengatebff}"
 FRONT_NAME="${FRONT_NAME:-opengatefront}"
@@ -73,7 +73,7 @@ check_port() {
   if (echo > "/dev/tcp/127.0.0.1/$port") >/dev/null 2>&1; then return 0; else return 1; fi
 }
 
-check_port "$BFF_PORT"   || echo "[ostrz] BFF (127.0.0.1:$BFF_PORT) nie odpowiada — odpal docker compose up bff-service"
+check_port "$EDGE_PORT"   || echo "[ostrz] BFF (127.0.0.1:$EDGE_PORT) nie odpowiada — odpal docker compose up bff-service"
 check_port "$FRONT_PORT" || echo "[ostrz] Front (127.0.0.1:$FRONT_PORT) nie odpowiada — odpal docker compose up front-service"
 
 # zatrzymujemy stare procesy żeby nie mnożyć tuneli
@@ -114,7 +114,7 @@ start_share() {
 }
 
 if [ "$RESERVED" -eq 1 ]; then
-  ensure_reserved "$BFF_NAME"   "$BFF_PORT"
+  ensure_reserved "$BFF_NAME"   "$EDGE_PORT"
   ensure_reserved "$FRONT_NAME" "$FRONT_PORT"
 
   if [ "$SYNC_ENV" -eq 1 ]; then
@@ -152,7 +152,7 @@ if [ "$RESERVED" -eq 1 ]; then
   start_share "front" share reserved --headless "$FRONT_NAME"
 else
   echo "Tryb ephemeral — losowe URL-e. Dla stałych użyj: --reserved --sync-env"
-  start_share "bff"   share public --headless "http://127.0.0.1:$BFF_PORT"
+  start_share "bff"   share public --headless "http://127.0.0.1:$EDGE_PORT"
   start_share "front" share public --headless "http://127.0.0.1:$FRONT_PORT"
 fi
 
@@ -164,7 +164,7 @@ if [ "$KEEPALIVE" -eq 1 ]; then
     while true; do
       # -s -o /dev/null bez -f: 4xx jest OK, chodzi tylko o trzymanie ciepło
       curl -sS -m 25 -o /dev/null -w "$(date -Is) front %{http_code} %{time_total}s\n" "http://127.0.0.1:$FRONT_PORT/" >>"$ka_log" 2>&1 || true
-      curl -sS -m 25 -o /dev/null -w "$(date -Is) bff   %{http_code} %{time_total}s\n" "http://127.0.0.1:$BFF_PORT/health" >>"$ka_log" 2>&1 || true
+      curl -sS -m 25 -o /dev/null -w "$(date -Is) bff   %{http_code} %{time_total}s\n" "http://127.0.0.1:$EDGE_PORT/health" >>"$ka_log" 2>&1 || true
       sleep 30
     done
   ) >/dev/null 2>&1 &
@@ -193,7 +193,7 @@ else
   front_url="$(extract_url_from_log "$RUN_DIR/front.log" || echo '(nie udało się odczytać — sprawdź log)')"
 fi
 echo "URL-e tuneli:"
-echo "  BFF   -> $bff_url   (lokalnie 127.0.0.1:$BFF_PORT)"
+echo "  BFF   -> $bff_url   (lokalnie 127.0.0.1:$EDGE_PORT)"
 echo "  Front -> $front_url (lokalnie 127.0.0.1:$FRONT_PORT)"
 echo
 echo "Tunele uruchomione w tle. Logi: $RUN_DIR/{bff,front}.log"

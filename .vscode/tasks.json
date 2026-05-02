@@ -63,6 +63,13 @@
     },
     {
       "type": "shell",
+      "command": "docker exec edge caddy reload --config /etc/caddy/Caddyfile",
+      "problemMatcher": [],
+      "label": "Reload edge caddy",
+      "detail": "Reload edge caddy"
+    },
+    {
+      "type": "shell",
       "command": "docker compose exec db-service npm run migration:run",
       "problemMatcher": [],
       "label": "migration:run",
@@ -77,7 +84,7 @@
     },
     {
       "type": "shell",
-      "command": "./scripts/zrok-tunnels.sh --reserved --sync-env",
+      "command": "./scripts/zrok-tunnels.sh --reserved",
       "problemMatcher": [],
       "label": "Tunels Start",
       "detail": "Tunels Start"
@@ -91,7 +98,7 @@
     },
     {
       "type": "shell",
-      "command": "docker compose up",
+      "command": "docker compose up --force-recreate",
       "problemMatcher": [],
       "label": "docker:up",
       "detail": "docker compose up"

@@ -1,0 +1,45 @@
+# Edge proxy in front of bff-service. The single public ingress (zrok
+# tunnel) terminates here; this layer routes by path so notify-service
+# webhooks bypass BFF entirely.
+#
+#   /webhooks/...  →  notify-service:3003   (HTTP webhook controller)
+#   everything else → bff-service:3001     (GraphQL + REST + sessions)
+#
+# Why path-match instead of `handle_path` strip: Twilio signs the full
+# URL it called (host + path including the /webhooks prefix). Stripping
+# would change the URL the notify side sees and break signature
+# validation. Forward the path unchanged.
+#
+# Why `dynamic a` upstreams: `docker compose up -d notify-service` (or
+# any recreate) gives the container a fresh IP. Caddy caches DNS at
+# config-load by default — without dynamic resolution we'd see 502s
+# (`dial connection refused` on the stale IP) until Caddy is restarted.
+# `dynamic a` re-resolves the docker-internal DNS every `refresh`.
+:80 {
+	@webhooks path /webhooks /webhooks/*
+	handle @webhooks {
+		reverse_proxy {
+			dynamic a {
+				name notify-service
+				port 3003
+				refresh 10s
+			}
+			health_uri /health
+			health_interval 30s
+			health_timeout 3s
+		}
+	}
+
+	handle {
+		reverse_proxy {
+			dynamic a {
+				name bff-service
+				port 3001
+				refresh 10s
+			}
+			health_uri /health
+			health_interval 30s
+			health_timeout 3s
+		}
+	}
+}

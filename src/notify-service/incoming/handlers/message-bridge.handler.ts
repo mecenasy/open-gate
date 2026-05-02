@@ -41,6 +41,7 @@ export class MessageBridgeHandler implements IEventHandler<MessageEvent>, OnModu
 
     try {
       const metadata = new Metadata();
+      console.log('🚀 ~ MessageBridgeHandler ~ handle ~ tenantId:', message, platform, tenantId);
       if (tenantId) {
         metadata.set('x-tenant-id', tenantId);
       }

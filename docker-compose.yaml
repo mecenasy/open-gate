@@ -1,4 +1,35 @@
 services:
+  # Edge HTTP proxy — single public ingress. zrok tunnel points here
+  # (port 8080 on host) instead of bff-service. Routes /webhooks/*
+  # straight to notify-service so BFF never sees webhook traffic;
+  # everything else falls through to bff-service.
+  edge:
+    container_name: edge
+    image: caddy:2-alpine
+    restart: unless-stopped
+    mem_limit: 64m
+    mem_reservation: 32m
+    cpus: "0.1"
+    ports:
+      # Edge takes host port 3001. BFF used to bind 3001 directly; now
+      # edge fronts it so zrok (which forwards to 127.0.0.1:3001) lands
+      # in Caddy first and webhooks bypass BFF.
+      - "127.0.0.1:${EDGE_PORT:-3001}:80"
+    volumes:
+      # Mount the directory, not the single Caddyfile — file bind-mounts
+      # in Docker Desktop / WSL break when the file is replaced atomically
+      # (editor rename → new inode), forcing a container recreate. Mounting
+      # the parent dir is robust to file rewrites and lets `caddy reload`
+      # pick up changes live.
+      - ./infra/caddy:/etc/caddy:ro
+    depends_on:
+      bff-service:
+        condition: service_started
+      notify-service:
+        condition: service_started
+    networks:
+      - backend-net
+
   # Serwis konfiguracyjny cały systme główny, odpowiedzialny za logikę biznesową, komunikację z bazą danych i innymi serwisami poprzez gRPC oraz udostępnianie API dla frontendu
   bff-service:
     # profiles:
@@ -16,8 +47,10 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    ports:
-      - "127.0.0.1:3001:3001"
+    # No host port mapping — bff is reached via edge (Caddy) only. Other
+    # services talk to it over backend-net at bff-service:3001.
+    expose:
+      - "3001"
     env_file:
       - .env
     environment:
@@ -56,8 +89,13 @@ services:
       context: ./src/front-service
       dockerfile: Dockerfile.dev
     restart: unless-stopped
-    mem_limit: 1024m
-    mem_reservation: 512m
+    # Next.js 15 + Turbopack on a multi-locale wizard climbs past 1G the
+    # first time each route is compiled. At a 1G limit the container hits
+    # 99.8 % and hangs (process stays alive but stops accepting connections,
+    # so zrok shows BadGateway). 2G leaves headroom for dev mode; a prod
+    # build (next build → next start) fits well below.
+    mem_limit: 2048m
+    mem_reservation: 1024m
     cpus: "0.5"
     volumes:
       - ./src/front-service:/app

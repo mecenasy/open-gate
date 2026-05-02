@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ConsoleLogger, Logger, ValidationPipe } from '@nestjs/common';
+import { json, urlencoded } from 'express';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import { getGrpcOptions } from 'src/utils/get-proto-files';
@@ -25,6 +26,12 @@ async function bootstrap() {
       url: `0.0.0.0:${process.env.NOTIFY_GRPC_URL?.split(':').pop() ?? '50052'}`,
     },
   });
+  // Twilio (and most webhook providers) send form-urlencoded — Nest's
+  // default body parser handles JSON only, so wire urlencoded here too.
+  // 1mb is plenty: a Twilio SMS webhook is ~2kb of fields.
+  app.use(json({ limit: '1mb' }));
+  app.use(urlencoded({ limit: '1mb', extended: true }));
+
   // Setup global logger filters and interceptors
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalInterceptors(new LoggingInterceptor());

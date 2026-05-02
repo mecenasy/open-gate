@@ -38,6 +38,7 @@ export class MassageHandler extends Handler<UnifiedMessageEvent, Status, UserPro
   }
 
   async execute({ message }: UnifiedMessageEvent): Promise<Status> {
+    console.log('🚀 ~ MassageHandler ~ execute ~ message:', message);
     try {
       if (await this.isPlatformDisabled(message.platform)) {
         await this.notifyPlatformDisabled(message);

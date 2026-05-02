@@ -8,12 +8,15 @@ import {
   OutgoingNotifyServiceController,
   OutgoingNotifyServiceControllerMethods,
   OutgoingNotifyRequest,
+  GetVerificationCodeRequest,
+  GetVerificationCodeResponse,
 } from 'src/proto/notify';
 import { OutgoingNotifyEvent } from './event/outgoing-notify-event';
 import { PlatformTransformer } from 'src/utils/platform';
 import { TypeTransformer } from 'src/utils/message-type';
 import { SendVerificationCodeCommand } from './commands/impl/send-verification-code.command';
 import { SendTokenCommand } from './commands/impl/send-token.command';
+import { SignalVerificationBridgeService } from '../signal-verification/signal-verification-bridge.service';
 
 @Controller()
 @OutgoingNotifyServiceControllerMethods()
@@ -21,7 +24,16 @@ export class OutgoingNotifyController implements OutgoingNotifyServiceController
   constructor(
     private readonly commandBus: CommandBus,
     private readonly eventBus: EventBus,
+    private readonly verificationBridge: SignalVerificationBridgeService,
   ) {}
+
+  async getVerificationCode({ phoneE164 }: GetVerificationCodeRequest): Promise<GetVerificationCodeResponse> {
+    const recorded = await this.verificationBridge.getCode(phoneE164);
+    if (!recorded) {
+      return { found: false };
+    }
+    return { found: true, code: recorded.code, source: recorded.source };
+  }
 
   async sendVerificationCode({ platforms, code, phoneNumber, email }: SendVerificationCodeRequest): Promise<NotifyAck> {
     await this.commandBus.execute(

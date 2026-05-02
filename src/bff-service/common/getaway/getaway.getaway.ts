@@ -1,6 +1,8 @@
 import { Logger } from '@nestjs/common';
+import { EventBus } from '@nestjs/cqrs';
 import { WebSocketGateway, WebSocketServer, OnGatewayConnection, ConnectedSocket } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { GatewayClientConnectedEvent } from './gateway-client-connected.event';
 
 interface CustomQuery {
   challenge: string;
@@ -22,7 +24,7 @@ export class Getaway implements OnGatewayConnection {
   server!: Server;
   logger: Logger;
 
-  constructor() {
+  constructor(private readonly eventBus: EventBus) {
     this.logger = new Logger(Getaway.name);
   }
 
@@ -35,5 +37,6 @@ export class Getaway implements OnGatewayConnection {
       return;
     }
     await client.join(challenge);
+    this.eventBus.publish(new GatewayClientConnectedEvent(client, challenge));
   }
 }

@@ -15,9 +15,18 @@ import { MailTokenPlatform } from './platforms/smtp/mail-token.platform';
 import { commandHandlers } from './commands/handlers';
 import { TenantModule } from '@app/tenant';
 import { PlatformConfigModule } from '../platform-config/platform-config.module';
+import { SignalVerificationModule } from '../signal-verification/signal-verification.module';
 
 @Module({
-  imports: [HttpModule, CqrsModule, SmsModule, SmtpModule, TenantModule, PlatformConfigModule],
+  imports: [
+    HttpModule,
+    CqrsModule,
+    SmsModule,
+    SmtpModule,
+    TenantModule,
+    PlatformConfigModule,
+    SignalVerificationModule,
+  ],
   providers: [
     SignalSender,
     OutgoingNotifyBridgeHandler,

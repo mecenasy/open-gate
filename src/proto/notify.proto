@@ -8,10 +8,12 @@ service IncomingNotifyService {
 }
 
 // Hosted by notify-service (port 50052) — receives outbound send requests from core-service
+// and verification-code reads from bff-service (auto-flush on socket connect).
 service OutgoingNotifyService {
   rpc SendMessage (OutgoingNotifyRequest) returns (NotifyAck);
   rpc SendVerificationCode (SendVerificationCodeRequest) returns (NotifyAck);
   rpc SendToken (SendTokenRequest) returns (NotifyAck);
+  rpc GetVerificationCode (GetVerificationCodeRequest) returns (GetVerificationCodeResponse);
 
     // TODO
   // rpc GetGroups (GetGroupsRequest) returns (GetGroupsResponse);
@@ -112,4 +114,17 @@ message SendTokenRequest {
 message NotifyAck {
   bool success = 1;
   string message = 2;
+}
+
+// Pulls a buffered verification code out of Redis on socket connect —
+// covers the race where the SMS arrives before the frontend opens its
+// websocket. Returns found=false when nothing is buffered for the number.
+message GetVerificationCodeRequest {
+  string phone_e164 = 1;
+}
+
+message GetVerificationCodeResponse {
+  bool found = 1;
+  optional string code = 2;
+  optional string source = 3;
 }

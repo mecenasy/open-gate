@@ -104,6 +104,21 @@ export interface NotifyAck {
   message: string;
 }
 
+/**
+ * Pulls a buffered verification code out of Redis on socket connect —
+ * covers the race where the SMS arrives before the frontend opens its
+ * websocket. Returns found=false when nothing is buffered for the number.
+ */
+export interface GetVerificationCodeRequest {
+  phoneE164: string;
+}
+
+export interface GetVerificationCodeResponse {
+  found: boolean;
+  code?: string | undefined;
+  source?: string | undefined;
+}
+
 export const NOTIFY_PACKAGE_NAME = 'notify';
 
 /** Hosted by core-service (port 50053) — receives incoming Signal messages from notify-service */
@@ -138,7 +153,10 @@ export function IncomingNotifyServiceControllerMethods() {
 
 export const INCOMING_NOTIFY_SERVICE_NAME = 'IncomingNotifyService';
 
-/** Hosted by notify-service (port 50052) — receives outbound send requests from core-service */
+/**
+ * Hosted by notify-service (port 50052) — receives outbound send requests from core-service
+ * and verification-code reads from bff-service (auto-flush on socket connect).
+ */
 
 export interface OutgoingNotifyServiceClient {
   sendMessage(request: OutgoingNotifyRequest, metadata?: Metadata): Observable<NotifyAck>;
@@ -146,9 +164,17 @@ export interface OutgoingNotifyServiceClient {
   sendVerificationCode(request: SendVerificationCodeRequest, metadata?: Metadata): Observable<NotifyAck>;
 
   sendToken(request: SendTokenRequest, metadata?: Metadata): Observable<NotifyAck>;
+
+  getVerificationCode(
+    request: GetVerificationCodeRequest,
+    metadata?: Metadata,
+  ): Observable<GetVerificationCodeResponse>;
 }
 
-/** Hosted by notify-service (port 50052) — receives outbound send requests from core-service */
+/**
+ * Hosted by notify-service (port 50052) — receives outbound send requests from core-service
+ * and verification-code reads from bff-service (auto-flush on socket connect).
+ */
 
 export interface OutgoingNotifyServiceController {
   sendMessage(
@@ -162,11 +188,16 @@ export interface OutgoingNotifyServiceController {
   ): Promise<NotifyAck> | Observable<NotifyAck> | NotifyAck;
 
   sendToken(request: SendTokenRequest, metadata?: Metadata): Promise<NotifyAck> | Observable<NotifyAck> | NotifyAck;
+
+  getVerificationCode(
+    request: GetVerificationCodeRequest,
+    metadata?: Metadata,
+  ): Promise<GetVerificationCodeResponse> | Observable<GetVerificationCodeResponse> | GetVerificationCodeResponse;
 }
 
 export function OutgoingNotifyServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['sendMessage', 'sendVerificationCode', 'sendToken'];
+    const grpcMethods: string[] = ['sendMessage', 'sendVerificationCode', 'sendToken', 'getVerificationCode'];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod('OutgoingNotifyService', method)(constructor.prototype[method], method, descriptor);

@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { DbGrpcModule } from '@app/db-grpc';
 import { PlatformConfigModule } from '../platform-config/platform-config.module';
-import { SignalVerificationModule } from '../signal-verification/signal-verification.module';
 import { PHONE_PROCUREMENT_PROVIDERS, PhoneProcurementService } from './phone-procurement.service';
 import { TwilioProcurementProvider } from './providers/twilio/twilio-procurement.provider';
 import { MockProcurementProvider } from './providers/mock/mock-procurement.provider';
@@ -23,7 +22,7 @@ import { PhoneProcurementNotifyController } from './phone-procurement.controller
  * is enabled at the app level.
  */
 @Module({
-  imports: [CqrsModule, PlatformConfigModule, DbGrpcModule, SignalVerificationModule],
+  imports: [CqrsModule, PlatformConfigModule, DbGrpcModule],
   controllers: [PhoneProcurementNotifyController],
   providers: [
     PhoneProcurementService,

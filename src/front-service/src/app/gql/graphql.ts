@@ -2109,19 +2109,6 @@ export type ReleasePendingPurchaseMutationVariables = Exact<{
 
 export type ReleasePendingPurchaseMutation = { __typename?: 'Mutation'; releasePendingPurchase: boolean };
 
-export type SignalVerificationCodeForPendingQueryVariables = Exact<{
-  pendingId: Scalars['String']['input'];
-}>;
-
-export type SignalVerificationCodeForPendingQuery = {
-  __typename?: 'Query';
-  signalVerificationCodeForPending?: {
-    __typename?: 'SignalVerificationCodeType';
-    code: string;
-    receivedAt: string;
-  } | null;
-};
-
 export type AttachPhoneToTenantWizardMutationVariables = Exact<{
   input: AttachPhoneToTenantInput;
 }>;
@@ -4988,46 +4975,6 @@ export const ReleasePendingPurchaseDocument = {
     },
   ],
 } as unknown as DocumentNode<ReleasePendingPurchaseMutation, ReleasePendingPurchaseMutationVariables>;
-export const SignalVerificationCodeForPendingDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'SignalVerificationCodeForPending' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'pendingId' } },
-          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'signalVerificationCodeForPending' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'pendingId' },
-                value: { kind: 'Variable', name: { kind: 'Name', value: 'pendingId' } },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'receivedAt' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<SignalVerificationCodeForPendingQuery, SignalVerificationCodeForPendingQueryVariables>;
 export const AttachPhoneToTenantWizardDocument = {
   kind: 'Document',
   definitions: [

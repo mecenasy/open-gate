@@ -153,11 +153,6 @@ export function TenantWizardView() {
               ? wizardState.phoneStrategy.purchasedPhoneE164
               : undefined
           }
-          pendingPurchaseId={
-            wizardState.phoneStrategy.mode === 'managed'
-              ? wizardState.phoneStrategy.pendingPurchaseId
-              : undefined
-          }
           onBack={(platforms) => send({ type: 'PLATFORMS_BACK', platforms })}
           onNext={(platforms) => send({ type: 'PLATFORMS_NEXT', platforms })}
         />

@@ -6,7 +6,7 @@ import { Modal } from '@/components/ui';
 import type { SignalFormSchema } from './schemas/signal-form.schema';
 import { useSignalOnboarding } from './hooks/use-signal-onboarding';
 import { useCaptchaListener } from './hooks/use-captcha-listener';
-import { useSignalVerificationCode } from '../../../hooks/use-signal-verification-code';
+import { useVerificationCodeSocket } from '../../../hooks/use-verification-code-socket';
 import type { SignalIntent } from './signal-onboarding.machine';
 import { BusyStep } from './components/BusyStep';
 import { CaptchaStep } from './components/CaptchaStep';
@@ -34,12 +34,12 @@ interface SignalOnboardingFlowProps {
    */
   lockMode?: boolean;
   /**
-   * When set, the verifyCode step polls the BFF for a code recorded by
-   * the Twilio webhook and auto-fills the input. Required for the
-   * managed wizard flow because the user has no inbox to read the code
-   * from — Signal sent it to the managed Twilio number we own.
+   * Managed Twilio number (E.164) the operator just bought. When set,
+   * the verifyCode step subscribes to the BFF websocket on
+   * `verify:<phoneE164>` and auto-fills the input as soon as Signal's
+   * verification SMS lands on that number.
    */
-  pendingPurchaseId?: string;
+  phoneE164?: string;
   onClose: () => void;
   /**
    * Fired when the flow finishes successfully. For wizard flow, the parent
@@ -64,7 +64,7 @@ export function SignalOnboardingFlow({
   previousAccount,
   defaults,
   lockMode = false,
-  pendingPurchaseId,
+  phoneE164,
   onClose,
   onDone,
 }: SignalOnboardingFlowProps) {
@@ -73,7 +73,7 @@ export function SignalOnboardingFlow({
   const { state, send } = useSignalOnboarding({ tenantId, intent, previousAccount });
 
   const onVerifyCodeStep = state.matches('verifyCode');
-  const verification = useSignalVerificationCode(pendingPurchaseId ?? null, onVerifyCodeStep);
+  const verification = useVerificationCodeSocket(phoneE164 ?? null, onVerifyCodeStep);
 
   // Same-origin postMessage listener — only active on captcha step so a
   // stale popup can't push tokens into other states.

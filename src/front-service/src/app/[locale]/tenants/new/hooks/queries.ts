@@ -122,15 +122,6 @@ export const RELEASE_PENDING_PURCHASE_MUTATION = graphql(`
   }
 `);
 
-export const SIGNAL_VERIFICATION_CODE_QUERY = graphql(`
-  query SignalVerificationCodeForPending($pendingId: String!) {
-    signalVerificationCodeForPending(pendingId: $pendingId) {
-      code
-      receivedAt
-    }
-  }
-`);
-
 export const ATTACH_PHONE_TO_TENANT_MUTATION = graphql(`
   mutation AttachPhoneToTenantWizard($input: AttachPhoneToTenantInput!) {
     attachPhoneToTenant(input: $input) {

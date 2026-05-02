@@ -96,10 +96,4 @@ export class PhoneProcurementClientService implements OnModuleInit {
     const res = await lastValueFrom(this.notifyGrpc.getActiveProviderInfo({}));
     return { providerKey: res.providerKey, isSandbox: res.isSandbox };
   }
-
-  async getSignalVerificationCode(phoneE164: string): Promise<{ code: string; receivedAt: string } | null> {
-    const res = await lastValueFrom(this.notifyGrpc.getSignalVerificationCode({ phoneE164 }));
-    if (!res.status || !res.code) return null;
-    return { code: res.code, receivedAt: res.receivedAt };
-  }
 }

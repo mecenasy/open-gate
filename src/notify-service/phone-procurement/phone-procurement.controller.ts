@@ -3,8 +3,6 @@ import {
   AvailablePhoneNumberEntry,
   GetActiveProviderInfoRequest,
   GetActiveProviderInfoResponse,
-  GetSignalVerificationCodeRequest,
-  GetSignalVerificationCodeResponse,
   ListAvailableNumbersRequest,
   ListAvailableNumbersResponse,
   MutationResponse,
@@ -17,7 +15,6 @@ import {
 } from 'src/proto/phone-procurement';
 import { PhoneProcurementService } from './phone-procurement.service';
 import { PhoneProcurementDbClient } from './db/phone-procurement-db.client';
-import { SignalVerificationBridgeService } from '../signal-verification/signal-verification-bridge.service';
 import type { AvailableNumber, PhoneCapabilities } from './phone-procurement.types';
 
 /**
@@ -41,7 +38,6 @@ export class PhoneProcurementNotifyController implements PhoneProcurementNotifyS
   constructor(
     private readonly procurement: PhoneProcurementService,
     private readonly dbClient: PhoneProcurementDbClient,
-    private readonly verificationBridge: SignalVerificationBridgeService,
   ) {}
 
   async listAvailableNumbers({
@@ -130,16 +126,6 @@ export class PhoneProcurementNotifyController implements PhoneProcurementNotifyS
       providerKey: this.procurement.getActiveProviderKey(),
       isSandbox: this.procurement.isSandbox(),
     };
-  }
-
-  async getSignalVerificationCode({
-    phoneE164,
-  }: GetSignalVerificationCodeRequest): Promise<GetSignalVerificationCodeResponse> {
-    const recorded = await this.verificationBridge.getCode(phoneE164);
-    if (!recorded) {
-      return { status: true, code: '', receivedAt: '' };
-    }
-    return { status: true, code: recorded.code, receivedAt: recorded.receivedAt };
   }
 
   private webhookUrl(path: 'sms' | 'voice'): string | undefined {

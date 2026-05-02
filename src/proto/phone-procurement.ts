@@ -184,18 +184,6 @@ export interface GetActiveProviderInfoResponse {
   isSandbox: boolean;
 }
 
-export interface GetSignalVerificationCodeRequest {
-  phoneE164: string;
-}
-
-export interface GetSignalVerificationCodeResponse {
-  status: boolean;
-  /** Empty when no code recorded yet (poll again). */
-  code: string;
-  /** ISO 8601 timestamp; empty when no code recorded. */
-  receivedAt: string;
-}
-
 export const PHONE_PROCUREMENT_PACKAGE_NAME = 'phoneProcurement';
 
 /**
@@ -404,19 +392,6 @@ export interface PhoneProcurementNotifyServiceClient {
     request: GetActiveProviderInfoRequest,
     metadata?: Metadata,
   ): Observable<GetActiveProviderInfoResponse>;
-
-  /**
-   * Reads a Signal verification code stashed by the Twilio webhook so the
-   * wizard frontend can auto-fill the verifyCode step without the user
-   * ever seeing the SMS body. Caller-side authorization (BFF resolver
-   * verifies the phone belongs to the calling user via pending purchase
-   * or tenant phone numbers).
-   */
-
-  getSignalVerificationCode(
-    request: GetSignalVerificationCodeRequest,
-    metadata?: Metadata,
-  ): Observable<GetSignalVerificationCodeResponse>;
 }
 
 /**
@@ -446,22 +421,6 @@ export interface PhoneProcurementNotifyServiceController {
     request: GetActiveProviderInfoRequest,
     metadata?: Metadata,
   ): Promise<GetActiveProviderInfoResponse> | Observable<GetActiveProviderInfoResponse> | GetActiveProviderInfoResponse;
-
-  /**
-   * Reads a Signal verification code stashed by the Twilio webhook so the
-   * wizard frontend can auto-fill the verifyCode step without the user
-   * ever seeing the SMS body. Caller-side authorization (BFF resolver
-   * verifies the phone belongs to the calling user via pending purchase
-   * or tenant phone numbers).
-   */
-
-  getSignalVerificationCode(
-    request: GetSignalVerificationCodeRequest,
-    metadata?: Metadata,
-  ):
-    | Promise<GetSignalVerificationCodeResponse>
-    | Observable<GetSignalVerificationCodeResponse>
-    | GetSignalVerificationCodeResponse;
 }
 
 export function PhoneProcurementNotifyServiceControllerMethods() {
@@ -471,7 +430,6 @@ export function PhoneProcurementNotifyServiceControllerMethods() {
       'purchasePhoneNumber',
       'releasePendingPurchase',
       'getActiveProviderInfo',
-      'getSignalVerificationCode',
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

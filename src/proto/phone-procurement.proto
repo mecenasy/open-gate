@@ -161,12 +161,6 @@ service PhoneProcurementNotifyService {
   rpc PurchasePhoneNumber (PurchasePhoneNumberRequest) returns (PendingPurchaseResponse);
   rpc ReleasePendingPurchase (ReleasePendingPurchaseRequest) returns (MutationResponse);
   rpc GetActiveProviderInfo (GetActiveProviderInfoRequest) returns (GetActiveProviderInfoResponse);
-  // Reads a Signal verification code stashed by the Twilio webhook so the
-  // wizard frontend can auto-fill the verifyCode step without the user
-  // ever seeing the SMS body. Caller-side authorization (BFF resolver
-  // verifies the phone belongs to the calling user via pending purchase
-  // or tenant phone numbers).
-  rpc GetSignalVerificationCode (GetSignalVerificationCodeRequest) returns (GetSignalVerificationCodeResponse);
 }
 
 message PhoneCapabilitiesEntry {
@@ -216,17 +210,5 @@ message GetActiveProviderInfoResponse {
   bool status = 1;
   string provider_key = 2;
   bool is_sandbox = 3;
-}
-
-message GetSignalVerificationCodeRequest {
-  string phone_e164 = 1;
-}
-
-message GetSignalVerificationCodeResponse {
-  bool status = 1;
-  // Empty when no code recorded yet (poll again).
-  string code = 2;
-  // ISO 8601 timestamp; empty when no code recorded.
-  string received_at = 3;
 }
 

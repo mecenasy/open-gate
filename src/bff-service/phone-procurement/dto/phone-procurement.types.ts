@@ -121,12 +121,3 @@ export class AttachPhoneToTenantInput {
   @Field()
   tenantId!: string;
 }
-
-@ObjectType()
-export class SignalVerificationCodeType {
-  @Field()
-  code!: string;
-
-  @Field()
-  receivedAt!: string;
-}

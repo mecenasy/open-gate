@@ -12,7 +12,6 @@ import {
   PendingPhonePurchaseType,
   PhoneProcurementInfoType,
   PurchasePhoneNumberInput,
-  SignalVerificationCodeType,
   TenantPhoneNumberType,
 } from './dto/phone-procurement.types';
 
@@ -135,30 +134,6 @@ export class PhoneProcurementResolver {
 
     const attached = await this.client.attachToTenant(input.pendingId, input.tenantId);
     return toPendingType(attached);
-  }
-
-  /**
-   * Frontend polls this during the Signal verifyCode step in managed
-   * flow. We trust the caller to know its own pending purchase id;
-   * server-side we verify the pending row belongs to the calling user
-   * and the requested phone matches that pending row, so a curious
-   * user can't poll someone else's verification code.
-   *
-   * Returns null until the Twilio webhook stashes a code in Redis.
-   */
-  @Query(() => SignalVerificationCodeType, { nullable: true })
-  async signalVerificationCodeForPending(
-    @Args('pendingId') pendingId: string,
-    @CurrentUserId() userId?: string,
-  ): Promise<SignalVerificationCodeType | null> {
-    if (!userId) throw new UnauthorizedException();
-    const pending = await this.client.getPending(pendingId);
-    if (!pending) return null;
-    if (pending.ownerUserId !== userId) {
-      throw new ForbiddenException('You do not own this pending purchase.');
-    }
-    const recorded = await this.client.getSignalVerificationCode(pending.phoneE164);
-    return recorded ?? null;
   }
 
   @Mutation(() => Boolean)

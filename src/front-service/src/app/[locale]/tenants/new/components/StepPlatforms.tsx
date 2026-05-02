@@ -27,12 +27,6 @@ interface StepPlatformsProps {
    *     managed number; the verification bridge auto-fills the code.
    */
   managedPhone?: string;
-  /**
-   * Pending purchase ID — passed to the Signal onboarding flow so its
-   * verifyCode step can poll for the auto-detected verification code.
-   * Only meaningful in managed flow.
-   */
-  pendingPurchaseId?: string;
   onBack: (drafts: PlatformDraft[]) => void;
   onNext: (drafts: PlatformDraft[]) => void;
 }
@@ -284,6 +278,7 @@ export function StepPlatforms({
             mode: 'register',
           }}
           lockMode={!!managedPhone}
+          phoneE164={managedPhone}
           onClose={() => setSignalOnboarding(false)}
           onDone={handleSignalDone}
         />

@@ -9,6 +9,7 @@ import { MessagesModule } from './messages/messages.module';
 import { TenantDbModule } from './tenant/tenant.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { PhoneProcurementDbModule } from './phone-procurement/phone-procurement.module';
+import { PlatformIdentityDbModule } from './platform-identity/platform-identity.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { PhoneProcurementDbModule } from './phone-procurement/phone-procurement.
     TenantDbModule,
     SubscriptionModule,
     PhoneProcurementDbModule,
+    PlatformIdentityDbModule,
   ],
 })
 export class AppModule {}

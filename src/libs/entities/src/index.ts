@@ -11,6 +11,10 @@ export * from './enums/subscription-change-kind.enum';
 export * from './enums/tenant-staff-role.enum';
 export * from './enums/contact-access-level.enum';
 export * from './enums/phone-provisioned-by.enum';
+export * from './enums/binding-platform.enum';
+export * from './enums/contact-binding-status.enum';
+export * from './enums/contact-binding-source.enum';
+export * from './enums/contact-binding-send-status.enum';
 
 // User domain
 export * from './user/user.entity';
@@ -54,3 +58,7 @@ export * from './tenant/pending-phone-purchase.entity';
 // Contact
 export * from './contact/contact.entity';
 export * from './contact/contact-membership.entity';
+
+// Platform identity & binding
+export * from './platform-identity/platform-identity.entity';
+export * from './contact-binding/contact-binding.entity';

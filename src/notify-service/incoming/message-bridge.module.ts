@@ -11,6 +11,7 @@ import { SignalBridgeManager } from './platforms/signal/signal-bridge.manager';
 import { PlatformConfigModule } from '../platform-config/platform-config.module';
 import { SignalVerificationModule } from '../signal-verification/signal-verification.module';
 import { PhoneProcurementModule } from '../phone-procurement/phone-procurement.module';
+import { PlatformIdentityModule } from '../platform-identity/platform-identity.module';
 import { TwilioTransformer } from './platforms/twilio/twilio.transformer';
 import { TwilioBridgeService } from './platforms/twilio/twilio-bridge.service';
 import { TwilioTenantLookupService } from './platforms/twilio/twilio-tenant-lookup.service';
@@ -19,7 +20,14 @@ import { WebhookController } from './webhook/webhook.controller';
 import { WebhookHandler } from './webhook/webhook.handler';
 
 @Module({
-  imports: [CqrsModule, HttpModule, PlatformConfigModule, SignalVerificationModule, PhoneProcurementModule],
+  imports: [
+    CqrsModule,
+    HttpModule,
+    PlatformConfigModule,
+    SignalVerificationModule,
+    PhoneProcurementModule,
+    PlatformIdentityModule,
+  ],
   controllers: [WebhookController],
   providers: [
     SignalTransformer,

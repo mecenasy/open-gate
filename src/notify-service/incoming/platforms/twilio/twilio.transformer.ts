@@ -21,6 +21,8 @@ export class TwilioTransformer extends Transform {
   platform = Platform.Sms;
 
   transform(data: TwilioSmsWebhookPayloadWithMedia): Promise<UnifiedMessage<TwilioSmsWebhookPayloadWithMedia>> {
+    // ctx (tenantId) is unused — Twilio webhooks already carry the
+    // sender's E.164 in the From field, no platform-side translation needed.
     const numMedia = parseInt(data.NumMedia ?? '0', 10);
     const firstMediaUrl = numMedia > 0 ? data.MediaUrl0 : undefined;
     const firstMediaType = numMedia > 0 ? data.MediaContentType0 : undefined;

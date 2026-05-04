@@ -32,7 +32,7 @@ export class MessageBridgeHandler implements IEventHandler<MessageEvent>, OnModu
       throw new Error(`No transformer found for platform ${platform}`);
     }
 
-    const message = await transformer.transform(data);
+    const message = await transformer.transform(data, { tenantId });
 
     if (message.media) {
       await this.eventBus.publish(new AttachmentEvent(message, platform, tenantId));

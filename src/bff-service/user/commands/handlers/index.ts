@@ -6,6 +6,7 @@ import { RemoveUserHandler } from './remove-user.handler';
 import { CreateUserSimpleHandler } from './create-simple-user.handler';
 import { RegisterHandler } from './register.handler';
 import { ConfirmRegistrationHandler } from './confirm-registration.handler';
+import { ActivatePendingUserHandler } from './activate-pending-user.handler';
 
 export const userCommands = [
   CreateUserHandler,
@@ -16,4 +17,5 @@ export const userCommands = [
   CreateUserSimpleHandler,
   RegisterHandler,
   ConfirmRegistrationHandler,
+  ActivatePendingUserHandler,
 ];

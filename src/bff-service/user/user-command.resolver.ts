@@ -14,10 +14,12 @@ import { UpdateUserRoleCommand } from './commands/impl/update-user-role.command'
 import { RemoveUserCommand } from './commands/impl/remove-user.command';
 import { RegisterCommand } from './commands/impl/register.command';
 import { ConfirmRegistrationCommand } from './commands/impl/confirm-registration.command';
-import { Public } from '@app/auth';
+import { CurrentUserId, Public } from '@app/auth';
 import { CreateSimpleUserType } from './dto/create-simple-user.type.';
 import { CreateSimpleUserCommand } from './commands/impl/create-simple-user.command';
 import { RegisterInput } from './dto/register.input';
+import { ActivatePendingUserCommand } from './commands/impl/activate-pending-user.command';
+import { UnauthorizedException } from '@nestjs/common';
 
 @Resolver()
 export class UserCommandResolver {
@@ -67,5 +69,24 @@ export class UserCommandResolver {
   @Mutation(() => SuccessResponseType)
   async removeUser(@Args('input') input: GetUserType) {
     return this.commandBus.execute<RemoveUserCommand, SuccessResponseType>(new RemoveUserCommand(input.id));
+  }
+
+  /**
+   * Manual activation gate for users created via contact binding (and any
+   * other path that lands status='pending'). Logged-in only — any account
+   * holding a session has either a password or PassKey, which by current
+   * design means a tenant_staff user with web-system access; that's the
+   * gate the user spec asked for. Self-activation is rejected at the
+   * handler level (no scripted self-promote).
+   */
+  @Mutation(() => UserSummaryType)
+  async activatePendingUser(
+    @Args('userId') userId: string,
+    @CurrentUserId() callerUserId?: string,
+  ): Promise<UserSummaryType> {
+    if (!callerUserId) throw new UnauthorizedException();
+    return this.commandBus.execute<ActivatePendingUserCommand, UserSummaryType>(
+      new ActivatePendingUserCommand(userId, callerUserId),
+    );
   }
 }

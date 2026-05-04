@@ -110,6 +110,7 @@
     "@types/express-session": "^1.18.2",
     "@types/geoip-lite": "^1.4.4",
     "@types/jest": "^30.0.0",
+    "@types/mocha": "^10.0.10",
     "@types/ms": "^2.1.0",
     "@types/node": "^22.19.17",
     "@types/passport-azure-ad": "^4.3.6",

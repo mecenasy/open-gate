@@ -11,9 +11,10 @@ import { AuditBffModule } from '../audit/audit.module';
 import { AuditResolver } from '../audit/audit.resolver';
 import { PlatformOnboardingResolver } from './platform-onboarding.resolver';
 import { PlatformOnboardingService } from './platform-onboarding.service';
+import { PhoneProcurementClientModule } from '../phone-procurement/phone-procurement.client.module';
 
 @Module({
-  imports: [TenantModule, TenantCustomizationModule, QuotasBffModule, AuditBffModule],
+  imports: [TenantModule, TenantCustomizationModule, QuotasBffModule, AuditBffModule, PhoneProcurementClientModule],
   providers: [
     TenantResolver,
     TenantSettingsResolver,

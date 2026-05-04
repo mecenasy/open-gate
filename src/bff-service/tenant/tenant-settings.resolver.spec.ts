@@ -3,6 +3,8 @@ import { TenantSettingsResolver } from './tenant-settings.resolver';
 import { DEFAULT_CUSTOMIZATION, type CommunityCustomization } from '@app/customization';
 import type { TenantCustomizationService } from '../common/customization/tenant-customization.service';
 import type { TenantAdminService } from './tenant-admin.service';
+import type { AuditClientService } from '../audit/audit.client.service';
+import type { PhoneProcurementClientService } from '../phone-procurement/phone-procurement.client.service';
 
 describe('TenantSettingsResolver', () => {
   let resolver: TenantSettingsResolver;
@@ -10,6 +12,8 @@ describe('TenantSettingsResolver', () => {
   let admin: jest.Mocked<
     Pick<TenantAdminService, 'updateCustomization' | 'transferTenantBilling' | 'setTenantActive' | 'deleteTenant'>
   >;
+  let audit: jest.Mocked<Pick<AuditClientService, 'record'>>;
+  let phoneProcurement: jest.Mocked<Pick<PhoneProcurementClientService, 'unregisterTenantPlatforms'>>;
 
   const baseConfig: CommunityCustomization = JSON.parse(JSON.stringify(DEFAULT_CUSTOMIZATION));
 
@@ -24,9 +28,17 @@ describe('TenantSettingsResolver', () => {
       setTenantActive: jest.fn().mockResolvedValue({ status: true, message: 'OK' }),
       deleteTenant: jest.fn().mockResolvedValue({ status: true, message: 'OK' }),
     };
+    audit = {
+      record: jest.fn().mockResolvedValue(undefined),
+    };
+    phoneProcurement = {
+      unregisterTenantPlatforms: jest.fn().mockResolvedValue({ status: true, message: 'OK', perPlatform: [] }),
+    };
     resolver = new TenantSettingsResolver(
       customization as unknown as TenantCustomizationService,
       admin as unknown as TenantAdminService,
+      audit as unknown as AuditClientService,
+      phoneProcurement as unknown as PhoneProcurementClientService,
     );
   });
 
@@ -147,6 +159,48 @@ describe('TenantSettingsResolver', () => {
       await resolver.deleteTenant({ tenantId: 't1', slugConfirmation: 'acme' });
       expect(admin.deleteTenant).toHaveBeenCalledWith('t1', 'acme');
       expect(customization.invalidate).toHaveBeenCalledWith('t1');
+    });
+
+    it('deleteTenant unregisters platform accounts before tenant rows are dropped', async () => {
+      const callOrder: string[] = [];
+      phoneProcurement.unregisterTenantPlatforms.mockImplementation(async () => {
+        callOrder.push('unregister');
+        return { status: true, message: 'OK', perPlatform: [] };
+      });
+      admin.deleteTenant.mockImplementation(async () => {
+        callOrder.push('delete');
+        return { status: true, message: 'OK' };
+      });
+
+      await resolver.deleteTenant({ tenantId: 't1', slugConfirmation: 'acme' });
+
+      expect(phoneProcurement.unregisterTenantPlatforms).toHaveBeenCalledWith('t1');
+      expect(callOrder).toEqual(['unregister', 'delete']);
+    });
+
+    it('deleteTenant proceeds even if platform unregister throws (logs and continues)', async () => {
+      phoneProcurement.unregisterTenantPlatforms.mockRejectedValueOnce(new Error('twilio down'));
+
+      const result = await resolver.deleteTenant({ tenantId: 't1', slugConfirmation: 'acme' });
+
+      expect(admin.deleteTenant).toHaveBeenCalledWith('t1', 'acme');
+      expect(result.status).toBe(true);
+    });
+
+    it('deleteTenant proceeds when one platform partial-fails (status=false)', async () => {
+      phoneProcurement.unregisterTenantPlatforms.mockResolvedValueOnce({
+        status: false,
+        message: 'partial',
+        perPlatform: [
+          { platform: 'twilio', status: true, message: 'released' },
+          { platform: 'signal', status: false, message: 'gateway down' },
+        ],
+      });
+
+      const result = await resolver.deleteTenant({ tenantId: 't1', slugConfirmation: 'acme' });
+
+      expect(admin.deleteTenant).toHaveBeenCalledWith('t1', 'acme');
+      expect(result.status).toBe(true);
     });
   });
 });

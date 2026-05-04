@@ -12,9 +12,12 @@ import {
   PhoneProcurementNotifyServiceControllerMethods,
   PurchasePhoneNumberRequest,
   ReleasePendingPurchaseRequest,
+  UnregisterTenantPlatformsRequest,
+  UnregisterTenantPlatformsResponse,
 } from 'src/proto/phone-procurement';
 import { PhoneProcurementService } from './phone-procurement.service';
 import { PhoneProcurementDbClient } from './db/phone-procurement-db.client';
+import { TenantPlatformCleanupService } from './tenant-platform-cleanup.service';
 import type { AvailableNumber, PhoneCapabilities } from './phone-procurement.types';
 
 /**
@@ -38,6 +41,7 @@ export class PhoneProcurementNotifyController implements PhoneProcurementNotifyS
   constructor(
     private readonly procurement: PhoneProcurementService,
     private readonly dbClient: PhoneProcurementDbClient,
+    private readonly tenantCleanup: TenantPlatformCleanupService,
   ) {}
 
   async listAvailableNumbers({
@@ -96,6 +100,16 @@ export class PhoneProcurementNotifyController implements PhoneProcurementNotifyS
       this.logger.error(`purchase failed: ${stringifyError(err)}`);
       return { status: false, message: stringifyError(err), entry: undefined };
     }
+  }
+
+  async unregisterTenantPlatforms(req: UnregisterTenantPlatformsRequest): Promise<UnregisterTenantPlatformsResponse> {
+    const results = await this.tenantCleanup.unregisterAll(req.tenantId);
+    const allOk = results.every((r) => r.status);
+    return {
+      status: allOk,
+      message: allOk ? 'OK' : 'One or more platforms failed to unregister',
+      perPlatform: results,
+    };
   }
 
   async releasePendingPurchase(req: ReleasePendingPurchaseRequest): Promise<MutationResponse> {

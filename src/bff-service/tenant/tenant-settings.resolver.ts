@@ -1,9 +1,10 @@
-import { BadRequestException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Logger, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { TenantStaffRole } from '@app/entities';
 import { AuditAction } from '@app/audit';
 import { CurrentUserId } from '@app/auth';
 import { AuditClientService } from '../audit/audit.client.service';
+import { PhoneProcurementClientService } from '../phone-procurement/phone-procurement.client.service';
 import {
   validateMessagingChannels,
   type CommunityCustomization,
@@ -56,10 +57,13 @@ function ensureUrl(value: string | undefined, field: string): void {
 
 @Resolver()
 export class TenantSettingsResolver {
+  private readonly logger = new Logger(TenantSettingsResolver.name);
+
   constructor(
     private readonly customization: TenantCustomizationService,
     private readonly admin: TenantAdminService,
     private readonly audit: AuditClientService,
+    private readonly phoneProcurement: PhoneProcurementClientService,
   ) {}
 
   @UseGuards(TenantStaffGuard(TenantStaffRole.Support))
@@ -280,6 +284,30 @@ export class TenantSettingsResolver {
         payload: { slug: input.slugConfirmation },
       });
     }
+
+    // Tear down every external platform account BEFORE deleting the tenant
+    // — Twilio numbers, signal-cli accounts, anything else hooked into the
+    // notify-side cleanup service. Once `admin.deleteTenant` runs, the FK
+    // CASCADE drops platform_credentials and tenant_phone_numbers, so we
+    // lose the SIDs / account numbers needed to call providers.
+    // Best-effort: log per-platform failures but don't block the user from
+    // deleting; orphans surface in `perPlatform` for ops to clean up.
+    try {
+      const cleanup = await this.phoneProcurement.unregisterTenantPlatforms(input.tenantId);
+      if (!cleanup.status) {
+        const failed = cleanup.perPlatform.filter((p) => !p.status);
+        this.logger.warn(
+          `Platform unregister partial-fail for tenant=${input.tenantId}: ${failed
+            .map((p) => `${p.platform}=${p.message}`)
+            .join('; ')}`,
+        );
+      }
+    } catch (err) {
+      this.logger.error(
+        `Platform unregister threw for tenant=${input.tenantId}; proceeding with delete. ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+
     const result = await this.admin.deleteTenant(input.tenantId, input.slugConfirmation);
     this.customization.invalidate(input.tenantId);
     return result;

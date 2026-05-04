@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { DbGrpcModule } from '@app/db-grpc';
 import { PlatformConfigModule } from '../platform-config/platform-config.module';
+import { SignalRestModule } from '../onboarding/platforms/signal/signal-rest.module';
 import { PHONE_PROCUREMENT_PROVIDERS, PhoneProcurementService } from './phone-procurement.service';
 import { TwilioProcurementProvider } from './providers/twilio/twilio-procurement.provider';
 import { MockProcurementProvider } from './providers/mock/mock-procurement.provider';
@@ -9,6 +10,7 @@ import { SmsCounterSyncService } from './sms-counter-sync.service';
 import { PendingPurchaseCleanupService } from './pending-purchase-cleanup.service';
 import { PhoneProcurementDbClient } from './db/phone-procurement-db.client';
 import { PhoneProcurementNotifyController } from './phone-procurement.controller';
+import { TenantPlatformCleanupService } from './tenant-platform-cleanup.service';
 
 /**
  * Provider registry — every concrete `PhoneProcurementProvider` is
@@ -22,7 +24,7 @@ import { PhoneProcurementNotifyController } from './phone-procurement.controller
  * is enabled at the app level.
  */
 @Module({
-  imports: [CqrsModule, PlatformConfigModule, DbGrpcModule],
+  imports: [CqrsModule, PlatformConfigModule, DbGrpcModule, SignalRestModule],
   controllers: [PhoneProcurementNotifyController],
   providers: [
     PhoneProcurementService,
@@ -31,6 +33,7 @@ import { PhoneProcurementNotifyController } from './phone-procurement.controller
     MockProcurementProvider,
     SmsCounterSyncService,
     PendingPurchaseCleanupService,
+    TenantPlatformCleanupService,
     {
       provide: PHONE_PROCUREMENT_PROVIDERS,
       inject: [TwilioProcurementProvider, MockProcurementProvider],

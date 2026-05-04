@@ -176,6 +176,29 @@ export interface ReleasePendingPurchaseRequest {
   ownerUserId: string;
 }
 
+export interface UnregisterTenantPlatformsRequest {
+  tenantId: string;
+}
+
+export interface PlatformUnregisterResult {
+  /** Platform key: 'twilio' | 'signal' | (future: 'whatsapp', 'messenger', ...) */
+  platform: string;
+  /** True when nothing needed doing OR the unregister succeeded. */
+  status: boolean;
+  /**
+   * Human-readable detail — 'no account', 'released', 'self-provisioned skipped',
+   * or an error string when status=false.
+   */
+  message: string;
+}
+
+export interface UnregisterTenantPlatformsResponse {
+  /** Aggregate: true iff every per-platform result succeeded. */
+  status: boolean;
+  message: string;
+  perPlatform: PlatformUnregisterResult[];
+}
+
 export interface GetActiveProviderInfoRequest {}
 
 export interface GetActiveProviderInfoResponse {
@@ -388,6 +411,20 @@ export interface PhoneProcurementNotifyServiceClient {
 
   releasePendingPurchase(request: ReleasePendingPurchaseRequest, metadata?: Metadata): Observable<MutationResponse>;
 
+  /**
+   * Tears down every external account/number registered for a tenant — one
+   * call from BFF before the DB row CASCADE drops our local mappings.
+   * Covers Twilio (release managed numbers), Signal (unregister via signal-cli)
+   * and any future platform plugged into the cleanup service.
+   * Best-effort per platform: a failing platform doesn't block the others;
+   * overall status is true iff every per-platform result succeeded. Idempotent.
+   */
+
+  unregisterTenantPlatforms(
+    request: UnregisterTenantPlatformsRequest,
+    metadata?: Metadata,
+  ): Observable<UnregisterTenantPlatformsResponse>;
+
   getActiveProviderInfo(
     request: GetActiveProviderInfoRequest,
     metadata?: Metadata,
@@ -417,6 +454,23 @@ export interface PhoneProcurementNotifyServiceController {
     metadata?: Metadata,
   ): Promise<MutationResponse> | Observable<MutationResponse> | MutationResponse;
 
+  /**
+   * Tears down every external account/number registered for a tenant — one
+   * call from BFF before the DB row CASCADE drops our local mappings.
+   * Covers Twilio (release managed numbers), Signal (unregister via signal-cli)
+   * and any future platform plugged into the cleanup service.
+   * Best-effort per platform: a failing platform doesn't block the others;
+   * overall status is true iff every per-platform result succeeded. Idempotent.
+   */
+
+  unregisterTenantPlatforms(
+    request: UnregisterTenantPlatformsRequest,
+    metadata?: Metadata,
+  ):
+    | Promise<UnregisterTenantPlatformsResponse>
+    | Observable<UnregisterTenantPlatformsResponse>
+    | UnregisterTenantPlatformsResponse;
+
   getActiveProviderInfo(
     request: GetActiveProviderInfoRequest,
     metadata?: Metadata,
@@ -429,6 +483,7 @@ export function PhoneProcurementNotifyServiceControllerMethods() {
       'listAvailableNumbers',
       'purchasePhoneNumber',
       'releasePendingPurchase',
+      'unregisterTenantPlatforms',
       'getActiveProviderInfo',
     ];
     for (const method of grpcMethods) {

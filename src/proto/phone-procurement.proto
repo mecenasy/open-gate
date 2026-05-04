@@ -160,6 +160,13 @@ service PhoneProcurementNotifyService {
   rpc ListAvailableNumbers (ListAvailableNumbersRequest) returns (ListAvailableNumbersResponse);
   rpc PurchasePhoneNumber (PurchasePhoneNumberRequest) returns (PendingPurchaseResponse);
   rpc ReleasePendingPurchase (ReleasePendingPurchaseRequest) returns (MutationResponse);
+  // Tears down every external account/number registered for a tenant — one
+  // call from BFF before the DB row CASCADE drops our local mappings.
+  // Covers Twilio (release managed numbers), Signal (unregister via signal-cli)
+  // and any future platform plugged into the cleanup service.
+  // Best-effort per platform: a failing platform doesn't block the others;
+  // overall status is true iff every per-platform result succeeded. Idempotent.
+  rpc UnregisterTenantPlatforms (UnregisterTenantPlatformsRequest) returns (UnregisterTenantPlatformsResponse);
   rpc GetActiveProviderInfo (GetActiveProviderInfoRequest) returns (GetActiveProviderInfoResponse);
 }
 
@@ -202,6 +209,27 @@ message ReleasePendingPurchaseRequest {
   // Caller (BFF) checks ownership before invoking; the notify side trusts
   // the request for now.
   string owner_user_id = 2;
+}
+
+message UnregisterTenantPlatformsRequest {
+  string tenant_id = 1;
+}
+
+message PlatformUnregisterResult {
+  // Platform key: 'twilio' | 'signal' | (future: 'whatsapp', 'messenger', ...)
+  string platform = 1;
+  // True when nothing needed doing OR the unregister succeeded.
+  bool status = 2;
+  // Human-readable detail — 'no account', 'released', 'self-provisioned skipped',
+  // or an error string when status=false.
+  string message = 3;
+}
+
+message UnregisterTenantPlatformsResponse {
+  // Aggregate: true iff every per-platform result succeeded.
+  bool status = 1;
+  string message = 2;
+  repeated PlatformUnregisterResult per_platform = 3;
 }
 
 message GetActiveProviderInfoRequest {}

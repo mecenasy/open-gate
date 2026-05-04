@@ -33,6 +33,11 @@ export class PhoneProcurementDbClient implements OnModuleInit {
     return res.status && res.entry ? res.entry : null;
   }
 
+  async getTenantPhoneNumber(tenantId: string): Promise<TenantPhoneNumberEntry | null> {
+    const res = await firstValueFrom(this.client.getTenantPhoneNumber({ tenantId }));
+    return res.status && res.entry ? res.entry : null;
+  }
+
   async listManagedPhoneNumbers(): Promise<TenantPhoneNumberEntry[]> {
     const res = await firstValueFrom(this.client.listManagedPhoneNumbers({}));
     return res.status ? (res.entries ?? []) : [];

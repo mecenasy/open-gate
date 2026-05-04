@@ -9,6 +9,7 @@ import {
   type PendingPurchaseEntry,
   type PhoneProcurementDbServiceClient,
   type PhoneProcurementNotifyServiceClient,
+  type PlatformUnregisterResult,
   type TenantPhoneNumberEntry,
 } from 'src/proto/phone-procurement';
 
@@ -68,6 +69,19 @@ export class PhoneProcurementClientService implements OnModuleInit {
     if (!res.status) {
       throw new Error(res.message || 'Failed to release phone number');
     }
+  }
+
+  async unregisterTenantPlatforms(tenantId: string): Promise<{
+    status: boolean;
+    message: string;
+    perPlatform: PlatformUnregisterResult[];
+  }> {
+    const res = await lastValueFrom(this.notifyGrpc.unregisterTenantPlatforms({ tenantId }));
+    return {
+      status: res.status,
+      message: res.message,
+      perPlatform: res.perPlatform ?? [],
+    };
   }
 
   async attachToTenant(

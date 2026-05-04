@@ -56,9 +56,14 @@ describe('SendTokenHandler', () => {
 
   it('awaits each strategy serially (sequential await over platforms)', async () => {
     const order: string[] = [];
+    let mailDone: () => void = () => undefined;
+    const mailPromise = new Promise<void>((resolve) => {
+      mailDone = resolve;
+    });
+
     mail.send.mockImplementation(async () => {
       order.push('mail-start');
-      await new Promise((r) => setTimeout(r, 0));
+      await mailPromise;
       order.push('mail-end');
     });
     signal.send.mockImplementation(async () => {
@@ -66,9 +71,15 @@ describe('SendTokenHandler', () => {
       order.push('signal-end');
     });
 
-    await handler.execute(
+    const exec = handler.execute(
       new SendTokenCommand([Platform.Email, Platform.Signal], 'a@b.c', 'https://x', TokenType.RESET_PASSWORD),
     );
+
+    // Let mail.send start, prove signal hasn't been called yet, then unblock mail.
+    await Promise.resolve();
+    expect(order).toEqual(['mail-start']);
+    mailDone();
+    await exec;
 
     expect(order).toEqual(['mail-start', 'mail-end', 'signal-start', 'signal-end']);
   });

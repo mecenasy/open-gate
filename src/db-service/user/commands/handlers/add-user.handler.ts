@@ -32,8 +32,7 @@ export class AddUserHandler extends BaseCommandHandler<AddUserCommand, UserData>
     return this.run(
       'AddUser',
       async () => {
-        const { email, phone, password, name, surname, type, phoneOwner } = command.request;
-        console.log('🚀 ~ AddUserHandler ~ execute ~ type:', type);
+        const { email, phone, password, name, surname, type, phoneOwner, ownerId } = command.request;
 
         const userType = await this.userRoleRepository.findOneOrFail({
           where: { userType: protoToJsUserType(type ?? ProtoUserType.USER) },
@@ -49,7 +48,11 @@ export class AddUserHandler extends BaseCommandHandler<AddUserCommand, UserData>
           userSettings: this.userSettingsService.create(),
         });
 
-        if (phoneOwner) {
+        // Direct ownerId wins (binding flow passes it). Legacy phoneOwner
+        // path (chat-driven self-add) still resolves owner by phone lookup.
+        if (ownerId) {
+          user.ownerId = ownerId;
+        } else if (phoneOwner) {
           const owner = await this.userRepository.findOneOrFail({ where: { phone: phoneOwner } });
           user.ownerId = owner.id;
         }

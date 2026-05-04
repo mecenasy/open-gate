@@ -10,6 +10,7 @@ import { TenantDbModule } from './tenant/tenant.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { PhoneProcurementDbModule } from './phone-procurement/phone-procurement.module';
 import { PlatformIdentityDbModule } from './platform-identity/platform-identity.module';
+import { ContactBindingDbModule } from './contact-binding/contact-binding.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PlatformIdentityDbModule } from './platform-identity/platform-identity.
     SubscriptionModule,
     PhoneProcurementDbModule,
     PlatformIdentityDbModule,
+    ContactBindingDbModule,
   ],
 })
 export class AppModule {}

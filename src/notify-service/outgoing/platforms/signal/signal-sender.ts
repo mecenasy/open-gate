@@ -22,6 +22,7 @@ export class SignalSender extends Sender {
   }
 
   async send(data: UnifiedMessage): Promise<void> {
+    console.log("🚀 ~ SignalSender ~ send ~ data:", data)
     const { chatId, content, media, type } = data;
 
     try {
@@ -60,6 +61,7 @@ export class SignalSender extends Sender {
   }
 
   private async sendText(config: SignalCredentials, phone: string, text: string): Promise<void> {
+    console.log("🚀 ~ SignalSender ~ sendText ~ config:", config)
     await firstValueFrom(
       this.httpService.post(`${config.apiUrl}/v1/send`, {
         message: text,

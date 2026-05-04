@@ -1,23 +1,30 @@
 #!/usr/bin/env bash
 # Uruchamia zrok tunele dla front (4002) i BFF (3001) z poziomu WSL.
-# Wywołuje zrok.exe z Windowsa (przez /mnt/c) — windowsowy zrok widzi
-# porty dockera, bo Docker Desktop forwarduje 127.0.0.1 z WSL na host.
+# Używa natywnego linuxowego zrok-a (nie .exe z Windowsa) — brak interopu vsock,
+# więc nohup ... & działa stabilnie. Konfig w ~/.zrok jest 1:1 zgodny z windowsowym.
 #
 # Wymagania:
-#   - zrok.exe pod /mnt/c/Users/gajda/zrok.exe (lub przekaż ZROK_EXE)
-#   - zrok włączony (zrok.exe enable <token>) — jednorazowo
-#   - docker compose up uruchomione (porty 3001, 4002 nasłuchują)
+#   - zrok w PATH (np. ~/.local/bin/zrok) lub przekaż ZROK_EXE=/sciezka/do/zrok
+#   - ~/.zrok skopiowane z Windowsa albo zrok enable <token> raz
+#   - docker compose up uruchomione (porty 3001, 4002 nasłuchują na 127.0.0.1)
 #
 # Użycie:
-#   ./scripts/zrok-tunnels.sh                   # ephemeral, losowe URL-e
-#   ./scripts/zrok-tunnels.sh --reserved        # stałe URL-e
-#   ./scripts/zrok-tunnels.sh --reserved --sync-env   # + nadpisuje .env i restart front-service
-#   ./scripts/zrok-tunnels.sh stop              # zatrzymuje uruchomione tunele
+#   ./scripts/zrok-tunnels.sh                   # reserved (domyślnie) — stałe URL-e opengatebff/opengatefront
+#   ./scripts/zrok-tunnels.sh --ephemeral       # losowe URL-e (nie używaj — .env wskazuje na reserved)
+#   ./scripts/zrok-tunnels.sh --sync-env        # reserved + nadpisuje .env i restart front-service
+#   ./scripts/zrok-tunnels.sh --keepalive       # dodatkowo pinguje co 30s żeby front-service nie zasypiał
+#   ./scripts/zrok-tunnels.sh stop              # zatrzymuje uruchomione tunele (też sieroty)
 
 set -euo pipefail
 
-ZROK_EXE="${ZROK_EXE:-/mnt/c/Users/gajda/zrok.exe}"
-EDGE_PORT="${EDGE_PORT:-8080}"
+# Wybór binarki: ZROK_EXE > zrok w PATH > ~/.local/bin/zrok > .exe (fallback dla starych setupów)
+default_zrok() {
+  if command -v zrok >/dev/null 2>&1; then command -v zrok; return; fi
+  if [ -x "$HOME/.local/bin/zrok" ]; then echo "$HOME/.local/bin/zrok"; return; fi
+  echo "/mnt/c/Users/gajda/zrok.exe"
+}
+ZROK_EXE="${ZROK_EXE:-$(default_zrok)}"
+EDGE_PORT="${EDGE_PORT:-3001}"
 FRONT_PORT="${FRONT_PORT:-4002}"
 BFF_NAME="${BFF_NAME:-opengatebff}"
 FRONT_NAME="${FRONT_NAME:-opengatefront}"
@@ -26,7 +33,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RUN_DIR="$REPO_ROOT/.zrok-run"
 mkdir -p "$RUN_DIR"
 
-RESERVED=0
+RESERVED=1
 SYNC_ENV=0
 KEEPALIVE=0
 ACTION="start"
@@ -34,17 +41,19 @@ ACTION="start"
 for arg in "$@"; do
   case "$arg" in
     --reserved)   RESERVED=1 ;;
+    --ephemeral)  RESERVED=0 ;;
     --sync-env)   SYNC_ENV=1 ;;
     --keepalive)  KEEPALIVE=1 ;;
     stop)         ACTION="stop" ;;
     -h|--help)
-      sed -n '2,20p' "$0"; exit 0 ;;
+      sed -n '2,18p' "$0"; exit 0 ;;
     *)
       echo "Nieznany argument: $arg" >&2; exit 1 ;;
   esac
 done
 
 stop_tunnels() {
+  # 1) procesy zarządzane przez skrypt (z .zrok-run/*.pid)
   for pidfile in "$RUN_DIR"/*.pid; do
     [ -e "$pidfile" ] || continue
     pid="$(cat "$pidfile" 2>/dev/null || true)"
@@ -54,6 +63,15 @@ stop_tunnels() {
     fi
     rm -f "$pidfile"
   done
+  # 2) sieroty: dowolny zrok (linux lub .exe) z --headless <token> uruchomiony poza skryptem
+  for token in "$BFF_NAME" "$FRONT_NAME"; do
+    while read -r pid; do
+      [ -n "$pid" ] || continue
+      echo "[stop] kill orphan $pid (--headless $token)"
+      kill "$pid" 2>/dev/null || true
+    done < <(pgrep -af "zrok(\\.exe)?.*--headless[[:space:]]+${token}\\b" 2>/dev/null | awk '{print $1}')
+  done
+  sleep 0.3
 }
 
 if [ "$ACTION" = "stop" ]; then
@@ -63,8 +81,9 @@ if [ "$ACTION" = "stop" ]; then
 fi
 
 if [ ! -x "$ZROK_EXE" ] && [ ! -f "$ZROK_EXE" ]; then
-  echo "Nie znaleziono zrok.exe pod: $ZROK_EXE" >&2
-  echo "Ustaw zmienną ZROK_EXE=/mnt/c/sciezka/do/zrok.exe" >&2
+  echo "Nie znaleziono zrok pod: $ZROK_EXE" >&2
+  echo "Zainstaluj: curl -sL https://github.com/openziti/zrok/releases/download/v0.4.49/zrok_0.4.49_linux_amd64.tar.gz | tar -xzC ~/.local/bin/" >&2
+  echo "Lub przekaż ZROK_EXE=/sciezka/do/zrok" >&2
   exit 1
 fi
 
@@ -73,35 +92,14 @@ check_port() {
   if (echo > "/dev/tcp/127.0.0.1/$port") >/dev/null 2>&1; then return 0; else return 1; fi
 }
 
-check_port "$EDGE_PORT"   || echo "[ostrz] BFF (127.0.0.1:$EDGE_PORT) nie odpowiada — odpal docker compose up bff-service"
+check_port "$EDGE_PORT"  || echo "[ostrz] BFF (127.0.0.1:$EDGE_PORT) nie odpowiada — odpal docker compose up edge"
 check_port "$FRONT_PORT" || echo "[ostrz] Front (127.0.0.1:$FRONT_PORT) nie odpowiada — odpal docker compose up front-service"
 
 # zatrzymujemy stare procesy żeby nie mnożyć tuneli
 stop_tunnels
 
-ensure_reserved() {
-  # best-effort: jeśli reserve nie wyjdzie (już istnieje, glitch WSL), lecimy dalej —
-  # 'share reserved' zadziała o ile token był kiedykolwiek zarezerwowany.
-  local name="$1" port="$2"
-  echo "[reserved] zapewniam $name -> http://127.0.0.1:$port"
-  local out
-  if out="$("$ZROK_EXE" reserve public --unique-name "$name" "http://127.0.0.1:$port" 2>&1)"; then
-    echo "$out"
-  else
-    if echo "$out" | grep -qiE 'conflict|409|already'; then
-      echo "[reserved] $name już istnieje"
-    else
-      echo "[reserved] reserve nie wyszedł (zakładam że token istnieje):" >&2
-      echo "$out" | sed 's/^/  /' >&2
-    fi
-  fi
-  return 0
-}
-
 reserved_url() {
-  # publiczny frontend zroka: https://<token>.share.zrok.io
-  local name="$1"
-  echo "https://${name}.share.zrok.io"
+  echo "https://${1}.share.zrok.io"
 }
 
 start_share() {
@@ -109,24 +107,16 @@ start_share() {
   local logfile="$RUN_DIR/$logname.log"
   local pidfile="$RUN_DIR/$logname.pid"
   echo "[start] $logname  (log: $logfile)"
-  nohup "$ZROK_EXE" "$@" > "$logfile" 2>&1 &
+  nohup "$ZROK_EXE" "$@" </dev/null >"$logfile" 2>&1 &
   echo $! > "$pidfile"
 }
 
 if [ "$RESERVED" -eq 1 ]; then
-  ensure_reserved "$BFF_NAME"   "$EDGE_PORT"
-  ensure_reserved "$FRONT_NAME" "$FRONT_PORT"
-
   if [ "$SYNC_ENV" -eq 1 ]; then
-    bff_url="$(reserved_url "$BFF_NAME" || true)"
+    bff_url="$(reserved_url "$BFF_NAME")"
     front_host="${FRONT_NAME}.share.zrok.io"
     bff_host="${BFF_NAME}.share.zrok.io"
     allowed_origins="$front_host,$bff_host"
-
-    if [ -z "${bff_url:-}" ]; then
-      echo "Nie udało się odczytać URL dla $BFF_NAME. Sprawdź: $ZROK_EXE overview" >&2
-      exit 1
-    fi
     env_file="$REPO_ROOT/.env"
     [ -f "$env_file" ] || { echo "Brak .env w $REPO_ROOT" >&2; exit 1; }
 
@@ -162,7 +152,6 @@ if [ "$KEEPALIVE" -eq 1 ]; then
   echo "[keepalive] start (co 30s pinguje front + bff)"
   (
     while true; do
-      # -s -o /dev/null bez -f: 4xx jest OK, chodzi tylko o trzymanie ciepło
       curl -sS -m 25 -o /dev/null -w "$(date -Is) front %{http_code} %{time_total}s\n" "http://127.0.0.1:$FRONT_PORT/" >>"$ka_log" 2>&1 || true
       curl -sS -m 25 -o /dev/null -w "$(date -Is) bff   %{http_code} %{time_total}s\n" "http://127.0.0.1:$EDGE_PORT/health" >>"$ka_log" 2>&1 || true
       sleep 30
@@ -172,7 +161,6 @@ if [ "$KEEPALIVE" -eq 1 ]; then
 fi
 
 extract_url_from_log() {
-  # zrok wypisuje URL w logu jako https://<token>.share.zrok.io — czekamy do 15s aż się pojawi
   local logfile="$1"
   local url=""
   for _ in $(seq 1 30); do
@@ -196,8 +184,9 @@ echo "URL-e tuneli:"
 echo "  BFF   -> $bff_url   (lokalnie 127.0.0.1:$EDGE_PORT)"
 echo "  Front -> $front_url (lokalnie 127.0.0.1:$FRONT_PORT)"
 echo
-echo "Tunele uruchomione w tle. Logi: $RUN_DIR/{bff,front}.log"
+echo "Binarka:             $ZROK_EXE"
+echo "Tunele w tle. Logi:  $RUN_DIR/{bff,front}.log"
 echo "Aby zatrzymać:       $0 stop"
 if [ "$RESERVED" -eq 1 ]; then
-  echo "Lub:                 $ZROK_EXE overview"
+  echo "Status:              $ZROK_EXE overview"
 fi

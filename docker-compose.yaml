@@ -86,37 +86,37 @@ services:
       retries: 5
       start_period: 60s
 
-  front-service:
-    container_name: front-service
-    build:
-      context: ./src/front-service
-      dockerfile: Dockerfile.dev
-    restart: unless-stopped
-    # Next.js 15 + Turbopack on a multi-locale wizard climbs past 1G the
-    # first time each route is compiled. At a 1G limit the container hits
-    # 99.8 % and hangs (process stays alive but stops accepting connections,
-    # so zrok shows BadGateway). 2G leaves headroom for dev mode; a prod
-    # build (next build → next start) fits well below.
-    mem_limit: 2048m
-    mem_reservation: 1024m
-    cpus: "0.5"
-    volumes:
-      - ./src/front-service:/app
-      - /app/node_modules
-      - /app/.next
-    ports:
-      - "127.0.0.1:4002:4002"
-    environment:
-      CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
-      API_INTERNAL_URL: "http://bff-service:${BFF_PORT:-3001}"
-      NEXT_PUBLIC_API_HOST_URL: "${NEXT_PUBLIC_API_HOST_URL:-http://localhost:${BFF_PORT:-3001}}"
-      NEXT_DEV_ALLOWED_ORIGINS: "${NEXT_DEV_ALLOWED_ORIGINS:-}"
-    depends_on:
-      bff-service:
-        condition: service_started
-    networks:
-      - backend-net
+  # front-service:
+  #   container_name: front-service
+  #   build:
+  #     context: ./src/front-service
+  #     dockerfile: Dockerfile.dev
+  #   restart: unless-stopped
+  #   # Next.js 15 + Turbopack on a multi-locale wizard climbs past 1G the
+  #   # first time each route is compiled. At a 1G limit the container hits
+  #   # 99.8 % and hangs (process stays alive but stops accepting connections,
+  #   # so zrok shows BadGateway). 2G leaves headroom for dev mode; a prod
+  #   # build (next build → next start) fits well below.
+  #   mem_limit: 2048m
+  #   mem_reservation: 1024m
+  #   cpus: "0.5"
+  #   volumes:
+  #     - ./src/front-service:/app
+  #     - /app/node_modules
+  #     - /app/.next
+  #   ports:
+  #     - "127.0.0.1:4002:4002"
+  #   environment:
+  #     CHOKIDAR_USEPOLLING: "true"
+  #     WATCHPACK_POLLING: "true"
+  #     API_INTERNAL_URL: "http://bff-service:${BFF_PORT:-3001}"
+  #     NEXT_PUBLIC_API_HOST_URL: "${NEXT_PUBLIC_API_HOST_URL:-http://localhost:${BFF_PORT:-3001}}"
+  #     NEXT_DEV_ALLOWED_ORIGINS: "${NEXT_DEV_ALLOWED_ORIGINS:-}"
+  #   depends_on:
+  #     bff-service:
+  #       condition: service_started
+  #   networks:
+  #     - backend-net
 
   # Serwis główny, odpowiedzialny za logikę biznesową, komunikację z bazą danych i innymi serwisami poprzez gRPC oraz udostępnianie API dla frontendu
   core-service:
@@ -316,9 +316,9 @@ services:
     image: bbernhard/signal-cli-rest-api
     container_name: signal_bridge
     restart: unless-stopped
-    mem_limit: 256m
-    mem_reservation: 128m
-    cpus: "0.25"
+    mem_limit: 5126m
+    mem_reservation: 256m
+    cpus: "0.5"
     environment:
       - MODE=json-rpc
     volumes:

@@ -28,7 +28,7 @@ export class SignalBridgeService implements OnModuleInit {
   }
 
   private initSignalConnection() {
-    this.signalClient = new WebSocket('ws://signal_bridge:8080/v1/receive/%2B48608447495');
+    this.signalClient = new WebSocket('ws://signal_bridge:8080/v1/receive/%2B48732144653');
 
     this.signalClient.on('open', () => {
       this.reconnectDelay = 2000;

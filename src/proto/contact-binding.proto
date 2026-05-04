@@ -1,0 +1,151 @@
+syntax = "proto3";
+
+package contactBinding;
+
+// Hosted by db-service (port 50051) — CRUD over shared_config.contact_bindings.
+// Ephemeral verification flow with 7-day TTL. Created when an operator (or
+// active user adding a household member) invites someone by phone; verified
+// when the recipient replies on Signal — either quoting our outbound message
+// (primary) or repeating the token in plaintext (regex fallback).
+service ContactBindingDbService {
+  rpc CreateBinding (CreateBindingRequest) returns (BindingResponse);
+  rpc UpdateBindingSendStatus (UpdateBindingSendStatusRequest) returns (BindingResponse);
+  rpc VerifyBinding (VerifyBindingRequest) returns (BindingResponse);
+  rpc GetBinding (GetBindingRequest) returns (BindingResponse);
+  rpc FindBindingByToken (FindBindingByTokenRequest) returns (BindingResponse);
+  rpc FindBindingByOutboundMessageId (FindBindingByOutboundMessageIdRequest) returns (BindingResponse);
+  rpc ListPendingBindings (ListPendingBindingsRequest) returns (ListBindingsResponse);
+  rpc MarkExpiredBindings (MarkExpiredBindingsRequest) returns (MarkExpiredResponse);
+  rpc RevokeBinding (RevokeBindingRequest) returns (BindingResponse);
+}
+
+// Hosted by notify-service (port 50052) — sends the invite over Signal and
+// reports the outbound timestamp back so quote-based detection can match it.
+// Triggered from BFF resolver after CreateBinding succeeded.
+service ContactBindingNotifyService {
+  rpc SendBindingInvite (SendBindingInviteRequest) returns (SendBindingInviteResponse);
+}
+
+message MutationResponse {
+  bool status = 1;
+  string message = 2;
+}
+
+message BindingEntry {
+  string id = 1;
+  string tenant_id = 2;
+  string user_id = 3;
+  string phone_e164 = 4;
+  string token = 5;
+  // 'signal' | 'whatsapp' | 'messenger'
+  string platform = 6;
+  // 'pending' | 'verified' | 'expired' | 'revoked'
+  string status = 7;
+  // 'operator_frontend' | 'household_invite'
+  string source = 8;
+  string outbound_message_id = 9;  // empty until invite sent
+  // 'pending' | 'sent' | 'failed' | 'not_on_platform'
+  string send_status = 10;
+  string send_error = 11;          // empty unless send failed
+  string expires_at = 12;          // ISO 8601
+  string verified_at = 13;         // ISO 8601, empty when not verified
+  string identity_id = 14;         // empty when not verified
+  string created_at = 15;
+  string updated_at = 16;
+}
+
+message BindingResponse {
+  bool status = 1;
+  string message = 2;
+  BindingEntry data = 3;
+}
+
+message CreateBindingRequest {
+  string tenant_id = 1;
+  string user_id = 2;
+  string phone_e164 = 3;
+  string platform = 4;
+  string source = 5;
+  // TTL in milliseconds; defaults to 7 days when 0.
+  int64 ttl_ms = 6;
+}
+
+message UpdateBindingSendStatusRequest {
+  string id = 1;
+  string send_status = 2;
+  string outbound_message_id = 3;  // empty unless send succeeded
+  string send_error = 4;           // empty unless failed
+}
+
+// Atomic: only succeeds when status='pending' AND expires_at > now().
+// On success: status → 'verified', verified_at set, identity_id set to
+// the upserted platform_identities row.
+message VerifyBindingRequest {
+  string id = 1;
+  string platform_user_id = 2;
+  string display_name = 3;     // empty when not known
+}
+
+message GetBindingRequest {
+  string id = 1;
+}
+
+message FindBindingByTokenRequest {
+  string token = 1;
+  // When true: only return rows with status='pending' AND expires_at > now().
+  bool only_active = 2;
+}
+
+message FindBindingByOutboundMessageIdRequest {
+  string outbound_message_id = 1;
+}
+
+message ListPendingBindingsRequest {
+  string tenant_id = 1;
+}
+
+message ListBindingsResponse {
+  bool status = 1;
+  string message = 2;
+  repeated BindingEntry data = 3;
+}
+
+// Bulk status flip for the cleanup cron — sets pending rows whose
+// expires_at < now() to 'expired'.
+message MarkExpiredBindingsRequest {
+  // Cap rows touched per run to keep the cron predictable; 0 = no cap.
+  int32 limit = 1;
+}
+
+message MarkExpiredResponse {
+  bool status = 1;
+  string message = 2;
+  int32 expired_count = 3;
+}
+
+message RevokeBindingRequest {
+  string id = 1;
+}
+
+// --- ContactBindingNotifyService ---
+
+message SendBindingInviteRequest {
+  string binding_id = 1;
+  string tenant_id = 2;
+  string phone_e164 = 3;
+  string platform = 4;
+  string token = 5;
+  // Optional override for tenant display name in the invite text.
+  // Empty = notify-service looks it up from tenants table.
+  string tenant_name = 6;
+}
+
+message SendBindingInviteResponse {
+  bool status = 1;
+  string message = 2;
+  // signal-cli /v2/send timestamp — caller writes this back via
+  // UpdateBindingSendStatus so quote-based detection can match it.
+  string outbound_message_id = 3;
+  // 'pending' | 'sent' | 'failed' | 'not_on_platform'
+  string send_status = 4;
+}

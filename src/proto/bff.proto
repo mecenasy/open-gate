@@ -3,16 +3,32 @@ syntax = "proto3";
 package bff;
 
 // Hosted by bff-service — receives push-style notifications from notify-service.
-// Today: forwards verification codes captured from inbound SMS to the frontend
-// over the existing socket.io gateway.
+// Forwards verification codes captured from inbound SMS to the frontend over
+// the existing socket.io gateway.
 service BffNotifyBridge {
   rpc ForwardVerificationCode (ForwardVerificationCodeRequest) returns (BffAck);
+}
+
+// Hosted by bff-service — receives binding-verified events for the contact
+// binding flow. Emits to socket.io room binding:{bindingId} so the frontend
+// that initiated the invite gets live status updates.
+service BffContactBindingBridge {
+  rpc ForwardBindingVerified (ForwardBindingVerifiedRequest) returns (BffAck);
 }
 
 message ForwardVerificationCodeRequest {
   string phone_e164 = 1;
   string code = 2;
   string source = 3; // "signal" | "whatsapp" | "messenger"
+}
+
+message ForwardBindingVerifiedRequest {
+  string binding_id = 1;
+  string tenant_id = 2;
+  string user_id = 3;
+  string platform = 4;            // "signal" | "whatsapp" | "messenger"
+  string platform_user_id = 5;
+  string phone_e164 = 6;
 }
 
 message BffAck {

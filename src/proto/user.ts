@@ -74,6 +74,11 @@ export interface AddUserRequest {
   type?: UserType | undefined;
   /** Initial password (if provided) */
   password?: string | undefined;
+  /**
+   * Household chain: when set, marks the new user as a household member
+   * added by another (active) user. NULL = operator-added from frontend.
+   */
+  ownerId?: string | undefined;
 }
 
 /** Retrieve user by ID */

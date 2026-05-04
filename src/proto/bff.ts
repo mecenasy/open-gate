@@ -18,6 +18,16 @@ export interface ForwardVerificationCodeRequest {
   source: string;
 }
 
+export interface ForwardBindingVerifiedRequest {
+  bindingId: string;
+  tenantId: string;
+  userId: string;
+  /** "signal" | "whatsapp" | "messenger" */
+  platform: string;
+  platformUserId: string;
+  phoneE164: string;
+}
+
 export interface BffAck {
   ok: boolean;
 }
@@ -26,8 +36,8 @@ export const BFF_PACKAGE_NAME = 'bff';
 
 /**
  * Hosted by bff-service — receives push-style notifications from notify-service.
- * Today: forwards verification codes captured from inbound SMS to the frontend
- * over the existing socket.io gateway.
+ * Forwards verification codes captured from inbound SMS to the frontend over
+ * the existing socket.io gateway.
  */
 
 export interface BffNotifyBridgeClient {
@@ -36,8 +46,8 @@ export interface BffNotifyBridgeClient {
 
 /**
  * Hosted by bff-service — receives push-style notifications from notify-service.
- * Today: forwards verification codes captured from inbound SMS to the frontend
- * over the existing socket.io gateway.
+ * Forwards verification codes captured from inbound SMS to the frontend over
+ * the existing socket.io gateway.
  */
 
 export interface BffNotifyBridgeController {
@@ -63,3 +73,43 @@ export function BffNotifyBridgeControllerMethods() {
 }
 
 export const BFF_NOTIFY_BRIDGE_SERVICE_NAME = 'BffNotifyBridge';
+
+/**
+ * Hosted by bff-service — receives binding-verified events for the contact
+ * binding flow. Emits to socket.io room binding:{bindingId} so the frontend
+ * that initiated the invite gets live status updates.
+ */
+
+export interface BffContactBindingBridgeClient {
+  forwardBindingVerified(request: ForwardBindingVerifiedRequest, metadata?: Metadata): Observable<BffAck>;
+}
+
+/**
+ * Hosted by bff-service — receives binding-verified events for the contact
+ * binding flow. Emits to socket.io room binding:{bindingId} so the frontend
+ * that initiated the invite gets live status updates.
+ */
+
+export interface BffContactBindingBridgeController {
+  forwardBindingVerified(
+    request: ForwardBindingVerifiedRequest,
+    metadata?: Metadata,
+  ): Promise<BffAck> | Observable<BffAck> | BffAck;
+}
+
+export function BffContactBindingBridgeControllerMethods() {
+  return function (constructor: Function) {
+    const grpcMethods: string[] = ['forwardBindingVerified'];
+    for (const method of grpcMethods) {
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcMethod('BffContactBindingBridge', method)(constructor.prototype[method], method, descriptor);
+    }
+    const grpcStreamMethods: string[] = [];
+    for (const method of grpcStreamMethods) {
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
+      GrpcStreamMethod('BffContactBindingBridge', method)(constructor.prototype[method], method, descriptor);
+    }
+  };
+}
+
+export const BFF_CONTACT_BINDING_BRIDGE_SERVICE_NAME = 'BffContactBindingBridge';

@@ -7,11 +7,17 @@ import { ContactBindingInviteController } from './contact-binding-invite.control
 import { ContactBindingDbClient } from './contact-binding-db.client';
 import { BffContactBindingPushClient } from './bff-binding-push.client';
 import { BindingTokenDetectorService } from './binding-token-detector.service';
+import { ContactBindingCleanupService } from './contact-binding-cleanup.service';
 
 @Module({
   imports: [HttpModule, PlatformConfigModule, DbGrpcModule, BffGrpcModule],
   controllers: [ContactBindingInviteController],
-  providers: [ContactBindingDbClient, BffContactBindingPushClient, BindingTokenDetectorService],
+  providers: [
+    ContactBindingDbClient,
+    BffContactBindingPushClient,
+    BindingTokenDetectorService,
+    ContactBindingCleanupService,
+  ],
   exports: [BindingTokenDetectorService, ContactBindingDbClient],
 })
 export class ContactBindingModule {}

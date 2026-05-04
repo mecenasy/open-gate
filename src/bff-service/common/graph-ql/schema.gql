@@ -451,6 +451,22 @@ type PhoneProcurementInfoType {
   isSandbox: Boolean!
 }
 
+type ContactBindingType {
+  id: String!
+  tenantId: String!
+  userId: String!
+  phoneE164: String!
+  token: String!
+  platform: String!
+  status: String!
+  source: String!
+  sendStatus: String!
+  sendError: String
+  expiresAt: String!
+  verifiedAt: String
+  createdAt: String!
+}
+
 type Query {
   users(input: GetAllUsersType): UsersListType!
   user(input: GetUserType!): UserSummaryType!
@@ -487,6 +503,7 @@ type Query {
   phoneProcurementInfo: PhoneProcurementInfoType!
   availablePhoneNumbers(input: ListAvailablePhoneNumbersInput!): [AvailablePhoneNumberType!]!
   tenantPhoneNumber(tenantId: String!): TenantPhoneNumberType
+  pendingBindings(tenantId: String!): [ContactBindingType!]!
   csrfToken: CsrfTokenType!
 }
 
@@ -557,6 +574,7 @@ type Mutation {
   updateUserStatus(input: UpdateUserStatusType!): UserSummaryType!
   updateUserRole(input: UpdateUserRoleType!): UserSummaryType!
   removeUser(input: GetUserType!): SuccessResponseType!
+  activatePendingUser(userId: String!): UserSummaryType!
   accept2fa: AcceptType!
   reject2fa: StatusType!
   adaptiveLogin: AcceptAdaptiveLoginType!
@@ -617,6 +635,9 @@ type Mutation {
   purchasePhoneNumber(input: PurchasePhoneNumberInput!): PendingPhonePurchaseType!
   attachPhoneToTenant(input: AttachPhoneToTenantInput!): PendingPhonePurchaseType!
   releasePendingPurchase(pendingId: String!): Boolean!
+  requestSignalBinding(input: RequestOperatorBindingInput!): ContactBindingType!
+  requestHouseholdSignalBinding(input: RequestHouseholdBindingInput!): ContactBindingType!
+  revokeBinding(id: String!): ContactBindingType!
 }
 
 input RegisterInput {
@@ -918,4 +939,17 @@ input PurchasePhoneNumberInput {
 input AttachPhoneToTenantInput {
   pendingId: String!
   tenantId: String!
+}
+
+input RequestOperatorBindingInput {
+  tenantId: String!
+  phoneE164: String!
+  name: String
+  email: String
+}
+
+input RequestHouseholdBindingInput {
+  phoneE164: String!
+  name: String
+  email: String
 }

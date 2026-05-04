@@ -16,6 +16,7 @@ import { PlatformConfigModule } from './platform-config/platform-config.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
 import { PhoneProcurementModule } from './phone-procurement/phone-procurement.module';
 import { SignalVerificationModule } from './signal-verification/signal-verification.module';
+import { ContactBindingModule } from './contact-binding/contact-binding.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { SignalVerificationModule } from './signal-verification/signal-verificat
     SignalVerificationModule,
     OnboardingModule,
     PhoneProcurementModule,
+    ContactBindingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

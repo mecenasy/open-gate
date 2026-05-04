@@ -5,6 +5,7 @@ import { SignalMessage } from '../../../types/types';
 import { MessageEvent } from '../../event/message.event';
 import { Platform } from '../../../types/platform';
 import { PlatformConfigService, SignalCredentials } from '../../../platform-config/platform-config.service';
+import { BindingTokenDetectorService } from '../../../contact-binding/binding-token-detector.service';
 
 interface TenantConnection {
   tenantId: string;
@@ -36,6 +37,7 @@ export class SignalBridgeManager implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly eventBus: EventBus,
     private readonly platformConfigService: PlatformConfigService,
+    private readonly bindingDetector: BindingTokenDetectorService,
   ) {}
 
   async onModuleInit() {
@@ -139,7 +141,7 @@ export class SignalBridgeManager implements OnModuleInit, OnModuleDestroy {
 
     const encodedAccount = encodeURIComponent(conn.account);
     const url = `${conn.apiUrl.replace(/^http/, 'ws')}/v1/receive/${encodedAccount}`;
-    console.log("🚀 ~ SignalBridgeManager ~ connect ~ url:", url)
+    console.log('🚀 ~ SignalBridgeManager ~ connect ~ url:', url);
 
     conn.ws = new WebSocket(url);
 
@@ -149,15 +151,10 @@ export class SignalBridgeManager implements OnModuleInit, OnModuleDestroy {
     });
 
     conn.ws.on('message', (data) => {
-      console.log("🚀 ~ SignalBridgeManager ~ connect ~ data:", data)
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-base-to-string
-        const msg = JSON.parse(data.toString()) as SignalMessage;
-        if (!msg.envelope?.dataMessage || msg.envelope.dataMessage?.groupInfo) return;
-        this.eventBus.publish(new MessageEvent(msg, Platform.Signal, conn.tenantId));
-      } catch (err) {
-        this.logger.error(`Failed to parse Signal message [tenant=${conn.tenantId}]`, err);
-      }
+      console.log('🚀 ~ SignalBridgeManager ~ connect ~ data:', data);
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      const raw = data.toString();
+      void this.handleIncomingMessage(conn.tenantId, raw);
     });
 
     conn.ws.on('ping', () => conn.ws?.pong());
@@ -174,5 +171,19 @@ export class SignalBridgeManager implements OnModuleInit, OnModuleDestroy {
         this.connect(conn);
       }, conn.reconnectDelay);
     });
+  }
+
+  private async handleIncomingMessage(tenantId: string, raw: string): Promise<void> {
+    try {
+      const msg = JSON.parse(raw) as SignalMessage;
+      if (!msg.envelope?.dataMessage || msg.envelope.dataMessage?.groupInfo) return;
+      // Binding detector runs first so the verification reply (or token
+      // echo) doesn't leak into core-service as a regular chat message.
+      const handled = await this.bindingDetector.detect(msg, tenantId);
+      if (handled) return;
+      this.eventBus.publish(new MessageEvent(msg, Platform.Signal, tenantId));
+    } catch (err) {
+      this.logger.error(`Failed to handle Signal message [tenant=${tenantId}]: ${(err as Error).message}`);
+    }
   }
 }

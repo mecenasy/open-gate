@@ -36,6 +36,20 @@ export interface SignalDataMessage {
   viewOnce?: boolean;
   attachments?: SignalAttachment[];
   groupInfo?: GroupInfo; // Obecność tego pola oznacza, że wiadomość pochodzi z grupy
+  quote?: SignalQuote;
+}
+
+/**
+ * Cytat innej wiadomości (Reply w Signalu). `id` to timestamp wiadomości
+ * cytowanej — używany przez detector bindingu do dopasowania
+ * outbound_message_id zapisanego przy wysłaniu invite.
+ */
+export interface SignalQuote {
+  id: number;
+  author?: string;
+  authorUuid?: string;
+  authorNumber?: string;
+  text?: string;
 }
 
 interface GroupInfo {
